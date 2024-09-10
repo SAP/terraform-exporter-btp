@@ -80,10 +80,10 @@ Valid resources are:
 
 ### Generate markdown documentation
 
-We can generate the markdown documentation via the following command:
+We can generate the markdown documentation via the make file:
 
 ```bash
-go run main.go gendoc
+make docs
 ```
 
 ## Support, Feedback, Contributing
