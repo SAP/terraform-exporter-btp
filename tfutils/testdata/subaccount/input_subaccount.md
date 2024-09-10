@@ -27,7 +27,7 @@ __Further documentation:__
 - `beta_enabled` (Boolean) Shows whether the subaccount can use beta services and applications.
 - `description` (String) A description of the subaccount for customer-facing UIs.
 - `labels` (Map of Set of String) The set of words or phrases assigned to the subaccount.
-- `parent_id` (String) The ID of the subaccount’s parent entity. If the subaccount is located directly in the global account (not in a directory), then this is the ID of the global account.
+- `parent_id` (String) The ID of the subaccount's parent entity. If the subaccount is located directly in the global account (not in a directory), then this is the ID of the global account.
 - `usage` (String) Shows whether the subaccount is used for production purposes. This flag can help your cloud operator to take appropriate action when handling incidents that are related to mission-critical accounts in production systems. Do not apply for subaccounts that are used for non-productive purposes, such as development, testing, and demos. Applying this setting this does not modify the subaccount. Possible values are:
 
   | value | description |
