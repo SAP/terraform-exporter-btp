@@ -28,12 +28,12 @@ __Further documentation:__
 - `description` (String) A description of the subaccount for customer-facing UIs.
 - `labels` (Map of Set of String) The set of words or phrases assigned to the subaccount.
 - `parent_id` (String) The ID of the subaccount’s parent entity. If the subaccount is located directly in the global account (not in a directory), then this is the ID of the global account.
-- `usage` (String) Shows whether the subaccount is used for production purposes. This flag can help your cloud operator to take appropriate action when handling incidents that are related to mission-critical accounts in production systems. Do not apply for subaccounts that are used for nonproduction purposes, such as development, testing, and demos. Applying this setting this does not modify the subaccount. Possible values are: 
+- `usage` (String) Shows whether the subaccount is used for production purposes. This flag can help your cloud operator to take appropriate action when handling incidents that are related to mission-critical accounts in production systems. Do not apply for subaccounts that are used for non-productive purposes, such as development, testing, and demos. Applying this setting this does not modify the subaccount. Possible values are:
 
-  | value | description | 
-  | --- | --- | 
-  | `UNSET` | Global account or subaccount admin has not set the production-relevancy flag (default value). | 
-  | `NOT_USED_FOR_PRODUCTION` | The subaccount is not used for production purposes. | 
+  | value | description |
+  | --- | --- |
+  | `UNSET` | Global account or subaccount admin has not set the production-relevancy flag (default value). |
+  | `NOT_USED_FOR_PRODUCTION` | The subaccount is not used for production purposes. |
   | `USED_FOR_PRODUCTION` | The subaccount is used for production purposes. |
 
 ### Read-Only
@@ -43,32 +43,32 @@ __Further documentation:__
 - `id` (String) The ID of the subaccount.
 - `last_modified` (String) The date and time when the resource was last modified in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) format.
 - `parent_features` (Set of String) The features of parent entity of the subaccount.
-- `state` (String) The current state of the subaccount. Possible values are: 
+- `state` (String) The current state of the subaccount. Possible values are:
 
-  | state | description | 
-  | --- | --- | 
-  | `OK` | The CRUD operation or series of operations completed successfully. | 
-  | `STARTED` | CRUD operation on the subaccount has started. | 
-  | `CANCELED` | The operation or processing was canceled by the operator. | 
-  | `PROCESSING` | A series of operations related to the subaccount are in progress. | 
-  | `PROCESSING_FAILED` | The processing operations failed. | 
-  | `CREATING` | Creating the subaccount is in progress. | 
-  | `CREATION_FAILED` | The creation operation failed, and the subaccount was not created or was created but cannot be used. | 
-  | `UPDATING` | Updating the subaccount is in progress. | 
-  | `UPDATE_FAILED` | The update operation failed, and the subaccount was not updated. | 
-  | `UPDATE_DIRECTORY_TYPE_FAILED` | The update of the directory type failed. | 
-  | `UPDATE_ACCOUNT_TYPE_FAILED` | The update of the account type failed. | 
-  | `DELETING` | Deleting the subaccount is in progress. | 
-  | `DELETION_FAILED` | The deletion of the subaccount failed, and the subaccount was not deleted. | 
-  | `MOVING` | Moving the subaccount is in progress. | 
-  | `MOVE_FAILED` | The moving of the subaccount failed. | 
-  | `MOVING_TO_OTHER_GA` | Moving the subaccount to another global account is in progress. | 
-  | `MOVE_TO_OTHER_GA_FAILED` | Moving the subaccount to another global account failed. | 
-  | `PENDING_REVIEW` | The processing operation has been stopped for reviewing and can be restarted by the operator. | 
-  | `MIGRATING` | Migrating the subaccount from Neo to Cloud Foundry. | 
-  | `MIGRATED` | The migration of the subaccount completed. | 
-  | `MIGRATION_FAILED` | The migration of the subaccount failed and the subaccount was not migrated. | 
-  | `ROLLBACK_MIGRATION_PROCESSING` | The migration of the subaccount was rolled back and the subaccount is not migrated. | 
+  | state | description |
+  | --- | --- |
+  | `OK` | The CRUD operation or series of operations completed successfully. |
+  | `STARTED` | CRUD operation on the subaccount has started. |
+  | `CANCELED` | The operation or processing was canceled by the operator. |
+  | `PROCESSING` | A series of operations related to the subaccount are in progress. |
+  | `PROCESSING_FAILED` | The processing operations failed. |
+  | `CREATING` | Creating the subaccount is in progress. |
+  | `CREATION_FAILED` | The creation operation failed, and the subaccount was not created or was created but cannot be used. |
+  | `UPDATING` | Updating the subaccount is in progress. |
+  | `UPDATE_FAILED` | The update operation failed, and the subaccount was not updated. |
+  | `UPDATE_DIRECTORY_TYPE_FAILED` | The update of the directory type failed. |
+  | `UPDATE_ACCOUNT_TYPE_FAILED` | The update of the account type failed. |
+  | `DELETING` | Deleting the subaccount is in progress. |
+  | `DELETION_FAILED` | The deletion of the subaccount failed, and the subaccount was not deleted. |
+  | `MOVING` | Moving the subaccount is in progress. |
+  | `MOVE_FAILED` | The moving of the subaccount failed. |
+  | `MOVING_TO_OTHER_GA` | Moving the subaccount to another global account is in progress. |
+  | `MOVE_TO_OTHER_GA_FAILED` | Moving the subaccount to another global account failed. |
+  | `PENDING_REVIEW` | The processing operation has been stopped for reviewing and can be restarted by the operator. |
+  | `MIGRATING` | Migrating the subaccount from Neo to Cloud Foundry. |
+  | `MIGRATED` | The migration of the subaccount completed. |
+  | `MIGRATION_FAILED` | The migration of the subaccount failed and the subaccount was not migrated. |
+  | `ROLLBACK_MIGRATION_PROCESSING` | The migration of the subaccount was rolled back and the subaccount is not migrated. |
   | `SUSPENSION_FAILED` | The suspension operations failed. |
 
 ## Import

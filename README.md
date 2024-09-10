@@ -11,22 +11,22 @@ The *Terraform Exporter for SAP BTP* is a tool that helps export resources from 
 
 ### Local build
 
-If you want to build the binary from scratch, folow these steps:
+If you want to build the binary from scratch, follow these steps:
 
-1. Open this repo inside VS Code Editor
-1. We have setup a devcontainer, so open the repo using devcontainer.
-1. Build the binary: From the terminal in vscode run `make build` & `make install`
+1. Open this repository inside VS Code Editor
+1. We have setup a devcontainer, so open the repository using devcontainer.
+1. Build the binary: From the terminal in VS Code run `make build` & `make install`
 1. A file (binary) `btptfexporter` will be found in the default binary path of your Go installation.
 1. Make it executable: `chomd +x btptfexporter`.
 
-### Prebuilt binary
+### Pre-built binary
 
 Please go to the releases section of this repository and download the binary for your system.
 
 ## Usage
 
 1. [Download](https://github.tools.sap/BTP-Terraform/btptfexporter/releases/tag/v0.0.3-poc) or build the binary to a local path/folder.
-1. Create the following required environment varaibles: `BTP_USERNAME`, `BTP_PASSWORD`, `BTP_GLOBALACCOUNT`
+1. Create the following required environment variables: `BTP_USERNAME`, `BTP_PASSWORD`, `BTP_GLOBALACCOUNT`
 Optionally, you can set the following parameters: `BTP_CLIENT_SERVER_URL`, `BTP_IDP`, `BTP_TLS_CLIENT_CERTIFICATE`, `BTP_TLS_CLIENT_KEY`, `BTP_TLS_IDP_URL`. Please refer the [BTP Terraform Provider documentation](https://registry.terraform.io/providers/SAP/btp/latest/docs) to learn more about these parameters.
 
     > **Note** - You can also define a `.env` file with the content of the parameters and export this file via `export $(xargs <.env)`.
