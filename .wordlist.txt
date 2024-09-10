@@ -10,11 +10,14 @@ html
 https
 Github
 github
-GoLang
+Golang
 md
+Pre
 README
 subaccount
 Subaccount
+subaccounts
+subaccount’s
 subcommands
 Terraform
 terraform
