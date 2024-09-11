@@ -28,12 +28,12 @@ If you want to build the binary from scratch, follow these steps:
 
 1. Open this repository inside VS Code Editor
 1. We have setup a devcontainer, so reopen the repository in the devcontainer.
-1. Open a terminal in VS Code and build the binary by running
+1. Open a terminal in VS Code and install the binary by running
 
    ```bash
     make build
-    make install
     ```
+   This will implicitly trigger a build of the source. If you want to build without install, execute `make install`.
 
 1. The system will store the binary as `btptfexporter` in the default binary path of your Go installation `$GOPATH/bin`.
 
