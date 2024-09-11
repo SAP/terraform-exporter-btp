@@ -8,7 +8,7 @@ import (
 var exportEnvironmentInstancesCmd = &cobra.Command{
 	Use:   "environment-instances",
 	Short: "export environment instance of a subaccount",
-	Long:  `exportEnvironmentInstance will export all the environment instance of the given subaccount and generate resource configuration for it`,
+	Long:  `export environment-instance will export all the environment instance of the given subaccount and generate resource configuration for it`,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")

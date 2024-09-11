@@ -4,7 +4,7 @@ export subscriptions of a subaccount
 
 ### Synopsis
 
-exportSubaccountSubscriptions will export subscriptions of the given subaccount and generate resource configuration for it
+export subscriptions will export subscriptions of the given subaccount and generate resource configuration for it
 
 ```
 btptfexporter resource subscriptions [flags]

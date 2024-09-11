@@ -7,8 +7,8 @@ Export specific btp resources from a subaccount
 
 This command is used when you need to export specific resources.
 By default, it will generate the <resource_name>_import.tf (import file) and resources.tf (resource file) files.
-The resources.tf file can be renamed by using the --resourceFileName.
-The command will fail if a resource file  file already exists
+The resources.tf file can be renamed by using the flag --resourceFileName.
+The command will fail if a resource file already exists
 
 ```
 btptfexporter resource [flags]

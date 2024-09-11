@@ -20,6 +20,7 @@ md
 Pre
 powershell
 README
+resourceFileName
 spf
 subaccount
 Subaccount
