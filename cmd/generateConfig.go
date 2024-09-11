@@ -46,6 +46,11 @@ func generateConfig(resourceFileName string, configFolder string) error {
 		return err
 	}
 
+	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
+		fmt.Println("Error running Terraform fmt:", err)
+		return err
+	}
+
 	fmt.Println("Terraform config successfully created")
 	cleanup()
 	return nil
@@ -77,7 +82,7 @@ func configureProvider() {
 	tlsClientKey := os.Getenv("BTP_TLS_CLIENT_KEY")
 	tlsIdpURL := os.Getenv("BTP_TLS_IDP_URL")
 
-	providerContent := "terraform {\nrequired_providers {\nbtp = {\nsource  = \"SAP/btp\"\nversion = \"1.4.0\"\n}\n}\n}\n\nprovider \"btp\" {\n"
+	providerContent := "terraform {\nrequired_providers {\nbtp = {\nsource  = \"SAP/btp\"\nversion = \"" + BtpProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"btp\" {\n"
 
 	if !(len(strings.TrimSpace(username)) != 0 && len(strings.TrimSpace(password)) != 0) {
 		if len(strings.TrimSpace(enableSSO)) == 0 {
