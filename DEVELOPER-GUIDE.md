@@ -12,9 +12,12 @@ Here is an example on how to debug the command `btptfexporter resource all`:
 
 ![]()
 
-1. Adjust the `launch.json` configuration to consider your environment variable values. The default is a `.env` file in the root of the repository:
+1. Adjust the `launch.json` configuration to consider your environment variable values. The default are single variables using SSO in the root of the repository:
 
 ![]()
+
+> [!WARNING]
+> The environment values will be displayed as clear text in the debug console. If you are using your password as environment paramater this will become visible when you start debugging. We therefore highly recommend to use the SSO option.
 
 1. Open the debug pane in VS Code:
 
