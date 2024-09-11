@@ -31,19 +31,23 @@ If you want to build the binary from scratch, follow these steps:
 1. Open a terminal in VS Code and install the binary by running
 
    ```bash
-    make build
+    make install
     ```
-   This will implicitly trigger a build of the source. If you want to build without install, execute `make install`.
+   This will implicitly trigger a build of the source. If you want to build *without* install, execute `make build`.
 
-1. The system will store the binary as `btptfexporter` in the default binary path of your Go installation `$GOPATH/bin`.
+1. The system will store the binary as `btptfexporter` (`btptfexporter.exe` in case of Windows) in the default binary path of your Go installation `$GOPATH/bin`.
 
    > **Note** - You find the value of the GOPATH via `go env GOPATH`
 
-1. You must make the executable executable via the command:
+#### Troubleshooting
 
-   ```bash
-   chomd +x btptfexporter
-   ```
+##### Binary not executable (MacOS or Linux)
+
+In case you get an error that the binary is not executable, naviigate to the location of the binary and execute the following command:
+
+```bash
+chomd +x btptfexporter
+```
 
 ## Usage
 
@@ -52,14 +56,13 @@ After executing the [setup](#setup) of the CLI you must set some required enviro
 1. Set the environment variable `BTP_GLOBALACCOUNT` which specifies the *subdomain* of your SAP BTP global account.
 1. Depending on the authentication flow, set the following environment variables:
 
-   - Basic Authentication: set the environment variable    `BTP_USERNAME` and `BTP_PASSWORD`
+   - Basic Authentication: set the environment variable `BTP_USERNAME` and `BTP_PASSWORD`
    - X509 Authentication: set the environment variables `BTP_TLS_CLIENT_CERTIFICATE`, `BTP_TLS_CLIENT_KEY`, `BTP_TLS_IDP_URL`
 
 1. In addition you can set the following optional parameters as environment variables, depending on your requirements:
 
    - Specify a custom IdP for the authentication via `BTP_IDP`
    - Specify a URL of the BTP CLI server (SAP internal only) via `BTP_CLI_SERVER_URL`
-
 
 The parameters correspond to the Terraform provider configuration options you find in the [BTP Terraform Provider documentation](https://registry.terraform.io/providers/SAP/btp/latest/docs)
 
@@ -97,14 +100,14 @@ How to set the parameters depends on your setup and is OS-specific:
       BTP_PASSWORD='<MY SAP BTP PASSWORD>'
       BTP_GLOBALACCOUNT='<MY SAP BTP GLOBAL ACCOUNT SUBDOMAIN>'
       ```
+
     - Execute the following command in a terminal:
 
        ```bash
        export $(xargs <.env)`
        ```
-    > **Note** - There is no predefined fucntionality in PowerShell to achieve the same. A custom script would be needed.
 
-1. use the `--help` flag to know more.
+    > **Note** - There is no predefined fucntionality in PowerShell to achieve the same. A custom script would be needed.
 
 ## Commands
 
