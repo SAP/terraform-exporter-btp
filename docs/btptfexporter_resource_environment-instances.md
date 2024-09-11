@@ -4,7 +4,7 @@ export environment instance of a subaccount
 
 ### Synopsis
 
-exportEnvironmentInstance will export all the environment instance of the given subaccount and gererate resource configuration for it
+exportEnvironmentInstance will export all the environment instance of the given subaccount and generate resource configuration for it
 
 ```
 btptfexporter resource environment-instances [flags]

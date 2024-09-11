@@ -4,7 +4,7 @@ export entitlements of a subaccount
 
 ### Synopsis
 
-exportSubaccountEntitlements will export all the entitlements of the given subaccount and gererate resource configuration for it
+exportSubaccountEntitlements will export all the entitlements of the given subaccount and generate resource configuration for it
 
 ```
 btptfexporter resource entitlements [flags]

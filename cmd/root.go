@@ -48,13 +48,6 @@ var docCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// remove the file docs/btptfexporter_gendoc.md
-		err = os.Remove(docsDir + "/btptfexporter_gendoc.md")
-		if err != nil {
-			fmt.Println("Error removing gendoc documentation:", err)
-			os.Exit(1)
-		}
-
 		fmt.Println("Documentation generated successfully in", docsDir)
 
 	},

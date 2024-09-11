@@ -4,7 +4,7 @@ export trust configurations of a subaccount
 
 ### Synopsis
 
-exportTrustConfigurations will export trust configurations of the given subaccount and gererate resource configuration for it
+exportTrustConfigurations will export trust configurations of the given subaccount and generate resource configuration for it
 
 ```
 btptfexporter resource trust-configurations [flags]
