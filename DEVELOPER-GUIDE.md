@@ -12,6 +12,8 @@ Here is an example on how to debug the command `btptfexporter resource all`:
 
 ![]()
 
+1. Adjust the launch.json configuration to consider your 
+
 1. Open the debug pane in VS Code.
 
 ![]()

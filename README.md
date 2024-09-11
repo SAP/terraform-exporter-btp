@@ -63,6 +63,7 @@ After executing the [setup](#setup) of the CLI you must set some required enviro
 
    - Specify a custom IdP for the authentication via `BTP_IDP`
    - Specify a URL of the BTP CLI server (SAP internal only) via `BTP_CLI_SERVER_URL`
+   - Specify the login using SSO via `BTP_ENABLE_SSO` (true/false)
 
 The parameters correspond to the Terraform provider configuration options you find in the [BTP Terraform Provider documentation](https://registry.terraform.io/providers/SAP/btp/latest/docs)
 
