@@ -52,7 +52,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
           cache: true
-      - run: ggo run main.go gendoc
+      - run: go run main.go gendoc
       - name: git diff
         run: |
           git diff --compact-summary --exit-code || \
