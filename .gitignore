@@ -74,3 +74,13 @@ terraform.rc
 ###
 # enf of gitignore Terraform
 ###
+
+###
+# gitignore devcontainer
+###
+
+devcontainer.env
+
+###
+# enf of gitignore devcontainer
+###

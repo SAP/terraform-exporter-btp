@@ -70,7 +70,7 @@ func configureProvider() {
 	username := os.Getenv("BTP_USERNAME")
 	password := os.Getenv("BTP_PASSWORD")
 	enableSSO := os.Getenv("BTP_ENABLE_SSO")
-	clientServerURL := os.Getenv("BTP_CLIENT_SERVER_URL")
+	cliServerUrl := os.Getenv("BTP_CLI_SERVER_URL")
 	globalAccount := os.Getenv("BTP_GLOBALACCOUNT")
 	idp := os.Getenv("BTP_IDP")
 	tlsClientCertificate := os.Getenv("BTP_TLS_CLIENT_CERTIFICATE")
@@ -93,8 +93,8 @@ func configureProvider() {
 		providerContent = providerContent + "globalaccount = \"" + globalAccount + "\"\n"
 	}
 
-	if len(strings.TrimSpace(clientServerURL)) != 0 {
-		providerContent = providerContent + "cli_server_url=\"" + clientServerURL + "\"\n"
+	if len(strings.TrimSpace(cliServerUrl)) != 0 {
+		providerContent = providerContent + "cli_server_url=\"" + cliServerUrl + "\"\n"
 	}
 
 	if len(strings.TrimSpace(idp)) != 0 {

@@ -18,6 +18,7 @@ JSON
 macOS
 md
 Pre
+PowerShell
 powershell
 README
 resourceFileName
