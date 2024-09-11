@@ -104,7 +104,7 @@ How to set the parameters depends on your setup and is OS-specific:
     - Execute the following command in a terminal:
 
        ```bash
-       export $(xargs <.env)`
+       export $(xargs <.env)
        ```
 
     > **Note** - There is no predefined fucntionality in PowerShell to achieve the same. A custom script would be needed.
