@@ -1,4 +1,5 @@
 autocompletion
+breakpoint
 BTP
 btp
 btptfexporter
@@ -26,6 +27,8 @@ powershell
 README
 resourceFileName
 spf
+SSO
+sso
 subaccount
 Subaccount
 subaccounts

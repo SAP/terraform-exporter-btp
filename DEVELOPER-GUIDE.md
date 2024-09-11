@@ -4,7 +4,7 @@ TBD
 
 ## Debug the CLI
 
-We provide a preconfigured configuration for debugging the btptfexporter commands in VS Code. The configuration is available in the `.vscode` directory as `launch.json`
+We provide a configuration for debugging the btptfexporter commands in VS Code. The configuration is available in the `.vscode` directory as `launch.json`
 
 Here is an example on how to debug the command `btptfexporter resource all`:
 
@@ -31,7 +31,7 @@ Here is an example on how to debug the command `btptfexporter resource all`:
 
    <img src="assets/devguide-pics/debug3.png" alt="Run debug configuration" width="600px">
 
-1. VS Code will prompt you for the command via the command palette. It defaults to `resource all -s`. Enter the command and the parameters you want to use for the command execution. In our case we add a subaccount ID and confiorm by pressing `Enter`:
+1. VS Code will prompt you for the command via the command palette. It defaults to `resource all -s`. Enter the command and the parameters you want to use for the command execution. In our case we add a subaccount ID and confirm by pressing `Enter`:
 
    <img src="assets/devguide-pics/debug4.png" alt="Prompt for parameters in debug configuration" width="600px">
 

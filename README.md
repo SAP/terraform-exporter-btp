@@ -44,7 +44,7 @@ If you want to build the binary from scratch, follow these steps:
 
 ##### Binary not executable (MacOS or Linux)
 
-In case you get an error that the binary is not executable, naviigate to the location of the binary and execute the following command:
+In case you get an error that the binary is not executable, navigate to the location of the binary and execute the following command:
 
 ```bash
 chomd +x btptfexporter
