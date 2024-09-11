@@ -53,7 +53,7 @@ After executing the [setup](#setup) of the CLI you must set some required enviro
 1. Depending on the authentication flow, set the following environment variables:
 
    - Basic Authentication: set the environment variable    `BTP_USERNAME` and `BTP_PASSWORD`
-   - X509 Authentication: set the envionment variables `BTP_TLS_CLIENT_CERTIFICATE`, `BTP_TLS_CLIENT_KEY`, `BTP_TLS_IDP_URL`
+   - X509 Authentication: set the environment variables `BTP_TLS_CLIENT_CERTIFICATE`, `BTP_TLS_CLIENT_KEY`, `BTP_TLS_IDP_URL`
 
 1. In addition you can set the following optional parameters as environment variables, depending on your requirements:
 
@@ -86,7 +86,7 @@ How to set the parameters depends on your setup and is OS-specific:
       BTP_PASSWORD='<MY SAP BTP PASSWORD>'
       BTP_GLOBALACCOUNT='<MY SAP BTP GLOBAL ACCOUNT SUBDOMAIN>'
       ```
-  - Start the devcontainer variant `Terraform exporter for SAP BTP - Development (with env file)`. The environment variables defined in the .`devcontainer.env` filewill be automatically injected.
+  - Start the devcontainer variant `Terraform exporter for SAP BTP - Development (with env file)`. The environment variables defined in the .`devcontainer.env` file will be automatically injected.
 
 - Alternative via `.env` file (available on MacOS and Linux only):
    - Create a file `.env` in the root of the project

@@ -3,6 +3,7 @@ BTP
 btp
 btptfexporter
 CLA
+CLI
 config
 DCO
 dependabot
@@ -13,11 +14,13 @@ github
 Golang
 html
 https
+IdP
 json
 JSON
 macOS
 md
 Pre
+pre
 PowerShell
 powershell
 README
