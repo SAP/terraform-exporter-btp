@@ -67,7 +67,7 @@ btptfexporter generate-resources-list [flags]
 
 Example:
 
-btptfexporter generate-resources-list --resources=entitlements,subscriptions --subaccount=<subacount_id>
+btptfexporter generate-resources-list --resources=entitlements,subscriptions --subaccount=<subaccount_id>
 ```
 
 Valid resources are:

@@ -10,7 +10,7 @@ var exportAllCmd = &cobra.Command{
 	Short: "export all resources of a subaccount",
 	Long: `export all will export all the resources from a subaccount. Currently only few resources are supported.
 
-exportAll is a single command to export btp_subaccount, btp_subaccount_entitlements, btp_subaccount_instances, btp_subaccount_subscriptions,
+export all is a single command to export btp_subaccount, btp_subaccount_entitlements, btp_subaccount_instances, btp_subaccount_subscriptions,
 btp_subaccount_trust_configurations `,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")

@@ -12,7 +12,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "btptfexporter",
 	Short: "Terraform exporter for BTP",
-	Long: `btptfexporter is a utility to generate configuration for existing btp resources that are created manually and not managed by terraform. btptfexporter help to generate configuration which then can be used by terrraform to bring that resorce under terraform state.
+	Long: `btptfexporter is a utility to generate configuration for existing btp resources that are created manually and not managed by terraform. btptfexporter help to generate configuration which then can be used by terrraform to bring that resource under terraform state.
 	`,
 }
 
@@ -32,8 +32,8 @@ func init() {
 }
 
 var docCmd = &cobra.Command{
-	Use:   "gendoc",
-	Short: "Generate markdown documentation",
+	Use:    "gendoc",
+	Short:  "Generate markdown documentation",
 	Hidden: true, // Hide the command from the official CLI
 	Run: func(cmd *cobra.Command, args []string) {
 		docsDir := "./docs"
@@ -47,6 +47,15 @@ var docCmd = &cobra.Command{
 			fmt.Println("Error generating documentation:", err)
 			os.Exit(1)
 		}
+
+		// remove the file docs/btptfexporter_gendoc.md
+		err = os.Remove(docsDir + "/btptfexporter_gendoc.md")
+		if err != nil {
+			fmt.Println("Error removing gendoc documentation:", err)
+			os.Exit(1)
+		}
+
 		fmt.Println("Documentation generated successfully in", docsDir)
+
 	},
 }

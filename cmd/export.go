@@ -15,9 +15,9 @@ var exportCmd = &cobra.Command{
 	Short: "Export specific btp resources from a subaccount",
 	Long: `
 This command is used when you need to export specific resources.
-By default,tt will generate the <resource_name>_import.tf (import file) and resources.tf (resource file) files.
+By default, it will generate the <resource_name>_import.tf (import file) and resources.tf (resource file) files.
 The resources.tf file can be renamed by using the --resourceFileName.
-The command will fail if a reource file  file already exists`,
+The command will fail if a resource file  file already exists`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("Invalid command\n\nUse 'btptfexporter export --help' for syntax instructions.\n\nERROR")
 		//fmt.Println("please provide the resource to be imported with this commnad. Supported resources are subaccount, entilements, environment-instances, subscriptions, trust-configurations")
