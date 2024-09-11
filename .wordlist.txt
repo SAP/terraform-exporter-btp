@@ -1,4 +1,5 @@
 autocompletion
+bash
 BTP
 btp
 btptfexporter
@@ -18,6 +19,7 @@ JSON
 macOS
 md
 Pre
+PowerShell
 powershell
 README
 resourceFileName

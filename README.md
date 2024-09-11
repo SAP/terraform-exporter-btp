@@ -7,84 +7,112 @@
 
 The *Terraform Exporter for SAP BTP* is a tool that helps export resources from a BTP Global Account.  It can generate Terraform scripts for the resources and import those resources into a Terraform state file.
 
-## Requirements and Setup
+## Setup
+
+You have two options to setup the CLI:
+
+1. Local build
+1. Download the pre-built binary
+
+The following sections describe the details for the two options.
+
+
+### Pre-built binary
+
+The easiest way to get the binary is to download from the [releases section](https://github.com/SAP/terraform-exporter-btp/releases) of this repository. Select the version you want to use and download the binary that fits your operating system from the `assets` of the release. We recommend using the latest version.
+
 
 ### Local build
 
 If you want to build the binary from scratch, follow these steps:
 
 1. Open this repository inside VS Code Editor
-1. We have setup a devcontainer, so open the repository using devcontainer.
-1. Build the binary: From the terminal in VS Code run `make build` & `make install`
-1. A file (binary) `btptfexporter` will be found in the default binary path of your Go installation.
-1. Make it executable: `chomd +x btptfexporter`.
+1. We have setup a devcontainer, so reopen the repository in the devcontainer.
+1. Open a terminal in VS Code and build the binary by running
 
-### Pre-built binary
+   ```bash
+    make build
+    make install
+    ```
 
-Please go to the releases section of this repository and download the binary for your system.
+1. The system will store the binary as `btptfexporter` in the default binary path of your Go installation `$GOPATH/bin`.
+
+   > **Note** - You find the value of the GOPATH via `go env GOPATH`
+
+1. You must make the executable executable via the command:
+
+   ```bash
+   chomd +x btptfexporter
+   ```
 
 ## Usage
 
-1. [Download](https://github.tools.sap/BTP-Terraform/btptfexporter/releases/tag/v0.0.3-poc) or build the binary to a local path/folder.
-1. Create the following required environment variables: `BTP_USERNAME`, `BTP_PASSWORD`, `BTP_GLOBALACCOUNT`
-Optionally, you can set the following parameters: `BTP_CLIENT_SERVER_URL`, `BTP_IDP`, `BTP_TLS_CLIENT_CERTIFICATE`, `BTP_TLS_CLIENT_KEY`, `BTP_TLS_IDP_URL`. Please refer the [BTP Terraform Provider documentation](https://registry.terraform.io/providers/SAP/btp/latest/docs) to learn more about these parameters.
+After executing the [setup](#setup) of the CLI you must set some required environment variables needed for authentication.
 
-    > **Note** - You can also define a `.env` file with the content of the parameters and export this file via `export $(xargs <.env)`.
+1. Set the environment variable `BTP_GLOBALACCOUNT` which specifies the *subdomain* of your SAP BTP global account.
+1. Depending on the authentication flow, set the following environment variables:
+
+   - Basic Authentication: set the environment variable    `BTP_USERNAME` and `BTP_PASSWORD`
+   - X509 Authentication: set the envionment variables `BTP_TLS_CLIENT_CERTIFICATE`, `BTP_TLS_CLIENT_KEY`, `BTP_TLS_IDP_URL`
+
+1. In addition you can set the following optional parameters as environment variables, depending on your requirements:
+
+   - Specify a custom IdP for the authentication via `BTP_IDP`
+   - Specify a URL of the BTP CLI server (SAP internal only) via `BTP_CLI_SERVER_URL`
+
+
+The parameters correspond to the Terraform provider configuration options you find in the [BTP Terraform Provider documentation](https://registry.terraform.io/providers/SAP/btp/latest/docs)
+
+How to set the parameters depends on your setup and is OS-specific:
+
+- On Windows (example):
+
+   ```powershell
+   $env:BTP_USERNAME=<MY SAP BTP USERNAME>
+   ```
+
+- On MacOS and Linux (example):
+
+   ```bash
+   export BTP_USERNAME=<MY SAP BTP USERNAME>
+   ```
+
+- In a devcontainer:
+   - Create a file `devcontainer.env` in the `.devcontainer` directory
+   - Add the environment variables in the file. Here is an example:
+
+      ```txt
+      BTP_USERNAME='<MY SAP BTP USERNAME>'
+      BTP_PASSWORD='<MY SAP BTP PASSWORD>'
+      BTP_GLOBALACCOUNT='<MY SAP BTP GLOBAL ACCOUNT SUBDOMAIN>'
+      ```
+  - Start the devcontainer variant `Terraform exporter for SAP BTP - Development (with env file)`. The environment variables defined in the .`devcontainer.env` filewill be automatically injected.
+
+- Alternative via `.env` file (available on MacOS and Linux only):
+   - Create a file `.env` in the root of the project
+   - Add the environment variables in the file. Here is an example:
+
+      ```txt
+      BTP_USERNAME='<MY SAP BTP USERNAME>'
+      BTP_PASSWORD='<MY SAP BTP PASSWORD>'
+      BTP_GLOBALACCOUNT='<MY SAP BTP GLOBAL ACCOUNT SUBDOMAIN>'
+      ```
+    - Execute the following command in a terminal:
+
+       ```bash
+       export $(xargs <.env)`
+       ```
+    > **Note** - There is no predefined fucntionality in PowerShell to achieve the same. A custom script would be needed.
 
 1. use the `--help` flag to know more.
 
 ## Commands
 
-### resource : Export specific btp resources from a subaccount
+The CLI offers several commands for the export of Terraform configurations of SAP BTP. You find a comprehensive overview of the commands and the options in the [documentation](./docs/btptfexporter.md).
 
-Use this command to create terraform configuration for all the resources of a subaccount or specific resource using the subcommands
+## Developer Guide
 
-```bash
-btptfexporter resource [command]
-
-Example:
-
-btptfexporter resource all --subaccount <subaccount-id>
-
-Available Commands:
-
-  all                   export all resources of a subaccount
-  entitlements          export entitlements of a subaccount
-  environment-instances export environment instance of a subaccount
-  from-file             export resources from a json file.
-  subaccount            export subaccount
-  subscriptions         export subscriptions of a subaccount
-  trust-configurations  export trust configurations of a subaccount
-
-  ```
-
-### generate-resources-list  : Store the list of resources from btp subaccount into a json file
-
-Use this command to get the list of resources from a subaccont and store it in a json file.
-
-```bash
-btptfexporter generate-resources-list [flags]
-
-Example:
-
-btptfexporter generate-resources-list --resources=entitlements,subscriptions --subaccount=<subaccount_id>
-```
-
-Valid resources are:
-- subaccount
-- entitlements
-- subscriptions
-- environment-instances
-- trust-configurations
-
-
-### Generate markdown documentation
-
-We can generate the markdown documentation via the make file:
-
-```bash
-make docs
-```
+If you want to contribute to the code of the Terraform Exporter for SAP BTP, please check our [Contribution Guidelines](CONTRIBUTING.md). The technical setup and how to get started are described in the [Developer Guide](DEVELOPER-GUIDE.md)
 
 ## Support, Feedback, Contributing
 
