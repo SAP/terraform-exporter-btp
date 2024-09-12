@@ -14,6 +14,7 @@ var rootCmd = &cobra.Command{
 	Short: "Terraform exporter for BTP",
 	Long: `btptfexporter is a utility to generate configuration for existing btp resources that are created manually and not managed by terraform. btptfexporter help to generate configuration which then can be used by Terraform to bring that resource under terraform state.
 	`,
+	DisableAutoGenTag: true,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

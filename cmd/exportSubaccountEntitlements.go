@@ -6,9 +6,10 @@ import (
 
 // exportSubaccountEntitlementsCmd represents the exportSubaccountEntitlements command
 var exportSubaccountEntitlementsCmd = &cobra.Command{
-	Use:   "entitlements",
-	Short: "export entitlements of a subaccount",
-	Long:  `export entitlements will export all the entitlements of the given subaccount and generate resource configuration for it`,
+	Use:               "entitlements",
+	Short:             "export entitlements of a subaccount",
+	Long:              `export entitlements will export all the entitlements of the given subaccount and generate resource configuration for it`,
+	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")

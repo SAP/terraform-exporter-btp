@@ -13,6 +13,7 @@ var generateCmd = &cobra.Command{
 	Short: "export resources from a json file.",
 	Long: `Use this command to export resources from the json file that is generated using the get command.
 You can removes resource names from this config file, if you want to selectively import resources`,
+	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		subaccount, _ := cmd.Flags().GetString("subaccount")

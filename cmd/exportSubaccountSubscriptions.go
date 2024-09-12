@@ -6,9 +6,10 @@ import (
 
 // exportSubaccountSubscriptionCmd represents the exportSubaccountSubscription command
 var exportSubaccountSubscriptionsCmd = &cobra.Command{
-	Use:   "subscriptions",
-	Short: "export subscriptions of a subaccount",
-	Long:  `export subscriptions will export subscriptions of the given subaccount and generate resource configuration for it`,
+	Use:               "subscriptions",
+	Short:             "export subscriptions of a subaccount",
+	Long:              `export subscriptions will export subscriptions of the given subaccount and generate resource configuration for it`,
+	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")

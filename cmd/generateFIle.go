@@ -32,6 +32,7 @@ OR
 
 Mixing "all" with other resources will throw an error.
 `,
+	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		fileName, _ := cmd.Flags().GetString("json-out")

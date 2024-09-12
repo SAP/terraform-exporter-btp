@@ -6,9 +6,10 @@ import (
 
 // exportTrustConfigurationsCmd represents the exportTrustConfigurations command
 var exportTrustConfigurationsCmd = &cobra.Command{
-	Use:   "trust-configurations",
-	Short: "export trust configurations of a subaccount",
-	Long:  `export trust-configurations will export trust configurations of the given subaccount and generate resource configuration for it`,
+	Use:               "trust-configurations",
+	Short:             "export trust configurations of a subaccount",
+	Long:              `export trust-configurations will export trust configurations of the given subaccount and generate resource configuration for it`,
+	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
