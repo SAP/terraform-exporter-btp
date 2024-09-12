@@ -16,8 +16,8 @@ It will then store this list into a file.
 
 For example:
 
-btptfexporter generate-resources-list --resources=subaccount,entitlements -s <subaccount-id>
-btptfexporter generate-resources-list --resources=all -s <subaccount-id> -j <file-name.json>
+btptfexport generate-resources-list --resources=subaccount,entitlements -s <subaccount-id>
+btptfexport generate-resources-list --resources=all -s <subaccount-id> -j <file-name.json>
 
 Valid resources are:
 - subaccount

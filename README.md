@@ -35,7 +35,7 @@ If you want to build the binary from scratch, follow these steps:
     ```
    This will implicitly trigger a build of the source. If you want to build *without* install, execute `make build`.
 
-1. The system will store the binary as `btptfexporter` (`btptfexporter.exe` in case of Windows) in the default binary path of your Go installation `$GOPATH/bin`.
+1. The system will store the binary as `btptfexport` (`btptfexport.exe` in case of Windows) in the default binary path of your Go installation `$GOPATH/bin`.
 
    > [!TIP]
    > You find the value of the GOPATH via `go env GOPATH`
@@ -47,7 +47,7 @@ If you want to build the binary from scratch, follow these steps:
 In case you get an error that the binary is not executable, navigate to the location of the binary and execute the following command:
 
 ```bash
-chomd +x btptfexporter
+chomd +x btptfexport
 ```
 
 ## Usage

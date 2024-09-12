@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"btptfexporter/tfutils"
+	"btptfexport/tfutils"
 	"encoding/json"
 	"fmt"
 	"log"

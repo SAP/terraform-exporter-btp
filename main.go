@@ -1,6 +1,6 @@
 package main
 
-import "btptfexporter/cmd"
+import "btptfexport/cmd"
 
 func main() {
 	cmd.Execute()

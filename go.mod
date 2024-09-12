@@ -1,4 +1,4 @@
-module btptfexporter
+module btptfexport
 
 go 1.23.0
 
