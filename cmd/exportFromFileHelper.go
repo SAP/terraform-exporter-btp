@@ -102,7 +102,7 @@ func getTrustConfig(values []string, subaccountID string, configDir string) {
 		return
 	}
 
-	jsonBytes, err := GetTfStateData(TmpFolder)
+	jsonBytes, err := GetTfStateData(TmpFolder, SubaccountTrustConfigurationType)
 	if err != nil {
 		log.Fatalf("error json.Marshal: %s", err)
 		return
@@ -183,7 +183,7 @@ func getSubscriptionConfig(values []string, subaccountID string, configDir strin
 		return
 	}
 
-	jsonBytes, err := GetTfStateData(TmpFolder)
+	jsonBytes, err := GetTfStateData(TmpFolder, SubaccountSubscriptionType)
 	if err != nil {
 		log.Fatalf("error json.Marshal: %s", err)
 		return
@@ -265,7 +265,7 @@ func getEntitlementConfig(values []string, subaccountID string, configDir string
 		return
 	}
 
-	jsonBytes, err := GetTfStateData(TmpFolder)
+	jsonBytes, err := GetTfStateData(TmpFolder, SubaccountEntitlementType)
 	if err != nil {
 		log.Fatalf("error json.Marshal: %s", err)
 		return
@@ -352,7 +352,7 @@ func getEnvInstanceConfig(values []string, subaccountID string, configDir string
 		return
 	}
 
-	jsonBytes, err := GetTfStateData(TmpFolder)
+	jsonBytes, err := GetTfStateData(TmpFolder, EnvironmentInstanceType)
 	if err != nil {
 		log.Fatalf("error json.Marshal: %s", err)
 		return

@@ -11,8 +11,6 @@ import (
 	"strings"
 )
 
-//var x map[string][]string
-
 func getResourcesInfo(subaccount string, fileName string, resources string) {
 	type Resource struct {
 		Name   string
@@ -102,7 +100,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 
-		jsonBytes, err = GetTfStateData(TmpFolder)
+		jsonBytes, err = GetTfStateData(TmpFolder, SubaccountType)
 		if err != nil {
 			log.Fatalf("error json.Marshal: %s", err)
 			return nil, err
@@ -120,7 +118,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 
-		jsonBytes, err = GetTfStateData(TmpFolder)
+		jsonBytes, err = GetTfStateData(TmpFolder, SubaccountEntitlementType)
 		if err != nil {
 			log.Fatalf("error json.Marshal: %s", err)
 			return nil, err
@@ -138,7 +136,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 
-		jsonBytes, err = GetTfStateData(TmpFolder)
+		jsonBytes, err = GetTfStateData(TmpFolder, SubaccountSubscriptionType)
 		if err != nil {
 			log.Fatalf("error json.Marshal: %s", err)
 			return nil, err
@@ -156,7 +154,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 
-		jsonBytes, err = GetTfStateData(TmpFolder)
+		jsonBytes, err = GetTfStateData(TmpFolder, EnvironmentInstanceType)
 		if err != nil {
 			log.Fatalf("error json.Marshal: %s", err)
 			return nil, err
@@ -174,7 +172,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 
-		jsonBytes, err = GetTfStateData(TmpFolder)
+		jsonBytes, err = GetTfStateData(TmpFolder, SubaccountTrustConfigurationType)
 		if err != nil {
 			log.Fatalf("error json.Marshal: %s", err)
 			return nil, err

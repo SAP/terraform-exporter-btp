@@ -29,7 +29,7 @@ func exportTrustConfigurations(subaccountID string, configDir string) {
 		return
 	}
 
-	jsonBytes, err := GetTfStateData(TmpFolder)
+	jsonBytes, err := GetTfStateData(TmpFolder, SubaccountTrustConfigurationType)
 	if err != nil {
 		log.Fatalf("error json.Marshal: %v", err)
 		return

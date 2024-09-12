@@ -12,7 +12,17 @@ import (
 // Constants for TF version for Terraform providers e.g. for SAP BTP
 const BtpProviderVersion = "v1.6.0"
 
-func GetTfStateData(configDir string) ([]byte, error) {
+type ResourceName string
+
+const (
+	SubaccountType                   ResourceName = "subaccount"
+	SubaccountEntitlementType        ResourceName = "subaccount_entitlement"
+	EnvironmentInstanceType          ResourceName = "environment_instance"
+	SubaccountSubscriptionType       ResourceName = "subaccount_subscription"
+	SubaccountTrustConfigurationType ResourceName = "subaccount_trust_configuration"
+)
+
+func GetTfStateData(configDir string, resourceName ResourceName) ([]byte, error) {
 	execPath, err := exec.LookPath("terraform")
 	if err != nil {
 		log.Fatalf("error finding Terraform: %v", err)
@@ -42,12 +52,19 @@ func GetTfStateData(configDir string) ([]byte, error) {
 		return nil, err
 	}
 
-	jsonBytes, err := json.Marshal(state.Values.RootModule.Resources[0].AttributeValues)
+	// distinguish if the resourceName is entitlelement or different via case
+	var jsonBytes []byte
+	switch resourceName {
+	case SubaccountEntitlementType:
+		jsonBytes, err = json.Marshal(state.Values.RootModule.Resources[0].AttributeValues["values"])
+	default:
+		jsonBytes, err = json.Marshal(state.Values.RootModule.Resources[0].AttributeValues)
+	}
+
 	if err != nil {
 		log.Fatalf("error json.Marshal: %v", err)
 		return nil, err
 	}
 
 	return jsonBytes, nil
-
 }

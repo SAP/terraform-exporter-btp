@@ -30,7 +30,7 @@ func exportEnvironmentInstances(subaccountID string, configFolder string) {
 		return
 	}
 
-	jsonBytes, err := GetTfStateData(TmpFolder)
+	jsonBytes, err := GetTfStateData(TmpFolder, "environment_instance")
 	if err != nil {
 		log.Fatalf("error json.Marshal: %v", err)
 		return
