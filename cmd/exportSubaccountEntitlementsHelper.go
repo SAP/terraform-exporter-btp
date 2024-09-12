@@ -2,16 +2,12 @@ package cmd
 
 import (
 	"btptfexporter/tfutils"
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
-
-	"github.com/hashicorp/terraform-exec/tfexec"
 )
 
 func exportSubaccountEntitlements(subaccountID string, configDir string) {
@@ -34,7 +30,7 @@ func exportSubaccountEntitlements(subaccountID string, configDir string) {
 		return
 	}
 
-	jsonBytes, err := getEntitlementTfStateData(TmpFolder)
+	jsonBytes, err := GetTfStateData(TmpFolder)
 	if err != nil {
 		log.Fatalf("error json.Marshal: %v", err)
 		return
@@ -83,47 +79,6 @@ func readSubaccountEntilementsDataSource(subaccountId string) (string, error) {
 	}
 	dataBlock := strings.Replace(dsDoc.Import, dsDoc.Attributes["subaccount_id"], subaccountId, -1)
 	return dataBlock, nil
-
-}
-
-// this function runs terraform actions and return the state values to create import block
-func getEntitlementTfStateData(configDir string) ([]byte, error) {
-	execPath, err := exec.LookPath("terraform")
-	if err != nil {
-		log.Fatalf("error finding Terraform: %v", err)
-		return nil, err
-	}
-	// create a new Terraform instance
-	tf, err := tfexec.NewTerraform(configDir, execPath)
-	if err != nil {
-		log.Fatalf("error running NewTerraform: %v", err)
-		return nil, err
-	}
-
-	err = tf.Init(context.Background(), tfexec.Upgrade(true))
-	if err != nil {
-		log.Fatalf("error running Init: %v", err)
-		return nil, err
-	}
-	err = tf.Apply(context.Background())
-	if err != nil {
-		log.Fatalf("error running Apply: %v", err)
-		return nil, err
-	}
-
-	state, err := tf.Show(context.Background())
-	if err != nil {
-		log.Fatalf("error running Show: %v", err)
-		return nil, err
-	}
-
-	jsonBytes, err := json.Marshal(state.Values.RootModule.Resources[0].AttributeValues["values"])
-	if err != nil {
-		log.Fatalf("error json.Marshal: %v", err)
-		return nil, err
-	}
-
-	return jsonBytes, nil
 
 }
 

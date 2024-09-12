@@ -37,7 +37,7 @@ If you want to build the binary from scratch, follow these steps:
 
 1. The system will store the binary as `btptfexporter` (`btptfexporter.exe` in case of Windows) in the default binary path of your Go installation `$GOPATH/bin`.
 
-   > > [!TIP]
+   > [!TIP]
    > You find the value of the GOPATH via `go env GOPATH`
 
 #### Troubleshooting
@@ -109,7 +109,7 @@ How to set the parameters depends on your setup and is OS-specific:
        export $(xargs <.env)
        ```
 
-    > > [!IMPORTANT]
+    > [!IMPORTANT]
     > There is no predefined functionality in PowerShell to achieve the same. A custom script would be needed.
 
 ## Commands

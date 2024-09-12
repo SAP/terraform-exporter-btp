@@ -102,7 +102,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 
-		jsonBytes, err = getSubaccountTfStateData(TmpFolder)
+		jsonBytes, err = GetTfStateData(TmpFolder)
 		if err != nil {
 			log.Fatalf("error json.Marshal: %s", err)
 			return nil, err
@@ -120,7 +120,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 
-		jsonBytes, err = getEntitlementTfStateData(TmpFolder)
+		jsonBytes, err = GetTfStateData(TmpFolder)
 		if err != nil {
 			log.Fatalf("error json.Marshal: %s", err)
 			return nil, err
@@ -138,7 +138,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 
-		jsonBytes, err = getSubscriptionsTfStateData(TmpFolder)
+		jsonBytes, err = GetTfStateData(TmpFolder)
 		if err != nil {
 			log.Fatalf("error json.Marshal: %s", err)
 			return nil, err
@@ -156,7 +156,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 
-		jsonBytes, err = getTfStateData(TmpFolder)
+		jsonBytes, err = GetTfStateData(TmpFolder)
 		if err != nil {
 			log.Fatalf("error json.Marshal: %s", err)
 			return nil, err
@@ -174,7 +174,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 
-		jsonBytes, err = getTrustConfigurationsTfStateData(TmpFolder)
+		jsonBytes, err = GetTfStateData(TmpFolder)
 		if err != nil {
 			log.Fatalf("error json.Marshal: %s", err)
 			return nil, err
