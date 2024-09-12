@@ -560,9 +560,7 @@ func parseNestedSchema(node *bf.Node, ingestNode func(node *bf.Node)) (*nestedSc
 func (ns *topLevelSchema) requiredParameters() []parameter {
 	return ns.required
 }
-func (ns *topLevelSchema) allParameters() []parameter {
-	return append(append(ns.optional, ns.required...), ns.readonly...)
-}
+
 func (ns *nestedSchema) allParameters() []parameter {
 	return append(append(ns.optional, ns.required...), ns.readonly...)
 }
@@ -1103,7 +1101,7 @@ func cleanupDocument(name string, doc entityDocs) (entityDocs, bool) {
 				doc.Import += fmt.Sprintf("%s = \"%s\" \n", attrName, attrValue)
 			}
 		} else {
-			doc.Import += fmt.Sprintf("id = \"The ID of the subaccount\" \n")
+			doc.Import += "id = \"The ID of the subaccount\" \n"
 		}
 		doc.Import += "}\n"
 	}

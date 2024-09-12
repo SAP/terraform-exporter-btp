@@ -25,7 +25,7 @@ func init() {
 	var resFile string
 	var configDir string
 	exportTrustConfigurationsCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
-	exportTrustConfigurationsCmd.MarkFlagRequired("subaccount")
+	_ = exportTrustConfigurationsCmd.MarkFlagRequired("subaccount")
 	exportTrustConfigurationsCmd.Flags().StringVarP(&resFile, "resourceFileName", "f", "resources.tf", "filename for resource config generation")
 	exportTrustConfigurationsCmd.Flags().StringVarP(&configDir, "config-output-dir", "o", "generated_configurations", "folder for config generation")
 }

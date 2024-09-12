@@ -17,13 +17,13 @@ import (
 func exportTrustConfigurations(subaccountID string, configDir string) {
 	dataBlock, err := readSubaccountTrustConfigurationsDataSource(subaccountID)
 	if err != nil {
-		fmt.Println("Error getting data source:", err)
+		log.Fatalf("error getting data source: %v", err)
 		return
 	}
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error getting current directory:", err)
+		log.Fatalf("error getting current directory: %v", err)
 		return
 	}
 	dataBlockFile := filepath.Join(TmpFolder, "main.tf")
@@ -35,7 +35,7 @@ func exportTrustConfigurations(subaccountID string, configDir string) {
 
 	jsonBytes, err := getTrustConfigurationsTfStateData(TmpFolder)
 	if err != nil {
-		log.Fatalf("error json.Marshal: %s", err)
+		log.Fatalf("error json.Marshal: %v", err)
 		return
 	}
 
@@ -43,13 +43,13 @@ func exportTrustConfigurations(subaccountID string, configDir string) {
 	jsonString := string(jsonBytes)
 	err = json.Unmarshal([]byte(jsonString), &data)
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Fatalf("error: %v", err)
 		return
 	}
 
 	importBlock, err := getTrustConfigurationsImportBlock(data, subaccountID)
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Fatalf("error: %v", err)
 		return
 	}
 
@@ -76,7 +76,7 @@ func readSubaccountTrustConfigurationsDataSource(subaccountId string) (string, e
 	dsDoc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", "data-sources", choice, BtpProviderVersion, "github.com")
 
 	if err != nil {
-		log.Fatalf("read doc failed!")
+		log.Fatalf("read doc failed")
 		return "", err
 	}
 	dataBlock := strings.Replace(dsDoc.Import, dsDoc.Attributes["subaccount_id"], subaccountId, -1)
@@ -87,36 +87,36 @@ func readSubaccountTrustConfigurationsDataSource(subaccountId string) (string, e
 func getTrustConfigurationsTfStateData(configDir string) ([]byte, error) {
 	execPath, err := exec.LookPath("terraform")
 	if err != nil {
-		log.Fatalf("error finding Terraform: %s", err)
+		log.Fatalf("error finding Terraform: %v", err)
 		return nil, err
 	}
-	// create a new Terraform instance
+
 	tf, err := tfexec.NewTerraform(configDir, execPath)
 	if err != nil {
-		log.Fatalf("error running NewTerraform: %s", err)
+		log.Fatalf("error running NewTerraform: %v", err)
 		return nil, err
 	}
 
 	err = tf.Init(context.Background(), tfexec.Upgrade(true))
 	if err != nil {
-		log.Fatalf("error running Init: %s", err)
+		log.Fatalf("error running Init: %v", err)
 		return nil, err
 	}
 	err = tf.Apply(context.Background())
 	if err != nil {
-		log.Fatalf("error running Apply: %s", err)
+		log.Fatalf("error running Apply: %v", err)
 		return nil, err
 	}
 
 	state, err := tf.Show(context.Background())
 	if err != nil {
-		log.Fatalf("error running Show: %s", err)
+		log.Fatalf("error running Show: %v", err)
 		return nil, err
 	}
 
 	jsonBytes, err := json.Marshal(state.Values.RootModule.Resources[0].AttributeValues)
 	if err != nil {
-		log.Fatalf("error json.Marshal: %s", err)
+		log.Fatalf("error json.Marshal: %v", err)
 		return nil, err
 	}
 

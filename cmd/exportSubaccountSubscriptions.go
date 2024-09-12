@@ -25,7 +25,7 @@ func init() {
 	var resFile string
 	var configDir string
 	exportSubaccountSubscriptionsCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
-	exportSubaccountSubscriptionsCmd.MarkFlagRequired("subaccount")
+	_ = exportSubaccountSubscriptionsCmd.MarkFlagRequired("subaccount")
 	exportSubaccountSubscriptionsCmd.Flags().StringVarP(&resFile, "resourceFileName", "f", "resources.tf", "filename for resource config generation")
 	exportSubaccountSubscriptionsCmd.Flags().StringVarP(&configDir, "config-output-dir", "o", "generated_configurations", "folder for config generation")
 }

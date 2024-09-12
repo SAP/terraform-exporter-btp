@@ -14,10 +14,8 @@ var subaccountCmd = &cobra.Command{
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
 		setupConfigDir(configDir)
-		err := exportSubaccount(subaccount, configDir)
-		if err == nil {
-			generateConfig(resourceFileName, configDir)
-		}
+		exportSubaccount(subaccount, configDir)
+		generateConfig(resourceFileName, configDir)
 	},
 }
 
@@ -27,7 +25,7 @@ func init() {
 	var resFile string
 	var configDir string
 	subaccountCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
-	subaccountCmd.MarkFlagRequired("subaccount")
+	_ = subaccountCmd.MarkFlagRequired("subaccount")
 	subaccountCmd.Flags().StringVarP(&resFile, "resourceFileName", "f", "resources.tf", "filename for resource config generation")
 	subaccountCmd.Flags().StringVarP(&configDir, "config-output-dir", "o", "generated_configurations", "folder for config generation")
 }

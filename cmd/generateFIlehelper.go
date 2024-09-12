@@ -30,7 +30,7 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 		for _, resource := range btpResources {
 			values, err := readDataSources(subaccount, resource)
 			if err != nil {
-				fmt.Println("Error:", err)
+				fmt.Println("error:", err)
 				return
 			}
 			data := Resource{Name: resource, Values: values}
@@ -56,7 +56,7 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 
 			values, err := readDataSources(subaccount, resource)
 			if err != nil {
-				fmt.Println("Error:", err)
+				fmt.Println("error:", err)
 				return
 			}
 			data := Resource{Name: resource, Values: values}
@@ -69,13 +69,13 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 	res2 := resourcesArr{Btp_resources: btpSubaccountResources}
 	jsonBytes, err := json.MarshalIndent(res2, "", "  ")
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("error:", err)
 		return
 	}
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error getting current directory:", err)
+		fmt.Println("error getting current directory:", err)
 		return
 	}
 	dataBlockFile := filepath.Join(currentDir, fileName)
@@ -93,7 +93,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 	if btpResource == "subaccount" {
 		dataBlock, err := readSubaccountDataSource(subaccountID)
 		if err != nil {
-			fmt.Println("Error getting data source:", err)
+			fmt.Println("error getting data source:", err)
 			return nil, err
 		}
 		err = tfutils.CreateFileWithContent(dataBlockFile, dataBlock)
@@ -110,7 +110,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 	} else if btpResource == "entitlements" {
 		dataBlock, err := readSubaccountEntilementsDataSource(subaccountID)
 		if err != nil {
-			fmt.Println("Error getting data source:", err)
+			fmt.Println("error getting data source:", err)
 			return nil, err
 		}
 
@@ -128,7 +128,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 	} else if btpResource == "subscriptions" {
 		dataBlock, err := readSubaccountSubscriptionDataSource(subaccountID)
 		if err != nil {
-			fmt.Println("Error getting data source:", err)
+			fmt.Println("error getting data source:", err)
 			return nil, err
 		}
 
@@ -146,7 +146,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 	} else if btpResource == "environment-instances" {
 		dataBlock, err := readDataSource(subaccountID)
 		if err != nil {
-			fmt.Println("Error getting data source:", err)
+			fmt.Println("error getting data source:", err)
 			return nil, err
 		}
 
@@ -164,7 +164,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 	} else if btpResource == "trust-configurations" {
 		dataBlock, err := readSubaccountTrustConfigurationsDataSource(subaccountID)
 		if err != nil {
-			fmt.Println("Error getting data source:", err)
+			fmt.Println("error getting data source:", err)
 			return nil, err
 		}
 
@@ -183,7 +183,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 	var data map[string]interface{}
 	err := json.Unmarshal(jsonBytes, &data)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("error:", err)
 		return nil, err
 	}
 	var stringArr []string

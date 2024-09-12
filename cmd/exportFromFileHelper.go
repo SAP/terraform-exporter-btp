@@ -34,7 +34,12 @@ func exportFromFile(subaccount string, jsonfile string, resourceFile string, con
 	byteValue, _ := io.ReadAll(jsonFile)
 	var resources ResourcesArr
 
-	json.Unmarshal(byteValue, &resources)
+	err = json.Unmarshal(byteValue, &resources)
+
+	if err != nil {
+		log.Fatalf("error in unmarshall: %v", err)
+		return
+	}
 
 	var resNames []string
 
@@ -86,7 +91,7 @@ func generateConfigForResource(resource string, values []string, subaccout strin
 func getTrustConfig(values []string, subaccountID string, configDir string) {
 	dataBlock, err := readSubaccountTrustConfigurationsDataSource(subaccountID)
 	if err != nil {
-		fmt.Println("Error getting data source:", err)
+		fmt.Println("error getting data source:", err)
 		return
 	}
 
@@ -107,18 +112,18 @@ func getTrustConfig(values []string, subaccountID string, configDir string) {
 	var data map[string]interface{}
 	err = json.Unmarshal([]byte(jsonString), &data)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("error:", err)
 		return
 	}
 	importBlock, err := getImportBlock4(data, subaccountID, values)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("error:", err)
 		return
 	}
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error getting current directory:", err)
+		fmt.Println("error getting current directory:", err)
 		return
 	}
 
@@ -167,7 +172,7 @@ func getImportBlock4(data map[string]interface{}, subaccountId string, values []
 func getSubscriptionConfig(values []string, subaccountID string, configDir string) {
 	dataBlock, err := readSubaccountSubscriptionDataSource(subaccountID)
 	if err != nil {
-		fmt.Println("Error getting data source:", err)
+		fmt.Println("error getting data source:", err)
 		return
 	}
 
@@ -188,18 +193,18 @@ func getSubscriptionConfig(values []string, subaccountID string, configDir strin
 	var data map[string]interface{}
 	err = json.Unmarshal([]byte(jsonString), &data)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("error:", err)
 		return
 	}
 	importBlock, err := getImportBlock3(data, subaccountID, values)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("error:", err)
 		return
 	}
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error getting current directory:", err)
+		fmt.Println("error getting current directory:", err)
 		return
 	}
 
@@ -249,7 +254,7 @@ func getImportBlock3(data map[string]interface{}, subaccountId string, values []
 func getEntitlementConfig(values []string, subaccountID string, configDir string) {
 	dataBlock, err := readSubaccountEntilementsDataSource(subaccountID)
 	if err != nil {
-		fmt.Println("Error getting data source:", err)
+		fmt.Println("error getting data source:", err)
 		return
 	}
 
@@ -270,12 +275,12 @@ func getEntitlementConfig(values []string, subaccountID string, configDir string
 	var data map[string]interface{}
 	err = json.Unmarshal([]byte(jsonString), &data)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("error:", err)
 		return
 	}
 	importBlock, err := getImportBlock2(data, subaccountID, values)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("error:", err)
 		return
 	}
 
@@ -286,7 +291,7 @@ func getEntitlementConfig(values []string, subaccountID string, configDir string
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error getting current directory:", err)
+		fmt.Println("error getting current directory:", err)
 		return
 	}
 
@@ -336,7 +341,7 @@ func getEnvInstanceConfig(values []string, subaccountID string, configDir string
 
 	dataBlock, err := readDataSource(subaccountID)
 	if err != nil {
-		fmt.Println("Error getting data source:", err)
+		fmt.Println("error getting data source:", err)
 		return
 	}
 
@@ -357,14 +362,14 @@ func getEnvInstanceConfig(values []string, subaccountID string, configDir string
 	var data map[string]interface{}
 	err = json.Unmarshal([]byte(jsonString), &data)
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("error:", err)
 		return
 	}
 
 	importBlock, err := getImportBlock1(data, subaccountID, values)
 
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("error:", err)
 		return
 	}
 
@@ -375,7 +380,7 @@ func getEnvInstanceConfig(values []string, subaccountID string, configDir string
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error getting current directory:", err)
+		fmt.Println("error getting current directory:", err)
 		return
 	}
 	importFileName := "btp_environment_instances_import.tf"

@@ -20,46 +20,45 @@ func runTerraformCommand(args ...string) error {
 	return cmd.Run()
 }
 
-func generateConfig(resourceFileName string, configFolder string) error {
+func generateConfig(resourceFileName string, configFolder string) {
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error getting current directory:", err)
-		return err
+		log.Fatalf("error getting current directory: %v", err)
+		return
 	}
 	terraformConfigPath := filepath.Join(currentDir, configFolder)
 	err = os.Chdir(terraformConfigPath)
 	if err != nil {
-		fmt.Printf("Error changing directory to %s: %s \n", terraformConfigPath, err)
-		return err
+		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
+		return
 	}
 	// Initialize Terraform
 	if err := runTerraformCommand("init"); err != nil {
-		fmt.Println("Error initializing Terraform:", err)
-		return err
+		log.Fatalf("error initializing Terraform: %v", err)
+		return
 	}
 
 	// Execute Terraform plan
 	planOption := "--generate-config-out=" + resourceFileName
 	if err := runTerraformCommand("plan", planOption); err != nil {
-		fmt.Println("Error running Terraform plan:", err)
-		return err
+		log.Fatalf("error running Terraform plan: %v", err)
+		return
 	}
 
 	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
-		fmt.Println("Error running Terraform fmt:", err)
-		return err
+		log.Fatalf("error running Terraform fmt: %v", err)
+		return
 	}
 
 	fmt.Println("Terraform config successfully created")
 	cleanup()
-	return nil
 }
 
 func cleanup() {
 	err := os.RemoveAll(TmpFolder)
 	if err != nil {
-		fmt.Println("error deleting temp files: ", err)
+		log.Fatalf("error deleting temp files: %v", err)
 	}
 }
 
@@ -86,13 +85,13 @@ func configureProvider() {
 
 	if !(len(strings.TrimSpace(username)) != 0 && len(strings.TrimSpace(password)) != 0) {
 		if len(strings.TrimSpace(enableSSO)) == 0 {
-			log.Fatal("Please set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
+			log.Fatal("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
 			os.Exit(0)
 		}
 	}
 
 	if len(strings.TrimSpace(globalAccount)) == 0 {
-		log.Fatal("gloabl account not set. Please set BTP_GLOBALACCOUNT environment variable to set global account")
+		log.Fatal("global account not set. set BTP_GLOBALACCOUNT environment variable to set global account")
 		os.Exit(0)
 	} else {
 		providerContent = providerContent + "globalaccount = \"" + globalAccount + "\"\n"
@@ -135,13 +134,13 @@ func setupConfigDir(configFolder string) {
 	}
 	curWd, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Fatalf("error: %v", err)
 		return
 	}
 
 	exist, err := exists(filepath.Join(curWd, configFolder))
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Fatalf("error: %v", err)
 		return
 	}
 
@@ -149,15 +148,15 @@ func setupConfigDir(configFolder string) {
 		fullpath := filepath.Join(curWd, configFolder)
 		err = os.Mkdir(fullpath, 0700)
 		if err != nil {
-			fmt.Println("Error:", err)
+			log.Fatalf("error: %v", err)
 			return
 		}
 	} else {
-		fmt.Print("config directory already exist. Do you want to continue... if yes then generated files will be overwritten if exist (Y/N): ")
+		fmt.Print("config directory already exist. Do you want to continue? If yes then generated files will be overwritten if existing (Y/N): ")
 		var choice string
 		_, err = fmt.Scanln(&choice)
 		if err != nil {
-			fmt.Println("Error:", err)
+			log.Fatalf("error: %v", err)
 			return
 		}
 		if strings.ToUpper(choice) == "N" {
@@ -165,7 +164,7 @@ func setupConfigDir(configFolder string) {
 		} else if strings.ToUpper(choice) == "Y" {
 			fmt.Println("existing directory will be used. It can overwrite some files ")
 		} else {
-			fmt.Println("Invalid input. Exiting......")
+			fmt.Println("invalid input. Exiting the process")
 			os.Exit(0)
 		}
 
@@ -173,7 +172,7 @@ func setupConfigDir(configFolder string) {
 
 	sourceFile, err := os.Open(TmpFolder + "/provider.tf")
 	if err != nil {
-		fmt.Println("failed to open source file: %w", err)
+		log.Fatalf("failed to open source file: %v", err)
 		return
 	}
 	defer sourceFile.Close()
@@ -182,14 +181,14 @@ func setupConfigDir(configFolder string) {
 
 	destinationFile, err := os.Create(fullpath + "/provider.tf")
 	if err != nil {
-		fmt.Println("failed to create destination file: %w", err)
+		log.Fatalf("failed to create destination file: %v", err)
 		return
 	}
 	defer destinationFile.Close()
 
 	_, err = io.Copy(destinationFile, sourceFile)
 	if err != nil {
-		fmt.Println("failed to copy file: %w", err)
+		log.Fatalf("failed to copy file: %v", err)
 		return
 	}
 }

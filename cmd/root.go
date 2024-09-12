@@ -38,13 +38,13 @@ var docCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		docsDir := "./docs"
 		if err := os.MkdirAll(docsDir, os.ModePerm); err != nil {
-			fmt.Println("Error creating docs directory:", err)
+			fmt.Println("error creating docs directory:", err)
 			os.Exit(1)
 		}
 
 		err := doc.GenMarkdownTree(rootCmd, docsDir)
 		if err != nil {
-			fmt.Println("Error generating documentation:", err)
+			fmt.Println("error generating documentation:", err)
 			os.Exit(1)
 		}
 

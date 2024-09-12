@@ -14,44 +14,44 @@ import (
 	"github.com/hashicorp/terraform-exec/tfexec"
 )
 
-func exportSubaccount(subaccountID string, configDir string) error {
+func exportSubaccount(subaccountID string, configDir string) {
 
 	dataBlock, err := readSubaccountDataSource(subaccountID)
 	if err != nil {
-		fmt.Println("Error getting data source:", err)
-		return err
+		log.Fatalf("error getting data source: %v", err)
+		return
 	}
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Println("Error getting current directory:", err)
-		return err
+		log.Fatalf("error getting current directory: %v", err)
+		return
 	}
 	dataBlockFile := filepath.Join(TmpFolder, "main.tf")
 	err = tfutils.CreateFileWithContent(dataBlockFile, dataBlock)
 	if err != nil {
 		log.Fatalf("create file %s failed!", dataBlockFile)
-		return err
+		return
 	}
 
 	jsonBytes, err := getSubaccountTfStateData(TmpFolder)
 	if err != nil {
-		log.Fatalf("error json.Marshal: %s", err)
-		return err
+		log.Fatalf("error json.Marshal: %v", err)
+		return
 	}
 
 	var data map[string]interface{}
 	subaccountName := string(jsonBytes)
 	err = json.Unmarshal([]byte(subaccountName), &data)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return err
+		log.Fatalf("error: %v", err)
+		return
 	}
 
 	importBlock, err := getSubaccountImportBlock(data, subaccountID)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return err
+		log.Fatalf("error: %v", err)
+		return
 	}
 
 	importFileName := "subaccount_import.tf"
@@ -60,11 +60,10 @@ func exportSubaccount(subaccountID string, configDir string) error {
 	err = tfutils.CreateFileWithContent(importFileName, importBlock)
 	if err != nil {
 		log.Fatalf("create file %s failed!", dataBlockFile)
-		return err
+		return
 	}
 
 	log.Println("btp subaccount has been exported. Please check " + configDir + " folder")
-	return nil
 }
 
 func readSubaccountDataSource(subaccountId string) (string, error) {
@@ -83,36 +82,36 @@ func readSubaccountDataSource(subaccountId string) (string, error) {
 func getSubaccountTfStateData(configDir string) ([]byte, error) {
 	execPath, err := exec.LookPath("terraform")
 	if err != nil {
-		log.Fatalf("error finding Terraform: %s", err)
+		log.Fatalf("error finding Terraform: %v", err)
 		return nil, err
 	}
 	// create a new Terraform instance
 	tf, err := tfexec.NewTerraform(configDir, execPath)
 	if err != nil {
-		log.Fatalf("error running NewTerraform: %s", err)
+		log.Fatalf("error running NewTerraform: %v", err)
 		return nil, err
 	}
 
 	err = tf.Init(context.Background(), tfexec.Upgrade(true))
 	if err != nil {
-		log.Fatalf("error running Init: %s", err)
+		log.Fatalf("error running Init: %v", err)
 		return nil, err
 	}
 	err = tf.Apply(context.Background())
 	if err != nil {
-		log.Fatalf("error running Apply: %s", err)
+		log.Fatalf("error running Apply: %v", err)
 		return nil, err
 	}
 
 	state, err := tf.Show(context.Background())
 	if err != nil {
-		log.Fatalf("error running Show: %s", err)
+		log.Fatalf("error running Show: %v", err)
 		return nil, err
 	}
 
 	jsonBytes, err := json.Marshal(state.Values.RootModule.Resources[0].AttributeValues)
 	if err != nil {
-		log.Fatalf("error json.Marshal: %s", err)
+		log.Fatalf("error json.Marshal: %v", err)
 		return nil, err
 	}
 
@@ -124,7 +123,7 @@ func getSubaccountImportBlock(data map[string]interface{}, subaccountId string) 
 	choice := "btp_subaccount"
 	resource_doc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", "resources", choice, BtpProviderVersion, "github.com")
 	if err != nil {
-		log.Fatalf("read doc failed!")
+		log.Fatalf("read doc failed")
 		return "", err
 	}
 

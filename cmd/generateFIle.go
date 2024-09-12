@@ -46,7 +46,7 @@ func init() {
 	var fileName string
 	var resources string
 	getCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
-	getCmd.MarkFlagRequired("subaccount")
+	_ = getCmd.MarkFlagRequired("subaccount")
 	getCmd.Flags().StringVarP(&fileName, "json-out", "j", "btpResources.json", "json file for list of resources")
 	getCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")
 
