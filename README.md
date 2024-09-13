@@ -114,7 +114,7 @@ How to set the parameters depends on your setup and is OS-specific:
 
 ## Commands
 
-The CLI offers several commands for the export of Terraform configurations of SAP BTP. You find a comprehensive overview of the commands and the options in the [documentation](./docs/btptfexporter.md).
+The CLI offers several commands for the export of Terraform configurations of SAP BTP. You find a comprehensive overview of the commands and the options in the [documentation](./docs/btptfexport.md).
 
 ## Developer Guide
 
