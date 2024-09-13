@@ -53,6 +53,13 @@ func generateConfig(resourceFileName string, configFolder string) {
 
 	fmt.Println("Terraform config successfully created")
 	cleanup()
+
+	//Switch back to the original directory
+	err = os.Chdir(currentDir)
+	if err != nil {
+		log.Fatalf("error changing directory to %s: %v \n", currentDir, err)
+		return
+	}
 }
 
 func cleanup() {
@@ -60,6 +67,9 @@ func cleanup() {
 	if err != nil {
 		log.Fatalf("error deleting temp files: %v", err)
 	}
+
+	// Cleanup temporary folder variable
+	TmpFolder = ""
 }
 
 func configureProvider() {
@@ -200,4 +210,152 @@ func exists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder string, resourceName string) {
+
+	currentDir, err := os.Getwd()
+
+	if err != nil {
+		log.Fatalf("error getting current directory: %v", err)
+		return
+	}
+
+	sourceConfigPath := filepath.Join(currentDir, resourceConfigFolder, fileName)
+
+	// Check if the source file exists
+	exist, err := exists(sourceConfigPath)
+	if err != nil {
+		log.Fatalf("error checking if source directory exists: %v", err)
+	}
+
+	if !exist {
+		// Nothing to do as the source file does not exist
+		return
+	}
+
+	sourceFile, err := os.Open(sourceConfigPath)
+	if err != nil {
+		log.Fatalf("error opening resource config file: %v", err)
+	}
+	defer sourceFile.Close()
+
+	targetConfigPath := filepath.Join(currentDir, configFolder, fileName)
+
+	exist, err = exists(targetConfigPath)
+	if err != nil {
+		log.Fatalf("error checking if target directory exists: %v", err)
+	}
+
+	if !exist {
+		// In the first run we must create the file if it does not exist
+		_, err := os.Create(targetConfigPath)
+		if err != nil {
+			log.Fatalf("error creating target configuration file: %v", err)
+		}
+	}
+
+	targetFile, err := os.OpenFile(targetConfigPath, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalf("error opening target configuration file: %v", err)
+	}
+	defer targetFile.Close()
+
+	headerTemplate := `
+###
+# Resource: ` + resourceName + `
+###
+`
+	if _, err := targetFile.Write([]byte(headerTemplate)); err != nil {
+		log.Fatalf("error adding header line to target file: %v", err)
+	}
+
+	if _, err := io.Copy(targetFile, sourceFile); err != nil {
+		log.Fatalf("error copying resource file to target file: %v", err)
+	}
+
+	copyImportFiles(resourceConfigFolder, configFolder)
+}
+
+func copyImportFiles(srcDir, destDir string) {
+	// Find all files ending with "_import.tf" in the source directory
+	files, err := filepath.Glob(filepath.Join(srcDir, "*_import.tf"))
+	if err != nil {
+		log.Fatalf("error finding files: %v", err)
+	}
+
+	// Copy each file to the destination directory
+	for _, srcFile := range files {
+		destFile := filepath.Join(destDir, filepath.Base(srcFile))
+
+		err := copyFile(srcFile, destFile)
+		if err != nil {
+			log.Printf("error copying file %s to %s: %v", srcFile, destFile, err)
+		}
+	}
+}
+
+func copyFile(src, dest string) error {
+	sourceFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer sourceFile.Close()
+
+	destFile, err := os.Create(dest)
+	if err != nil {
+		return err
+	}
+	defer destFile.Close()
+
+	_, err = io.Copy(destFile, sourceFile)
+	return err
+}
+
+func deleteSourceFolder(srcDir string) {
+	err := os.RemoveAll(srcDir)
+	if err != nil {
+		log.Fatalf("error deleting source folder %s: %v", srcDir, err)
+	}
+}
+
+func finalizeTfConfig(configFolder string) {
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("error getting current directory: %v", err)
+		return
+	}
+	terraformConfigPath := filepath.Join(currentDir, configFolder)
+	err = os.Chdir(terraformConfigPath)
+	if err != nil {
+		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
+		return
+	}
+
+	if err := runTerraformCommand("init"); err != nil {
+		log.Fatalf("error initializing Terraform: %v", err)
+		return
+	}
+
+	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
+		log.Fatalf("error running Terraform fmt: %v", err)
+		return
+	}
+	//Switch back to the original directory
+	err = os.Chdir(currentDir)
+	if err != nil {
+		log.Fatalf("error changing directory to %s: %v \n", currentDir, err)
+		return
+	}
+}
+
+func execPreExportSteps(tempConfigDir string) {
+	setupConfigDir(tempConfigDir)
+}
+
+func execPostExportSteps(tempConfigDir string, targetConfigDir string, targetResourceFileName string, resourceNameLong string) {
+	generateConfig(targetResourceFileName, tempConfigDir)
+	mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)
+	deleteSourceFolder(tempConfigDir)
 }

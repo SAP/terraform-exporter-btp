@@ -17,13 +17,30 @@ btp_subaccount_trust_configurations `,
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
+
 		setupConfigDir(configDir)
-		exportSubaccount(subaccount, configDir)
-		exportSubaccountEntitlements(subaccount, configDir)
-		exportEnvironmentInstances(subaccount, configDir)
-		exportSubaccountSubscriptions(subaccount, configDir)
-		exportTrustConfigurations(subaccount, configDir)
-		generateConfig(resourceFileName, configDir)
+
+		execPreExportSteps("saconf")
+		exportSubaccount(subaccount, "saconf")
+		execPostExportSteps("saconf", configDir, resourceFileName, "SUBACCOUNT")
+
+		execPreExportSteps("saentitlementconf")
+		exportSubaccountEntitlements(subaccount, "saentitlementconf")
+		execPostExportSteps("saentitlementconf", configDir, resourceFileName, "SUBACCOUNT ENTITLEMENTS")
+
+		execPreExportSteps("saenvinstanceconf")
+		exportEnvironmentInstances(subaccount, "saenvinstanceconf")
+		execPostExportSteps("saenvinstanceconf", configDir, resourceFileName, "SUBACCOUNT ENVIRONMENT INSTANCES")
+
+		execPreExportSteps("sasubscriptionconf")
+		exportSubaccountSubscriptions(subaccount, "sasubscriptionconf")
+		execPostExportSteps("sasubscriptionconf", configDir, resourceFileName, "SUBACCOUNT  SUBSCRIPTIONS")
+
+		execPreExportSteps("satrustconf")
+		exportTrustConfigurations(subaccount, "satrustconf")
+		execPostExportSteps("satrustconf", configDir, resourceFileName, "SUBACCOUNT TRUST CONFIGURATIONS")
+
+		finalizeTfConfig(configDir)
 	},
 }
 
