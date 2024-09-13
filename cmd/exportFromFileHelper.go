@@ -58,28 +58,38 @@ func exportFromFile(subaccount string, jsonfile string, resourceFile string, con
 			}
 		}
 		if len(value) != 0 {
-			generateConfigForResource(resName, value, subaccount, configDir)
+			generateConfigForResource(resName, value, subaccount, configDir, resourceFile)
 		}
 	}
 
-	generateConfig(resourceFile, configDir)
+	finalizeTfConfig(configDir)
 }
 
-func generateConfigForResource(resource string, values []string, subaccount string, configDir string) {
+func generateConfigForResource(resource string, values []string, subaccount string, configDir string, resourceFileName string) {
 	if resource == "environment-instances" {
-		exportEnvironmentInstances(subaccount, configDir, values)
+		execPreExportSteps("saenvinstanceconf")
+		exportEnvironmentInstances(subaccount, "saenvinstanceconf", values)
+		execPostExportSteps("saenvinstanceconf", configDir, resourceFileName, "SUBACCOUNT ENVIRONMENT INSTANCES")
 	}
 	if resource == "subaccount" {
-		exportSubaccount(subaccount, configDir, values)
+		execPreExportSteps("saconf")
+		exportSubaccount(subaccount, "saconf", values)
+		execPostExportSteps("saconf", configDir, resourceFileName, "SUBACCOUNT")
 	}
 	if resource == "entitlements" {
-		exportSubaccountEntitlements(subaccount, configDir, values)
+		execPreExportSteps("saentitlementconf")
+		exportSubaccountEntitlements(subaccount, "saentitlementconf", values)
+		execPostExportSteps("saentitlementconf", configDir, resourceFileName, "SUBACCOUNT ENTITLEMENTS")
 	}
 	if resource == "subscriptions" {
-		exportSubaccountSubscriptions(subaccount, configDir, values)
+		execPreExportSteps("sasubscriptionconf")
+		exportSubaccountSubscriptions(subaccount, "sasubscriptionconf", values)
+		execPostExportSteps("sasubscriptionconf", configDir, resourceFileName, "SUBACCOUNT  SUBSCRIPTIONS")
 	}
 	if resource == "trust-configurations" {
-		exportTrustConfigurations(subaccount, configDir, values)
+		execPreExportSteps("satrustconf")
+		exportTrustConfigurations(subaccount, "satrustconf", values)
+		execPostExportSteps("satrustconf", configDir, resourceFileName, "SUBACCOUNT TRUST CONFIGURATIONS")
 	}
 }
 
