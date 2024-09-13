@@ -2,7 +2,7 @@ autocompletion
 breakpoint
 BTP
 btp
-btptfexporter
+btptfexport
 CLA
 CLI
 config
