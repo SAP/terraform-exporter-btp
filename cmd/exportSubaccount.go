@@ -15,7 +15,7 @@ var subaccountCmd = &cobra.Command{
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
 		setupConfigDir(configDir)
-		exportSubaccount(subaccount, configDir)
+		exportSubaccount(subaccount, configDir, nil)
 		generateConfig(resourceFileName, configDir)
 	},
 }

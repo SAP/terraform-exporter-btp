@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func exportSubaccount(subaccountID string, configDir string, optionalValues ...[]string) {
+func exportSubaccount(subaccountID string, configDir string, filterValues []string) {
 
 	dataBlock, err := readSubaccountDataSource(subaccountID)
 	if err != nil {
@@ -44,15 +44,14 @@ func exportSubaccount(subaccountID string, configDir string, optionalValues ...[
 		return
 	}
 
-	if len(optionalValues) != 0 {
-		valueFromJson := optionalValues[0]
-		if valueFromJson[0] != fmt.Sprintf("%v", data["name"]) {
-			log.Println("Error:", fmt.Errorf("subaccount %s not found. Please adjust it in the provided file", valueFromJson[0]))
+	if len(filterValues) != 0 {
+		if filterValues[0] != fmt.Sprintf("%v", data["name"]) {
+			log.Println("Error:", fmt.Errorf("subaccount %s not found. Please adjust it in the provided file", filterValues[0]))
 			os.Exit(0)
 		}
 	}
 
-	importBlock, err := getSubaccountImportBlock(data, subaccountID)
+	importBlock, err := getSubaccountImportBlock(data, subaccountID, nil)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -83,7 +82,7 @@ func readSubaccountDataSource(subaccountId string) (string, error) {
 
 }
 
-func getSubaccountImportBlock(data map[string]interface{}, subaccountId string) (string, error) {
+func getSubaccountImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
 	choice := "btp_subaccount"
 	resource_doc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", "resources", choice, BtpProviderVersion, "github.com")
 	if err != nil {

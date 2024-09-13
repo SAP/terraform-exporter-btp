@@ -7,10 +7,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
-func exportTrustConfigurations(subaccountID string, configDir string) {
+func exportTrustConfigurations(subaccountID string, configDir string, filterValues []string) {
 	dataBlock, err := readSubaccountTrustConfigurationsDataSource(subaccountID)
 	if err != nil {
 		log.Fatalf("error getting data source: %v", err)
@@ -43,7 +44,7 @@ func exportTrustConfigurations(subaccountID string, configDir string) {
 		return
 	}
 
-	importBlock, err := getTrustConfigurationsImportBlock(data, subaccountID)
+	importBlock, err := getTrustConfigurationsImportBlock(data, subaccountID, filterValues)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -80,7 +81,7 @@ func readSubaccountTrustConfigurationsDataSource(subaccountId string) (string, e
 
 }
 
-func getTrustConfigurationsImportBlock(data map[string]interface{}, subaccountId string) (string, error) {
+func getTrustConfigurationsImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
 	choice := "btp_subaccount_trust_configuration"
 	resource_doc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", "resources", choice, BtpProviderVersion, "github.com")
 	if err != nil {
@@ -91,13 +92,35 @@ func getTrustConfigurationsImportBlock(data map[string]interface{}, subaccountId
 	var importBlock string
 	trusts := data["values"].([]interface{})
 
-	for x, value := range trusts {
-		trust := value.(map[string]interface{})
-		template := strings.Replace(resource_doc.Import, "<resource_name>", "trust"+fmt.Sprint(x), -1)
-		template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
-		template = strings.Replace(template, "<origin>", fmt.Sprintf("%v", trust["origin"]), -1)
-		importBlock += template + "\n"
+	if len(filterValues) != 0 {
+		var subaccountAllTrusts []string
+
+		for x, value := range trusts {
+			trust := value.(map[string]interface{})
+			subaccountAllTrusts = append(subaccountAllTrusts, fmt.Sprintf("%v", trust["origin"]))
+			if slices.Contains(filterValues, fmt.Sprintf("%v", trust["origin"])) {
+				importBlock += templateTrustImport(x, trust, subaccountId, resource_doc)
+			}
+		}
+
+		missingTrust, subset := isSubset(subaccountAllTrusts, filterValues)
+
+		if !subset {
+			return "", fmt.Errorf("trust configuration %s not found in the subaccount. Please adjust it in the provided file", missingTrust)
+		}
+	} else {
+		for x, value := range trusts {
+			trust := value.(map[string]interface{})
+			importBlock += templateTrustImport(x, trust, subaccountId, resource_doc)
+		}
 	}
 
 	return importBlock, nil
+}
+
+func templateTrustImport(x int, trust map[string]interface{}, subaccountId string, resource_doc tfutils.EntityDocs) string {
+	template := strings.Replace(resource_doc.Import, "<resource_name>", "trust"+fmt.Sprint(x), -1)
+	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
+	template = strings.Replace(template, "<origin>", fmt.Sprintf("%v", trust["origin"]), -1)
+	return template + "\n"
 }

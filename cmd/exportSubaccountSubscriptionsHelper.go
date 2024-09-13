@@ -7,10 +7,11 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
-func exportSubaccountSubscriptions(subaccountID string, configDir string) {
+func exportSubaccountSubscriptions(subaccountID string, configDir string, filterValues []string) {
 
 	dataBlock, err := readSubaccountSubscriptionDataSource(subaccountID)
 	if err != nil {
@@ -45,7 +46,7 @@ func exportSubaccountSubscriptions(subaccountID string, configDir string) {
 		return
 	}
 
-	importBlock, err := getSubscriptionsImportBlock(data, subaccountID)
+	importBlock, err := getSubscriptionsImportBlock(data, subaccountID, filterValues)
 	if err != nil {
 		fmt.Println("error:", err)
 		return
@@ -82,7 +83,7 @@ func readSubaccountSubscriptionDataSource(subaccountId string) (string, error) {
 
 }
 
-func getSubscriptionsImportBlock(data map[string]interface{}, subaccountId string) (string, error) {
+func getSubscriptionsImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
 	choice := "btp_subaccount_subscription"
 	resource_doc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", "resources", choice, BtpProviderVersion, "github.com")
 	if err != nil {
@@ -93,16 +94,40 @@ func getSubscriptionsImportBlock(data map[string]interface{}, subaccountId strin
 	var importBlock string
 	subscriptions := data["values"].([]interface{})
 
-	for _, value := range subscriptions {
-		subscription := value.(map[string]interface{})
-		if fmt.Sprintf("%v", subscription["state"]) != "NOT_SUBSCRIBED" {
-			template := strings.Replace(resource_doc.Import, "<resource_name>", strings.Replace(fmt.Sprintf("%v", subscription["app_name"]), "-", "_", -1), -1)
-			template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
-			template = strings.Replace(template, "<app_name>", fmt.Sprintf("%v", subscription["app_name"]), -1)
-			template = strings.Replace(template, "<plan_name>", fmt.Sprintf("%v", subscription["plan_name"]), -1)
-			importBlock += template + "\n"
+	if len(filterValues) != 0 {
+		var subaccountAllSubscriptions []string
+
+		for _, value := range subscriptions {
+			subscription := value.(map[string]interface{})
+			subaccountAllSubscriptions = append(subaccountAllSubscriptions, fmt.Sprintf("%v", subscription["app_name"])+"_"+fmt.Sprintf("%v", subscription["plan_name"]))
+			if slices.Contains(filterValues, fmt.Sprintf("%v", subscription["app_name"])+"_"+fmt.Sprintf("%v", subscription["plan_name"])) {
+				importBlock += templateSubscriptionImport(subscription, subaccountId, resource_doc)
+			}
+		}
+
+		missingSubscription, subset := isSubset(subaccountAllSubscriptions, filterValues)
+
+		if !subset {
+			return "", fmt.Errorf("subscription %s not found in the subaccount. Please adjust it in the provided file", missingSubscription)
+
+		}
+
+	} else {
+		for _, value := range subscriptions {
+			subscription := value.(map[string]interface{})
+			if fmt.Sprintf("%v", subscription["state"]) != "NOT_SUBSCRIBED" {
+				importBlock += templateSubscriptionImport(subscription, subaccountId, resource_doc)
+			}
 		}
 	}
 
 	return importBlock, nil
+}
+
+func templateSubscriptionImport(subscription map[string]interface{}, subaccountId string, resource_doc tfutils.EntityDocs) string {
+	template := strings.Replace(resource_doc.Import, "<resource_name>", strings.Replace(fmt.Sprintf("%v", subscription["app_name"]), "-", "_", -1), -1)
+	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
+	template = strings.Replace(template, "<app_name>", fmt.Sprintf("%v", subscription["app_name"]), -1)
+	template = strings.Replace(template, "<plan_name>", fmt.Sprintf("%v", subscription["plan_name"]), -1)
+	return template + "\n"
 }

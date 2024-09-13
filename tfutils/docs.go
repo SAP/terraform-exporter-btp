@@ -38,8 +38,8 @@ type argumentDocs struct {
 	isNested bool
 }
 
-// entityDocs represents the documentation for a resource or datasource as extracted from TF markdown.
-type entityDocs struct {
+// EntityDocs represents the documentation for a resource or datasource as extracted from TF markdown.
+type EntityDocs struct {
 	// Description is the description of the resource
 	Description string
 	Arguments   map[string]*argumentDocs
@@ -140,7 +140,7 @@ type tfMarkdownParser struct {
 	kind             DocKind
 	markdownFileName string
 	rawname          string
-	ret              entityDocs
+	ret              EntityDocs
 }
 
 // splitGroupLines splits and groups a string, s, by a given separator, sep.
@@ -566,7 +566,7 @@ func (ns *nestedSchema) allParameters() []parameter {
 }
 
 func parseTopLevelSchemaIntoDocs(
-	accumulatedDocs *entityDocs,
+	accumulatedDocs *EntityDocs,
 	topLevelSchema *topLevelSchema,
 ) {
 	//for _, param := range topLevelSchema.allParameters() {
@@ -588,7 +588,7 @@ func parseTopLevelSchemaIntoDocs(
 }
 
 func parseNestedSchemaIntoDocuments(
-	accumulatedDocs *entityDocs,
+	accumulatedDocs *EntityDocs,
 	nestedSchema *nestedSchema,
 ) {
 
@@ -618,7 +618,7 @@ func parseNestedSchemaIntoDocuments(
 	}
 }
 
-func (ed *entityDocs) getOrCreateArgumentDocs(argumentName string) (*argumentDocs, bool) {
+func (ed *EntityDocs) getOrCreateArgumentDocs(argumentName string) (*argumentDocs, bool) {
 	if ed.Arguments == nil {
 		ed.Arguments = make(map[string]*argumentDocs)
 	}
@@ -851,7 +851,7 @@ func getNestedBlockNames(line string) string {
 
 var genericNestedRegexp = regexp.MustCompile("supports? the following:")
 
-func parseArgumentReferenceSection(subsec []string, entity *entityDocs) {
+func parseArgumentReferenceSection(subsec []string, entity *EntityDocs) {
 	var lastArgument, nestedBlock string
 
 	addHeading := func(headingName string, headingDescription string, line string) {
@@ -976,7 +976,7 @@ func (p *tfMarkdownParser) parseImport(importLines []string) {
 	p.ret.Import = p.ret.Import + strings.Join(importString, " ")
 }
 
-func parseAttrReferenceSection(attributeLines []string, entity *entityDocs) {
+func parseAttrReferenceSection(attributeLines []string, entity *EntityDocs) {
 	var lastMatchedAttribute string
 	for _, line := range attributeLines {
 		matches := attributeBulletRegexp.FindStringSubmatch(line)
@@ -1054,7 +1054,7 @@ func reorgenizeText(text string) (string, bool) {
 	return strings.TrimSpace(strings.Join(parts, "")), false
 }
 
-func cleanupDocument(name string, doc entityDocs) (entityDocs, bool) {
+func cleanupDocument(name string, doc EntityDocs) (EntityDocs, bool) {
 	hasElidedDoc := false
 	cleanedArguments := make(map[string]*argumentDocs, len(doc.Arguments))
 
@@ -1106,7 +1106,7 @@ func cleanupDocument(name string, doc entityDocs) (entityDocs, bool) {
 		doc.Import += "}\n"
 	}
 
-	return entityDocs{
+	return EntityDocs{
 		Description: cleanupText,
 		Arguments:   cleanedArguments,
 		Attributes:  cleanedAttributes,
@@ -1114,8 +1114,8 @@ func cleanupDocument(name string, doc entityDocs) (entityDocs, bool) {
 	}, hasElidedDoc
 }
 
-func (p *tfMarkdownParser) parse(tfMarkdown []byte) (entityDocs, error) {
-	p.ret = entityDocs{
+func (p *tfMarkdownParser) parse(tfMarkdown []byte) (EntityDocs, error) {
+	p.ret = EntityDocs{
 		Arguments:  make(map[string]*argumentDocs),
 		Attributes: make(map[string]string),
 	}
@@ -1132,7 +1132,7 @@ func (p *tfMarkdownParser) parse(tfMarkdown []byte) (entityDocs, error) {
 
 	for _, section := range sections {
 		if err := p.parseMarkdownSections(section); err != nil {
-			return entityDocs{}, err
+			return EntityDocs{}, err
 		}
 	}
 
@@ -1144,7 +1144,7 @@ func (p *tfMarkdownParser) parse(tfMarkdown []byte) (entityDocs, error) {
 // parseTFMarkdown takes a TF website markdown doc and extracts a structured representation for use in
 // generating doc comments
 func parseTFMarkdown(kind DocKind,
-	markdown []byte, markdownFileName, rawname string) (entityDocs, error) {
+	markdown []byte, markdownFileName, rawname string) (EntityDocs, error) {
 
 	p := &tfMarkdownParser{
 		kind:             kind,
@@ -1158,17 +1158,17 @@ func parseTFMarkdown(kind DocKind,
 // TF website documentation markdown content
 func GetDocsForResource(org string, provider string, resourcePrefix string, kind DocKind,
 	rawname string /* info tfbridge.ResourceOrDataSourceInfo, */, providerModuleVersion string,
-	githost string) (entityDocs, error) {
+	githost string) (EntityDocs, error) {
 
 	markdownBytes, markdownFileName, found := getMarkdownDetails(org, provider,
 		resourcePrefix, kind, rawname, providerModuleVersion, githost)
 	if !found {
-		return entityDocs{}, fmt.Errorf("could not find docs for %v %v", kind, rawname)
+		return EntityDocs{}, fmt.Errorf("could not find docs for %v %v", kind, rawname)
 	}
 
 	doc, err := parseTFMarkdown(kind, markdownBytes, markdownFileName, rawname)
 	if err != nil {
-		return entityDocs{}, err
+		return EntityDocs{}, err
 	}
 
 	return doc, nil

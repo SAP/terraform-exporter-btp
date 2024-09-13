@@ -21,23 +21,23 @@ btp_subaccount_trust_configurations `,
 		setupConfigDir(configDir)
 
 		execPreExportSteps("saconf")
-		exportSubaccount(subaccount, "saconf")
+		exportSubaccount(subaccount, "saconf", nil)
 		execPostExportSteps("saconf", configDir, resourceFileName, "SUBACCOUNT")
 
 		execPreExportSteps("saentitlementconf")
-		exportSubaccountEntitlements(subaccount, "saentitlementconf")
+		exportSubaccountEntitlements(subaccount, "saentitlementconf", nil)
 		execPostExportSteps("saentitlementconf", configDir, resourceFileName, "SUBACCOUNT ENTITLEMENTS")
 
 		execPreExportSteps("saenvinstanceconf")
-		exportEnvironmentInstances(subaccount, "saenvinstanceconf")
+		exportEnvironmentInstances(subaccount, "saenvinstanceconf", nil)
 		execPostExportSteps("saenvinstanceconf", configDir, resourceFileName, "SUBACCOUNT ENVIRONMENT INSTANCES")
 
 		execPreExportSteps("sasubscriptionconf")
-		exportSubaccountSubscriptions(subaccount, "sasubscriptionconf")
+		exportSubaccountSubscriptions(subaccount, "sasubscriptionconf", nil)
 		execPostExportSteps("sasubscriptionconf", configDir, resourceFileName, "SUBACCOUNT  SUBSCRIPTIONS")
 
 		execPreExportSteps("satrustconf")
-		exportTrustConfigurations(subaccount, "satrustconf")
+		exportTrustConfigurations(subaccount, "satrustconf", nil)
 		execPostExportSteps("satrustconf", configDir, resourceFileName, "SUBACCOUNT TRUST CONFIGURATIONS")
 
 		finalizeTfConfig(configDir)

@@ -54,7 +54,7 @@ func TestParseArgumentFromMarkdownLine(t *testing.T) {
 }
 
 func TestParseAttrReferenceSection(t *testing.T) {
-	ret := entityDocs{
+	ret := EntityDocs{
 		Arguments:  make(map[string]*argumentDocs),
 		Attributes: make(map[string]string),
 	}
@@ -300,7 +300,7 @@ func TestArgumentRegularExp(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			ret := entityDocs{
+			ret := EntityDocs{
 				Arguments: make(map[string]*argumentDocs),
 			}
 			parseArgumentReferenceSection(tt.input, &ret)

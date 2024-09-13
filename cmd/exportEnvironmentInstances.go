@@ -15,7 +15,7 @@ var exportEnvironmentInstancesCmd = &cobra.Command{
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
 		setupConfigDir(configDir)
-		exportEnvironmentInstances(subaccount, configDir)
+		exportEnvironmentInstances(subaccount, configDir, nil)
 		generateConfig(resourceFileName, configDir)
 	},
 }
