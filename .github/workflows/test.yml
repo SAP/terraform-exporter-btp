@@ -55,9 +55,9 @@ jobs:
       - run: go run main.go gendoc
       - name: git diff
         run: |
-          git diff --compact-summary --exit-code || \
+          git add .
+          git diff --staged --compact-summary --no-color --exit-code || \
             (echo; echo "Unexpected difference docu generation. Run 'make docs' command and commit."; exit 1)
-
 
   test:
     if: github.event.pull_request.draft == false
