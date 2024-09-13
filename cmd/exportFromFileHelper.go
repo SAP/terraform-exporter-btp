@@ -73,7 +73,7 @@ func generateConfigForResource(resource string, values []string, subaccount stri
 		exportSubaccount(subaccount, configDir, values)
 	}
 	if resource == "entitlements" {
-		exportEnvironmentInstances(subaccount, configDir, values)
+		exportSubaccountEntitlements(subaccount, configDir, values)
 	}
 	if resource == "subscriptions" {
 		exportSubaccountSubscriptions(subaccount, configDir, values)
