@@ -4,7 +4,7 @@ Terraform exporter for BTP
 
 ### Synopsis
 
-btptfexport is a utility to generate configuration for existing btp resources that are created manually and not managed by terraform. btptfexporter help to generate configuration which then can be used by Terraform to bring that resource under terraform state.
+btptfexport is a utility to generate configuration for existing btp resources that are created manually and not managed by terraform. The CLI helps to generate configuration which then can be used by Terraform to bring that resource under terraform state.
 	
 
 ### Options

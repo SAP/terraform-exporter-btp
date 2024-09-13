@@ -4,9 +4,9 @@ TBD
 
 ## Debug the CLI
 
-We provide a configuration for debugging the btptfexporter commands in VS Code. The configuration is available in the `.vscode` directory as `launch.json`
+We provide a configuration for debugging the btptfexport commands in VS Code. The configuration is available in the `.vscode` directory as `launch.json`
 
-Here is an example on how to debug the command `btptfexporter resource all`:
+Here is an example on how to debug the command `btptfexport resource all`:
 
 1. Set a breakpoint in the file `cmd/exportAll.go` in the run section of the command:
 

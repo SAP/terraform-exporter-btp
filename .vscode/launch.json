@@ -25,7 +25,7 @@
     {
       "id": "cliArgs",
       "type": "promptString",
-      "description": "Args for launching btptfexporter CLI. Use --cwd to set the working directory.",
+      "description": "Args for launching btptfexport CLI. Use --cwd to set the working directory.",
       "default": "resource all -s"
     }
   ]
