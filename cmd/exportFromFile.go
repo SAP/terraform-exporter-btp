@@ -18,7 +18,7 @@ You can removes resource names from this config file, if you want to selectively
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
-		jsonFile, _ := cmd.Flags().GetString("resource-file-path")
+		jsonFile, _ := cmd.Flags().GetString("file-path")
 
 		exportFromFile(subaccount, jsonFile, resourceFileName, configDir)
 	},
@@ -34,8 +34,8 @@ func init() {
 	generateCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
 	_ = generateCmd.MarkFlagRequired("subaccount")
 	generateCmd.Flags().StringVarP(&resFile, "resourceFileName", "f", "resources.tf", "filename for resource config generation")
-	generateCmd.Flags().StringVarP(&jsonFile, "resource-file-path", "", "", "json file having subaccount resources info")
-	_ = generateCmd.MarkFlagRequired("json-file")
+	generateCmd.Flags().StringVarP(&jsonFile, "file-path", "p", "", "json file having subaccount resources list")
+	_ = generateCmd.MarkFlagRequired("file-path")
 	generateCmd.Flags().StringVarP(&configDir, "config-output-dir", "o", "generated_configurations", "folder for config generation")
 
 }
