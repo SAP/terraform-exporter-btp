@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// exportTrustConfigurationsCmd represents the exportTrustConfigurations command
+// exportTrustConfigurationsCmd represents the exportSubaccountTrustConfigurations command
 var exportTrustConfigurationsCmd = &cobra.Command{
 	Use:               "trust-configurations",
 	Short:             "export trust configurations of a subaccount",
@@ -15,7 +15,7 @@ var exportTrustConfigurationsCmd = &cobra.Command{
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
 		setupConfigDir(configDir)
-		exportTrustConfigurations(subaccount, configDir, nil)
+		exportSubaccountTrustConfigurations(subaccount, configDir, nil)
 		generateConfig(resourceFileName, configDir)
 	},
 }

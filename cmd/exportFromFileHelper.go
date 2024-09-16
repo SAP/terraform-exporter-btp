@@ -71,7 +71,20 @@ func generateConfigForResource(resource string, values []string, subaccount stri
 	techResourceNameLong := strings.ToUpper(string(translateResourceParamToTechnicalName(resource)))
 
 	execPreExportSteps(tempConfigDir)
-	exportEnvironmentInstances(subaccount, tempConfigDir, values)
+	// Export must be done for each resource individually
+	switch resource {
+	case CmdSubaccountParameter:
+		exportSubaccount(subaccount, tempConfigDir, values)
+	case CmdEntitlementParameter:
+		exportSubaccountEntitlements(subaccount, tempConfigDir, values)
+	case CmdEnvironmentInstanceParameter:
+		exportEnvironmentInstances(subaccount, tempConfigDir, values)
+	case CmdSubscriptionParameter:
+		exportSubaccountSubscriptions(subaccount, tempConfigDir, values)
+	case CmdTrustConfigurationParameter:
+		exportSubaccountTrustConfigurations(subaccount, tempConfigDir, values)
+	}
+
 	execPostExportSteps(tempConfigDir, configDir, resourceFileName, techResourceNameLong)
 }
 

@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func exportTrustConfigurations(subaccountID string, configDir string, filterValues []string) {
+func exportSubaccountTrustConfigurations(subaccountID string, configDir string, filterValues []string) {
 	data, err := fetchImportConfiguration(subaccountID, SubaccountTrustConfigurationType, TmpFolder)
 	if err != nil {
 		log.Fatalf("error: %v", err)

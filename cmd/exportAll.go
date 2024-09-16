@@ -37,7 +37,7 @@ btp_subaccount_trust_configurations `,
 		execPostExportSteps("sasubscriptionconf", configDir, resourceFileName, "SUBACCOUNT  SUBSCRIPTIONS")
 
 		execPreExportSteps("satrustconf")
-		exportTrustConfigurations(subaccount, "satrustconf", nil)
+		exportSubaccountTrustConfigurations(subaccount, "satrustconf", nil)
 		execPostExportSteps("satrustconf", configDir, resourceFileName, "SUBACCOUNT TRUST CONFIGURATIONS")
 
 		finalizeTfConfig(configDir)
