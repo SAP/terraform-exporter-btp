@@ -350,6 +350,7 @@ func finalizeTfConfig(configFolder string) {
 	}
 }
 
+// Conveniecce functions that wrap repetitive steps
 func execPreExportSteps(tempConfigDir string) {
 	setupConfigDir(tempConfigDir)
 }

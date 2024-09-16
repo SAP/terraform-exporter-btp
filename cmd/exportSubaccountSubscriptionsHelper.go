@@ -58,7 +58,6 @@ func getSubscriptionsImportBlock(data map[string]interface{}, subaccountId strin
 
 		if !subset {
 			return "", fmt.Errorf("subscription %s not found in the subaccount. Please adjust it in the provided file", missingSubscription)
-
 		}
 
 	} else {

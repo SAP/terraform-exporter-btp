@@ -48,7 +48,6 @@ func getImportBlock(data map[string]interface{}, subaccountId string, filterValu
 		var subaccountAllEnvInstances []string
 
 		for _, value := range environmentInstances {
-
 			environmentInstance := value.(map[string]interface{})
 			subaccountAllEnvInstances = append(subaccountAllEnvInstances, fmt.Sprintf("%v", environmentInstance["environment_type"]))
 			if slices.Contains(filterValues, fmt.Sprintf("%v", environmentInstance["environment_type"])) {

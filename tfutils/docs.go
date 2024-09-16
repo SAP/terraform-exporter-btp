@@ -793,10 +793,6 @@ func (p *tfMarkdownParser) parseIntro(subsection []string) {
 
 //nolint:lll
 var (
-	// For example:
-	// [1]: https://docs.aws.amazon.com/lambda/latest/dg/welcome.html
-	//linkFooterRegexp = regexp.MustCompile(`(?m)^(\[\d+\]):\s(.*)`)
-
 	argumentBulletRegexp = regexp.MustCompile(
 		"^\\s*[*+-]\\s*`([a-zA-z0-9_]*)`\\s*(\\([a-zA-Z]*\\)\\s*)?\\s*[:–-]?\\s*(\\([^\\)]*\\)[-\\s]*)?(.*)",
 	)
@@ -998,13 +994,6 @@ var (
 
 	// Match a ```fenced code block```.
 	codeBlocks = regexp.MustCompile(`(?ms)\x60\x60\x60[^\n]*?$.*?\x60\x60\x60\s*$`)
-
-	// codeLikeSingleWord = regexp.MustCompile(`` + // trick gofmt into aligning the rest of the string
-	// 	// Match code_like_words inside code and plain text
-	// 	`((?P<open>[\s"\x60\[])(?P<name>([0-9a-z]+_)+[0-9a-z]+)(?P<close>[\s"\x60\]]))` +
-
-	// 	// Match `code` words
-	// 	`|(\x60(?P<name>[0-9a-z]+)\x60)`)
 )
 
 func reorgenizeText(text string) (string, bool) {

@@ -46,7 +46,6 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 	}
 
 	for _, resource := range inputRes {
-
 		values, err := readDataSources(subaccount, resource)
 		if err != nil {
 			fmt.Println("error:", err)
@@ -54,7 +53,6 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 		}
 		data := Resource{Name: resource, Values: values}
 		btpSubaccountResources = append(btpSubaccountResources, data)
-
 	}
 
 	res2 := resourcesArr{Btp_resources: btpSubaccountResources}
@@ -69,6 +67,7 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 		fmt.Println("error getting current directory:", err)
 		return
 	}
+
 	dataBlockFile := filepath.Join(currentDir, fileName)
 	err = tfutils.CreateFileWithContent(dataBlockFile, string(jsonBytes))
 	if err != nil {
