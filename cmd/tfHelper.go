@@ -76,10 +76,12 @@ func GetTfStateData(configDir string, resourceName ResourceName) ([]byte, error)
 
 func getDocByResourceName(kind tfutils.DocKind, resourceName ResourceName) (tfutils.EntityDocs, error) {
 	var choice string
-	if kind == ResourcesKind {
+
+	if kind == ResourcesKind || (kind == DataSourcesKind && resourceName == SubaccountType) {
+		// We need the singular form of the resource name for all resoucres and the subaccount data source
 		choice = string(resourceName)
 	} else {
-		// We need the plural form of the resource name for data sources
+		// We need the plural form of the resource name for all other data sources
 		choice = string(resourceName) + "s"
 	}
 
