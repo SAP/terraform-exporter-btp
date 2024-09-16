@@ -21,7 +21,7 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 		Btp_resources []Resource
 	}
 
-	allowedResources := []cmdResourceParameter{CmdSubaccountParameter, CmdEntitlementParameter, CmdEnvironmentInstanceParameter, CmdSubscriptionParameter, CmdTrustConfigurationParameter}
+	allowedResources := []string{CmdSubaccountParameter, CmdEntitlementParameter, CmdEnvironmentInstanceParameter, CmdSubscriptionParameter, CmdTrustConfigurationParameter}
 	var btpSubaccountResources []Resource
 
 	if len(resources) == 0 {
@@ -31,7 +31,7 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 
 	configureProvider()
 
-	inputRes := []string{}
+	var inputRes []string
 
 	if resources == "all" {
 		inputRes = allowedResources
@@ -105,7 +105,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 
 	var data map[string]interface{}
 
-	err := json.Unmarshal(jsonBytes, &data)
+	err = json.Unmarshal(jsonBytes, &data)
 	if err != nil {
 		fmt.Println("error:", err)
 		return nil, err

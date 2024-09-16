@@ -7,14 +7,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type cmdResourceParameter string
-
 const (
-	CmdSubaccountParameter          cmdResourceParameter = "subaccount"
-	CmdEntitlementParameter         cmdResourceParameter = "entitlements"
-	CmdEnvironmentInstanceParameter cmdResourceParameter = "environment-instances"
-	CmdSubscriptionParameter        cmdResourceParameter = "subscriptions"
-	CmdTrustConfigurationParameter  cmdResourceParameter = "trust-configurations"
+	CmdSubaccountParameter          string = "subaccount"
+	CmdEntitlementParameter         string = "entitlements"
+	CmdEnvironmentInstanceParameter string = "environment-instances"
+	CmdSubscriptionParameter        string = "subscriptions"
+	CmdTrustConfigurationParameter  string = "trust-configurations"
 )
 
 // getCmd represents the get command
