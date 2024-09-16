@@ -109,3 +109,19 @@ func readDataSource(subaccountId string, resourceName ResourceName) (string, err
 	}
 	return dataBlock, nil
 }
+
+func translateResourceParamToTechnicalName(resource string) ResourceName {
+	switch resource {
+	case "subaccount":
+		return SubaccountType
+	case "entitlements":
+		return SubaccountEntitlementType
+	case "environment-instances":
+		return SubaccountEnvironmentInstanceType
+	case "subscriptions":
+		return SubaccountSubscriptionType
+	case "trust-configurations":
+		return SubaccountTrustConfigurationType
+	}
+	return ""
+}

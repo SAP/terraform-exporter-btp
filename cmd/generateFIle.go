@@ -7,6 +7,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type cmdResourceParameter string
+
+const (
+	CmdSubaccountParameter          cmdResourceParameter = "subaccount"
+	CmdEntitlementParameter         cmdResourceParameter = "entitlements"
+	CmdEnvironmentInstanceParameter cmdResourceParameter = "environment-instances"
+	CmdSubscriptionParameter        cmdResourceParameter = "subscriptions"
+	CmdTrustConfigurationParameter  cmdResourceParameter = "trust-configurations"
+)
+
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "generate-resources-list",
