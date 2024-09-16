@@ -55,7 +55,7 @@ func exportEnvironmentInstances(subaccountID string, configFolder string, filter
 		return
 	}
 
-	importFileName := "btp_environment_instances_import.tf"
+	importFileName := "environment_instances_import.tf"
 	importFileName = filepath.Join(currentDir, configFolder, importFileName)
 
 	err = tfutils.CreateFileWithContent(importFileName, importBlock)
@@ -64,7 +64,7 @@ func exportEnvironmentInstances(subaccountID string, configFolder string, filter
 		return
 	}
 
-	log.Println(" environment instances have been exported. Please check " + configFolder + " folder")
+	log.Println("environment instances have been exported. Please check " + configFolder + " folder")
 }
 
 func getImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
