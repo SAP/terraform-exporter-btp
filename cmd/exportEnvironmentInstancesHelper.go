@@ -2,43 +2,15 @@ package cmd
 
 import (
 	"btptfexport/tfutils"
-	"encoding/json"
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"slices"
 	"strings"
 )
 
 func exportEnvironmentInstances(subaccountID string, configFolder string, filterValues []string) {
 
-	dataBlock, err := readDataSource(subaccountID, SubaccountEnvironmentInstanceType)
-	if err != nil {
-		return
-	}
-
-	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("error getting current directory: %v", err)
-		return
-	}
-	dataBlockFile := filepath.Join(TmpFolder, "main.tf")
-	err = tfutils.CreateFileWithContent(dataBlockFile, dataBlock)
-	if err != nil {
-		log.Fatalf("create file %s failed!", dataBlockFile)
-		return
-	}
-
-	jsonBytes, err := GetTfStateData(TmpFolder, "environment_instance")
-	if err != nil {
-		log.Fatalf("error json.Marshal: %v", err)
-		return
-	}
-
-	jsonString := string(jsonBytes)
-	var data map[string]interface{}
-	err = json.Unmarshal([]byte(jsonString), &data)
+	data, err := fetchImportConfiguration(subaccountID, SubaccountEnvironmentInstanceType, TmpFolder)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -55,16 +27,11 @@ func exportEnvironmentInstances(subaccountID string, configFolder string, filter
 		return
 	}
 
-	importFileName := "environment_instances_import.tf"
-	importFileName = filepath.Join(currentDir, configFolder, importFileName)
-
-	err = tfutils.CreateFileWithContent(importFileName, importBlock)
+	err = writeImportConfiguration(configFolder, SubaccountEnvironmentInstanceType, importBlock)
 	if err != nil {
-		log.Fatalf("create file %s failed!", dataBlockFile)
+		log.Fatalf("error: %v", err)
 		return
 	}
-
-	log.Println("environment instances have been exported. Please check " + configFolder + " folder")
 }
 
 func getImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {

@@ -112,15 +112,15 @@ func readDataSource(subaccountId string, resourceName ResourceName) (string, err
 
 func translateResourceParamToTechnicalName(resource string) ResourceName {
 	switch resource {
-	case "subaccount":
+	case CmdSubaccountParameter:
 		return SubaccountType
-	case "entitlements":
+	case CmdEntitlementParameter:
 		return SubaccountEntitlementType
-	case "environment-instances":
+	case CmdEnvironmentInstanceParameter:
 		return SubaccountEnvironmentInstanceType
-	case "subscriptions":
+	case CmdSubscriptionParameter:
 		return SubaccountSubscriptionType
-	case "trust-configurations":
+	case CmdTrustConfigurationParameter:
 		return SubaccountTrustConfigurationType
 	}
 	return ""

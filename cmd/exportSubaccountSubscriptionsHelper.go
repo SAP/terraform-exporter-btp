@@ -2,44 +2,15 @@ package cmd
 
 import (
 	"btptfexport/tfutils"
-	"encoding/json"
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"slices"
 	"strings"
 )
 
 func exportSubaccountSubscriptions(subaccountID string, configDir string, filterValues []string) {
 
-	dataBlock, err := readDataSource(subaccountID, SubaccountSubscriptionType)
-	if err != nil {
-		return
-	}
-
-	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("error getting current directory: %v", err)
-		return
-	}
-	dataBlockFile := filepath.Join(TmpFolder, "main.tf")
-	err = tfutils.CreateFileWithContent(dataBlockFile, dataBlock)
-	if err != nil {
-		log.Fatalf("create file %s failed!", dataBlockFile)
-		return
-	}
-
-	jsonBytes, err := GetTfStateData(TmpFolder, SubaccountSubscriptionType)
-	if err != nil {
-		log.Fatalf("error json.Marshal: %v", err)
-		return
-	}
-
-	var data map[string]interface{}
-	jsonString := string(jsonBytes)
-
-	err = json.Unmarshal([]byte(jsonString), &data)
+	data, err := fetchImportConfiguration(subaccountID, SubaccountSubscriptionType, TmpFolder)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -56,16 +27,11 @@ func exportSubaccountSubscriptions(subaccountID string, configDir string, filter
 		return
 	}
 
-	importFileName := "subaccount_subscriptions_import.tf"
-	importFileName = filepath.Join(currentDir, configDir, importFileName)
-
-	err = tfutils.CreateFileWithContent(importFileName, importBlock)
+	err = writeImportConfiguration(configDir, SubaccountSubscriptionType, importBlock)
 	if err != nil {
-		log.Fatalf("create file %v failed!", dataBlockFile)
+		log.Fatalf("error: %v", err)
 		return
 	}
-
-	log.Println("subaccount subscriptions has been exported. Please check " + configDir + " folder")
 }
 
 func getSubscriptionsImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {

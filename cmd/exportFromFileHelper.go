@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"slices"
+	"strings"
 )
 
 type Resource struct {
@@ -66,31 +67,12 @@ func exportFromFile(subaccount string, jsonfile string, resourceFile string, con
 }
 
 func generateConfigForResource(resource string, values []string, subaccount string, configDir string, resourceFileName string) {
-	if resource == "environment-instances" {
-		execPreExportSteps("saenvinstanceconf")
-		exportEnvironmentInstances(subaccount, "saenvinstanceconf", values)
-		execPostExportSteps("saenvinstanceconf", configDir, resourceFileName, "SUBACCOUNT ENVIRONMENT INSTANCES")
-	}
-	if resource == "subaccount" {
-		execPreExportSteps("saconf")
-		exportSubaccount(subaccount, "saconf", values)
-		execPostExportSteps("saconf", configDir, resourceFileName, "SUBACCOUNT")
-	}
-	if resource == "entitlements" {
-		execPreExportSteps("saentitlementconf")
-		exportSubaccountEntitlements(subaccount, "saentitlementconf", values)
-		execPostExportSteps("saentitlementconf", configDir, resourceFileName, "SUBACCOUNT ENTITLEMENTS")
-	}
-	if resource == "subscriptions" {
-		execPreExportSteps("sasubscriptionconf")
-		exportSubaccountSubscriptions(subaccount, "sasubscriptionconf", values)
-		execPostExportSteps("sasubscriptionconf", configDir, resourceFileName, "SUBACCOUNT  SUBSCRIPTIONS")
-	}
-	if resource == "trust-configurations" {
-		execPreExportSteps("satrustconf")
-		exportTrustConfigurations(subaccount, "satrustconf", values)
-		execPostExportSteps("satrustconf", configDir, resourceFileName, "SUBACCOUNT TRUST CONFIGURATIONS")
-	}
+	tempConfigDir := resource + "-config"
+	techResourceNameLong := strings.ToUpper(string(translateResourceParamToTechnicalName(resource)))
+
+	execPreExportSteps(tempConfigDir)
+	exportEnvironmentInstances(subaccount, tempConfigDir, values)
+	execPostExportSteps(tempConfigDir, configDir, resourceFileName, techResourceNameLong)
 }
 
 func isSubset(superSet []string, subset []string) (string, bool) {

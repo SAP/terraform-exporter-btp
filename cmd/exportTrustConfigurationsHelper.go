@@ -2,42 +2,14 @@ package cmd
 
 import (
 	"btptfexport/tfutils"
-	"encoding/json"
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"slices"
 	"strings"
 )
 
 func exportTrustConfigurations(subaccountID string, configDir string, filterValues []string) {
-	dataBlock, err := readDataSource(subaccountID, SubaccountTrustConfigurationType)
-	if err != nil {
-		return
-	}
-
-	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("error getting current directory: %v", err)
-		return
-	}
-	dataBlockFile := filepath.Join(TmpFolder, "main.tf")
-	err = tfutils.CreateFileWithContent(dataBlockFile, dataBlock)
-	if err != nil {
-		log.Fatalf("create file %s failed!", dataBlockFile)
-		return
-	}
-
-	jsonBytes, err := GetTfStateData(TmpFolder, SubaccountTrustConfigurationType)
-	if err != nil {
-		log.Fatalf("error json.Marshal: %v", err)
-		return
-	}
-
-	var data map[string]interface{}
-	jsonString := string(jsonBytes)
-	err = json.Unmarshal([]byte(jsonString), &data)
+	data, err := fetchImportConfiguration(subaccountID, SubaccountTrustConfigurationType, TmpFolder)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -54,17 +26,11 @@ func exportTrustConfigurations(subaccountID string, configDir string, filterValu
 		return
 	}
 
-	importFileName := "subaccount_trust_configurations_import.tf"
-	importFileName = filepath.Join(currentDir, configDir, importFileName)
-
-	err = tfutils.CreateFileWithContent(importFileName, importBlock)
+	err = writeImportConfiguration(configDir, SubaccountTrustConfigurationType, importBlock)
 	if err != nil {
-		log.Fatalf("create file %s failed!", dataBlockFile)
+		log.Fatalf("error: %v", err)
 		return
 	}
-
-	log.Println("subaccount trust configuration has been exported. Please check " + configDir + " folder")
-
 }
 
 func getTrustConfigurationsImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
