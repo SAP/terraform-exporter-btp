@@ -29,7 +29,7 @@ btp_subaccount_trust_configurations `,
 		execPostExportSteps("saentitlementconf", configDir, resourceFileName, "SUBACCOUNT ENTITLEMENTS")
 
 		execPreExportSteps("saenvinstanceconf")
-		exportEnvironmentInstances(subaccount, "saenvinstanceconf", nil)
+		exportSubaccountEnvironmentInstances(subaccount, "saenvinstanceconf", nil)
 		execPostExportSteps("saenvinstanceconf", configDir, resourceFileName, "SUBACCOUNT ENVIRONMENT INSTANCES")
 
 		execPreExportSteps("sasubscriptionconf")

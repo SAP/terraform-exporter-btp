@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// exportEnvironmentInstancesCmd represents the exportEnvironmentInstances command
+// exportEnvironmentInstancesCmd represents the exportSubaccountEnvironmentInstances command
 var exportEnvironmentInstancesCmd = &cobra.Command{
 	Use:               "environment-instances",
 	Short:             "export environment instance of a subaccount",
@@ -15,7 +15,7 @@ var exportEnvironmentInstancesCmd = &cobra.Command{
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
 		setupConfigDir(configDir)
-		exportEnvironmentInstances(subaccount, configDir, nil)
+		exportSubaccountEnvironmentInstances(subaccount, configDir, nil)
 		generateConfig(resourceFileName, configDir)
 	},
 }

@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func exportEnvironmentInstances(subaccountID string, configFolder string, filterValues []string) {
+func exportSubaccountEnvironmentInstances(subaccountID string, configFolder string, filterValues []string) {
 
 	data, err := fetchImportConfiguration(subaccountID, SubaccountEnvironmentInstanceType, TmpFolder)
 	if err != nil {

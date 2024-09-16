@@ -78,7 +78,7 @@ func generateConfigForResource(resource string, values []string, subaccount stri
 	case CmdEntitlementParameter:
 		exportSubaccountEntitlements(subaccount, tempConfigDir, values)
 	case CmdEnvironmentInstanceParameter:
-		exportEnvironmentInstances(subaccount, tempConfigDir, values)
+		exportSubaccountEnvironmentInstances(subaccount, tempConfigDir, values)
 	case CmdSubscriptionParameter:
 		exportSubaccountSubscriptions(subaccount, tempConfigDir, values)
 	case CmdTrustConfigurationParameter:
