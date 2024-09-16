@@ -15,6 +15,8 @@ const (
 	CmdTrustConfigurationParameter  string = "trust-configurations"
 )
 
+var AllowedResources = []string{CmdSubaccountParameter, CmdEntitlementParameter, CmdEnvironmentInstanceParameter, CmdSubscriptionParameter, CmdTrustConfigurationParameter}
+
 // getCmd represents the get command
 var getCmd = &cobra.Command{
 	Use:   "generate-resources-list",

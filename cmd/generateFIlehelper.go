@@ -21,7 +21,6 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 		Btp_resources []Resource
 	}
 
-	allowedResources := []string{CmdSubaccountParameter, CmdEntitlementParameter, CmdEnvironmentInstanceParameter, CmdSubscriptionParameter, CmdTrustConfigurationParameter}
 	var btpSubaccountResources []Resource
 
 	if len(resources) == 0 {
@@ -34,12 +33,12 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 	var inputRes []string
 
 	if resources == "all" {
-		inputRes = allowedResources
+		inputRes = AllowedResources
 	} else {
 		inputRes = strings.Split(resources, ",")
 
 		for _, resource := range inputRes {
-			if !(slices.Contains(allowedResources, resource)) {
+			if !(slices.Contains(AllowedResources, resource)) {
 				log.Fatal("please check the resource provided. Currently supported resources are subaccount, entitlements, subscriptions, environment-instances and trust-configurations. Provide 'all' to check for all resources")
 				return
 			}
