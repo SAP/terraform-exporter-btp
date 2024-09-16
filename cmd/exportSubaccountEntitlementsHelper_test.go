@@ -7,7 +7,7 @@ import (
 
 func TestReadSubaccountEntilementsDataSource(t *testing.T) {
 
-	dataBlock, err := readSubaccountEntilementsDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5")
+	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", SubaccountEntitlementType)
 
 	if err != nil {
 		t.Errorf("error creating dataBlock")

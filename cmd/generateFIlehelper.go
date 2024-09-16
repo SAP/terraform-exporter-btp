@@ -89,7 +89,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 	dataBlockFile := filepath.Join(TmpFolder, "main.tf")
 	var jsonBytes []byte
 	if btpResource == "subaccount" {
-		dataBlock, err := readSubaccountDataSource(subaccountID)
+		dataBlock, err := readDataSource(subaccountID, SubaccountType)
 		if err != nil {
 			fmt.Println("error getting data source:", err)
 			return nil, err
@@ -106,7 +106,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 	} else if btpResource == "entitlements" {
-		dataBlock, err := readSubaccountEntilementsDataSource(subaccountID)
+		dataBlock, err := readDataSource(subaccountID, SubaccountEntitlementType)
 		if err != nil {
 			fmt.Println("error getting data source:", err)
 			return nil, err
@@ -124,7 +124,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 	} else if btpResource == "subscriptions" {
-		dataBlock, err := readSubaccountSubscriptionDataSource(subaccountID)
+		dataBlock, err := readDataSource(subaccountID, SubaccountSubscriptionType)
 		if err != nil {
 			fmt.Println("error getting data source:", err)
 			return nil, err
@@ -142,7 +142,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 	} else if btpResource == "environment-instances" {
-		dataBlock, err := readDataSource(subaccountID)
+		dataBlock, err := readDataSource(subaccountID, SubaccountEnvironmentInstanceType)
 		if err != nil {
 			fmt.Println("error getting data source:", err)
 			return nil, err
@@ -154,13 +154,13 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 			return nil, err
 		}
 
-		jsonBytes, err = GetTfStateData(TmpFolder, EnvironmentInstanceType)
+		jsonBytes, err = GetTfStateData(TmpFolder, SubaccountEnvironmentInstanceType)
 		if err != nil {
 			log.Fatalf("error json.Marshal: %s", err)
 			return nil, err
 		}
 	} else if btpResource == "trust-configurations" {
-		dataBlock, err := readSubaccountTrustConfigurationsDataSource(subaccountID)
+		dataBlock, err := readDataSource(subaccountID, SubaccountTrustConfigurationType)
 		if err != nil {
 			fmt.Println("error getting data source:", err)
 			return nil, err
@@ -188,8 +188,7 @@ func readDataSources(subaccountID string, btpResource string) ([]string, error) 
 	if btpResource == "subaccount" {
 		stringArr = []string{fmt.Sprintf("%v", data["name"])}
 	} else if btpResource == "entitlements" {
-		for key, _ := range data {
-
+		for key := range data {
 			key := strings.Replace(key, ":", "_", -1)
 			stringArr = append(stringArr, key)
 		}

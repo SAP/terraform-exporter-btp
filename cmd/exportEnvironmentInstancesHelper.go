@@ -13,9 +13,8 @@ import (
 
 func exportEnvironmentInstances(subaccountID string, configFolder string, filterValues []string) {
 
-	dataBlock, err := readDataSource(subaccountID)
+	dataBlock, err := readDataSource(subaccountID, SubaccountEnvironmentInstanceType)
 	if err != nil {
-		log.Fatalf("error getting data source: %v", err)
 		return
 	}
 
@@ -68,25 +67,10 @@ func exportEnvironmentInstances(subaccountID string, configFolder string, filter
 	log.Println(" environment instances have been exported. Please check " + configFolder + " folder")
 }
 
-// this function read the data source document and return the data block to use to get the resoure state
-func readDataSource(subaccountId string) (string, error) {
-	choice := "btp_subaccount_environment_instances"
-	dsDoc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", "data-sources", choice, BtpProviderVersion, "github.com")
-
-	if err != nil {
-		log.Fatalf("read doc failed")
-		return "", err
-	}
-	dataBlock := strings.Replace(dsDoc.Import, dsDoc.Attributes["subaccount_id"], subaccountId, -1)
-	return dataBlock, nil
-
-}
-
 func getImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
-	choice := "btp_subaccount_environment_instance"
-	resource_doc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", "resources", choice, BtpProviderVersion, "github.com")
+
+	resourceDoc, err := getDocByResourceName(ResourcesKind, SubaccountEnvironmentInstanceType)
 	if err != nil {
-		log.Fatalf("read doc failed!")
 		return "", err
 	}
 
@@ -101,7 +85,7 @@ func getImportBlock(data map[string]interface{}, subaccountId string, filterValu
 			environmentInstance := value.(map[string]interface{})
 			subaccountAllEnvInstances = append(subaccountAllEnvInstances, fmt.Sprintf("%v", environmentInstance["environment_type"]))
 			if slices.Contains(filterValues, fmt.Sprintf("%v", environmentInstance["environment_type"])) {
-				importBlock += templateEnvironmentInstanceImport(environmentInstance, subaccountId, resource_doc)
+				importBlock += templateEnvironmentInstanceImport(environmentInstance, subaccountId, resourceDoc)
 			}
 		}
 
@@ -115,15 +99,15 @@ func getImportBlock(data map[string]interface{}, subaccountId string, filterValu
 
 		for _, value := range environmentInstances {
 			environmentInstance := value.(map[string]interface{})
-			importBlock += templateEnvironmentInstanceImport(environmentInstance, subaccountId, resource_doc)
+			importBlock += templateEnvironmentInstanceImport(environmentInstance, subaccountId, resourceDoc)
 		}
 	}
 
 	return importBlock, nil
 }
 
-func templateEnvironmentInstanceImport(environmentInstance map[string]interface{}, subaccountId string, resource_doc tfutils.EntityDocs) string {
-	template := strings.Replace(resource_doc.Import, "<resource_name>", fmt.Sprintf("%v", environmentInstance["environment_type"]), -1)
+func templateEnvironmentInstanceImport(environmentInstance map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", fmt.Sprintf("%v", environmentInstance["environment_type"]), -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	template = strings.Replace(template, "<environment_instance_id>", fmt.Sprintf("%v", environmentInstance["id"]), -1)
 	return template + "\n"

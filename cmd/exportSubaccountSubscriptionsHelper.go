@@ -13,9 +13,8 @@ import (
 
 func exportSubaccountSubscriptions(subaccountID string, configDir string, filterValues []string) {
 
-	dataBlock, err := readSubaccountSubscriptionDataSource(subaccountID)
+	dataBlock, err := readDataSource(subaccountID, SubaccountSubscriptionType)
 	if err != nil {
-		log.Fatalf("error getting data source: %v", err)
 		return
 	}
 
@@ -69,25 +68,9 @@ func exportSubaccountSubscriptions(subaccountID string, configDir string, filter
 	log.Println("subaccount subscriptions has been exported. Please check " + configDir + " folder")
 }
 
-// this function read the data source document and return the data block to use to get the resoure state
-func readSubaccountSubscriptionDataSource(subaccountId string) (string, error) {
-	choice := "btp_subaccount_subscriptions"
-	dsDoc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", "data-sources", choice, BtpProviderVersion, "github.com")
-
-	if err != nil {
-		log.Fatalf("read doc failed")
-		return "", err
-	}
-	dataBlock := strings.Replace(dsDoc.Import, dsDoc.Attributes["subaccount_id"], subaccountId, -1)
-	return dataBlock, nil
-
-}
-
 func getSubscriptionsImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
-	choice := "btp_subaccount_subscription"
-	resource_doc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", "resources", choice, BtpProviderVersion, "github.com")
+	resourceDoc, err := getDocByResourceName(ResourcesKind, SubaccountSubscriptionType)
 	if err != nil {
-		log.Fatalf("read doc failed")
 		return "", err
 	}
 
@@ -101,7 +84,7 @@ func getSubscriptionsImportBlock(data map[string]interface{}, subaccountId strin
 			subscription := value.(map[string]interface{})
 			subaccountAllSubscriptions = append(subaccountAllSubscriptions, fmt.Sprintf("%v", subscription["app_name"])+"_"+fmt.Sprintf("%v", subscription["plan_name"]))
 			if slices.Contains(filterValues, fmt.Sprintf("%v", subscription["app_name"])+"_"+fmt.Sprintf("%v", subscription["plan_name"])) {
-				importBlock += templateSubscriptionImport(subscription, subaccountId, resource_doc)
+				importBlock += templateSubscriptionImport(subscription, subaccountId, resourceDoc)
 			}
 		}
 
@@ -116,7 +99,7 @@ func getSubscriptionsImportBlock(data map[string]interface{}, subaccountId strin
 		for _, value := range subscriptions {
 			subscription := value.(map[string]interface{})
 			if fmt.Sprintf("%v", subscription["state"]) != "NOT_SUBSCRIBED" {
-				importBlock += templateSubscriptionImport(subscription, subaccountId, resource_doc)
+				importBlock += templateSubscriptionImport(subscription, subaccountId, resourceDoc)
 			}
 		}
 	}
@@ -124,8 +107,8 @@ func getSubscriptionsImportBlock(data map[string]interface{}, subaccountId strin
 	return importBlock, nil
 }
 
-func templateSubscriptionImport(subscription map[string]interface{}, subaccountId string, resource_doc tfutils.EntityDocs) string {
-	template := strings.Replace(resource_doc.Import, "<resource_name>", strings.Replace(fmt.Sprintf("%v", subscription["app_name"]), "-", "_", -1), -1)
+func templateSubscriptionImport(subscription map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", strings.Replace(fmt.Sprintf("%v", subscription["app_name"]), "-", "_", -1), -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	template = strings.Replace(template, "<app_name>", fmt.Sprintf("%v", subscription["app_name"]), -1)
 	template = strings.Replace(template, "<plan_name>", fmt.Sprintf("%v", subscription["plan_name"]), -1)

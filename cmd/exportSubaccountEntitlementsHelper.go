@@ -13,9 +13,8 @@ import (
 
 func exportSubaccountEntitlements(subaccountID string, configDir string, filterValues []string) {
 
-	dataBlock, err := readSubaccountEntilementsDataSource(subaccountID)
+	dataBlock, err := readDataSource(subaccountID, SubaccountEntitlementType)
 	if err != nil {
-		log.Fatalf("error getting data source: %v", err)
 		return
 	}
 
@@ -69,25 +68,10 @@ func exportSubaccountEntitlements(subaccountID string, configDir string, filterV
 
 }
 
-// this function read the data source document and return the data block to use to get the resoure state
-func readSubaccountEntilementsDataSource(subaccountId string) (string, error) {
-	choice := "btp_subaccount_entitlements"
-	dsDoc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", "data-sources", choice, BtpProviderVersion, "github.com")
-
-	if err != nil {
-		log.Fatalf("read doc failed")
-		return "", err
-	}
-	dataBlock := strings.Replace(dsDoc.Import, dsDoc.Attributes["subaccount_id"], subaccountId, -1)
-	return dataBlock, nil
-
-}
-
 func getEntitlementsImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
-	choice := "btp_subaccount_entitlement"
-	resource_doc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", "resources", choice, BtpProviderVersion, "github.com")
+
+	resourceDoc, err := getDocByResourceName(ResourcesKind, SubaccountEntitlementType)
 	if err != nil {
-		log.Fatalf("read doc failed")
 		return "", err
 	}
 
@@ -98,7 +82,7 @@ func getEntitlementsImportBlock(data map[string]interface{}, subaccountId string
 		for key, value := range data {
 			subaccountAllEntitlements = append(subaccountAllEntitlements, strings.Replace(key, ":", "_", -1))
 			if slices.Contains(filterValues, strings.Replace(key, ":", "_", -1)) {
-				importBlock += templateEntitlementImport(key, value, subaccountId, resource_doc)
+				importBlock += templateEntitlementImport(key, value, subaccountId, resourceDoc)
 			}
 		}
 
@@ -110,15 +94,15 @@ func getEntitlementsImportBlock(data map[string]interface{}, subaccountId string
 
 	} else {
 		for key, value := range data {
-			importBlock += templateEntitlementImport(key, value, subaccountId, resource_doc)
+			importBlock += templateEntitlementImport(key, value, subaccountId, resourceDoc)
 		}
 	}
 
 	return importBlock, nil
 }
 
-func templateEntitlementImport(key string, value interface{}, subaccountId string, resource_doc tfutils.EntityDocs) string {
-	template := strings.Replace(resource_doc.Import, "<resource_name>", strings.Replace(key, ":", "_", -1), -1)
+func templateEntitlementImport(key string, value interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", strings.Replace(key, ":", "_", -1), -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	if subMap, ok := value.(map[string]interface{}); ok {
 		for subKey, subValue := range subMap {

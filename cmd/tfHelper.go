@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"btptfexport/tfutils"
 	"context"
 	"encoding/json"
 	"log"
 	"os/exec"
+	"strings"
 
 	"github.com/hashicorp/terraform-exec/tfexec"
 )
@@ -15,12 +17,15 @@ const BtpProviderVersion = "v1.6.0"
 type ResourceName string
 
 const (
-	SubaccountType                   ResourceName = "subaccount"
-	SubaccountEntitlementType        ResourceName = "subaccount_entitlement"
-	EnvironmentInstanceType          ResourceName = "environment_instance"
-	SubaccountSubscriptionType       ResourceName = "subaccount_subscription"
-	SubaccountTrustConfigurationType ResourceName = "subaccount_trust_configuration"
+	SubaccountType                    ResourceName = "btp_subaccount"
+	SubaccountEntitlementType         ResourceName = "btp_subaccount_entitlement"
+	SubaccountEnvironmentInstanceType ResourceName = "btp_subaccount_environment_instance"
+	SubaccountSubscriptionType        ResourceName = "btp_subaccount_subscription"
+	SubaccountTrustConfigurationType  ResourceName = "btp_subaccount_trust_configuration"
 )
+
+const DataSourcesKind tfutils.DocKind = "data-sources"
+const ResourcesKind tfutils.DocKind = "resources"
 
 func GetTfStateData(configDir string, resourceName ResourceName) ([]byte, error) {
 	execPath, err := exec.LookPath("terraform")
@@ -67,4 +72,38 @@ func GetTfStateData(configDir string, resourceName ResourceName) ([]byte, error)
 	}
 
 	return jsonBytes, nil
+}
+
+func getDocByResourceName(kind tfutils.DocKind, resourceName ResourceName) (tfutils.EntityDocs, error) {
+	var choice string
+	if kind == ResourcesKind {
+		choice = string(resourceName)
+	} else {
+		// We need the plural form of the resource name for data sources
+		choice = string(resourceName) + "s"
+	}
+
+	doc, err := tfutils.GetDocsForResource("SAP", "btp", "btp", kind, choice, BtpProviderVersion, "github.com")
+	if err != nil {
+		log.Fatalf("read doc failed for %s, %s: %v", kind, choice, err)
+		return tfutils.EntityDocs{}, err
+	}
+
+	return doc, nil
+}
+
+func readDataSource(subaccountId string, resourceName ResourceName) (string, error) {
+
+	doc, err := getDocByResourceName(DataSourcesKind, resourceName)
+	if err != nil {
+		return "", err
+	}
+
+	var dataBlock string
+	if resourceName == SubaccountType {
+		dataBlock = strings.Replace(doc.Import, "The ID of the subaccount", subaccountId, -1)
+	} else {
+		dataBlock = strings.Replace(doc.Import, doc.Attributes["subaccount_id"], subaccountId, -1)
+	}
+	return dataBlock, nil
 }
