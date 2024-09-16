@@ -15,7 +15,7 @@ btptfexport resource from-file [flags]
 
 ```
   -o, --config-output-dir string   folder for config generation (default "generated_configurations")
-  -p, --file-path string           json file having subaccount resources list
+  -p, --file-path string           json file having subaccount resources list (default "btpResources.json")
   -h, --help                       help for from-file
   -f, --resourceFileName string    filename for resource config generation (default "resources.tf")
   -s, --subaccount string          Id of the subaccount
