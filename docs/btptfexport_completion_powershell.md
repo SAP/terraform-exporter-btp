@@ -25,6 +25,12 @@ btptfexport completion powershell [flags]
       --no-descriptions   disable completion descriptions
 ```
 
+### Options inherited from parent commands
+
+```
+  -d, --debug   Display debugging output in the console. (default: false)
+```
+
 ### SEE ALSO
 
 * [btptfexport completion](btptfexport_completion.md)	 - Generate the autocompletion script for the specified shell

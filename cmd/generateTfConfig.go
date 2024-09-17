@@ -9,13 +9,22 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 var TmpFolder string
 
 func runTerraformCommand(args ...string) error {
+
+	debug := viper.GetViper().GetBool("debug")
 	cmd := exec.Command("terraform", args...)
-	cmd.Stdout = os.Stdout
+	if debug {
+		cmd.Stdout = os.Stdout
+	} else {
+		cmd.Stdout = nil
+	}
+
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }

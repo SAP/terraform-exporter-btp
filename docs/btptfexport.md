@@ -10,8 +10,8 @@ btptfexport is a utility to generate configuration for existing btp resources th
 ### Options
 
 ```
-  -h, --help     help for btptfexport
-  -t, --toggle   Help message for toggle
+  -d, --debug   Display debugging output in the console. (default: false)
+  -h, --help    help for btptfexport
 ```
 
 ### SEE ALSO
