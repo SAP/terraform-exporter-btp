@@ -20,6 +20,12 @@ btptfexport resource [flags]
   -h, --help   help for resource
 ```
 
+### Options inherited from parent commands
+
+```
+  -d, --debug   Display debugging output in the console. (default: false)
+```
+
 ### SEE ALSO
 
 * [btptfexport](btptfexport.md)	 - Terraform exporter for BTP

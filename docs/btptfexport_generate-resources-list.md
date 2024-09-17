@@ -39,6 +39,12 @@ btptfexport generate-resources-list [flags]
   -s, --subaccount string   Id of the subaccount
 ```
 
+### Options inherited from parent commands
+
+```
+  -d, --debug   Display debugging output in the console. (default: false)
+```
+
 ### SEE ALSO
 
 * [btptfexport](btptfexport.md)	 - Terraform exporter for BTP

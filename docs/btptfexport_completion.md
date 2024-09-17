@@ -14,6 +14,12 @@ See each sub-command's help for details on how to use the generated script.
   -h, --help   help for completion
 ```
 
+### Options inherited from parent commands
+
+```
+  -d, --debug   Display debugging output in the console. (default: false)
+```
+
 ### SEE ALSO
 
 * [btptfexport](btptfexport.md)	 - Terraform exporter for BTP
