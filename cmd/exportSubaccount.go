@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +20,7 @@ var subaccountCmd = &cobra.Command{
 		printExportStartMessage()
 		setupConfigDir(configDir, true)
 		exportSubaccount(subaccount, configDir, nil)
-		generateConfig(resourceFileName, configDir, true, string(SubaccountType))
+		generateConfig(resourceFileName, configDir, true, strings.ToUpper(string(SubaccountType)))
 		printExportSuccessMessage()
 	},
 }

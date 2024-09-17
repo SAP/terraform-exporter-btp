@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +18,7 @@ var exportEnvironmentInstancesCmd = &cobra.Command{
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
 		setupConfigDir(configDir, true)
 		exportSubaccountEnvironmentInstances(subaccount, configDir, nil)
-		generateConfig(resourceFileName, configDir, true, string(SubaccountEnvironmentInstanceType))
+		generateConfig(resourceFileName, configDir, true, strings.ToUpper(string(SubaccountEnvironmentInstanceType)))
 	},
 }
 

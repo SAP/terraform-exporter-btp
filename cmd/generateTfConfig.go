@@ -38,7 +38,7 @@ func generateConfig(resourceFileName string, configFolder string, isMainCmd bool
 
 	if isMainCmd {
 		// We must distinguish if the command is run from a main command or via delegation from helper functions
-		spinner, err = startSpinner("create Terraform configuration for " + resourceNameLong)
+		spinner, err = startSpinner("generating Terraform configuration for " + resourceNameLong)
 		if err != nil {
 			log.Fatalf("error: %v", err)
 			return
@@ -89,8 +89,8 @@ func generateConfig(resourceFileName string, configFolder string, isMainCmd bool
 			log.Fatalf("error: %v", err)
 			return
 		}
+		fmt.Println(color.HiBlackString("   temporary files deleted"))
 	}
-
 }
 
 func cleanup() {
@@ -108,9 +108,16 @@ func configureProvider() {
 	if err != nil {
 		panic(err)
 	}
+
 	TmpFolder = tmpdir
 	abspath := filepath.Join(tmpdir, "provider.tf")
-	fmt.Println(abspath)
+
+	debug := viper.GetViper().GetBool("debug")
+
+	if debug {
+		fmt.Printf("temp file created at %s\n", abspath)
+	}
+
 	username := os.Getenv("BTP_USERNAME")
 	password := os.Getenv("BTP_PASSWORD")
 	enableSSO := os.Getenv("BTP_ENABLE_SSO")
@@ -405,7 +412,7 @@ func execPreExportSteps(tempConfigDir string) {
 
 func execPostExportSteps(tempConfigDir string, targetConfigDir string, targetResourceFileName string, resourceNameLong string) {
 
-	spinner, err := startSpinner("create Terraform configuration for " + resourceNameLong)
+	spinner, err := startSpinner("generating Terraform configuration for " + resourceNameLong)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -420,4 +427,6 @@ func execPostExportSteps(tempConfigDir string, targetConfigDir string, targetRes
 		log.Fatalf("error: %v", err)
 		return
 	}
+
+	fmt.Println(color.HiBlackString("   temporary files deleted"))
 }

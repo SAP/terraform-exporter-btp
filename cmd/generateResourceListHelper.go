@@ -45,6 +45,12 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 		}
 	}
 
+	spinner, err := startSpinner("Collecting resources of subaccount")
+	if err != nil {
+		log.Fatalf("error: %v", err)
+		return
+	}
+
 	for _, resource := range inputRes {
 		values, err := readDataSources(subaccount, resource)
 		if err != nil {
@@ -72,6 +78,12 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 	err = tfutils.CreateFileWithContent(dataBlockFile, string(jsonBytes))
 	if err != nil {
 		log.Fatalf("create file %s failed!", dataBlockFile)
+		return
+	}
+
+	err = stopSpinner(spinner)
+	if err != nil {
+		log.Fatalf("error: %v", err)
 		return
 	}
 

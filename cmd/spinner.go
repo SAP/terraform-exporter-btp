@@ -7,6 +7,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/theckman/yacspin"
 )
 
@@ -63,6 +64,12 @@ func renderSpinner(spinner *yacspin.Spinner) error {
 
 func startSpinner(message string) (*yacspin.Spinner, error) {
 
+	// No spinner execution during debug mode
+	debug := viper.GetViper().GetBool("debug")
+	if debug {
+		return nil, nil
+	}
+
 	spinner, err := createSpinner(message)
 	if err != nil {
 		fmt.Printf("failed to make spinner from config struct: %v\n", err)
@@ -80,6 +87,13 @@ func startSpinner(message string) (*yacspin.Spinner, error) {
 }
 
 func stopSpinner(spinner *yacspin.Spinner) error {
+
+	// No spinner execution during debug mode
+	debug := viper.GetViper().GetBool("debug")
+	if debug {
+		return nil
+	}
+
 	if err := spinner.Stop(); err != nil {
 		return fmt.Errorf("failed to stop spinner: %w", err)
 	}
@@ -96,5 +110,17 @@ func printExportStartMessage() {
 func printExportSuccessMessage() {
 	fmt.Println("")
 	fmt.Println("🎉 Terraform configuration successfully created")
+	fmt.Println("")
+}
+
+func printInventoryCreationStartMessage() {
+	fmt.Println("")
+	fmt.Println("🚀 Creation of resource list started ...")
+	fmt.Println("")
+}
+
+func printInventoryCreationSuccessMessage() {
+	fmt.Println("")
+	fmt.Println("📋 Resource list successfully created")
 	fmt.Println("")
 }

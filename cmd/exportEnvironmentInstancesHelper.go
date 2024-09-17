@@ -10,7 +10,8 @@ import (
 
 func exportSubaccountEnvironmentInstances(subaccountID string, configFolder string, filterValues []string) {
 
-	spinner, err := startSpinner("crafting import block for " + string(SubaccountEnvironmentInstanceType))
+	fmt.Println("")
+	spinner, err := startSpinner("crafting import block for " + strings.ToUpper(string(SubaccountEnvironmentInstanceType)))
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return

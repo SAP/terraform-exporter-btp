@@ -9,7 +9,8 @@ import (
 
 func exportSubaccount(subaccountID string, configDir string, filterValues []string) {
 
-	spinner, err := startSpinner("crafting import block for " + string(SubaccountType))
+	fmt.Println("")
+	spinner, err := startSpinner("crafting import block for " + strings.ToUpper(string(SubaccountType)))
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return

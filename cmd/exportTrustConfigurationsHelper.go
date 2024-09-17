@@ -10,7 +10,8 @@ import (
 
 func exportSubaccountTrustConfigurations(subaccountID string, configDir string, filterValues []string) {
 
-	spinner, err := startSpinner("crafting import block for " + string(SubaccountTrustConfigurationType))
+	fmt.Println("")
+	spinner, err := startSpinner("crafting import block for " + strings.ToUpper(string(SubaccountTrustConfigurationType)))
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return

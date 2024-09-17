@@ -10,7 +10,8 @@ import (
 
 func exportSubaccountEntitlements(subaccountID string, configDir string, filterValues []string) {
 
-	spinner, err := startSpinner("crafting import block for " + string(SubaccountEntitlementType))
+	fmt.Println("")
+	spinner, err := startSpinner("crafting import block for " + strings.ToUpper(string(SubaccountEntitlementType)))
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return

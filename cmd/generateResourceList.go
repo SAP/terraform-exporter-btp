@@ -47,7 +47,9 @@ Mixing "all" with other resources will throw an error.
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		fileName, _ := cmd.Flags().GetString("json-out")
 		resources, _ := cmd.Flags().GetString("resources")
+		printInventoryCreationStartMessage()
 		getResourcesInfo(subaccount, fileName, resources)
+		printInventoryCreationSuccessMessage()
 	},
 }
 
