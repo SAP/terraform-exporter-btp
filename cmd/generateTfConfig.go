@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/spf13/viper"
 	"github.com/theckman/yacspin"
 )
@@ -169,7 +170,8 @@ func configureProvider() {
 func setupConfigDir(configFolder string, isMainCmd bool) {
 
 	if isMainCmd {
-		fmt.Printf("Setting up config directory %s\n", configFolder)
+		message := "set up config directory \"" + configFolder + "\""
+		fmt.Println(color.HiBlackString(message))
 	}
 
 	if len(TmpFolder) == 0 {

@@ -88,11 +88,13 @@ func stopSpinner(spinner *yacspin.Spinner) error {
 }
 
 func printExportStartMessage() {
-	fmt.Println("🚀 Terraform configuration export started")
+	fmt.Println("")
+	fmt.Println("🚀 Terraform configuration export started ...")
 	fmt.Println("")
 }
 
 func printExportSuccessMessage() {
 	fmt.Println("")
 	fmt.Println("🎉 Terraform configuration successfully created")
+	fmt.Println("")
 }

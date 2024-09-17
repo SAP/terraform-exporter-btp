@@ -171,7 +171,5 @@ func writeImportConfiguration(configDir string, resourceType ResourceName, impor
 		return fmt.Errorf("create file %s failed: %v", importFileName, err)
 	}
 
-	fmt.Println(string(resourceType) + " exported to " + configDir + " folder")
-
 	return nil
 }
