@@ -10,13 +10,19 @@ import (
 
 func exportSubaccountSubscriptions(subaccountID string, configDir string, filterValues []string) {
 
+	spinner, err := startSpinner("crafting import block for " + string(SubaccountSubscriptionType))
+	if err != nil {
+		log.Fatalf("error: %v", err)
+		return
+	}
+
 	data, err := fetchImportConfiguration(subaccountID, SubaccountSubscriptionType, TmpFolder)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
 	}
 
-	importBlock, err := getSubscriptionsImportBlock(data, subaccountID, filterValues)
+	importBlock, err := getSubaccountSubscriptionsImportBlock(data, subaccountID, filterValues)
 	if err != nil {
 		fmt.Println("error:", err)
 		return
@@ -32,9 +38,16 @@ func exportSubaccountSubscriptions(subaccountID string, configDir string, filter
 		log.Fatalf("error: %v", err)
 		return
 	}
+
+	err = stopSpinner(spinner)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+		return
+	}
 }
 
-func getSubscriptionsImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
+func getSubaccountSubscriptionsImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
+
 	resourceDoc, err := getDocByResourceName(ResourcesKind, SubaccountSubscriptionType)
 	if err != nil {
 		return "", err

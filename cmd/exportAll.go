@@ -18,13 +18,15 @@ btp_subaccount_trust_configurations `,
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
 
-		setupConfigDir(configDir)
+		printExportStartMessage()
+		setupConfigDir(configDir, true)
 
 		for _, resourceToImport := range AllowedResources {
 			generateConfigForResource(resourceToImport, nil, subaccount, configDir, resourceFileName)
 		}
 
 		finalizeTfConfig(configDir)
+		printExportSuccessMessage()
 	},
 }
 

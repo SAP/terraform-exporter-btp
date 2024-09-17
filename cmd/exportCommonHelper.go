@@ -130,6 +130,7 @@ func translateResourceParamToTechnicalName(resource string) ResourceName {
 }
 
 func fetchImportConfiguration(subaccountID string, resourceType ResourceName, tmpFolder string) (map[string]interface{}, error) {
+
 	dataBlock, err := readDataSource(subaccountID, resourceType)
 	if err != nil {
 		return nil, fmt.Errorf("error reading data source: %v", err)
@@ -156,6 +157,7 @@ func fetchImportConfiguration(subaccountID string, resourceType ResourceName, tm
 }
 
 func writeImportConfiguration(configDir string, resourceType ResourceName, importBlock string) error {
+
 	currentDir, err := os.Getwd()
 	if err != nil {
 		return fmt.Errorf("error getting current directory: %v", err)
@@ -169,7 +171,7 @@ func writeImportConfiguration(configDir string, resourceType ResourceName, impor
 		return fmt.Errorf("create file %s failed: %v", importFileName, err)
 	}
 
-	log.Println(string(resourceType) + " exported. Please check " + configDir + " folder")
+	fmt.Println(string(resourceType) + " exported to " + configDir + " folder")
 
 	return nil
 }

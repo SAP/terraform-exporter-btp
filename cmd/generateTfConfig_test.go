@@ -15,7 +15,7 @@ func TestSetupConfigDir(t *testing.T) {
 
 	curWd, _ := os.Getwd()
 
-	setupConfigDir("configFolder")
+	setupConfigDir("configFolder", true)
 	if _, err := os.Stat(filepath.Join(curWd, "configFolder")); os.IsNotExist(err) {
 		t.Errorf("Directory should have been created")
 	}

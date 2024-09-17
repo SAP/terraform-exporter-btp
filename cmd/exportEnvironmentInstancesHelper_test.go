@@ -30,7 +30,7 @@ func TestGetImportBlock(t *testing.T) {
 		t.Errorf("error in unmarshalling")
 	}
 
-	importBlock, err := getImportBlock(data, "5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", nil)
+	importBlock, err := getSubaccountEnvironmentInstanceBlock(data, "5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", nil)
 	if err != nil {
 		t.Errorf("error creating importBlock")
 	}

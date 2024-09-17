@@ -49,7 +49,7 @@ func exportFromFile(subaccount string, jsonfile string, resourceFile string, con
 		return
 	}
 
-	setupConfigDir(configDir)
+	setupConfigDir(configDir, true)
 
 	for _, resName := range resNames {
 		var value []string

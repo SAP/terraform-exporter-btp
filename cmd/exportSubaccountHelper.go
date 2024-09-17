@@ -9,6 +9,12 @@ import (
 
 func exportSubaccount(subaccountID string, configDir string, filterValues []string) {
 
+	spinner, err := startSpinner("crafting import block for " + string(SubaccountType))
+	if err != nil {
+		log.Fatalf("error: %v", err)
+		return
+	}
+
 	data, err := fetchImportConfiguration(subaccountID, SubaccountType, TmpFolder)
 	if err != nil {
 		log.Fatalf("error: %v", err)
@@ -26,15 +32,22 @@ func exportSubaccount(subaccountID string, configDir string, filterValues []stri
 		log.Fatalf("error: %v", err)
 		return
 	}
+
+	err = stopSpinner(spinner)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+		return
+	}
 }
 
 func getSubaccountImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
 
 	if len(filterValues) != 0 {
 		if filterValues[0] != fmt.Sprintf("%v", data["name"]) {
-			log.Println("Error:", fmt.Errorf("subaccount %s not found. Please adjust it in the provided file", filterValues[0]))
+			err := fmt.Errorf("subaccount %s not found. Please adjust it in the provided file", filterValues[0])
+			log.Println("Error:", err)
 			os.Exit(0)
-			return "", nil
+			return "", err
 		}
 	}
 

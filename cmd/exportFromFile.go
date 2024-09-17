@@ -20,7 +20,9 @@ You can removes resource names from this config file, if you want to selectively
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
 		jsonFile, _ := cmd.Flags().GetString("file-path")
 
+		printExportStartMessage()
 		exportFromFile(subaccount, jsonFile, resourceFileName, configDir)
+		printExportSuccessMessage()
 	},
 }
 
