@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"btptfexport/output"
+	"btptfexport/tfutils"
+
 	"github.com/spf13/cobra"
 )
 
@@ -18,15 +21,15 @@ btp_subaccount_trust_configurations `,
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
 
-		printExportStartMessage()
-		setupConfigDir(configDir, true)
+		output.PrintExportStartMessage()
+		tfutils.SetupConfigDir(configDir, true)
 
 		for _, resourceToImport := range AllowedResources {
 			generateConfigForResource(resourceToImport, nil, subaccount, configDir, resourceFileName)
 		}
 
-		finalizeTfConfig(configDir)
-		printExportSuccessMessage()
+		tfutils.FinalizeTfConfig(configDir)
+		output.PrintExportSuccessMessage()
 	},
 }
 

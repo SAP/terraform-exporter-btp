@@ -1,44 +1,29 @@
-package cmd
+package tfutils
 
 import (
-	"btptfexport/tfutils"
+	"btptfexport/files"
+	"btptfexport/output"
 	"fmt"
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
-	"github.com/fatih/color"
 	"github.com/spf13/viper"
 	"github.com/theckman/yacspin"
 )
 
 var TmpFolder string
 
-func runTerraformCommand(args ...string) error {
-
-	debug := viper.GetViper().GetBool("debug")
-	cmd := exec.Command("terraform", args...)
-	if debug {
-		cmd.Stdout = os.Stdout
-	} else {
-		cmd.Stdout = nil
-	}
-
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func generateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) {
+func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) {
 
 	var spinner *yacspin.Spinner
 	var err error
 
 	if isMainCmd {
 		// We must distinguish if the command is run from a main command or via delegation from helper functions
-		spinner, err = startSpinner("generating Terraform configuration for " + resourceNameLong)
+		spinner, err = output.StartSpinner("generating Terraform configuration for " + resourceNameLong)
 		if err != nil {
 			log.Fatalf("error: %v", err)
 			return
@@ -50,19 +35,19 @@ func generateConfig(resourceFileName string, configFolder string, isMainCmd bool
 		log.Fatalf("error getting current directory: %v", err)
 		return
 	}
+
 	terraformConfigPath := filepath.Join(currentDir, configFolder)
 	err = os.Chdir(terraformConfigPath)
 	if err != nil {
 		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
 		return
 	}
-	// Initialize Terraform
+
 	if err := runTerraformCommand("init"); err != nil {
-		log.Fatalf("error initializing Terraform: %v", err)
+		log.Fatalf("error running Terraform init: %v", err)
 		return
 	}
 
-	// Execute Terraform plan
 	planOption := "--generate-config-out=" + resourceFileName
 	if err := runTerraformCommand("plan", planOption); err != nil {
 		log.Fatalf("error running Terraform plan: %v", err)
@@ -84,26 +69,16 @@ func generateConfig(resourceFileName string, configFolder string, isMainCmd bool
 	}
 
 	if isMainCmd {
-		err = stopSpinner(spinner)
+		err = output.StopSpinner(spinner)
 		if err != nil {
 			log.Fatalf("error: %v", err)
 			return
 		}
-		fmt.Println(color.HiBlackString("   temporary files deleted"))
+		fmt.Println(output.ColorStringGrey("   temporary files deleted"))
 	}
 }
 
-func cleanup() {
-	err := os.RemoveAll(TmpFolder)
-	if err != nil {
-		log.Fatalf("error deleting temp files: %v", err)
-	}
-
-	// Cleanup temporary folder variable
-	TmpFolder = ""
-}
-
-func configureProvider() {
+func ConfigureProvider() {
 	tmpdir, err := os.MkdirTemp("", "provider.tf")
 	if err != nil {
 		panic(err)
@@ -166,7 +141,7 @@ func configureProvider() {
 
 	providerContent = providerContent + "}"
 
-	err = tfutils.CreateFileWithContent(abspath, providerContent)
+	err = files.CreateFileWithContent(abspath, providerContent)
 	if err != nil {
 		log.Fatalf("create file %s failed!", abspath)
 		return
@@ -174,15 +149,15 @@ func configureProvider() {
 
 }
 
-func setupConfigDir(configFolder string, isMainCmd bool) {
+func SetupConfigDir(configFolder string, isMainCmd bool) {
 
 	if isMainCmd {
 		message := "set up config directory \"" + configFolder + "\""
-		fmt.Println(color.HiBlackString(message))
+		fmt.Println(output.ColorStringGrey(message))
 	}
 
 	if len(TmpFolder) == 0 {
-		configureProvider()
+		ConfigureProvider()
 	}
 	curWd, err := os.Getwd()
 	if err != nil {
@@ -190,7 +165,7 @@ func setupConfigDir(configFolder string, isMainCmd bool) {
 		return
 	}
 
-	exist, err := exists(filepath.Join(curWd, configFolder))
+	exist, err := files.Exists(filepath.Join(curWd, configFolder))
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -244,15 +219,86 @@ func setupConfigDir(configFolder string, isMainCmd bool) {
 	}
 }
 
-func exists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
+func cleanup() {
+	err := os.RemoveAll(TmpFolder)
+	if err != nil {
+		log.Fatalf("error deleting temp files: %v", err)
 	}
-	if os.IsNotExist(err) {
-		return false, nil
+
+	// Cleanup temporary folder variable
+	TmpFolder = ""
+}
+
+func FinalizeTfConfig(configFolder string) {
+
+	spinner, err := output.StartSpinner("finalizing Terraform configuration")
+	if err != nil {
+		log.Fatalf("error: %v", err)
+		return
 	}
-	return false, err
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("error getting current directory: %v", err)
+		return
+	}
+
+	terraformConfigPath := filepath.Join(currentDir, configFolder)
+
+	err = os.Chdir(terraformConfigPath)
+	if err != nil {
+		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
+		return
+	}
+
+	if err := runTerraformCommand("init"); err != nil {
+		log.Fatalf("error initializing Terraform: %v", err)
+		return
+	}
+
+	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
+		log.Fatalf("error running Terraform fmt: %v", err)
+		return
+	}
+
+	//Switch back to the original directory
+	err = os.Chdir(currentDir)
+	if err != nil {
+		log.Fatalf("error changing directory to %s: %v \n", currentDir, err)
+		return
+	}
+
+	err = output.StopSpinner(spinner)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+		return
+	}
+}
+
+// Convenience functions that wrap repetitive steps
+func ExecPreExportSteps(tempConfigDir string) {
+	SetupConfigDir(tempConfigDir, false)
+}
+
+func ExecPostExportSteps(tempConfigDir string, targetConfigDir string, targetResourceFileName string, resourceNameLong string) {
+
+	spinner, err := output.StartSpinner("generating Terraform configuration for " + resourceNameLong)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+		return
+	}
+
+	GenerateConfig(targetResourceFileName, tempConfigDir, false, resourceNameLong)
+	mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)
+	files.DeleteSourceFolder(tempConfigDir)
+
+	err = output.StopSpinner(spinner)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+		return
+	}
+
+	fmt.Println(output.ColorStringGrey("   temporary files deleted"))
 }
 
 func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder string, resourceName string) {
@@ -267,7 +313,7 @@ func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder st
 	sourceConfigPath := filepath.Join(currentDir, resourceConfigFolder, fileName)
 
 	// Check if the source file exists
-	exist, err := exists(sourceConfigPath)
+	exist, err := files.Exists(sourceConfigPath)
 	if err != nil {
 		log.Fatalf("error checking if source directory exists: %v", err)
 	}
@@ -285,7 +331,7 @@ func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder st
 
 	targetConfigPath := filepath.Join(currentDir, configFolder, fileName)
 
-	exist, err = exists(targetConfigPath)
+	exist, err = files.Exists(targetConfigPath)
 	if err != nil {
 		log.Fatalf("error checking if target directory exists: %v", err)
 	}
@@ -317,116 +363,5 @@ func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder st
 		log.Fatalf("error copying resource file to target file: %v", err)
 	}
 
-	copyImportFiles(resourceConfigFolder, configFolder)
-}
-
-func copyImportFiles(srcDir, destDir string) {
-	// Find all files ending with "_import.tf" in the source directory
-	files, err := filepath.Glob(filepath.Join(srcDir, "*_import.tf"))
-	if err != nil {
-		log.Fatalf("error finding files: %v", err)
-	}
-
-	// Copy each file to the destination directory
-	for _, srcFile := range files {
-		destFile := filepath.Join(destDir, filepath.Base(srcFile))
-
-		err := copyFile(srcFile, destFile)
-		if err != nil {
-			log.Printf("error copying file %s to %s: %v", srcFile, destFile, err)
-		}
-	}
-}
-
-func copyFile(src, dest string) error {
-	sourceFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer sourceFile.Close()
-
-	destFile, err := os.Create(dest)
-	if err != nil {
-		return err
-	}
-	defer destFile.Close()
-
-	_, err = io.Copy(destFile, sourceFile)
-	return err
-}
-
-func deleteSourceFolder(srcDir string) {
-	err := os.RemoveAll(srcDir)
-	if err != nil {
-		log.Fatalf("error deleting source folder %s: %v", srcDir, err)
-	}
-}
-
-func finalizeTfConfig(configFolder string) {
-
-	spinner, err := startSpinner("finalizing Terraform configuration")
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
-
-	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("error getting current directory: %v", err)
-		return
-	}
-	terraformConfigPath := filepath.Join(currentDir, configFolder)
-	err = os.Chdir(terraformConfigPath)
-	if err != nil {
-		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
-		return
-	}
-
-	if err := runTerraformCommand("init"); err != nil {
-		log.Fatalf("error initializing Terraform: %v", err)
-		return
-	}
-
-	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
-		log.Fatalf("error running Terraform fmt: %v", err)
-		return
-	}
-	//Switch back to the original directory
-	err = os.Chdir(currentDir)
-	if err != nil {
-		log.Fatalf("error changing directory to %s: %v \n", currentDir, err)
-		return
-	}
-
-	err = stopSpinner(spinner)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
-}
-
-// Conveniecce functions that wrap repetitive steps
-func execPreExportSteps(tempConfigDir string) {
-	setupConfigDir(tempConfigDir, false)
-}
-
-func execPostExportSteps(tempConfigDir string, targetConfigDir string, targetResourceFileName string, resourceNameLong string) {
-
-	spinner, err := startSpinner("generating Terraform configuration for " + resourceNameLong)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
-
-	generateConfig(targetResourceFileName, tempConfigDir, false, resourceNameLong)
-	mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)
-	deleteSourceFolder(tempConfigDir)
-
-	err = stopSpinner(spinner)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
-
-	fmt.Println(color.HiBlackString("   temporary files deleted"))
+	files.CopyImportFiles(resourceConfigFolder, configFolder)
 }

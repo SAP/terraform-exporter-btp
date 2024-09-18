@@ -405,8 +405,8 @@ func parseParamSec(node *bf.Node, ingestNode func(node *bf.Node)) (paramFlags, *
 				return -1, nil, nil, err
 			}
 
-			if parameterList == nil || node == nil || node.Next == nil {
-				return -1, nil, nil, fmt.Errorf("Expected a parameter list, got %s", prettyPrint(node.Next))
+			if parameterList == nil || node.Next == nil {
+				return -1, nil, nil, fmt.Errorf("expected a parameter list, got %s", prettyPrint(node.Next))
 			}
 
 			defer ingestNode(node)
@@ -524,7 +524,7 @@ func parseNestedSchema(node *bf.Node, ingestNode func(node *bf.Node)) (*nestedSc
 
 	code := label.Next
 	if code == nil || code.Type != bf.Code {
-		return nil, fmt.Errorf("Expected a Code block, got %s", prettyPrint(code))
+		return nil, fmt.Errorf("expected a Code block, got %s", prettyPrint(code))
 	}
 
 	ns := &nestedSchema{

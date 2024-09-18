@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"btptfexport/tfutils"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,15 +10,6 @@ import (
 	"slices"
 	"strings"
 )
-
-type Resource struct {
-	Name   string
-	Values []string
-}
-
-type ResourcesArr struct {
-	Btp_resources []Resource
-}
 
 func exportFromFile(subaccount string, jsonfile string, resourceFile string, configDir string) {
 	jsonFile, err := os.Open(jsonfile)
@@ -30,10 +22,9 @@ func exportFromFile(subaccount string, jsonfile string, resourceFile string, con
 	defer jsonFile.Close()
 
 	byteValue, _ := io.ReadAll(jsonFile)
-	var resources ResourcesArr
+	var resources tfutils.BtpResources
 
 	err = json.Unmarshal(byteValue, &resources)
-
 	if err != nil {
 		log.Fatalf("error in unmarshall: %v", err)
 		return
@@ -49,7 +40,7 @@ func exportFromFile(subaccount string, jsonfile string, resourceFile string, con
 		return
 	}
 
-	setupConfigDir(configDir, true)
+	tfutils.SetupConfigDir(configDir, true)
 
 	for _, resName := range resNames {
 		var value []string
@@ -63,29 +54,29 @@ func exportFromFile(subaccount string, jsonfile string, resourceFile string, con
 		}
 	}
 
-	finalizeTfConfig(configDir)
+	tfutils.FinalizeTfConfig(configDir)
 }
 
 func generateConfigForResource(resource string, values []string, subaccount string, configDir string, resourceFileName string) {
 	tempConfigDir := resource + "-config"
-	techResourceNameLong := strings.ToUpper(string(translateResourceParamToTechnicalName(resource)))
+	techResourceNameLong := strings.ToUpper(tfutils.TranslateResourceParamToTechnicalName(resource))
 
-	execPreExportSteps(tempConfigDir)
+	tfutils.ExecPreExportSteps(tempConfigDir)
 	// Export must be done for each resource individually
 	switch resource {
-	case CmdSubaccountParameter:
+	case tfutils.CmdSubaccountParameter:
 		exportSubaccount(subaccount, tempConfigDir, values)
-	case CmdEntitlementParameter:
+	case tfutils.CmdEntitlementParameter:
 		exportSubaccountEntitlements(subaccount, tempConfigDir, values)
-	case CmdEnvironmentInstanceParameter:
+	case tfutils.CmdEnvironmentInstanceParameter:
 		exportSubaccountEnvironmentInstances(subaccount, tempConfigDir, values)
-	case CmdSubscriptionParameter:
+	case tfutils.CmdSubscriptionParameter:
 		exportSubaccountSubscriptions(subaccount, tempConfigDir, values)
-	case CmdTrustConfigurationParameter:
+	case tfutils.CmdTrustConfigurationParameter:
 		exportSubaccountTrustConfigurations(subaccount, tempConfigDir, values)
 	}
 
-	execPostExportSteps(tempConfigDir, configDir, resourceFileName, techResourceNameLong)
+	tfutils.ExecPostExportSteps(tempConfigDir, configDir, resourceFileName, techResourceNameLong)
 }
 
 func isSubset(superSet []string, subset []string) (string, bool) {

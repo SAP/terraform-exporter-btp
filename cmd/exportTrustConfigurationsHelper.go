@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"btptfexport/files"
+	"btptfexport/output"
 	"btptfexport/tfutils"
 	"fmt"
 	"log"
@@ -11,13 +13,13 @@ import (
 func exportSubaccountTrustConfigurations(subaccountID string, configDir string, filterValues []string) {
 
 	fmt.Println("")
-	spinner, err := startSpinner("crafting import block for " + strings.ToUpper(string(SubaccountTrustConfigurationType)))
+	spinner, err := output.StartSpinner("crafting import block for " + strings.ToUpper(tfutils.SubaccountTrustConfigurationType))
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
 	}
 
-	data, err := fetchImportConfiguration(subaccountID, SubaccountTrustConfigurationType, TmpFolder)
+	data, err := tfutils.FetchImportConfiguration(subaccountID, tfutils.SubaccountTrustConfigurationType, tfutils.TmpFolder)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -34,13 +36,13 @@ func exportSubaccountTrustConfigurations(subaccountID string, configDir string, 
 		return
 	}
 
-	err = writeImportConfiguration(configDir, SubaccountTrustConfigurationType, importBlock)
+	err = files.WriteImportConfiguration(configDir, tfutils.SubaccountTrustConfigurationType, importBlock)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
 	}
 
-	err = stopSpinner(spinner)
+	err = output.StopSpinner(spinner)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -49,7 +51,7 @@ func exportSubaccountTrustConfigurations(subaccountID string, configDir string, 
 
 func getSubaccountTrustConfigurationsImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
 
-	resourceDoc, err := getDocByResourceName(ResourcesKind, SubaccountTrustConfigurationType)
+	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountTrustConfigurationType)
 	if err != nil {
 		log.Fatalf("read doc failed!")
 		return "", err

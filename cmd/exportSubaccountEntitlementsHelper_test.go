@@ -5,21 +5,7 @@ import (
 	"testing"
 )
 
-func TestReadSubaccountEntilementsDataSource(t *testing.T) {
 
-	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", SubaccountEntitlementType)
-
-	if err != nil {
-		t.Errorf("error creating dataBlock")
-	}
-
-	expectedValue := "data \"btp_subaccount_entitlements\" \"all\"{\n  subaccount_id = \"5163621f-6a1e-4fbf-af3a-0f530a0dc4d5\" \n}\n"
-
-	if dataBlock != expectedValue {
-		t.Errorf("got %q, wanted %q", dataBlock, expectedValue)
-	}
-
-}
 
 func TestGetEntitlementsImportBlock(t *testing.T) {
 

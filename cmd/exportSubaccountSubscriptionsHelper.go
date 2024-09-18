@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"btptfexport/files"
+	"btptfexport/output"
 	"btptfexport/tfutils"
 	"fmt"
 	"log"
@@ -11,13 +13,13 @@ import (
 func exportSubaccountSubscriptions(subaccountID string, configDir string, filterValues []string) {
 
 	fmt.Println("")
-	spinner, err := startSpinner("crafting import block for " + strings.ToUpper(string(SubaccountSubscriptionType)))
+	spinner, err := output.StartSpinner("crafting import block for " + strings.ToUpper(tfutils.SubaccountSubscriptionType))
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
 	}
 
-	data, err := fetchImportConfiguration(subaccountID, SubaccountSubscriptionType, TmpFolder)
+	data, err := tfutils.FetchImportConfiguration(subaccountID, tfutils.SubaccountSubscriptionType, tfutils.TmpFolder)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -34,13 +36,13 @@ func exportSubaccountSubscriptions(subaccountID string, configDir string, filter
 		return
 	}
 
-	err = writeImportConfiguration(configDir, SubaccountSubscriptionType, importBlock)
+	err = files.WriteImportConfiguration(configDir, tfutils.SubaccountSubscriptionType, importBlock)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
 	}
 
-	err = stopSpinner(spinner)
+	err = output.StopSpinner(spinner)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -49,7 +51,7 @@ func exportSubaccountSubscriptions(subaccountID string, configDir string, filter
 
 func getSubaccountSubscriptionsImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
 
-	resourceDoc, err := getDocByResourceName(ResourcesKind, SubaccountSubscriptionType)
+	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountSubscriptionType)
 	if err != nil {
 		return "", err
 	}

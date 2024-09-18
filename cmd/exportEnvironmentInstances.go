@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"btptfexport/tfutils"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -16,9 +17,9 @@ var exportEnvironmentInstancesCmd = &cobra.Command{
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
-		setupConfigDir(configDir, true)
+		tfutils.SetupConfigDir(configDir, true)
 		exportSubaccountEnvironmentInstances(subaccount, configDir, nil)
-		generateConfig(resourceFileName, configDir, true, strings.ToUpper(string(SubaccountEnvironmentInstanceType)))
+		tfutils.GenerateConfig(resourceFileName, configDir, true, strings.ToUpper(tfutils.SubaccountEnvironmentInstanceType))
 	},
 }
 

@@ -1,4 +1,4 @@
-package tfutils
+package files
 
 import (
 	"os"

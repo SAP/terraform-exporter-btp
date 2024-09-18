@@ -4,18 +4,13 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"btptfexport/output"
+	"btptfexport/tfutils"
+
 	"github.com/spf13/cobra"
 )
 
-const (
-	CmdSubaccountParameter          string = "subaccount"
-	CmdEntitlementParameter         string = "entitlements"
-	CmdEnvironmentInstanceParameter string = "environment-instances"
-	CmdSubscriptionParameter        string = "subscriptions"
-	CmdTrustConfigurationParameter  string = "trust-configurations"
-)
-
-var AllowedResources = []string{CmdSubaccountParameter, CmdEntitlementParameter, CmdEnvironmentInstanceParameter, CmdSubscriptionParameter, CmdTrustConfigurationParameter}
+var AllowedResources = []string{tfutils.CmdSubaccountParameter, tfutils.CmdEntitlementParameter, tfutils.CmdEnvironmentInstanceParameter, tfutils.CmdSubscriptionParameter, tfutils.CmdTrustConfigurationParameter}
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
@@ -47,9 +42,9 @@ Mixing "all" with other resources will throw an error.
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		fileName, _ := cmd.Flags().GetString("json-out")
 		resources, _ := cmd.Flags().GetString("resources")
-		printInventoryCreationStartMessage()
+		output.PrintInventoryCreationStartMessage()
 		getResourcesInfo(subaccount, fileName, resources)
-		printInventoryCreationSuccessMessage()
+		output.PrintInventoryCreationSuccessMessage()
 	},
 }
 

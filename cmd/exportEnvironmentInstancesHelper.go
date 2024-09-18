@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"btptfexport/files"
+	"btptfexport/output"
 	"btptfexport/tfutils"
 	"fmt"
 	"log"
@@ -11,13 +13,13 @@ import (
 func exportSubaccountEnvironmentInstances(subaccountID string, configFolder string, filterValues []string) {
 
 	fmt.Println("")
-	spinner, err := startSpinner("crafting import block for " + strings.ToUpper(string(SubaccountEnvironmentInstanceType)))
+	spinner, err := output.StartSpinner("crafting import block for " + strings.ToUpper(tfutils.SubaccountEnvironmentInstanceType))
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
 	}
 
-	data, err := fetchImportConfiguration(subaccountID, SubaccountEnvironmentInstanceType, TmpFolder)
+	data, err := tfutils.FetchImportConfiguration(subaccountID, tfutils.SubaccountEnvironmentInstanceType, tfutils.TmpFolder)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -34,13 +36,13 @@ func exportSubaccountEnvironmentInstances(subaccountID string, configFolder stri
 		return
 	}
 
-	err = writeImportConfiguration(configFolder, SubaccountEnvironmentInstanceType, importBlock)
+	err = files.WriteImportConfiguration(configFolder, tfutils.SubaccountEnvironmentInstanceType, importBlock)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
 	}
 
-	err = stopSpinner(spinner)
+	err = output.StopSpinner(spinner)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 		return
@@ -50,7 +52,7 @@ func exportSubaccountEnvironmentInstances(subaccountID string, configFolder stri
 
 func getSubaccountEnvironmentInstanceBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
 
-	resourceDoc, err := getDocByResourceName(ResourcesKind, SubaccountEnvironmentInstanceType)
+	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountEnvironmentInstanceType)
 	if err != nil {
 		return "", err
 	}

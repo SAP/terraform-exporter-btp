@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"btptfexport/output"
+	"btptfexport/tfutils"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -17,11 +19,11 @@ var exportSubaccountEntitlementsCmd = &cobra.Command{
 		resourceFileName, _ := cmd.Flags().GetString("resourceFileName")
 		configDir, _ := cmd.Flags().GetString("config-output-dir")
 
-		printExportStartMessage()
-		setupConfigDir(configDir, true)
+		output.PrintExportStartMessage()
+		tfutils.SetupConfigDir(configDir, true)
 		exportSubaccountEntitlements(subaccount, configDir, nil)
-		generateConfig(resourceFileName, configDir, true, strings.ToUpper(string(SubaccountEntitlementType)))
-		printExportSuccessMessage()
+		tfutils.GenerateConfig(resourceFileName, configDir, true, strings.ToUpper(tfutils.SubaccountEntitlementType))
+		output.PrintExportSuccessMessage()
 	},
 }
 

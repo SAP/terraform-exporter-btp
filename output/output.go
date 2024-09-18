@@ -1,4 +1,4 @@
-package cmd
+package output
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/spf13/viper"
 	"github.com/theckman/yacspin"
 )
@@ -62,7 +63,7 @@ func renderSpinner(spinner *yacspin.Spinner) error {
 	return nil
 }
 
-func startSpinner(message string) (*yacspin.Spinner, error) {
+func StartSpinner(message string) (*yacspin.Spinner, error) {
 
 	// No spinner execution during debug mode
 	debug := viper.GetViper().GetBool("debug")
@@ -86,7 +87,7 @@ func startSpinner(message string) (*yacspin.Spinner, error) {
 	return spinner, nil
 }
 
-func stopSpinner(spinner *yacspin.Spinner) error {
+func StopSpinner(spinner *yacspin.Spinner) error {
 
 	// No spinner execution during debug mode
 	debug := viper.GetViper().GetBool("debug")
@@ -101,26 +102,30 @@ func stopSpinner(spinner *yacspin.Spinner) error {
 	return nil
 }
 
-func printExportStartMessage() {
+func PrintExportStartMessage() {
 	fmt.Println("")
 	fmt.Println("🚀 Terraform configuration export started ...")
 	fmt.Println("")
 }
 
-func printExportSuccessMessage() {
+func PrintExportSuccessMessage() {
 	fmt.Println("")
 	fmt.Println("🎉 Terraform configuration successfully created")
 	fmt.Println("")
 }
 
-func printInventoryCreationStartMessage() {
+func PrintInventoryCreationStartMessage() {
 	fmt.Println("")
 	fmt.Println("🚀 Creation of resource list started ...")
 	fmt.Println("")
 }
 
-func printInventoryCreationSuccessMessage() {
+func PrintInventoryCreationSuccessMessage() {
 	fmt.Println("")
 	fmt.Println("📋 Resource list successfully created")
 	fmt.Println("")
+}
+
+func ColorStringGrey(s string) string {
+	return color.HiBlackString(s)
 }
