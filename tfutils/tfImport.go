@@ -43,7 +43,7 @@ type BtpResource struct {
 }
 
 type BtpResources struct {
-	Btp_resources []BtpResource
+	BtpResources []BtpResource
 }
 
 func FetchImportConfiguration(subaccountID string, resourceType string, tmpFolder string) (map[string]interface{}, error) {
@@ -122,7 +122,7 @@ func ReadDataSources(subaccountID string, resourceList []string) (btpResources B
 		btpResourcesList = append(btpResourcesList, data)
 	}
 
-	btpResources = BtpResources{Btp_resources: btpResourcesList}
+	btpResources = BtpResources{BtpResources: btpResourcesList}
 	return btpResources, nil
 }
 

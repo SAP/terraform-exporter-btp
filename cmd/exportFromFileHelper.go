@@ -32,8 +32,8 @@ func exportFromFile(subaccount string, jsonfile string, resourceFile string, con
 
 	var resNames []string
 
-	for i := 0; i < len(resources.Btp_resources); i++ {
-		resNames = append(resNames, resources.Btp_resources[i].Name)
+	for i := 0; i < len(resources.BtpResources); i++ {
+		resNames = append(resNames, resources.BtpResources[i].Name)
 	}
 	if len(resNames) == 0 {
 		fmt.Println("No resource needs to be export")
@@ -44,7 +44,7 @@ func exportFromFile(subaccount string, jsonfile string, resourceFile string, con
 
 	for _, resName := range resNames {
 		var value []string
-		for _, temp := range resources.Btp_resources {
+		for _, temp := range resources.BtpResources {
 			if temp.Name == resName {
 				value = temp.Values
 			}
