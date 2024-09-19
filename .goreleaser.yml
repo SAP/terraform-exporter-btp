@@ -84,3 +84,5 @@ nfpms:
     # files and dependencies.
     # When set to `true`, the `builds` option is ignored.
     meta: false
+
+    maintainer: 'See GitHub <https://github.com/SAP/terraform-exporter-btp>'
