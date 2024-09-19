@@ -13,13 +13,11 @@ builds:
     ldflags:
       - "-s -w"
     goos:
-      - freebsd
       - windows
       - linux
       - darwin
     goarch:
       - amd64
-      - "386"
       - arm
       - arm64
     ignore:
@@ -34,3 +32,55 @@ checksum:
   algorithm: sha256
 changelog:
   use: github-native
+
+nfpms:
+  - id: btptfexporter
+    # Name of the package - Default: ProjectName.
+
+    # File name of the package.
+    # Default: '{{ .PackageName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}'.
+
+    # Your app's vendor.
+    vendor: SAP SE
+
+    # Your app's homepage.
+    #
+    # Default: inferred from global metadata.
+    homepage: https://github.com/SAP/terraform-exporter-btp
+
+
+    # Your app's description.
+    #
+    # Default: inferred from global metadata.
+    description: |-
+      The Terraform Exporter for SAP BTP is a tool that helps export resources in a BTP Global Account.
+      It generates Terraform scripts for the resources and import those resources into a Terraform state file.
+
+    # Your app's license.
+    #
+    # Default: inferred from global metadata.
+    license: Apache 2.0
+
+    # Formats to be generated.
+    formats:
+      - deb
+      - rpm
+
+    # Packages your package recommends installing. (overridable)
+    recommends:
+      - terraform
+
+    # Path that the binaries should be installed.
+    #
+    # Default: '/usr/bin'.
+
+    # Section.
+    section: default
+
+    # Priority.
+    priority: normal
+
+    # Makes a meta package - an empty package that contains only supporting
+    # files and dependencies.
+    # When set to `true`, the `builds` option is ignored.
+    meta: false
