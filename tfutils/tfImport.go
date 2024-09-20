@@ -232,7 +232,7 @@ func generateDataSourcesForList(subaccountID string, resourceName string) ([]str
 
 	dataBlock, err := readDataSource(subaccountID, btpResourceType)
 	if err != nil {
-		log.Fatalf("error getting data source:", err)
+		log.Fatalf("error getting data source: %s", err)
 		return nil, err
 	}
 
