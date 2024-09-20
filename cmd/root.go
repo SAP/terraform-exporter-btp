@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"btptfexport/output"
 	"fmt"
 	"os"
 
@@ -43,17 +44,20 @@ var docCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		docsDir := "./docs"
 		if err := os.MkdirAll(docsDir, os.ModePerm); err != nil {
-			fmt.Println("error creating docs directory:", err)
+			errorMsg := output.ColorStringLightRed("error creating docs directory:")
+			fmt.Println(errorMsg, err)
 			os.Exit(1)
 		}
 
 		err := doc.GenMarkdownTree(rootCmd, docsDir)
 		if err != nil {
-			fmt.Println("error generating documentation:", err)
+			errorMsg := output.ColorStringLightRed("error generating documentation:")
+			fmt.Println(errorMsg, err)
 			os.Exit(1)
 		}
 
-		fmt.Println("Documentation generated successfully in", docsDir)
+		successMsg := output.ColorStringLightGreen("Documentation generated successfully in:")
+		fmt.Println(successMsg, docsDir)
 
 	},
 }

@@ -129,3 +129,19 @@ func PrintInventoryCreationSuccessMessage() {
 func ColorStringGrey(s string) string {
 	return color.HiBlackString(s)
 }
+
+func ColorStringCyan(s string) string {
+	return color.CyanString(s)
+}
+
+func ColorStringLightGreen(s string) string {
+	return color.HiGreenString(s)
+}
+
+func ColorStringLightRed(s string) string {
+	return color.HiRedString(s)
+}
+
+func AddNewLine() {
+	fmt.Println("")
+}

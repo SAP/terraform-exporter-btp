@@ -12,7 +12,7 @@ import (
 
 func exportSubaccountSubscriptions(subaccountID string, configDir string, filterValues []string) {
 
-	fmt.Println("")
+	output.AddNewLine()
 	spinner, err := output.StartSpinner("crafting import block for " + strings.ToUpper(tfutils.SubaccountSubscriptionType))
 	if err != nil {
 		log.Fatalf("error: %v", err)
@@ -27,7 +27,7 @@ func exportSubaccountSubscriptions(subaccountID string, configDir string, filter
 
 	importBlock, err := getSubaccountSubscriptionsImportBlock(data, subaccountID, filterValues)
 	if err != nil {
-		fmt.Println("error:", err)
+		log.Fatalf("error: %s", err)
 		return
 	}
 

@@ -179,20 +179,31 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 			return
 		}
 	} else {
-		fmt.Print("config directory already exist. Do you want to continue? If yes then generated files will be overwritten if existing (Y/N): ")
+		fmt.Print("config directory already exist. Do you want to continue? If yes then generated files will be overwritten if existing (y/N): ")
 		var choice string
+
 		_, err = fmt.Scanln(&choice)
 		if err != nil {
-			log.Fatalf("error: %v", err)
-			return
+			if err.Error() == "unexpected newline" {
+				choice = "N"
+			} else {
+				log.Fatalf("error reading input: %v", err)
+				return
+			}
 		}
+
+		choice = strings.TrimSpace(choice)
+		if choice == "" {
+			choice = "N"
+		}
+
 		if strings.ToUpper(choice) == "N" {
 			os.Exit(0)
 		} else if strings.ToUpper(choice) == "Y" {
-			fmt.Println("existing directory will be used. It can overwrite some files ")
+			fmt.Println(output.ColorStringCyan("existing directory will be used. Existing files will be overwritten"))
 		} else {
 			fmt.Println("invalid input. Exiting the process")
-			os.Exit(0)
+			os.Exit(1)
 		}
 	}
 

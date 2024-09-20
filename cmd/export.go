@@ -19,7 +19,7 @@ By default, it will generate the <resource_name>_import.tf (import file) and res
 The resources.tf file can be renamed by using the flag --resourceFileName.
 The command will fail if a resource file already exists`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Invalid command\n\nUse 'btptfexporter export --help' for syntax instructions.\n\nERROR")
+		fmt.Printf("Invalid command\n\nUse 'btptfexport resource --help' for syntax instructions.")
 	},
 }
 

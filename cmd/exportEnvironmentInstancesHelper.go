@@ -12,7 +12,7 @@ import (
 
 func exportSubaccountEnvironmentInstances(subaccountID string, configFolder string, filterValues []string) {
 
-	fmt.Println("")
+	output.AddNewLine()
 	spinner, err := output.StartSpinner("crafting import block for " + strings.ToUpper(tfutils.SubaccountEnvironmentInstanceType))
 	if err != nil {
 		log.Fatalf("error: %v", err)

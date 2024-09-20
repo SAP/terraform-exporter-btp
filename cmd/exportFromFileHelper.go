@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"btptfexport/output"
 	"btptfexport/tfutils"
 	"encoding/json"
 	"fmt"
@@ -15,7 +16,7 @@ func exportFromFile(subaccount string, jsonfile string, resourceFile string, con
 	jsonFile, err := os.Open(jsonfile)
 
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Fatalf("Error: %v", err)
 		return
 	}
 
@@ -36,7 +37,7 @@ func exportFromFile(subaccount string, jsonfile string, resourceFile string, con
 		resNames = append(resNames, resources.BtpResources[i].Name)
 	}
 	if len(resNames) == 0 {
-		fmt.Println("No resource needs to be export")
+		fmt.Println(output.ColorStringCyan("No resource needs to be exported"))
 		return
 	}
 

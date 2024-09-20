@@ -12,7 +12,7 @@ import (
 
 func exportSubaccountTrustConfigurations(subaccountID string, configDir string, filterValues []string) {
 
-	fmt.Println("")
+	output.AddNewLine()
 	spinner, err := output.StartSpinner("crafting import block for " + strings.ToUpper(tfutils.SubaccountTrustConfigurationType))
 	if err != nil {
 		log.Fatalf("error: %v", err)

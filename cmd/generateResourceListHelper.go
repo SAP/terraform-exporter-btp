@@ -5,7 +5,6 @@ import (
 	"btptfexport/output"
 	"btptfexport/tfutils"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -50,13 +49,13 @@ func getResourcesInfo(subaccount string, fileName string, resources string) {
 
 	jsonBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
-		fmt.Println("error:", err)
+		log.Fatalf("error: %s", err)
 		return
 	}
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		fmt.Println("error getting current directory:", err)
+		log.Fatalf("error getting current directory: %s", err)
 		return
 	}
 

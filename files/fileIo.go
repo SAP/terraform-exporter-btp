@@ -21,7 +21,7 @@ func CreateFileWithContent(fileName string, content string) error {
 	file, err := os.Create(fileName)
 	if err != nil {
 		fmt.Println("error:", err)
-		return nil
+		return err
 	}
 	defer file.Close()
 
