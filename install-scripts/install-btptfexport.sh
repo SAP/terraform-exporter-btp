@@ -261,6 +261,14 @@ chmod +x "$tmp_folder/$bin_name"
 say_verbose "Writing to $tmp_folder/.installed-by.txt"
 echo "install-btptfexport.sh" > "$tmp_folder/.installed-by.txt"
 
+say_verbose "Verifying signature of $bin_name"
+    if ! output=$( codesign -v "$tmp_folder/$bin_name" 2>&1); then
+        say_error "Could not verify signature of $bin_name, error output:"
+        say_error "$output"
+        save_error_report_if_enabled "InstallFailed" "SignatureVerificationFailure"
+        exit 1
+    fi
+
 if [[ ! -d "$install_folder" ]]; then
     say_verbose "Install folder does not exist: $install_folder. Creating..."
 

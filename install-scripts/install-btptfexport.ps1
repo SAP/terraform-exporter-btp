@@ -204,6 +204,20 @@ try {
     }
 
     try {
+        Write-Verbose "Verifying signature of $releaseArtifactFilename" -Verbose:$Verbose
+        $signature = Get-AuthenticodeSignature $releaseArtifactFilename
+        if ($signature.Status -ne 'Valid') {
+            Write-Error "Signature of $releaseArtifactFilename is not valid"
+            reportTelemetryIfEnabled 'InstallFailed' 'SignatureVerificationFailed'
+            exit 1
+        }
+    } catch {
+        Write-Error -ErrorRecord $_
+        reportTelemetryIfEnabled 'InstallFailed' 'SignatureVerificationFailed'
+        exit 1
+    }
+
+    try {
         Write-Verbose "Installing btptfexport CLI" -Verbose:$Verbose
         $MSIEXEC = "${env:SystemRoot}\System32\msiexec.exe"
         $installProcess = Start-Process $MSIEXEC `
