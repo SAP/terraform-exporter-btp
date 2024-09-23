@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-
-
 func TestGetSubscriptionsImportBlock(t *testing.T) {
 
 	jsonString := "{\"id\":\"5163621f-6a1e-4fbf-af3a-0f530a0dc4d5\",\"subaccount_id\":\"5163621f-6a1e-4fbf-af3a-0f530a0dc4d5\",\"values\":[{\"state\":\"SUBSCRIBED\",\"app_name\":\"testapp\",\"plan_name\":\"testplan\"}]}"
