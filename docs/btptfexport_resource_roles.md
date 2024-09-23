@@ -4,7 +4,7 @@ export roles of a subaccount
 
 ### Synopsis
 
-export roles will export all the roless of the given subaccount and generate resource configuration for it
+export roles will export all the roles of the given subaccount and generate resource configuration for it
 
 ```
 btptfexport resource roles [flags]
