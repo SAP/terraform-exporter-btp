@@ -12,7 +12,7 @@ import (
 var exportSubaccountRolesCmd = &cobra.Command{
 	Use:               "roles",
 	Short:             "export roles of a subaccount",
-	Long:              `export roles will export all the roless of the given subaccount and generate resource configuration for it`,
+	Long:              `export roles will export all the roles of the given subaccount and generate resource configuration for it`,
 	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
