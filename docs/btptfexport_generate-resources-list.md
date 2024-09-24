@@ -18,6 +18,7 @@ Valid resources are:
 - subscriptions
 - environment-instances
 - trust-configurations
+- roles
 
 OR
 

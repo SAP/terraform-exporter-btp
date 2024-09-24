@@ -2,6 +2,7 @@ package tfutils
 
 import (
 	"btptfexport/files"
+	"btptfexport/output"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -24,6 +25,7 @@ const (
 	CmdEnvironmentInstanceParameter string = "environment-instances"
 	CmdSubscriptionParameter        string = "subscriptions"
 	CmdTrustConfigurationParameter  string = "trust-configurations"
+	CmdRoleParameter                string = "roles"
 )
 
 const (
@@ -32,6 +34,7 @@ const (
 	SubaccountEnvironmentInstanceType string = "btp_subaccount_environment_instance"
 	SubaccountSubscriptionType        string = "btp_subaccount_subscription"
 	SubaccountTrustConfigurationType  string = "btp_subaccount_trust_configuration"
+	SubaccountRoleType                string = "btp_subaccount_role"
 )
 
 const DataSourcesKind DocKind = "data-sources"
@@ -105,6 +108,8 @@ func TranslateResourceParamToTechnicalName(resource string) string {
 		return SubaccountSubscriptionType
 	case CmdTrustConfigurationParameter:
 		return SubaccountTrustConfigurationType
+	case CmdRoleParameter:
+		return SubaccountRoleType
 	}
 	return ""
 }
@@ -205,7 +210,7 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		for _, value := range subscriptions {
 			subscription := value.(map[string]interface{})
 			if fmt.Sprintf("%v", subscription["state"]) != "NOT_SUBSCRIBED" {
-				stringArr = append(stringArr, fmt.Sprintf("%v", subscription["app_name"])+"_"+fmt.Sprintf("%v", subscription["plan_name"]))
+				stringArr = append(stringArr, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 			}
 		}
 	case CmdEnvironmentInstanceParameter:
@@ -219,6 +224,12 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		for _, value := range trusts {
 			trust := value.(map[string]interface{})
 			stringArr = append(stringArr, fmt.Sprintf("%v", trust["origin"]))
+		}
+	case CmdRoleParameter:
+		roles := data["values"].([]interface{})
+		for _, value := range roles {
+			role := value.(map[string]interface{})
+			stringArr = append(stringArr, output.FormatRoleResourceName(fmt.Sprintf("%v", role["name"])))
 		}
 	}
 	return stringArr
