@@ -28,3 +28,16 @@ func TestFormatSubscriptionResourceName(t *testing.T) {
 	}
 
 }
+
+func TestFormatRoleCollectionResourceName(t *testing.T) {
+
+	input := "Destination Administrator"
+	expected := "destination_administrator"
+
+	result := FormatRoleCollectionResourceName(input)
+
+	if result != expected {
+		t.Errorf("got %q, wanted %q", result, expected)
+	}
+
+}

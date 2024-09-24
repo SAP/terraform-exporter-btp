@@ -32,7 +32,7 @@ func exportSubaccountRoles(subaccountID string, configDir string, filterValues [
 	}
 
 	if len(importBlock) == 0 {
-		log.Println("no entitlement found for the given subaccount")
+		log.Println("no role found for the given subaccount")
 		return
 	}
 
@@ -68,7 +68,7 @@ func getSubaccountRolesImportBlock(data map[string]interface{}, subaccountId str
 			resourceName := output.FormatRoleResourceName(fmt.Sprintf("%v", role["name"]))
 			subaccountAllRoles = append(subaccountAllRoles, resourceName)
 			if slices.Contains(filterValues, resourceName) {
-				importBlock += templateEnvironmentInstanceImport(role, subaccountId, resourceDoc)
+				importBlock += templateRoleImport(role, subaccountId, resourceDoc)
 			}
 		}
 
