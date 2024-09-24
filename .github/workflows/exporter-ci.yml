@@ -1,0 +1,39 @@
+name: Exporter CI tests
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  # Credentials used by the Terraform script
+  BTP_USERNAME: ${{ secrets.BTP_USERNAME }}
+  BTP_PASSWORD: ${{ secrets.BTP_PASSWORD }}
+  BTP_CLI_SERVER_URL: ${{ secrets.BTP_CLI_SERVER_URL }}
+  BTP_GLOBALACCOUNT: ${{ secrets.BTP_GLOBALACCOUNT }}
+  BTP_SUBACCOUNT: ${{ secrets.BTP_SUBACCOUNT }}
+jobs:
+  setup_infrastructure:
+    name: Test
+    runs-on: ubuntu-latest
+steps:
+      - name: Check out Git repository
+        id: checkout_repo
+        uses: actions/checkout@v4
+      - name: Build Exporter
+        id: build_exporter
+        run: |
+          make install
+      - name: Export All Resources
+        id : setup_exporter
+        shell: bash
+        run: |
+          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
+          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export BTP_CLI_SERVER_URL: ${{ secrets.BTP_CLI_SERVER_URL }}
+          export BTP_GLOBALACCOUNT: ${{ secrets.BTP_GLOBALACCOUNT }}
+          export BTP_SUBACCOUNT: ${{ secrets.BTP_SUBACCOUNT }}
+          btptfexport resource all -s ${BTP_SUBACCOUNT}
+
