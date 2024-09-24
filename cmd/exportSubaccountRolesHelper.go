@@ -65,8 +65,9 @@ func getSubaccountRolesImportBlock(data map[string]interface{}, subaccountId str
 
 		for _, value := range roles {
 			role := value.(map[string]interface{})
-			subaccountAllRoles = append(subaccountAllRoles, strings.ToLower(fmt.Sprintf("%v", role["role_template_name"])))
-			if slices.Contains(filterValues, strings.ToLower(fmt.Sprintf("%v", role["role_template_name"]))) {
+			resourceName := output.FormatRoleResourceName(fmt.Sprintf("%v", role["name"]))
+			subaccountAllRoles = append(subaccountAllRoles, resourceName)
+			if slices.Contains(filterValues, resourceName) {
 				importBlock += templateEnvironmentInstanceImport(role, subaccountId, resourceDoc)
 			}
 		}
@@ -90,7 +91,8 @@ func getSubaccountRolesImportBlock(data map[string]interface{}, subaccountId str
 func templateRoleImport(role map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 
 	resourceDoc.Import = strings.Replace(resourceDoc.Import, "'", "", -1)
-	template := strings.ToLower(strings.Replace(resourceDoc.Import, "<resource_name>", fmt.Sprintf("%v", role["role_template_name"]), -1))
+	resourceName := output.FormatRoleResourceName(fmt.Sprintf("%v", role["name"]))
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", resourceName, -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	template = strings.Replace(template, "<name>", fmt.Sprintf("%v", role["name"]), -1)
 	template = strings.Replace(template, "<role_template_name>", fmt.Sprintf("%v", role["role_template_name"]), -1)

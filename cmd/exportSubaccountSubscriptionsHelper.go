@@ -66,14 +66,14 @@ func getSubaccountSubscriptionsImportBlock(data map[string]interface{}, subaccou
 
 		for _, value := range subscriptions {
 			subscription := value.(map[string]interface{})
-			subaccountAllSubscriptions = append(subaccountAllSubscriptions, fmt.Sprintf("%v", subscription["app_name"])+"_"+fmt.Sprintf("%v", subscription["plan_name"]))
-			if slices.Contains(filterValues, fmt.Sprintf("%v", subscription["app_name"])+"_"+fmt.Sprintf("%v", subscription["plan_name"])) {
+			subaccountAllSubscriptions = append(subaccountAllSubscriptions, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
+			if slices.Contains(filterValues, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"]))) {
 				if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBED" {
 					importBlock += templateSubscriptionImport(subscription, subaccountId, resourceDoc)
 				} else if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBE_FAILED" {
-					failedSubscriptions = append(failedSubscriptions, fmt.Sprintf("%v", subscription["app_name"])+"_"+fmt.Sprintf("%v", subscription["plan_name"]))
+					failedSubscriptions = append(failedSubscriptions, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 				} else if fmt.Sprintf("%v", subscription["state"]) == "IN_PROCESS" {
-					inProgressSubscription = append(inProgressSubscription, fmt.Sprintf("%v", subscription["app_name"])+"_"+fmt.Sprintf("%v", subscription["plan_name"]))
+					inProgressSubscription = append(inProgressSubscription, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 				}
 			}
 		}
@@ -90,11 +90,9 @@ func getSubaccountSubscriptionsImportBlock(data map[string]interface{}, subaccou
 			if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBED" {
 				importBlock += templateSubscriptionImport(subscription, subaccountId, resourceDoc)
 			} else if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBE_FAILED" {
-				failedSubscriptions = append(failedSubscriptions, fmt.Sprintf("%v", subscription["app_name"])+"_"+fmt.Sprintf("%v", subscription["plan_name"]))
-
+				failedSubscriptions = append(failedSubscriptions, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 			} else if fmt.Sprintf("%v", subscription["state"]) == "IN_PROCESS" {
-				inProgressSubscription = append(inProgressSubscription, fmt.Sprintf("%v", subscription["app_name"])+"_"+fmt.Sprintf("%v", subscription["plan_name"]))
-
+				inProgressSubscription = append(inProgressSubscription, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 			}
 		}
 	}
