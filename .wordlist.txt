@@ -9,6 +9,7 @@ config
 DCO
 dependabot
 devcontainer
+dir
 faq
 Github
 github

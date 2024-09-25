@@ -52,7 +52,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
           cache: true
-      - run: go run main.go gendoc
+      - run: go run main.go gendoc -s "123"
       - name: git diff
         run: |
           git add .
