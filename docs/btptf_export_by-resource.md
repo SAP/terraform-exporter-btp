@@ -19,10 +19,11 @@ Valid resources are:
 - trust-configurations
 - roles
 - role-collections
+- service-bindings
 
 OR
 
-- alls
+- all
 
 Mixing "all" with other resources will throw an error.
 

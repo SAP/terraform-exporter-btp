@@ -22,7 +22,7 @@ Valid resources are:
 
 OR
 
-- alls
+- all
 
 Mixing "all" with other resources will throw an error.
 
