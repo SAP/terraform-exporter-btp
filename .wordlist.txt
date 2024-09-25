@@ -6,6 +6,7 @@ btptf
 CLA
 CLI
 config
+Copilot
 DCO
 dependabot
 devcontainer
@@ -19,6 +20,7 @@ https
 IdP
 json
 JSON
+jq
 macOS
 md
 Pre
@@ -27,6 +29,7 @@ PowerShell
 powershell
 README
 resourceFileName
+restrictedplan
 spf
 SSO
 sso

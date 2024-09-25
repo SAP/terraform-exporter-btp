@@ -51,7 +51,7 @@ When updating command descriptions you must generate the markdown documentation 
 make docs
 ```
 
-## Adding support for new resources on sibaccount level
+## Adding support for new resources on subaccount level
 
 To enable new resources on subaccount level you must execute the following steps:
 
@@ -61,11 +61,11 @@ To enable new resources on subaccount level you must execute the following steps
 1. Create a new implementation for the import factory in the directory `tfimportprovider`. You can take the file `subaccountRoleCollectionImportProvider.go` as an example concerning the structure of the file.
 1. Add the new implementation to the import factory function `GetImportBlockProvider` in the file `tfimportprovider/tfImportProviderFactory.go`.
 1. Depending on the resource you must define a transformation of the data from the data source to a string array. Place this logic into the function `transformDataToStringArray` in the `tfutils/tfutils.go` file.
-1. Depending on your resource you might also need to add custom formating logic for the resource address in the Terraform configuration. Place that into the file `output/format.go`. In most cases the function `FormatResourceNameGeneric` is sufficient.
+1. Depending on your resource you might also need to add custom formatting logic for the resource address in the Terraform configuration. Place that into the file `output/format.go`. In most cases the function `FormatResourceNameGeneric` is sufficient.
 
 ### Adding Unit Tests
 
-The main domain logic that we must test islocated in the factory implementations in the directory `tfimportprovider`. Creating these tests should reflect the real world setup, so we need to extract the test data from subaccounts and store them in the tests. In the following sections we describe how to best extract this data namely the JSON string that you need as input for your test.
+The main domain logic that we must test is located in the factory implementations in the directory `tfimportprovider`. Creating these tests should reflect the real world setup, so we need to extract the test data from subaccounts and store them in the tests. In the following sections we describe how to best extract this data namely the JSON string that you need as input for your test.
 
 #### Prerequisites
 
@@ -125,4 +125,4 @@ With that you get a file that contains the JSON string that you can use as input
 #### Creating the Unit Test
 
 An example how to create test case is given by the unit test implemented in `tfimportprovider/subaccountSubscriptionImportProvider_test.go`.
-GitHub CoPilot can be quite useful to setup the basics for the test, but some rework is needed.
+GitHub Copilot can be quite useful to setup the basics for the test, but some rework is needed.
