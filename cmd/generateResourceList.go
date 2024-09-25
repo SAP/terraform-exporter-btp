@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var AllowedResources = []string{tfutils.CmdSubaccountParameter, tfutils.CmdEntitlementParameter, tfutils.CmdEnvironmentInstanceParameter, tfutils.CmdSubscriptionParameter, tfutils.CmdTrustConfigurationParameter, tfutils.CmdRoleParameter}
+var AllowedResources = []string{tfutils.CmdSubaccountParameter, tfutils.CmdEntitlementParameter, tfutils.CmdEnvironmentInstanceParameter, tfutils.CmdSubscriptionParameter, tfutils.CmdTrustConfigurationParameter, tfutils.CmdRoleParameter, tfutils.CmdServiceBindingParameter}
 
 // getCmd represents the get command
 var getCmd = &cobra.Command{
@@ -31,6 +31,7 @@ Valid resources are:
 - environment-instances
 - trust-configurations
 - roles
+- service-bindings
 
 OR
 

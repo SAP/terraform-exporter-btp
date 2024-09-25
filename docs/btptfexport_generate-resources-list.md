@@ -19,6 +19,7 @@ Valid resources are:
 - environment-instances
 - trust-configurations
 - roles
+- service-bindings
 
 OR
 

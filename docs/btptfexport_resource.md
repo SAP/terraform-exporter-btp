@@ -34,6 +34,7 @@ btptfexport resource [flags]
 * [btptfexport resource environment-instances](btptfexport_resource_environment-instances.md)	 - export environment instance of a subaccount
 * [btptfexport resource from-file](btptfexport_resource_from-file.md)	 - export resources from a json file.
 * [btptfexport resource roles](btptfexport_resource_roles.md)	 - export roles of a subaccount
+* [btptfexport resource service-bindings](btptfexport_resource_service-bindings.md)	 - export service bindings of a subaccount
 * [btptfexport resource subaccount](btptfexport_resource_subaccount.md)	 - export subaccount
 * [btptfexport resource subscriptions](btptfexport_resource_subscriptions.md)	 - export subscriptions of a subaccount
 * [btptfexport resource trust-configurations](btptfexport_resource_trust-configurations.md)	 - export trust configurations of a subaccount

@@ -26,6 +26,7 @@ const (
 	CmdSubscriptionParameter        string = "subscriptions"
 	CmdTrustConfigurationParameter  string = "trust-configurations"
 	CmdRoleParameter                string = "roles"
+	CmdServiceBindingParameter      string = "service-bindings"
 )
 
 const (
@@ -35,6 +36,7 @@ const (
 	SubaccountSubscriptionType        string = "btp_subaccount_subscription"
 	SubaccountTrustConfigurationType  string = "btp_subaccount_trust_configuration"
 	SubaccountRoleType                string = "btp_subaccount_role"
+	SubaccountServiceBindingType      string = "btp_subaccount_service_binding"
 )
 
 const DataSourcesKind DocKind = "data-sources"
@@ -110,6 +112,8 @@ func TranslateResourceParamToTechnicalName(resource string) string {
 		return SubaccountTrustConfigurationType
 	case CmdRoleParameter:
 		return SubaccountRoleType
+	case CmdServiceBindingParameter:
+		return SubaccountServiceBindingType
 	}
 	return ""
 }
@@ -230,6 +234,12 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		for _, value := range roles {
 			role := value.(map[string]interface{})
 			stringArr = append(stringArr, output.FormatRoleResourceName(fmt.Sprintf("%v", role["name"])))
+		}
+	case CmdServiceBindingParameter:
+		bindings := data["values"].([]interface{})
+		for _, value := range bindings {
+			binding := value.(map[string]interface{})
+			stringArr = append(stringArr, fmt.Sprintf("%v", binding["name"]))
 		}
 	}
 	return stringArr
