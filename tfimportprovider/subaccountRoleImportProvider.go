@@ -46,7 +46,7 @@ func createRoleImportBlock(data map[string]interface{}, subaccountId string, fil
 
 		for _, value := range roles {
 			role := value.(map[string]interface{})
-			resourceName := output.FormatRoleResourceName(fmt.Sprintf("%v", role["name"]))
+			resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"]))
 			subaccountAllRoles = append(subaccountAllRoles, resourceName)
 			if slices.Contains(filterValues, resourceName) {
 				importBlock += templateRoleImport(role, subaccountId, resourceDoc)
@@ -71,7 +71,7 @@ func createRoleImportBlock(data map[string]interface{}, subaccountId string, fil
 func templateRoleImport(role map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 
 	resourceDoc.Import = strings.Replace(resourceDoc.Import, "'", "", -1)
-	resourceName := output.FormatRoleResourceName(fmt.Sprintf("%v", role["name"]))
+	resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"]))
 	template := strings.Replace(resourceDoc.Import, "<resource_name>", resourceName, -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	template = strings.Replace(template, "<name>", fmt.Sprintf("%v", role["name"]), -1)

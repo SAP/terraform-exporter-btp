@@ -118,7 +118,7 @@ The CLI offers several commands for the export of Terraform configurations of SA
 
 ## Developer Guide
 
-If you want to contribute to the code of the Terraform Exporter for SAP BTP, please check our [Contribution Guidelines](CONTRIBUTING.md). The technical setup and how to get started are described in the [Developer Guide](DEVELOPER-GUIDE.md)
+If you want to contribute to the code of the Terraform Exporter for SAP BTP, please check our [Contribution Guidelines](CONTRIBUTING.md). The technical setup and how to get started are described in the [Developer Guide](./guidelines/DEVELOPER-GUIDE.md)
 
 ## Support, Feedback, Contributing
 

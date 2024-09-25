@@ -26,6 +26,7 @@ var AllowedResources = []string{
 	CmdTrustConfigurationParameter,
 	CmdRoleParameter,
 	CmdRoleCollectionParameter,
+	CmdServiceBindingParameter,
 }
 
 func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) {

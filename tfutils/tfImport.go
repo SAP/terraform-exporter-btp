@@ -237,13 +237,13 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		roles := data["values"].([]interface{})
 		for _, value := range roles {
 			role := value.(map[string]interface{})
-			stringArr = append(stringArr, output.FormatRoleResourceName(fmt.Sprintf("%v", role["name"])))
+			stringArr = append(stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"])))
 		}
 	case CmdRoleCollectionParameter:
 		roleCollections := data["values"].([]interface{})
 		for _, value := range roleCollections {
 			roleCollection := value.(map[string]interface{})
-			stringArr = append(stringArr, output.FormatRoleCollectionResourceName(fmt.Sprintf("%v", roleCollection["name"])))
+			stringArr = append(stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", roleCollection["name"])))
 		}
 	case CmdServiceBindingParameter:
 		bindings := data["values"].([]interface{})

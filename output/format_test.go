@@ -2,12 +2,12 @@ package output
 
 import "testing"
 
-func TestFormatRoleResourceName(t *testing.T) {
+func TestFormatResourceNameGeneric(t *testing.T) {
 
 	input := "Application Destination Administrator"
 	expected := "application_destination_administrator"
 
-	result := FormatRoleResourceName(input)
+	result := FormatResourceNameGeneric(input)
 
 	if result != expected {
 		t.Errorf("got %q, wanted %q", result, expected)
@@ -27,26 +27,4 @@ func TestFormatSubscriptionResourceName(t *testing.T) {
 		t.Errorf("got %q, wanted %q", result, expected)
 	}
 
-}
-
-func TestFormatRoleCollectionResourceName(t *testing.T) {
-
-	input := "Destination Administrator"
-	expected := "destination_administrator"
-
-	result := FormatRoleCollectionResourceName(input)
-
-	if result != expected {
-		t.Errorf("got %q, wanted %q", result, expected)
-	}
-
-}
-
-func TestFormatServiceBindingResourceName(t *testing.T) {
-	input := "My App binding"
-	expected := "my_app_binding"
-	result := FormatServiceBindingResourceName(input)
-	if result != expected {
-		t.Errorf("got %q, wanted %q", result, expected)
-	}
 }

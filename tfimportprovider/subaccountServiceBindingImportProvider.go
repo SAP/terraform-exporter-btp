@@ -68,7 +68,7 @@ func createServiceBindingurationImportBlock(data map[string]interface{}, subacco
 }
 
 func templateServiceBindingImport(binding map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
-	resourceName := output.FormatServiceBindingResourceName(fmt.Sprintf("%v", binding["name"]))
+	resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", binding["name"]))
 	template := strings.Replace(resourceDoc.Import, "<resource_name>", resourceName, -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	template = strings.Replace(template, "<service_binding_id>", fmt.Sprintf("%v", binding["id"]), -1)
