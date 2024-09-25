@@ -23,10 +23,10 @@ builds:
     ignore:
       - goos: darwin
         goarch: "386"
-    binary: "{{ .ProjectName }}_v{{ .Version }}"
+    binary: "btptf_v{{ .Version }}"
 archives:
   - format: binary
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "btptf_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 checksum:
   algorithm: sha256
   split: true
@@ -34,7 +34,7 @@ changelog:
   use: github-native
 
 nfpms:
-  - id: btptfexporter
+  - id: btptf
     # Name of the package - Default: ProjectName.
 
     # File name of the package.

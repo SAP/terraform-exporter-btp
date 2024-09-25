@@ -54,7 +54,7 @@ body:
         Describe the steps to reproduce the observed behavior.
 
       placeholder: |
-        1. Execute the command `btptfexport --help`
+        1. Execute the command `btptf --help`
         2. Execute the command ...
     validations:
       required: false

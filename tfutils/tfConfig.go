@@ -1,20 +1,32 @@
 package tfutils
 
 import (
-	"btptfexport/files"
-	"btptfexport/output"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
+
+	files "github.com/SAP/terraform-exporter-btp/files"
+	output "github.com/SAP/terraform-exporter-btp/output"
 
 	"github.com/spf13/viper"
 	"github.com/theckman/yacspin"
 )
 
 var TmpFolder string
+
+var AllowedResources = []string{
+	CmdSubaccountParameter,
+	CmdEntitlementParameter,
+	CmdEnvironmentInstanceParameter,
+	CmdSubscriptionParameter,
+	CmdTrustConfigurationParameter,
+	CmdRoleParameter,
+	CmdRoleCollectionParameter,
+}
 
 func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) {
 
@@ -228,6 +240,26 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 		log.Fatalf("failed to copy file: %v", err)
 		return
 	}
+}
+
+func GetResourcesList(resourcesString string) []string {
+
+	var resources []string
+
+	if resourcesString == "all" {
+		resources = AllowedResources
+	} else {
+		resources = strings.Split(resourcesString, ",")
+
+		for _, resource := range resources {
+			if !(slices.Contains(AllowedResources, resource)) {
+				log.Fatal("please check the resource provided. Currently supported resources are subaccount, entitlements, subscriptions, environment-instances and trust-configurations. Provide 'all' to check for all resources")
+				return []string{}
+			}
+		}
+	}
+
+	return resources
 }
 
 func cleanup() {

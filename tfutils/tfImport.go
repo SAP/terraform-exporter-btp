@@ -1,8 +1,6 @@
 package tfutils
 
 import (
-	"btptfexport/files"
-	"btptfexport/output"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -12,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	files "github.com/SAP/terraform-exporter-btp/files"
+	output "github.com/SAP/terraform-exporter-btp/output"
 	"github.com/hashicorp/terraform-exec/tfexec"
 	"github.com/spf13/viper"
 )
@@ -27,7 +27,7 @@ const (
 	CmdTrustConfigurationParameter  string = "trust-configurations"
 	CmdRoleParameter                string = "roles"
 	CmdRoleCollectionParameter      string = "role-collections"
-  CmdServiceBindingParameter      string = "service-bindings"
+	CmdServiceBindingParameter      string = "service-bindings"
 )
 
 const (
@@ -38,7 +38,7 @@ const (
 	SubaccountTrustConfigurationType  string = "btp_subaccount_trust_configuration"
 	SubaccountRoleType                string = "btp_subaccount_role"
 	SubaccountRoleCollectionType      string = "btp_subaccount_role_collection"
-  SubaccountServiceBindingType      string = "btp_subaccount_service_binding"
+	SubaccountServiceBindingType      string = "btp_subaccount_service_binding"
 )
 
 const DataSourcesKind DocKind = "data-sources"
@@ -116,7 +116,7 @@ func TranslateResourceParamToTechnicalName(resource string) string {
 		return SubaccountRoleType
 	case CmdRoleCollectionParameter:
 		return SubaccountRoleCollectionType
-  case CmdServiceBindingParameter:
+	case CmdServiceBindingParameter:
 		return SubaccountServiceBindingType
 	}
 	return ""
@@ -245,7 +245,7 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 			roleCollection := value.(map[string]interface{})
 			stringArr = append(stringArr, output.FormatRoleCollectionResourceName(fmt.Sprintf("%v", roleCollection["name"])))
 		}
-  case CmdServiceBindingParameter:
+	case CmdServiceBindingParameter:
 		bindings := data["values"].([]interface{})
 		for _, value := range bindings {
 			binding := value.(map[string]interface{})

@@ -1,24 +1,32 @@
 package cmd
 
 import (
-	"btptfexport/output"
 	"fmt"
 	"os"
+
+	output "github.com/SAP/terraform-exporter-btp/output"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 	"github.com/spf13/viper"
 )
 
-var Debug bool
+var debug bool
+var subaccount string
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "btptfexport",
-	Short: "Terraform exporter for BTP",
-	Long: `btptfexport is a utility to generate configuration for existing btp resources that are created manually and not managed by terraform. The CLI helps to generate configuration which then can be used by Terraform to bring that resource under terraform state.
-	`,
+	Use:               "btptf",
+	Short:             "Terraform Exporter for SAP BTP",
+	Long:              `btptf is a utility to generate Terraform configurations for existing SAP BTP resources that have been created manually and are not managed by Terraform.`,
 	DisableAutoGenTag: true,
+}
+
+func init() {
+	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Display debugging output in the console.")
+	rootCmd.PersistentFlags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
+	_ = rootCmd.MarkPersistentFlagRequired("subaccount")
+	_ = viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
+	rootCmd.AddCommand(docCmd)
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -29,12 +37,6 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func init() {
-	rootCmd.PersistentFlags().BoolVarP(&Debug, "debug", "d", false, "Display debugging output in the console. (default: false)")
-	_ = viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
-	rootCmd.AddCommand(docCmd)
 }
 
 var docCmd = &cobra.Command{
@@ -58,6 +60,5 @@ var docCmd = &cobra.Command{
 
 		successMsg := output.ColorStringLightGreen("Documentation generated successfully in:")
 		fmt.Println(successMsg, docsDir)
-
 	},
 }

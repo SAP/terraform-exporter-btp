@@ -1,19 +1,21 @@
-module btptfexport
+module github.com/SAP/terraform-exporter-btp
 
 go 1.23.0
 
 require (
+	github.com/fatih/color v1.17.0
 	github.com/hashicorp/terraform-exec v0.21.0
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.8.1
+	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
+	github.com/theckman/yacspin v0.13.12
 )
 
 require (
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/fatih/color v1.17.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
@@ -33,9 +35,7 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/spf13/viper v1.19.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/theckman/yacspin v0.13.12 // indirect
 	github.com/zclconf/go-cty v1.14.4 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect

@@ -43,12 +43,10 @@ func TestFormatRoleCollectionResourceName(t *testing.T) {
 }
 
 func TestFormatServiceBindingResourceName(t *testing.T) {
-
 	input := "My App binding"
 	expected := "my_app_binding"
 	result := FormatServiceBindingResourceName(input)
 	if result != expected {
 		t.Errorf("got %q, wanted %q", result, expected)
 	}
-
 }
