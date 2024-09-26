@@ -5,15 +5,23 @@ ifeq ($(OS),Windows_NT)
 	SETENV=set
 endif
 
-BINARY_NAME=btptf
+ifeq ($(OS),Windows_NT)
+	BINARY_NAME=btptf.exe
+	GOBIN_PATH=$(if $(GOBIN),$(GOBIN),$(shell powershell -Command (go env GOPATH))\bin)
+	BINARY_PATH=$(GOBIN_PATH)\$(BINARY_NAME)
+else
+	BINARY_NAME=btptf
+	GOBIN_PATH=$(if $(GOBIN),$(GOBIN),$(shell go env GOPATH)/bin)
+	BINARY_PATH=$(GOBIN_PATH)/$(BINARY_NAME)
+endif
+
 MAIN_PACKAGE=main.go
-GOBIN_PATH=$(if $(GOBIN),$(GOBIN),$(shell go env GOPATH)/bin)
 
 build:
 	go build -v ./...
 
 install: build
-	go build -o $(GOBIN_PATH)/$(BINARY_NAME) $(MAIN_PACKAGE)
+	go build -o $(BINARY_PATH) $(MAIN_PACKAGE)
 
 lint:
 	golangci-lint run
