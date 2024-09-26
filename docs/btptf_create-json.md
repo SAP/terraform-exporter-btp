@@ -35,7 +35,7 @@ btptf create-json [flags]
 
 ```
   -h, --help               help for create-json
-  -p, --json-out string    JSON file for list of resources (default "btpResources.json")
+  -p, --path string        path to JSON file with list of resources (default "btpResources.json")
   -r, --resources string   comma seperated string for resources (default "all")
 ```
 

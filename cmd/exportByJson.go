@@ -19,17 +19,17 @@ var exportByJsonCmd = &cobra.Command{
 		subaccount, _ := cmd.InheritedFlags().GetString("subaccount")
 		configDir, _ := cmd.InheritedFlags().GetString("config-dir")
 		resourceFileName, _ := cmd.InheritedFlags().GetString("resource-file-name")
-		jsonFile, _ := cmd.Flags().GetString("from")
+		path, _ := cmd.Flags().GetString("path")
 
 		output.PrintExportStartMessage()
-		exportByJson(subaccount, jsonFile, resourceFileName, configDir)
+		exportByJson(subaccount, path, resourceFileName, configDir)
 		output.PrintExportSuccessMessage()
 	},
 }
 
 func init() {
-	var jsonFile string
-	exportByJsonCmd.Flags().StringVarP(&jsonFile, "from", "p", "btpResources.json", "path to JSON file with resources")
+	var path string
+	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")
 
 	exportCmd.AddCommand(exportByJsonCmd)
 }

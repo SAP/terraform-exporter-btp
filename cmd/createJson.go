@@ -39,20 +39,20 @@ Mixing "all" with other resources will throw an error.
 	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.InheritedFlags().GetString("subaccount")
-		fileName, _ := cmd.Flags().GetString("json-out")
+		path, _ := cmd.Flags().GetString("path")
 		resources, _ := cmd.Flags().GetString("resources")
 
 		output.PrintInventoryCreationStartMessage()
 		resourcesList := tfutils.GetResourcesList(resources)
-		createJson(subaccount, fileName, resourcesList)
+		createJson(subaccount, path, resourcesList)
 		output.PrintInventoryCreationSuccessMessage()
 	},
 }
 
 func init() {
-	var fileName string
+	var path string
 	var resources string
-	createJsonCmd.Flags().StringVarP(&fileName, "json-out", "p", "btpResources.json", "JSON file for list of resources")
+	createJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")
 	createJsonCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")
 
 	rootCmd.AddCommand(createJsonCmd)

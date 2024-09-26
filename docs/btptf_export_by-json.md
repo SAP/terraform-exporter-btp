@@ -13,8 +13,8 @@ btptf export by-json [flags]
 ### Options
 
 ```
-  -p, --from string   path to JSON file with resources (default "btpResources.json")
   -h, --help          help for by-json
+  -p, --path string   path to JSON file with list of resources (default "btpResources.json")
 ```
 
 ### Options inherited from parent commands
