@@ -1,6 +1,5 @@
 package tfimportprovider
 
-// 	expectedValue := "import {\n\t\t\t\tto = btp_subaccount_role_collection.cloud_connector_administrator\n\t\t\t\tid = \"5163621f-6a1e-4fbf-af3a-0f530a0dc4d5,Cloud Connector Administrator\"\n\t\t\t  }\n"
 import (
 	"testing"
 
