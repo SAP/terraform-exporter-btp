@@ -46,9 +46,10 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 			return
 		}
 
-		fmt.Println(output.ColorStringCyan("No " + techResourceNameLong + "found for the given subaccount"))
+		fmt.Println(output.ColorStringCyan("   no " + techResourceNameLong + " found for the given subaccount"))
 
 		tfutils.CleanupTempFiles(tempConfigDir)
+		fmt.Println(output.ColorStringGrey("   temporary files deleted"))
 
 	} else {
 

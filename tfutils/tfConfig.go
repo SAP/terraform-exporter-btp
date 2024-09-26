@@ -275,6 +275,7 @@ func cleanup() {
 
 func FinalizeTfConfig(configFolder string) {
 
+	output.AddNewLine()
 	spinner, err := output.StartSpinner("finalizing Terraform configuration")
 	if err != nil {
 		log.Fatalf("error: %v", err)

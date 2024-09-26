@@ -36,7 +36,7 @@ func exportByJson(subaccount string, jsonfile string, resourceFile string, confi
 		resNames = append(resNames, resources.BtpResources[i].Name)
 	}
 	if len(resNames) == 0 {
-		fmt.Println(output.ColorStringCyan("No resource needs to be exported"))
+		fmt.Println(output.ColorStringCyan("no resource needs to be exported"))
 		return
 	}
 
