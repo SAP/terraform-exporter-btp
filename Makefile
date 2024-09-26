@@ -7,14 +7,10 @@ endif
 
 ifeq ($(OS),Windows_NT)
 	BINARY_NAME=btptf.exe
-else
-	BINARY_NAME=btptf
-endif
-
-ifeq ($(OS),Windows_NT)
 	GOBIN_PATH=$(if $(GOBIN),$(GOBIN),$(shell powershell -Command (go env GOPATH))\bin)
 	BINARY_PATH=$(GOBIN_PATH)\$(BINARY_NAME)
 else
+	BINARY_NAME=btptf
 	GOBIN_PATH=$(if $(GOBIN),$(GOBIN),$(shell go env GOPATH)/bin)
 	BINARY_PATH=$(GOBIN_PATH)/$(BINARY_NAME)
 endif
