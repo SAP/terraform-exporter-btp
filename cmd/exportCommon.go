@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
@@ -39,21 +40,30 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 	}
 
 	if len(importBlock) == 0 {
-		log.Println("No environment instance found for the given subaccount")
-		return
+		err = output.StopSpinner(spinner)
+		if err != nil {
+			log.Fatalf("error: %v", err)
+			return
+		}
+
+		fmt.Println(output.ColorStringCyan("No " + techResourceNameLong + "found for the given subaccount"))
+
+		tfutils.CleanupTempFiles(tempConfigDir)
+
+	} else {
+
+		err = files.WriteImportConfiguration(configDir, resourceType, importBlock)
+		if err != nil {
+			log.Fatalf("error: %v", err)
+			return
+		}
+
+		err = output.StopSpinner(spinner)
+		if err != nil {
+			log.Fatalf("error: %v", err)
+			return
+		}
+		tfutils.ExecPostExportSteps(tempConfigDir, configDir, resourceFileName, techResourceNameLong)
 	}
 
-	err = files.WriteImportConfiguration(configDir, resourceType, importBlock)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
-
-	err = output.StopSpinner(spinner)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
-
-	tfutils.ExecPostExportSteps(tempConfigDir, configDir, resourceFileName, techResourceNameLong)
 }
