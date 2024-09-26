@@ -71,7 +71,6 @@ func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId s
 }
 
 func templateRoleCollectionImport(roleCollection map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
-
 	resourceDoc.Import = strings.Replace(resourceDoc.Import, "'", "", -1)
 	resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", roleCollection["name"]))
 	template := strings.Replace(resourceDoc.Import, "<resource_name>", resourceName, -1)
