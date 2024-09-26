@@ -12,7 +12,7 @@ else
 endif
 
 ifeq ($(OS),Windows_NT)
-	GOBIN_PATH=$(if $(GOBIN),$(GOBIN),$(shell powershell -Command "(go env GOPATH))\bin)
+	GOBIN_PATH=$(if $(GOBIN),$(GOBIN),$(shell powershell -Command (go env GOPATH))\bin)
 	BINARY_PATH=$(GOBIN_PATH)\$(BINARY_NAME)
 else
 	GOBIN_PATH=$(if $(GOBIN),$(GOBIN),$(shell go env GOPATH)/bin)
