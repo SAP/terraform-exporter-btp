@@ -118,7 +118,7 @@ you have two options now:
 - If you want to adjust the result you must execute the following steps:
    1. Generate the JSON file via: terraform show -json plan.out |  jq .planned_values.outputs.all.value > restrictedplan.json
    1. Adjust the JSON file e.g., remove some entries
-   1. execute the script `guidelines/scripts/transform_all.sh` that needs to be located at the same level as the `restrictedplan.json` file.
+   1. execute the script `guidelines/scripts/transform_json.sh` that needs to be located at the same level as the `restrictedplan.json` file.
 
 With that you get a file that contains the JSON string that you can use as input for your tests of the creation of the import block functions.
 

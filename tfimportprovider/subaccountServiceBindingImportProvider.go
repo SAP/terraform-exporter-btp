@@ -29,7 +29,7 @@ func (tf *subaccountServiceBindingImportProvider) GetImportBlock(data map[string
 		return "", err
 	}
 
-	importBlock, err := createServiceBindingurationImportBlock(data, subaccountId, filterValues, resourceDoc)
+	importBlock, err := createServiceBindingImportBlock(data, subaccountId, filterValues, resourceDoc)
 	if err != nil {
 		return "", err
 	}
@@ -37,7 +37,7 @@ func (tf *subaccountServiceBindingImportProvider) GetImportBlock(data map[string
 	return importBlock, nil
 }
 
-func createServiceBindingurationImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
+func createServiceBindingImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
 	serviceBindings := data["values"].([]interface{})
 
 	if len(filterValues) != 0 {
