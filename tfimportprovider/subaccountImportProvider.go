@@ -3,7 +3,6 @@ package tfimportprovider
 import (
 	"fmt"
 	"log"
-	"os"
 	"strings"
 
 	tfutils "github.com/SAP/terraform-exporter-btp/tfutils"
@@ -41,7 +40,6 @@ func createSubaccountImportBlock(data map[string]interface{}, subaccountId strin
 		if filterValues[0] != fmt.Sprintf("%v", data["name"]) {
 			err := fmt.Errorf("subaccount %s not found. Please adjust it in the provided file", filterValues[0])
 			log.Println("Error:", err)
-			os.Exit(0)
 			return "", err
 		}
 	}
