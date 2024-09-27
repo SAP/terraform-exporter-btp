@@ -253,7 +253,7 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		instances := data["values"].([]interface{})
 		for _, value := range instances {
 			instance := value.(map[string]interface{})
-			stringArr = append(stringArr, output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["plan_id"])))
+			stringArr = append(stringArr, output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["serviceplan_id"])))
 		}
 	case CmdServiceBindingParameter:
 		bindings := data["values"].([]interface{})

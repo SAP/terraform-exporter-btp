@@ -45,7 +45,7 @@ func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId 
 
 		for _, value := range serviceInstances {
 			instance := value.(map[string]interface{})
-			resourceName := output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["plan_id"]))
+			resourceName := output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["serviceplan_id"]))
 			subaccountAllServiceInstances = append(subaccountAllServiceInstances, resourceName)
 			if slices.Contains(filterValues, resourceName) {
 				importBlock += templateServiceInstanceImport(instance, subaccountId, resourceDoc)
@@ -68,7 +68,7 @@ func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId 
 }
 
 func templateServiceInstanceImport(instance map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
-	resourceName := output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["plan_id"]))
+	resourceName := output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["serviceplan_id"]))
 	template := strings.Replace(resourceDoc.Import, "<resource_name>", resourceName, -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	template = strings.Replace(template, "<service_instance_id>", fmt.Sprintf("%v", instance["id"]), -1)
