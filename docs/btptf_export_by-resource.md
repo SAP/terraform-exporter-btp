@@ -17,9 +17,10 @@ Valid resources are:
 - subscriptions
 - environment-instances
 - trust-configurations
+- service-instances
+- service-bindings
 - roles
 - role-collections
-- service-bindings
 
 OR
 
