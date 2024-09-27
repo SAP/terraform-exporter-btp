@@ -37,7 +37,7 @@ func TestCreateRoleImportBlock(t *testing.T) {
 			name:          "With filter values",
 			data:          dataMultipleRoles,
 			subaccountId:  "12345",
-			filterValues:  []string{"BusinessContextManagerAdministrator"},
+			filterValues:  []string{"businesscontextmanageradministrator"},
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_role.businesscontextmanageradministrator\n\t\t\t\tid = \"12345,BusinessContextManagerAdministrator,BusinessContextManagerAdministrator,business-context-manager-service!b28142\"\n\t\t\t  }\n\n",
 			expectError:   false,
 		},

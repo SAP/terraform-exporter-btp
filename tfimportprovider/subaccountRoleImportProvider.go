@@ -46,7 +46,7 @@ func createRoleImportBlock(data map[string]interface{}, subaccountId string, fil
 
 		for _, value := range roles {
 			role := value.(map[string]interface{})
-			resourceName := fmt.Sprintf("%v", role["name"])
+			resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"]))
 			subaccountAllRoles = append(subaccountAllRoles, resourceName)
 			if slices.Contains(filterValues, resourceName) {
 				importBlock += templateRoleImport(role, subaccountId, resourceDoc)
