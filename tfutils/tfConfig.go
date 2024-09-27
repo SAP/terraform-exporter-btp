@@ -275,6 +275,7 @@ func cleanup() {
 
 func FinalizeTfConfig(configFolder string) {
 
+	output.AddNewLine()
 	spinner, err := output.StartSpinner("finalizing Terraform configuration")
 	if err != nil {
 		log.Fatalf("error: %v", err)
@@ -334,7 +335,7 @@ func ExecPostExportSteps(tempConfigDir string, targetConfigDir string, targetRes
 
 	GenerateConfig(targetResourceFileName, tempConfigDir, false, resourceNameLong)
 	mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)
-	files.DeleteSourceFolder(tempConfigDir)
+	CleanupTempFiles(tempConfigDir)
 
 	err = output.StopSpinner(spinner)
 	if err != nil {
@@ -343,6 +344,10 @@ func ExecPostExportSteps(tempConfigDir string, targetConfigDir string, targetRes
 	}
 
 	fmt.Println(output.ColorStringGrey("   temporary files deleted"))
+}
+
+func CleanupTempFiles(tempConfigDir string) {
+	files.DeleteSourceFolder(tempConfigDir)
 }
 
 func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder string, resourceName string) {
