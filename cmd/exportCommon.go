@@ -53,7 +53,7 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 
 	} else {
 
-		err = files.WriteImportConfiguration(configDir, resourceType, importBlock)
+		err = files.WriteImportConfiguration(tempConfigDir, resourceType, importBlock)
 		if err != nil {
 			log.Fatalf("error: %v", err)
 			return

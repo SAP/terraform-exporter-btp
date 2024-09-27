@@ -14,9 +14,9 @@
       "args": "${input:cliArgs}",
       "console": "integratedTerminal",
       "env": {
-        "BTP_USERNAME": "christian.lechner@sap.com",
+        "BTP_USERNAME": "",
         "BTP_ENABLE_SSO": "true",
-        "BTP_GLOBALACCOUNT": "terrformintprod"
+        "BTP_GLOBALACCOUNT": ""
       },
       //"envFile": "${workspaceFolder}/.env"
     },
