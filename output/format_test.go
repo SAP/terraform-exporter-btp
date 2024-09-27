@@ -12,7 +12,6 @@ func TestFormatResourceNameGeneric(t *testing.T) {
 	if result != expected {
 		t.Errorf("got %q, wanted %q", result, expected)
 	}
-
 }
 
 func TestFormatSubscriptionResourceName(t *testing.T) {
@@ -22,6 +21,19 @@ func TestFormatSubscriptionResourceName(t *testing.T) {
 	expected := "feature-flags-dashboard_dashboard"
 
 	result := FormatSubscriptionResourceName(appName, planName)
+
+	if result != expected {
+		t.Errorf("got %q, wanted %q", result, expected)
+	}
+}
+
+func TestFormatServiceInstanceResourceName(t *testing.T) {
+
+	serviceINstanceName := "audit-log-exporter"
+	planId := "a50128a9-35fc-4624-9953-c79668ef3e5b"
+	expected := "audit-log-exporter_a50128a9-35fc-4624-9953-c79668ef3e5b"
+
+	result := FormatServiceInstanceResourceName(serviceINstanceName, planId)
 
 	if result != expected {
 		t.Errorf("got %q, wanted %q", result, expected)

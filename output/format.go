@@ -9,3 +9,7 @@ func FormatResourceNameGeneric(name string) string {
 func FormatSubscriptionResourceName(appName string, planName string) string {
 	return appName + "_" + planName
 }
+
+func FormatServiceInstanceResourceName(serviceInstanceName string, planId string) string {
+	return serviceInstanceName + "_" + planId
+}

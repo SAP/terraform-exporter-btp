@@ -27,6 +27,7 @@ var AllowedResources = []string{
 	CmdRoleParameter,
 	CmdRoleCollectionParameter,
 	CmdServiceBindingParameter,
+	CmdServiceInstanceParameter,
 }
 
 func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) {
@@ -254,7 +255,10 @@ func GetResourcesList(resourcesString string) []string {
 
 		for _, resource := range resources {
 			if !(slices.Contains(AllowedResources, resource)) {
-				log.Fatal("please check the resource provided. Currently supported resources are subaccount, entitlements, subscriptions, environment-instances and trust-configurations. Provide 'all' to check for all resources")
+
+				allowedResourceList := strings.Join(AllowedResources, ", ")
+
+				log.Fatal("please check the resource provided. Currently supported resources are " + allowedResourceList + ". Provide 'all' to check for all resources")
 				return []string{}
 			}
 		}

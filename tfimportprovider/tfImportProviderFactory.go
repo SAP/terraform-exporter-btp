@@ -23,6 +23,8 @@ func GetImportBlockProvider(cmdResourceName string) (ITfImportProvider, error) {
 		return newSubaccountRoleImportProvider(), nil
 	case tfutils.CmdRoleCollectionParameter:
 		return newSubaccountRoleCollectionImportProvider(), nil
+	case tfutils.CmdServiceInstanceParameter:
+		return newSubaccountServiceInstanceImportProvider(), nil
 	case tfutils.CmdServiceBindingParameter:
 		return newSubaccountServiceBindingImportProvider(), nil
 	default:
