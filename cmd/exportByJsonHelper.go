@@ -57,4 +57,5 @@ func exportByJson(subaccount string, jsonfile string, resourceFile string, confi
 	}
 
 	tfutils.FinalizeTfConfig(configDir)
+	tfutils.CleanupProviderConfig()
 }

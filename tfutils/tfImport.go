@@ -135,8 +135,12 @@ func ReadDataSources(subaccountID string, resourceList []string) (btpResources B
 			error := fmt.Errorf("error generating dats sources: %v", err)
 			return BtpResources{}, error
 		}
-		data := BtpResource{Name: resource, Values: values}
-		btpResourcesList = append(btpResourcesList, data)
+
+		if len(values) != 0 {
+			// Only append existing resources to avoid confusion
+			data := BtpResource{Name: resource, Values: values}
+			btpResourcesList = append(btpResourcesList, data)
+		}
 	}
 
 	btpResources = BtpResources{BtpResources: btpResourcesList}

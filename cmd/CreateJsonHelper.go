@@ -45,5 +45,7 @@ func createJson(subaccount string, fileName string, resources []string) {
 		log.Fatalf("create file %s failed!", dataBlockFile)
 	}
 
+	tfutils.CleanupProviderConfig()
+
 	output.StopSpinner(spinner)
 }
