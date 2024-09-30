@@ -37,11 +37,7 @@ func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool
 
 	if isMainCmd {
 		// We must distinguish if the command is run from a main command or via delegation from helper functions
-		spinner, err = output.StartSpinner("generating Terraform configuration for " + resourceNameLong)
-		if err != nil {
-			log.Fatalf("error: %v", err)
-			return
-		}
+		spinner = output.StartSpinner("generating Terraform configuration for " + resourceNameLong)
 	}
 
 	currentDir, err := os.Getwd()
@@ -83,11 +79,7 @@ func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool
 	}
 
 	if isMainCmd {
-		err = output.StopSpinner(spinner)
-		if err != nil {
-			log.Fatalf("error: %v", err)
-			return
-		}
+		output.StopSpinner(spinner)
 		fmt.Println(output.ColorStringGrey("   temporary files deleted"))
 	}
 }
@@ -121,14 +113,14 @@ func ConfigureProvider() {
 
 	if !(len(strings.TrimSpace(username)) != 0 && len(strings.TrimSpace(password)) != 0) {
 		if len(strings.TrimSpace(enableSSO)) == 0 {
-			log.Fatal("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
-			os.Exit(0)
+			cleanup()
+			log.Fatalf("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
 		}
 	}
 
 	if len(strings.TrimSpace(globalAccount)) == 0 {
-		log.Fatal("global account not set. set BTP_GLOBALACCOUNT environment variable to set global account")
-		os.Exit(0)
+		cleanup()
+		log.Fatalf("global account not set. set BTP_GLOBALACCOUNT environment variable to set global account")
 	} else {
 		providerContent = providerContent + "globalaccount = \"" + globalAccount + "\"\n"
 	}
@@ -157,8 +149,8 @@ func ConfigureProvider() {
 
 	err = files.CreateFileWithContent(abspath, providerContent)
 	if err != nil {
+		cleanup()
 		log.Fatalf("create file %s failed!", abspath)
-		return
 	}
 
 }
@@ -175,13 +167,13 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 	}
 	curWd, err := os.Getwd()
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		log.Fatalf("error getting current working directory: %v", err)
 		return
 	}
 
 	exist, err := files.Exists(filepath.Join(curWd, configFolder))
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		log.Fatalf("error reading configuration folder %s: %v", configFolder, err)
 		return
 	}
 
@@ -189,7 +181,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 		fullpath := filepath.Join(curWd, configFolder)
 		err = os.Mkdir(fullpath, 0700)
 		if err != nil {
-			log.Fatalf("error: %v", err)
+			log.Fatalf("error creating configuration folder %s at %s: %v", configFolder, curWd, err)
 			return
 		}
 	} else {
@@ -216,14 +208,13 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 		} else if strings.ToUpper(choice) == "Y" {
 			fmt.Println(output.ColorStringCyan("existing directory will be used. Existing files will be overwritten"))
 		} else {
-			fmt.Println("invalid input. Exiting the process")
-			os.Exit(1)
+			log.Fatalf("invalid input. exiting the process")
 		}
 	}
 
 	sourceFile, err := os.Open(TmpFolder + "/provider.tf")
 	if err != nil {
-		log.Fatalf("failed to open source file: %v", err)
+		log.Fatalf("failed to open file 'provider.tf' at %s: %v", TmpFolder, err)
 		return
 	}
 	defer sourceFile.Close()
@@ -232,14 +223,14 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 
 	destinationFile, err := os.Create(fullpath + "/provider.tf")
 	if err != nil {
-		log.Fatalf("failed to create destination file: %v", err)
+		log.Fatalf("failed to create file 'provider.tf' at %s: %v", fullpath, err)
 		return
 	}
 	defer destinationFile.Close()
 
 	_, err = io.Copy(destinationFile, sourceFile)
 	if err != nil {
-		log.Fatalf("failed to copy file: %v", err)
+		log.Fatalf("failed to copy file from temporary (%s) to final configuration directory (%s): %v", TmpFolder, fullpath, err)
 		return
 	}
 }
@@ -259,7 +250,6 @@ func GetResourcesList(resourcesString string) []string {
 				allowedResourceList := strings.Join(AllowedResources, ", ")
 
 				log.Fatal("please check the resource provided. Currently supported resources are " + allowedResourceList + ". Provide 'all' to check for all resources")
-				return []string{}
 			}
 		}
 	}
@@ -267,24 +257,25 @@ func GetResourcesList(resourcesString string) []string {
 	return resources
 }
 
+func CleanupProviderConfig() {
+	cleanup()
+}
+
 func cleanup() {
+	// Cleanup temporary folder variable
+	TmpFolder = ""
+
+	// Cleanup temporary files on disk
 	err := os.RemoveAll(TmpFolder)
 	if err != nil {
 		log.Fatalf("error deleting temp files: %v", err)
 	}
-
-	// Cleanup temporary folder variable
-	TmpFolder = ""
 }
 
 func FinalizeTfConfig(configFolder string) {
 
 	output.AddNewLine()
-	spinner, err := output.StartSpinner("finalizing Terraform configuration")
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
+	spinner := output.StartSpinner("finalizing Terraform configuration")
 
 	currentDir, err := os.Getwd()
 	if err != nil {
@@ -317,11 +308,7 @@ func FinalizeTfConfig(configFolder string) {
 		return
 	}
 
-	err = output.StopSpinner(spinner)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
+	output.StopSpinner(spinner)
 }
 
 // Convenience functions that wrap repetitive steps
@@ -331,21 +318,13 @@ func ExecPreExportSteps(tempConfigDir string) {
 
 func ExecPostExportSteps(tempConfigDir string, targetConfigDir string, targetResourceFileName string, resourceNameLong string) {
 
-	spinner, err := output.StartSpinner("generating Terraform configuration for " + resourceNameLong)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
+	spinner := output.StartSpinner("generating Terraform configuration for " + resourceNameLong)
 
 	GenerateConfig(targetResourceFileName, tempConfigDir, false, resourceNameLong)
 	mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)
 	CleanupTempFiles(tempConfigDir)
 
-	err = output.StopSpinner(spinner)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
+	output.StopSpinner(spinner)
 
 	fmt.Println(output.ColorStringGrey("   temporary files deleted"))
 }

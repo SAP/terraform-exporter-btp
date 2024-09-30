@@ -14,46 +14,36 @@ import (
 func createJson(subaccount string, fileName string, resources []string) {
 	if len(resources) == 0 {
 		log.Fatal("please provide the btp resources you want to get using --resources flag or provide 'all' to get all resources")
-		return
 	}
 
 	tfutils.ConfigureProvider()
 
-	spinner, err := output.StartSpinner("collecting resources")
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
+	spinner := output.StartSpinner("collecting resources")
 
 	result, err := tfutils.ReadDataSources(subaccount, resources)
 	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
+		tfutils.CleanupProviderConfig()
+		log.Fatalf("error reading data sources: %v", err)
 	}
 
 	jsonBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
-		log.Fatalf("error: %s", err)
-		return
+		tfutils.CleanupProviderConfig()
+		log.Fatalf("error processing JSON of data source: %s", err)
 	}
 
 	currentDir, err := os.Getwd()
 	if err != nil {
+		tfutils.CleanupProviderConfig()
 		log.Fatalf("error getting current directory: %s", err)
-		return
 	}
 
 	dataBlockFile := filepath.Join(currentDir, fileName)
 	err = files.CreateFileWithContent(dataBlockFile, string(jsonBytes))
 	if err != nil {
+		tfutils.CleanupProviderConfig()
 		log.Fatalf("create file %s failed!", dataBlockFile)
-		return
 	}
 
-	err = output.StopSpinner(spinner)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
-
+	output.StopSpinner(spinner)
 }

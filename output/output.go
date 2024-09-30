@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -63,31 +64,7 @@ func renderSpinner(spinner *yacspin.Spinner) error {
 	return nil
 }
 
-func StartSpinner(message string) (*yacspin.Spinner, error) {
-
-	// No spinner execution during debug mode
-	debug := viper.GetViper().GetBool("debug")
-	if debug {
-		return nil, nil
-	}
-
-	spinner, err := createSpinner(message)
-	if err != nil {
-		fmt.Printf("failed to make spinner from config struct: %v\n", err)
-		os.Exit(1)
-	}
-
-	stopOnSignal(spinner)
-
-	err = renderSpinner(spinner)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-	return spinner, nil
-}
-
-func StopSpinner(spinner *yacspin.Spinner) error {
+func StartSpinner(message string) *yacspin.Spinner {
 
 	// No spinner execution during debug mode
 	debug := viper.GetViper().GetBool("debug")
@@ -95,11 +72,37 @@ func StopSpinner(spinner *yacspin.Spinner) error {
 		return nil
 	}
 
-	if err := spinner.Stop(); err != nil {
-		return fmt.Errorf("failed to stop spinner: %w", err)
+	spinner, err := createSpinner(message)
+	if err != nil {
+		slog.Warn(fmt.Sprintf("failed to make spinner from config struct: %v", err))
+		return nil
 	}
 
-	return nil
+	stopOnSignal(spinner)
+
+	err = renderSpinner(spinner)
+	if err != nil {
+		slog.Warn(err.Error())
+		return nil
+	}
+	return spinner
+}
+
+func StopSpinner(spinner *yacspin.Spinner) {
+
+	// No spinner execution during debug mode
+	debug := viper.GetViper().GetBool("debug")
+	if debug {
+		return
+	}
+
+	if spinner == nil {
+		return
+	}
+
+	if err := spinner.Stop(); err != nil {
+		slog.Warn(fmt.Errorf("failed to stop spinner: %w", err).Error())
+	}
 }
 
 func PrintExportStartMessage() {

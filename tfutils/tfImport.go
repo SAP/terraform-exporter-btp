@@ -132,8 +132,8 @@ func ReadDataSources(subaccountID string, resourceList []string) (btpResources B
 	for _, resource := range resourceList {
 		values, err := generateDataSourcesForList(subaccountID, resource)
 		if err != nil {
-			fmt.Println("error:", err)
-			return BtpResources{}, err
+			error := fmt.Errorf("error generating dats sources: %v", err)
+			return BtpResources{}, error
 		}
 		data := BtpResource{Name: resource, Values: values}
 		btpResourcesList = append(btpResourcesList, data)
@@ -273,20 +273,20 @@ func generateDataSourcesForList(subaccountID string, resourceName string) ([]str
 
 	dataBlock, err := readDataSource(subaccountID, btpResourceType)
 	if err != nil {
-		log.Fatalf("error getting data source: %s", err)
-		return nil, err
+		error := fmt.Errorf("error reading data source: %s", err)
+		return nil, error
 	}
 
 	err = files.CreateFileWithContent(dataBlockFile, dataBlock)
 	if err != nil {
-		log.Fatalf("create file %s failed!", dataBlockFile)
-		return nil, err
+		error := fmt.Errorf("error creating file %s", dataBlockFile)
+		return nil, error
 	}
 
 	jsonBytes, err = getTfStateData(TmpFolder, btpResourceType)
 	if err != nil {
-		log.Fatalf("error json.Marshal: %s", err)
-		return nil, err
+		error := fmt.Errorf("error fetching Terraform data: %s", err)
+		return nil, error
 	}
 
 	var data map[string]interface{}

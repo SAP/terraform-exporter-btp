@@ -21,11 +21,7 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 	tfutils.ExecPreExportSteps(tempConfigDir)
 
 	output.AddNewLine()
-	spinner, err := output.StartSpinner("crafting import block for " + techResourceNameLong)
-	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
-	}
+	spinner := output.StartSpinner("crafting import block for " + techResourceNameLong)
 
 	data, err := tfutils.FetchImportConfiguration(subaccountId, resourceType, tfutils.TmpFolder)
 	if err != nil {
@@ -40,11 +36,7 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 	}
 
 	if len(importBlock) == 0 {
-		err = output.StopSpinner(spinner)
-		if err != nil {
-			log.Fatalf("error: %v", err)
-			return
-		}
+		output.StopSpinner(spinner)
 
 		fmt.Println(output.ColorStringCyan("   no " + techResourceNameLong + " found for the given subaccount"))
 
@@ -59,11 +51,8 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 			return
 		}
 
-		err = output.StopSpinner(spinner)
-		if err != nil {
-			log.Fatalf("error: %v", err)
-			return
-		}
+		output.StopSpinner(spinner)
+
 		tfutils.ExecPostExportSteps(tempConfigDir, configDir, resourceFileName, techResourceNameLong)
 	}
 
