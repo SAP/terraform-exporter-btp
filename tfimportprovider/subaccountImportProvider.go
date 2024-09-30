@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/SAP/terraform-exporter-btp/output"
 	tfutils "github.com/SAP/terraform-exporter-btp/tfutils"
 )
 
@@ -44,7 +45,7 @@ func createSubaccountImportBlock(data map[string]interface{}, subaccountId strin
 		}
 	}
 
-	saName := fmt.Sprintf("%v", data["name"])
+	saName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", data["name"]))
 	template := strings.Replace(resourceDoc.Import, "<resource_name>", saName, -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	importBlock += template + "\n"
