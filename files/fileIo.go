@@ -52,11 +52,11 @@ func WriteImportConfiguration(configDir string, resourceType string, importBlock
 	return nil
 }
 
-func CopyImportFiles(srcDir, destDir string) {
+func CopyImportFiles(srcDir, destDir string) error {
 	// Find all files ending with "_import.tf" in the source directory
 	files, err := filepath.Glob(filepath.Join(srcDir, "*_import.tf"))
 	if err != nil {
-		log.Fatalf("error finding files: %v", err)
+		return fmt.Errorf("error finding files: %v", err)
 	}
 
 	// Copy each file to the destination directory
@@ -65,9 +65,10 @@ func CopyImportFiles(srcDir, destDir string) {
 
 		err := copyFile(srcFile, destFile)
 		if err != nil {
-			log.Printf("error copying file %s to %s: %v", srcFile, destFile, err)
+			return fmt.Errorf("error copying file %s to %s: %v", srcFile, destFile, err)
 		}
 	}
+	return nil
 }
 
 func Exists(path string) (bool, error) {

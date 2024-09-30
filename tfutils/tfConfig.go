@@ -30,7 +30,7 @@ var AllowedResources = []string{
 	CmdServiceInstanceParameter,
 }
 
-func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) {
+func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) error {
 
 	var spinner *yacspin.Spinner
 	var err error
@@ -42,46 +42,42 @@ func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool
 
 	currentDir, err := os.Getwd()
 	if err != nil {
-		log.Fatalf("error getting current directory: %v", err)
-		return
+		return fmt.Errorf("error getting current directory: %v", err)
 	}
 
 	terraformConfigPath := filepath.Join(currentDir, configFolder)
 	err = os.Chdir(terraformConfigPath)
 	if err != nil {
-		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
-		return
+		return fmt.Errorf("error changing directory to %s: %v", terraformConfigPath, err)
 	}
 
 	if err := runTerraformCommand("init"); err != nil {
-		log.Fatalf("error running Terraform init: %v", err)
-		return
+		return fmt.Errorf("error running Terraform init: %v", err)
 	}
 
 	planOption := "--generate-config-out=" + resourceFileName
 	if err := runTerraformCommand("plan", planOption); err != nil {
-		log.Fatalf("error running Terraform plan: %v", err)
-		return
+		return fmt.Errorf("error running Terraform plan: %v", err)
 	}
 
 	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
-		log.Fatalf("error running Terraform fmt: %v", err)
-		return
+		return fmt.Errorf("error running Terraform fmt: %v", err)
 	}
-
-	cleanup()
 
 	//Switch back to the original directory
 	err = os.Chdir(currentDir)
 	if err != nil {
-		log.Fatalf("error changing directory to %s: %v \n", currentDir, err)
-		return
+		return fmt.Errorf("error changing directory to %s: %v", currentDir, err)
 	}
+
+	cleanup()
 
 	if isMainCmd {
 		output.StopSpinner(spinner)
 		fmt.Println(output.ColorStringGrey("   temporary files deleted"))
 	}
+
+	return nil
 }
 
 func ConfigureProvider() {
@@ -167,22 +163,22 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 	}
 	curWd, err := os.Getwd()
 	if err != nil {
+		CleanupProviderConfig()
 		log.Fatalf("error getting current working directory: %v", err)
-		return
 	}
 
 	exist, err := files.Exists(filepath.Join(curWd, configFolder))
 	if err != nil {
+		CleanupProviderConfig()
 		log.Fatalf("error reading configuration folder %s: %v", configFolder, err)
-		return
 	}
 
 	if !exist {
 		fullpath := filepath.Join(curWd, configFolder)
 		err = os.Mkdir(fullpath, 0700)
 		if err != nil {
+			CleanupProviderConfig()
 			log.Fatalf("error creating configuration folder %s at %s: %v", configFolder, curWd, err)
-			return
 		}
 	} else {
 		fmt.Print("config directory already exist. Do you want to continue? If yes then generated files will be overwritten if existing (y/N): ")
@@ -193,8 +189,8 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 			if err.Error() == "unexpected newline" {
 				choice = "N"
 			} else {
+				CleanupProviderConfig()
 				log.Fatalf("error reading input: %v", err)
-				return
 			}
 		}
 
@@ -204,18 +200,20 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 		}
 
 		if strings.ToUpper(choice) == "N" {
+			CleanupProviderConfig()
 			os.Exit(0)
 		} else if strings.ToUpper(choice) == "Y" {
 			fmt.Println(output.ColorStringCyan("existing directory will be used. Existing files will be overwritten"))
 		} else {
+			CleanupProviderConfig()
 			log.Fatalf("invalid input. exiting the process")
 		}
 	}
 
 	sourceFile, err := os.Open(TmpFolder + "/provider.tf")
 	if err != nil {
+		CleanupProviderConfig()
 		log.Fatalf("failed to open file 'provider.tf' at %s: %v", TmpFolder, err)
-		return
 	}
 	defer sourceFile.Close()
 
@@ -223,15 +221,15 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 
 	destinationFile, err := os.Create(fullpath + "/provider.tf")
 	if err != nil {
+		CleanupProviderConfig()
 		log.Fatalf("failed to create file 'provider.tf' at %s: %v", fullpath, err)
-		return
 	}
 	defer destinationFile.Close()
 
 	_, err = io.Copy(destinationFile, sourceFile)
 	if err != nil {
+		CleanupProviderConfig(fullpath)
 		log.Fatalf("failed to copy file from temporary (%s) to final configuration directory (%s): %v", TmpFolder, fullpath, err)
-		return
 	}
 }
 
@@ -257,8 +255,12 @@ func GetResourcesList(resourcesString string) []string {
 	return resources
 }
 
-func CleanupProviderConfig() {
+func CleanupProviderConfig(directory ...string) {
 	cleanup()
+
+	for _, dir := range directory {
+		CleanupTempFiles(dir)
+	}
 }
 
 func cleanup() {
@@ -279,33 +281,33 @@ func FinalizeTfConfig(configFolder string) {
 
 	currentDir, err := os.Getwd()
 	if err != nil {
+		CleanupProviderConfig()
 		log.Fatalf("error getting current directory: %v", err)
-		return
 	}
 
 	terraformConfigPath := filepath.Join(currentDir, configFolder)
 
 	err = os.Chdir(terraformConfigPath)
 	if err != nil {
+		CleanupProviderConfig()
 		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
-		return
 	}
 
 	if err := runTerraformCommand("init"); err != nil {
+		CleanupProviderConfig()
 		log.Fatalf("error initializing Terraform: %v", err)
-		return
 	}
 
 	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
+		CleanupProviderConfig()
 		log.Fatalf("error running Terraform fmt: %v", err)
-		return
 	}
 
 	//Switch back to the original directory
 	err = os.Chdir(currentDir)
 	if err != nil {
+		CleanupProviderConfig()
 		log.Fatalf("error changing directory to %s: %v \n", currentDir, err)
-		return
 	}
 
 	output.StopSpinner(spinner)
@@ -320,8 +322,18 @@ func ExecPostExportSteps(tempConfigDir string, targetConfigDir string, targetRes
 
 	spinner := output.StartSpinner("generating Terraform configuration for " + resourceNameLong)
 
-	GenerateConfig(targetResourceFileName, tempConfigDir, false, resourceNameLong)
-	mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)
+	err := GenerateConfig(targetResourceFileName, tempConfigDir, false, resourceNameLong)
+	if err != nil {
+		CleanupTempFiles(tempConfigDir)
+		log.Fatalf("error generating Terraform configuration for %s: %v", resourceNameLong, err)
+	}
+
+	err = mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)
+	if err != nil {
+		CleanupTempFiles(tempConfigDir)
+		log.Fatalf("error merging Terraform configuration for %s: %v", resourceNameLong, err)
+	}
+
 	CleanupTempFiles(tempConfigDir)
 
 	output.StopSpinner(spinner)
@@ -333,13 +345,12 @@ func CleanupTempFiles(tempConfigDir string) {
 	files.DeleteSourceFolder(tempConfigDir)
 }
 
-func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder string, resourceName string) {
+func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder string, resourceName string) error {
 
 	currentDir, err := os.Getwd()
 
 	if err != nil {
-		log.Fatalf("error getting current directory: %v", err)
-		return
+		return fmt.Errorf("error getting current directory: %v", err)
 	}
 
 	sourceConfigPath := filepath.Join(currentDir, resourceConfigFolder, fileName)
@@ -347,17 +358,17 @@ func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder st
 	// Check if the source file exists
 	exist, err := files.Exists(sourceConfigPath)
 	if err != nil {
-		log.Fatalf("error checking if source directory exists: %v", err)
+		return fmt.Errorf("error checking if source directory exists: %v", err)
 	}
 
 	if !exist {
 		// Nothing to do as the source file does not exist
-		return
+		return nil
 	}
 
 	sourceFile, err := os.Open(sourceConfigPath)
 	if err != nil {
-		log.Fatalf("error opening resource config file: %v", err)
+		return fmt.Errorf("error opening resource config file: %v", err)
 	}
 	defer sourceFile.Close()
 
@@ -365,20 +376,20 @@ func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder st
 
 	exist, err = files.Exists(targetConfigPath)
 	if err != nil {
-		log.Fatalf("error checking if target directory exists: %v", err)
+		return fmt.Errorf("error checking if target directory exists: %v", err)
 	}
 
 	if !exist {
 		// In the first run we must create the file if it does not exist
 		_, err := os.Create(targetConfigPath)
 		if err != nil {
-			log.Fatalf("error creating target configuration file: %v", err)
+			return fmt.Errorf("error creating target configuration file: %v", err)
 		}
 	}
 
 	targetFile, err := os.OpenFile(targetConfigPath, os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
-		log.Fatalf("error opening target configuration file: %v", err)
+		return fmt.Errorf("error opening target configuration file: %v", err)
 	}
 	defer targetFile.Close()
 
@@ -388,12 +399,16 @@ func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder st
 ###
 `
 	if _, err := targetFile.Write([]byte(headerTemplate)); err != nil {
-		log.Fatalf("error adding header line to target file: %v", err)
+		return fmt.Errorf("error adding header line to target file: %v", err)
 	}
 
 	if _, err := io.Copy(targetFile, sourceFile); err != nil {
-		log.Fatalf("error copying resource file to target file: %v", err)
+		return fmt.Errorf("error copying resource file to target file: %v", err)
 	}
 
-	files.CopyImportFiles(resourceConfigFolder, configFolder)
+	err = files.CopyImportFiles(resourceConfigFolder, configFolder)
+	if err != nil {
+		return fmt.Errorf("error copying import files: %v", err)
+	}
+	return nil
 }

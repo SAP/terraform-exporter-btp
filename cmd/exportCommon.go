@@ -25,14 +25,14 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 
 	data, err := tfutils.FetchImportConfiguration(subaccountId, resourceType, tfutils.TmpFolder)
 	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
+		tfutils.CleanupProviderConfig(tempConfigDir)
+		log.Fatalf("error fetching impport configuration for %s: %v", resourceType, err)
 	}
 
 	importBlock, err := importProvider.GetImportBlock(data, subaccountId, values)
 	if err != nil {
-		log.Fatalf("error: %v", err)
-		return
+		tfutils.CleanupProviderConfig(tempConfigDir)
+		log.Fatalf("error crafting import block: %v", err)
 	}
 
 	if len(importBlock) == 0 {
@@ -40,6 +40,7 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 
 		fmt.Println(output.ColorStringCyan("   no " + techResourceNameLong + " found for the given subaccount"))
 
+		// Just clean up the temporary files, remaining setup remains untouched
 		tfutils.CleanupTempFiles(tempConfigDir)
 		fmt.Println(output.ColorStringGrey("   temporary files deleted"))
 
@@ -47,13 +48,12 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 
 		err = files.WriteImportConfiguration(tempConfigDir, resourceType, importBlock)
 		if err != nil {
-			log.Fatalf("error: %v", err)
-			return
+			tfutils.CleanupProviderConfig(tempConfigDir)
+			log.Fatalf("error writing import configuration for %s: %v", resourceType, err)
 		}
 
 		output.StopSpinner(spinner)
 
 		tfutils.ExecPostExportSteps(tempConfigDir, configDir, resourceFileName, techResourceNameLong)
 	}
-
 }

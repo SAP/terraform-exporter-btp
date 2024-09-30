@@ -13,21 +13,22 @@ import (
 
 func exportByJson(subaccount string, jsonfile string, resourceFile string, configDir string) {
 	jsonFile, err := os.Open(jsonfile)
-
 	if err != nil {
-		log.Fatalf("Error: %v", err)
-		return
+		log.Fatalf("error opening JSON file with resources: %v", err)
 	}
 
 	defer jsonFile.Close()
 
-	byteValue, _ := io.ReadAll(jsonFile)
+	byteValue, err := io.ReadAll(jsonFile)
+	if err != nil {
+		log.Fatalf("error reading JSON file: %v", err)
+	}
+
 	var resources tfutils.BtpResources
 
 	err = json.Unmarshal(byteValue, &resources)
 	if err != nil {
-		log.Fatalf("error in unmarshall: %v", err)
-		return
+		log.Fatalf("error unmarshalling JSON file: %v", err)
 	}
 
 	var resNames []string
@@ -35,6 +36,7 @@ func exportByJson(subaccount string, jsonfile string, resourceFile string, confi
 	for i := 0; i < len(resources.BtpResources); i++ {
 		resNames = append(resNames, resources.BtpResources[i].Name)
 	}
+
 	if len(resNames) == 0 {
 		fmt.Println(output.ColorStringCyan("no resource needs to be exported"))
 		return
