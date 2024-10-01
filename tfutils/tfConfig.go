@@ -182,7 +182,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 			log.Fatalf("error creating configuration folder %s at %s: %v", configFolder, curWd, err)
 		}
 	} else {
-		fmt.Print("config directory already exist. Do you want to continue? If yes then generated files will be overwritten if existing (y/N): ")
+		fmt.Print("the configuration directory already exist. Do you want to continue? If yes then the directory will be overwritten (y/N): ")
 		var choice string
 
 		_, err = fmt.Scanln(&choice)
