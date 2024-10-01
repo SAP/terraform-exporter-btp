@@ -168,21 +168,22 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 		log.Fatalf("error getting current working directory: %v", err)
 	}
 
-	exist, err := files.Exists(filepath.Join(curWd, configFolder))
+	configFilepath := filepath.Join(curWd, configFolder)
+
+	exist, err := files.Exists(configFilepath)
 	if err != nil {
 		CleanupProviderConfig()
 		log.Fatalf("error reading configuration folder %s: %v", configFolder, err)
 	}
 
 	if !exist {
-		fullpath := filepath.Join(curWd, configFolder)
-		err = os.Mkdir(fullpath, 0700)
+		err = os.Mkdir(configFilepath, 0700)
 		if err != nil {
 			CleanupProviderConfig()
 			log.Fatalf("error creating configuration folder %s at %s: %v", configFolder, curWd, err)
 		}
 	} else {
-		fmt.Print("config directory already exist. Do you want to continue? If yes then generated files will be overwritten if existing (y/N): ")
+		fmt.Print("the configuration directory already exist. Do you want to continue? If yes then the directory will be overwritten (y/N): ")
 		var choice string
 
 		_, err = fmt.Scanln(&choice)
@@ -204,7 +205,14 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 			CleanupProviderConfig()
 			os.Exit(0)
 		} else if strings.ToUpper(choice) == "Y" {
-			fmt.Println(output.ColorStringCyan("existing directory will be used. Existing files will be overwritten"))
+			fmt.Println(output.ColorStringCyan("existing files will be overwritten"))
+
+			// Configuration folder must be re-created, otherwiese the Terraform commands will fail
+			err := recreateExistingConfigDir(configFilepath)
+			if err != nil {
+				CleanupProviderConfig()
+				log.Fatalf("error recreating configuration folder %s at %s: %v", configFolder, curWd, err)
+			}
 		} else {
 			CleanupProviderConfig()
 			log.Fatalf("invalid input. exiting the process")
@@ -411,5 +419,19 @@ func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder st
 	if err != nil {
 		return fmt.Errorf("error copying import files: %v", err)
 	}
+	return nil
+}
+
+func recreateExistingConfigDir(filepath string) error {
+	err := os.RemoveAll(filepath)
+	if err != nil {
+		return fmt.Errorf("error recreating existing configuration folder %s: %v", filepath, err)
+	}
+
+	err = os.Mkdir(filepath, 0700)
+	if err != nil {
+		return fmt.Errorf("error recreating configuration folder %s: %v", filepath, err)
+	}
+
 	return nil
 }
