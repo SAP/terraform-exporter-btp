@@ -29,6 +29,7 @@ const (
 	CmdRoleCollectionParameter      string = "role-collections"
 	CmdServiceInstanceParameter     string = "service-instances"
 	CmdServiceBindingParameter      string = "service-bindings"
+	CmdSecuritySettingParameter     string = "security-settings"
 )
 
 const (
@@ -41,6 +42,7 @@ const (
 	SubaccountRoleCollectionType      string = "btp_subaccount_role_collection"
 	SubaccountServiceInstanceType     string = "btp_subaccount_service_instance"
 	SubaccountServiceBindingType      string = "btp_subaccount_service_binding"
+	SubaccountSecuritySettingType     string = "btp_subaccount_security_setting"
 )
 
 const DataSourcesKind DocKind = "data-sources"
@@ -85,11 +87,11 @@ func FetchImportConfiguration(subaccountID string, resourceType string, tmpFolde
 func GetDocByResourceName(kind DocKind, resourceName string) (EntityDocs, error) {
 	var choice string
 
-	if kind == ResourcesKind || (kind == DataSourcesKind && resourceName == SubaccountType) {
+	if (kind == ResourcesKind && resourceName != SubaccountSecuritySettingType) || (kind == DataSourcesKind && resourceName == SubaccountType) {
 		// We need the singular form of the resource name for all resoucres and the subaccount data source
 		choice = resourceName
 	} else {
-		// We need the plural form of the resource name for all other data sources
+		// We need the plural form of the resource name for all other data sources and security setting resource
 		choice = resourceName + "s"
 	}
 
@@ -122,6 +124,8 @@ func TranslateResourceParamToTechnicalName(resource string) string {
 		return SubaccountServiceInstanceType
 	case CmdServiceBindingParameter:
 		return SubaccountServiceBindingType
+	case CmdSecuritySettingParameter:
+		return SubaccountSecuritySettingType
 	}
 	return ""
 }
@@ -261,6 +265,9 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 			binding := value.(map[string]interface{})
 			stringArr = append(stringArr, fmt.Sprintf("%v", binding["name"]))
 		}
+	case CmdSecuritySettingParameter:
+		stringArr = []string{fmt.Sprintf("%v", data["subaccount_id"])}
+
 	}
 	return stringArr
 }

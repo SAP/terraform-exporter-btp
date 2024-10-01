@@ -21,6 +21,7 @@ Valid resources are:
 - service-bindings
 - roles
 - role-collections
+- security-settings
 
 OR
 
