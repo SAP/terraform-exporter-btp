@@ -204,9 +204,12 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 			CleanupProviderConfig()
 			os.Exit(0)
 		} else if strings.ToUpper(choice) == "Y" {
-			fmt.Println(output.ColorStringCyan("existing directory will be used. Existing files will be overwritten"))
-			os.RemoveAll(configFilepath)
-			os.Mkdir(configFilepath, 0700)
+			fmt.Println(output.ColorStringCyan("existing files will be overwritten"))
+			err := recreateExistingConfigDir(configFilepath)
+			if err != nil {
+				CleanupProviderConfig()
+				log.Fatalf("error recreating configuration folder %s at %s: %v", configFolder, curWd, err)
+			}
 		} else {
 			CleanupProviderConfig()
 			log.Fatalf("invalid input. exiting the process")
@@ -413,5 +416,19 @@ func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder st
 	if err != nil {
 		return fmt.Errorf("error copying import files: %v", err)
 	}
+	return nil
+}
+
+func recreateExistingConfigDir(filepath string) error {
+	err := os.RemoveAll(filepath)
+	if err != nil {
+		return fmt.Errorf("error recreating existing configuration folder %s: %v", filepath, err)
+	}
+
+	err = os.Mkdir(filepath, 0700)
+	if err != nil {
+		return fmt.Errorf("error recreating configuration folder %s: %v", filepath, err)
+	}
+
 	return nil
 }
