@@ -205,6 +205,8 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 			os.Exit(0)
 		} else if strings.ToUpper(choice) == "Y" {
 			fmt.Println(output.ColorStringCyan("existing files will be overwritten"))
+
+			// Configuration folder must be re-created, otherwiese the Terraform commands will fail
 			err := recreateExistingConfigDir(configFilepath)
 			if err != nil {
 				CleanupProviderConfig()
