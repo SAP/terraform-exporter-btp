@@ -52,6 +52,7 @@ Mixing "all" with other resources will throw an error.`,
 		}
 
 		tfutils.FinalizeTfConfig(configDir)
+		tfutils.CleanupProviderConfig()
 		output.PrintExportSuccessMessage()
 	},
 }
