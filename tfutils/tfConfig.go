@@ -167,15 +167,16 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 		log.Fatalf("error getting current working directory: %v", err)
 	}
 
-	exist, err := files.Exists(filepath.Join(curWd, configFolder))
+	configFilepath := filepath.Join(curWd, configFolder)
+
+	exist, err := files.Exists(configFilepath)
 	if err != nil {
 		CleanupProviderConfig()
 		log.Fatalf("error reading configuration folder %s: %v", configFolder, err)
 	}
 
 	if !exist {
-		fullpath := filepath.Join(curWd, configFolder)
-		err = os.Mkdir(fullpath, 0700)
+		err = os.Mkdir(configFilepath, 0700)
 		if err != nil {
 			CleanupProviderConfig()
 			log.Fatalf("error creating configuration folder %s at %s: %v", configFolder, curWd, err)
@@ -204,6 +205,8 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 			os.Exit(0)
 		} else if strings.ToUpper(choice) == "Y" {
 			fmt.Println(output.ColorStringCyan("existing directory will be used. Existing files will be overwritten"))
+			os.RemoveAll(configFilepath)
+			os.Mkdir(configFilepath, 0700)
 		} else {
 			CleanupProviderConfig()
 			log.Fatalf("invalid input. exiting the process")
