@@ -39,6 +39,7 @@ subaccounts
 subaccount's
 subcommands
 TBD
+templating
 Terraform
 terraform
 tf
