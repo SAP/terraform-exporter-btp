@@ -6,7 +6,7 @@ By default the CLI suppresses the verbose output of the different Terraform comm
 
 ## Debug the CLI
 
-We provide a configuration for debugging the btptf commands in VS Code. The configuration is available in the `.vscode` directory as `launch.json`
+We provide a configuration for debugging the `btptf` commands in VS Code. The configuration is available in the `.vscode` directory as `launch.json`
 
 Here is an example on how to debug the command `btptf create-json`:
 
