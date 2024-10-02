@@ -1,33 +1,6 @@
 ## btptf export by-resource
 
-export resources of a subaccount
-
-### Synopsis
-
-by-resource command exports the resources of a subaccount as specified.
-
-Examples:
-
-btptf export by-resource --resources=subaccount,entitlements -s <subaccount-id>
-btptf export by-resource --resources=all -s <subaccount-id> -p <file-name.json>
-
-Valid resources are:
-- subaccount
-- entitlements
-- subscriptions
-- environment-instances
-- trust-configurations
-- service-instances
-- service-bindings
-- roles
-- role-collections
-- security-settings
-
-OR
-
-- all
-
-Mixing "all" with other resources will throw an error.
+Export resources of a subaccount
 
 ```
 btptf export by-resource [flags]
@@ -43,10 +16,9 @@ btptf export by-resource [flags]
 ### Options inherited from parent commands
 
 ```
-  -o, --config-dir string           folder for config generation (default "generated_configurations")
-  -d, --debug                       Display debugging output in the console.
-  -f, --resource-file-name string   filename for resource config generation (default "btp_resources.tf")
-  -s, --subaccount string           Id of the subaccount
+  -o, --config-dir string   folder for config generation (default "generated_configurations")
+  -s, --subaccount string   Id of the subaccount
+      --verbose             Display verbose output in the console for debugging.
 ```
 
 ### SEE ALSO

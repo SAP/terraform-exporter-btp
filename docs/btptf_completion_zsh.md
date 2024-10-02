@@ -42,8 +42,7 @@ btptf completion zsh [flags]
 ### Options inherited from parent commands
 
 ```
-  -d, --debug               Display debugging output in the console.
-  -s, --subaccount string   Id of the subaccount
+      --verbose   Display verbose output in the console for debugging.
 ```
 
 ### SEE ALSO

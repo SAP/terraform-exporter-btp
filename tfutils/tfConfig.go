@@ -90,9 +90,9 @@ func ConfigureProvider() {
 	TmpFolder = tmpdir
 	abspath := filepath.Join(tmpdir, "provider.tf")
 
-	debug := viper.GetViper().GetBool("debug")
+	verbose := viper.GetViper().GetBool("verbose")
 
-	if debug {
+	if verbose {
 		fmt.Printf("temp file created at %s\n", abspath)
 	}
 

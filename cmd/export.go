@@ -6,41 +6,63 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/SAP/terraform-exporter-btp/output"
 	"github.com/spf13/cobra"
 )
 
-// exportCmd represents the export command
-var resFile string
 var configDir string
+var subaccount string
+
+const tfConfigFileName = "btp_resources.tf"
+const configDirDefault = "generated_configurations"
 
 var exportCmd = &cobra.Command{
 	Use:   "export",
 	Short: "Export specific resources from an SAP BTP subaccount",
-	Long: `
-This command is used when you want to export resources of SAP BTP.
-
-You have two options:
-
-- by-json: export resources from a json file that is generated using the create-list command.
-- by-resource: export resources you specify by type.
-
-By default, the CLI it will generate the import files and a resource configuration file.
-The directory for the configuration files has as default value 'generated_configurations'.
-The resource configuration file has as default value 'btp_resources.tf'.
-
-You can change the default values for the directory by using the flag --config-dir.
-You can change the name of the resource configuration file by using the flag --resource-file-name.
-
-
-The command will fail if a resource file already exists`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("Invalid command\n\nUse 'btptf resource --help' for syntax instructions.")
 	},
 }
 
 func init() {
-	exportCmd.PersistentFlags().StringVarP(&resFile, "resource-file-name", "f", "btp_resources.tf", "filename for resource config generation")
-	exportCmd.PersistentFlags().StringVarP(&configDir, "config-dir", "o", "generated_configurations", "folder for config generation")
+	templateOptions := generateCmdHelpOptions{
+		Description: getExportCmdDescription,
+		Usage:       getExportCmdUsage,
+	}
 
+	exportCmd.PersistentFlags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
+	_ = exportCmd.MarkPersistentFlagRequired("subaccount")
+	exportCmd.PersistentFlags().StringVarP(&configDir, "config-dir", "o", configDirDefault, "folder for config generation")
+	exportCmd.SetUsageTemplate(generateCmdHelp(exportCmd, templateOptions))
+	exportCmd.SetHelpTemplate(generateCmdHelp(exportCmd, templateOptions))
 	rootCmd.AddCommand(exportCmd)
+}
+
+func getExportCmdDescription(c *cobra.Command) string {
+	return generateCmdHelpDescription(c.Short,
+		[]string{
+			formatHelpNote(
+				fmt.Sprintf("Use the %s commands to export resources specified by type",
+					output.ColorStringCyan("by-resource"),
+				)),
+			formatHelpNote(
+				fmt.Sprintf("Use the %s commands to export resources specified by type",
+					output.ColorStringCyan("by-json"),
+				)),
+			formatHelpNote(
+				fmt.Sprintf("The export creates a new directory (%s). "+
+					"This directory contains the terraform configuration file (%s) and import files for each resource.",
+					output.ColorStringYellow(fmt.Sprintf("%s_<UUID of parent>", configDirDefault)),
+					output.ColorStringYellow(tfConfigFileName),
+				)),
+			formatHelpNote(
+				fmt.Sprintf("You can change the default values for the directory by using the flag %s.",
+					output.ColorStringCyan("--config-dir"),
+				)),
+		})
+}
+
+func getExportCmdUsage(*cobra.Command) string {
+	return fmt.Sprintf("%s\n  %s\n\n",
+		output.BoldString("Usage"), "btptf export by-json|by-resource [flags]")
 }

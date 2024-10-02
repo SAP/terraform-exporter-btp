@@ -313,9 +313,9 @@ func generateDataSourcesForList(subaccountID string, resourceName string) ([]str
 
 func runTerraformCommand(args ...string) error {
 
-	debug := viper.GetViper().GetBool("debug")
+	verbose := viper.GetViper().GetBool("verbose")
 	cmd := exec.Command("terraform", args...)
-	if debug {
+	if verbose {
 		cmd.Stdout = os.Stdout
 	} else {
 		cmd.Stdout = nil

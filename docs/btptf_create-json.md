@@ -2,34 +2,6 @@
 
 Store the list of resources in a subaccount into a JSON file
 
-### Synopsis
-
-create-json command compiles a list of all resources in a subaccount and store it into a file.
-
-Examples:
-
-btptf create-json --resources=subaccount,entitlements -s <subaccount-id>
-btptf create-json --resources=all -s <subaccount-id> -p <file-name.json>
-
-Valid resources are:
-- subaccount
-- entitlements
-- subscriptions
-- environment-instances
-- trust-configurations
-- service-instances
-- service-bindings
-- roles
-- role-collections
-- security-settings
-
-OR
-
-- all
-
-Mixing "all" with other resources will throw an error.
-
-
 ```
 btptf create-json [flags]
 ```
@@ -37,16 +9,16 @@ btptf create-json [flags]
 ### Options
 
 ```
-  -h, --help               help for create-json
-  -p, --path string        path to JSON file with list of resources (default "btpResources.json")
-  -r, --resources string   comma seperated string for resources (default "all")
+  -h, --help                help for create-json
+  -p, --path string         path to JSON file with list of resources (default "btpResources.json")
+  -r, --resources string    comma seperated string for resources (default "all")
+  -s, --subaccount string   Id of the subaccount
 ```
 
 ### Options inherited from parent commands
 
 ```
-  -d, --debug               Display debugging output in the console.
-  -s, --subaccount string   Id of the subaccount
+      --verbose   Display verbose output in the console for debugging.
 ```
 
 ### SEE ALSO

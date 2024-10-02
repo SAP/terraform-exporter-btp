@@ -33,6 +33,6 @@ test:
 	go test -v -cover -tags=all -timeout=900s -parallel=4 ./...
 
 docs:
-	go run main.go gendoc -s "abc"
+	go run main.go gendoc
 
 .PHONY: build install lint fmt test docs

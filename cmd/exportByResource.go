@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/SAP/terraform-exporter-btp/output"
 	"github.com/SAP/terraform-exporter-btp/tfutils"
 
@@ -9,32 +11,8 @@ import (
 
 // exportByResourceCmd represents the exportAll command
 var exportByResourceCmd = &cobra.Command{
-	Use:   "by-resource",
-	Short: "export resources of a subaccount",
-	Long: `by-resource command exports the resources of a subaccount as specified.
-
-Examples:
-
-btptf export by-resource --resources=subaccount,entitlements -s <subaccount-id>
-btptf export by-resource --resources=all -s <subaccount-id> -p <file-name.json>
-
-Valid resources are:
-- subaccount
-- entitlements
-- subscriptions
-- environment-instances
-- trust-configurations
-- service-instances
-- service-bindings
-- roles
-- role-collections
-- security-settings
-
-OR
-
-- all
-
-Mixing "all" with other resources will throw an error.`,
+	Use:               "by-resource",
+	Short:             "Export resources of a subaccount",
 	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.InheritedFlags().GetString("subaccount")
@@ -58,8 +36,64 @@ Mixing "all" with other resources will throw an error.`,
 }
 
 func init() {
+	templateOptions := generateCmdHelpOptions{
+		Description: getExportByResourceCmdDescription,
+		Examples:    getExportByResourceCmdExamples,
+	}
+
 	var resources string
 	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")
 
+	exportByResourceCmd.SetUsageTemplate(generateCmdHelp(exportByResourceCmd, templateOptions))
+	exportByResourceCmd.SetHelpTemplate(generateCmdHelp(exportByResourceCmd, templateOptions))
+
 	exportCmd.AddCommand(exportByResourceCmd)
+}
+
+func getExportByResourceCmdDescription(c *cobra.Command) string {
+
+	var resources string
+	for i, resource := range tfutils.AllowedResources {
+		if i == 0 {
+			resources = output.ColorStringYellow(resource)
+		} else {
+			resources = resources + ", " + output.ColorStringYellow(resource)
+		}
+	}
+
+	return generateCmdHelpDescription(c.Short,
+		[]string{
+			formatHelpNote(
+				"Use this command to export SAP BTP resources specified by subaccount ID and, optionally, resource types.",
+			),
+			formatHelpNote(
+				fmt.Sprintf("By default, the command will export all resources of a subaccount. "+
+					"You can specify a subset with the %s flag.",
+					output.ColorStringCyan("--resources"),
+				)),
+			formatHelpNote(
+				fmt.Sprintf("Valid resources are: "+resources+" or %s (default)",
+					output.ColorStringYellow("all"),
+				)),
+			formatHelpNote(
+				fmt.Sprintf("Mixing %s with other resources will throw an error.",
+					output.ColorStringYellow("all"),
+				)),
+		})
+}
+
+func getExportByResourceCmdExamples(c *cobra.Command) string {
+
+	return generateCmdHelpCustomExamplesBlock(map[string]string{
+		"Export a subaccount together with all its contained resources.": fmt.Sprintf("%s %s",
+			output.ColorStringCyan("btptf export by-resource --subaccount"),
+			output.ColorStringYellow("[Subaccount ID]"),
+		),
+		"Export a subaccount with entitlements only.": fmt.Sprintf("%s %s %s%s",
+			output.ColorStringCyan("btptf export by-resource --subaccount"),
+			output.ColorStringYellow("[Subaccount ID]"),
+			output.ColorStringCyan("--resource="),
+			output.ColorStringYellow("'subaccount,entitlements'"),
+		),
+	})
 }

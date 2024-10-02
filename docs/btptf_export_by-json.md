@@ -1,10 +1,6 @@
 ## btptf export by-json
 
-export resources based on a JSON file.
-
-### Synopsis
-
-Use this command to export resources from the JSON file that is generated using the create-json command.
+Export resources based on a JSON file.
 
 ```
 btptf export by-json [flags]
@@ -20,10 +16,9 @@ btptf export by-json [flags]
 ### Options inherited from parent commands
 
 ```
-  -o, --config-dir string           folder for config generation (default "generated_configurations")
-  -d, --debug                       Display debugging output in the console.
-  -f, --resource-file-name string   filename for resource config generation (default "btp_resources.tf")
-  -s, --subaccount string           Id of the subaccount
+  -o, --config-dir string   folder for config generation (default "generated_configurations")
+  -s, --subaccount string   Id of the subaccount
+      --verbose             Display verbose output in the console for debugging.
 ```
 
 ### SEE ALSO

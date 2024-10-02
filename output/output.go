@@ -66,9 +66,9 @@ func renderSpinner(spinner *yacspin.Spinner) error {
 
 func StartSpinner(message string) *yacspin.Spinner {
 
-	// No spinner execution during debug mode
-	debug := viper.GetViper().GetBool("debug")
-	if debug {
+	// No spinner execution during verbose mode
+	verbose := viper.GetViper().GetBool("verbose")
+	if verbose {
 		return nil
 	}
 
@@ -90,9 +90,9 @@ func StartSpinner(message string) *yacspin.Spinner {
 
 func StopSpinner(spinner *yacspin.Spinner) {
 
-	// No spinner execution during debug mode
-	debug := viper.GetViper().GetBool("debug")
-	if debug {
+	// No spinner execution during verbose mode
+	verbose := viper.GetViper().GetBool("verbose")
+	if verbose {
 		return
 	}
 
@@ -145,6 +145,18 @@ func ColorStringLightRed(s string) string {
 	return color.HiRedString(s)
 }
 
+func ColorStringYellow(s string) string {
+	return color.YellowString(s)
+}
+
 func AddNewLine() {
 	fmt.Println("")
+}
+
+func BoldString(s string) string {
+	return color.New(color.Bold).Sprint(s)
+}
+
+func AsLink(s string) string {
+	return color.HiCyanString(s)
 }

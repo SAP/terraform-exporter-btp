@@ -2,16 +2,11 @@
 
 Terraform Exporter for SAP BTP
 
-### Synopsis
-
-btptf is a utility to generate Terraform configurations for existing SAP BTP resources that have been created manually and are not managed by Terraform.
-
 ### Options
 
 ```
-  -d, --debug               Display debugging output in the console.
-  -h, --help                help for btptf
-  -s, --subaccount string   Id of the subaccount
+  -h, --help      help for btptf
+      --verbose   Display verbose output in the console for debugging.
 ```
 
 ### SEE ALSO
