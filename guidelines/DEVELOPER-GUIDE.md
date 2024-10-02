@@ -126,3 +126,13 @@ With that you get a file that contains the JSON string that you can use as input
 
 An example how to create test case is given by the unit test implemented in `tfimportprovider/subaccountSubscriptionImportProvider_test.go`.
 GitHub Copilot can be quite useful to setup the basics for the test, but some rework is needed.
+
+## Creating Console Help
+
+We make use of the custom templating option available in the Cobra Framework to construct the output in the console. The override of the default templating flow is triggered in the commands via the function `SetHelpTemplate` and `SetUsageTemplate`.
+
+In general, we call the `generateCmdHelp` function to generate the output that will be displayed in the console. The `generateCmdHelp` function gets the command as well as a structure of the type `generateCmdHelpOptions`.
+
+If the command receives an emtpy structure, it will call several default functions to create the console help. However, you have the option to override the sigle section by providing a custom function that crfats the string used in the console help.
+
+You find an example for this setup in the command `exportByResourceCmd`. Be aware that the code leverages several helper functions that are available in the file `cmdDocsHelper.go`.
