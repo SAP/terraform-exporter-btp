@@ -5,10 +5,10 @@ import (
 	"log"
 	"strings"
 
-	files "github.com/SAP/terraform-exporter-btp/files"
-	output "github.com/SAP/terraform-exporter-btp/output"
-	tfimportprovider "github.com/SAP/terraform-exporter-btp/tfimportprovider"
-	tfutils "github.com/SAP/terraform-exporter-btp/tfutils"
+	files "github.com/SAP/terraform-exporter-btp/pkg/files"
+	output "github.com/SAP/terraform-exporter-btp/pkg/output"
+	tfimportprovider "github.com/SAP/terraform-exporter-btp/pkg/tfimportprovider"
+	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
 func generateConfigForResource(resource string, values []string, subaccountId string, configDir string, resourceFileName string) {

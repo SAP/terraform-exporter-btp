@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	output "github.com/SAP/terraform-exporter-btp/output"
+	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"

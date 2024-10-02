@@ -7,8 +7,8 @@ import (
 	"log"
 	"os"
 
-	output "github.com/SAP/terraform-exporter-btp/output"
-	tfutils "github.com/SAP/terraform-exporter-btp/tfutils"
+	output "github.com/SAP/terraform-exporter-btp/pkg/output"
+	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
 func exportByJson(subaccount string, jsonfile string, resourceFile string, configDir string) {

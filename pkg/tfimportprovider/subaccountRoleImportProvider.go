@@ -6,8 +6,8 @@ import (
 	"slices"
 	"strings"
 
-	output "github.com/SAP/terraform-exporter-btp/output"
-	tfutils "github.com/SAP/terraform-exporter-btp/tfutils"
+	output "github.com/SAP/terraform-exporter-btp/pkg/output"
+	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
 type subaccountRoleImportProvider struct {

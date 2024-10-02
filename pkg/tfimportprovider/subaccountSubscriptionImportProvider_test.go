@@ -3,7 +3,7 @@ package tfimportprovider
 import (
 	"testing"
 
-	"github.com/SAP/terraform-exporter-btp/tfutils"
+	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 	"github.com/stretchr/testify/assert"
 )
 

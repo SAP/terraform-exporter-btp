@@ -5,8 +5,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/SAP/terraform-exporter-btp/output"
-	tfutils "github.com/SAP/terraform-exporter-btp/tfutils"
+	"github.com/SAP/terraform-exporter-btp/pkg/output"
+	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
 type subaccountImportProvider struct {

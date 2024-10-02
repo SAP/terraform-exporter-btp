@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	files "github.com/SAP/terraform-exporter-btp/files"
-	output "github.com/SAP/terraform-exporter-btp/output"
-	tfutils "github.com/SAP/terraform-exporter-btp/tfutils"
+	files "github.com/SAP/terraform-exporter-btp/pkg/files"
+	output "github.com/SAP/terraform-exporter-btp/pkg/output"
+	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
 func createJson(subaccount string, fileName string, resources []string) {

@@ -3,7 +3,7 @@ package tfimportprovider
 import (
 	"fmt"
 
-	tfutils "github.com/SAP/terraform-exporter-btp/tfutils"
+	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
 func GetImportBlockProvider(cmdResourceName string) (ITfImportProvider, error) {

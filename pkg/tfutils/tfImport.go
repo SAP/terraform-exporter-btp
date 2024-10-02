@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	files "github.com/SAP/terraform-exporter-btp/files"
-	output "github.com/SAP/terraform-exporter-btp/output"
+	files "github.com/SAP/terraform-exporter-btp/pkg/files"
+	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	"github.com/hashicorp/terraform-exec/tfexec"
 	"github.com/spf13/viper"
 )

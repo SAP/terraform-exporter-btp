@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/SAP/terraform-exporter-btp/output"
-	"github.com/SAP/terraform-exporter-btp/tfutils"
+	"github.com/SAP/terraform-exporter-btp/pkg/output"
+	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 
 	"github.com/spf13/cobra"
 )

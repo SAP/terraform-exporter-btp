@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	tfutils "github.com/SAP/terraform-exporter-btp/tfutils"
+	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
 type subaccountTrustConfigImportProvider struct {

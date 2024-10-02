@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	tfutils "github.com/SAP/terraform-exporter-btp/tfutils"
+	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
 type subaccountSecuritySettingImportProvider struct {

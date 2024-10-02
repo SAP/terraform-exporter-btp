@@ -6,8 +6,8 @@ package cmd
 import (
 	"fmt"
 
-	output "github.com/SAP/terraform-exporter-btp/output"
-	tfutils "github.com/SAP/terraform-exporter-btp/tfutils"
+	output "github.com/SAP/terraform-exporter-btp/pkg/output"
+	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 
 	"github.com/spf13/cobra"
 )

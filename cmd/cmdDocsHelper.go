@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/SAP/terraform-exporter-btp/output"
+	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
