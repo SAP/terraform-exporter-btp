@@ -133,6 +133,6 @@ We make use of the custom templating option available in the Cobra Framework to 
 
 In general, we call the `generateCmdHelp` function to generate the output that will be displayed in the console. The `generateCmdHelp` function gets the command as well as a structure of the type `generateCmdHelpOptions`.
 
-If the command receives an emtpy structure, it will call several default functions to create the console help. However, you have the option to override the sigle section by providing a custom function that crfats the string used in the console help.
+If the command receives an empty structure, it will call several default functions to create the console help. However, you have the option to override the single section by providing a custom function that crafts the string used in the console help.
 
 You find an example for this setup in the command `exportByResourceCmd`. Be aware that the code leverages several helper functions that are available in the file `cmdDocsHelper.go`.
