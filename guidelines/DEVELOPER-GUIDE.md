@@ -2,7 +2,7 @@
 
 ## Debugging Output
 
-By default the CLI suppresses the verbose output of the different Terraform commands. However, they might be quite useful, when it comes to analyzing issues. For that you can add the `--verbose` flag to any command of the CLI, which will result in the full output of any `cmd.exec()` execution supressing any "UI candy" like spinners.
+By default the CLI suppresses the verbose output of the different Terraform commands. However, they might be quite useful, when it comes to analyzing issues. For that you can add the `--verbose` flag to any command of the CLI, which will result in the full output of any `cmd.exec()` execution suppressing any "UI candy" like spinners.
 
 ## Debug the CLI
 
