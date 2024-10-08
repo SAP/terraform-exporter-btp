@@ -37,10 +37,15 @@ func init() {
 	}
 
 	var path string
+	var configDir string
+	var subaccount string
+	exportCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
+	_ = exportCmd.MarkFlagRequired("subaccount")
+	exportCmd.Flags().StringVarP(&configDir, "config-dir", "o", configDirDefault, "folder for config generation")
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")
 	exportByJsonCmd.SetUsageTemplate(generateCmdHelp(exportByJsonCmd, templateOptions))
 	exportByJsonCmd.SetHelpTemplate(generateCmdHelp(exportByJsonCmd, templateOptions))
-	exportCmd.AddCommand(exportByJsonCmd)
+	rootCmd.AddCommand(exportByJsonCmd)
 }
 
 func getExportByJsonCmdDescription(c *cobra.Command) string {

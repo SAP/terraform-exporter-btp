@@ -42,12 +42,17 @@ func init() {
 	}
 
 	var resources string
+	var configDir string
+	var subaccount string
+	exportCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
+	_ = exportCmd.MarkFlagRequired("subaccount")
+	exportCmd.Flags().StringVarP(&configDir, "config-dir", "o", configDirDefault, "folder for config generation")
 	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")
 
 	exportByResourceCmd.SetUsageTemplate(generateCmdHelp(exportByResourceCmd, templateOptions))
 	exportByResourceCmd.SetHelpTemplate(generateCmdHelp(exportByResourceCmd, templateOptions))
 
-	exportCmd.AddCommand(exportByResourceCmd)
+	rootCmd.AddCommand(exportByResourceCmd)
 }
 
 func getExportByResourceCmdDescription(c *cobra.Command) string {
