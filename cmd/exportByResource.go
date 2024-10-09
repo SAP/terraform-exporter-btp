@@ -16,16 +16,19 @@ var exportByResourceCmd = &cobra.Command{
 	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
-		resourceFileName, _ := cmd.Flags().GetString("resource-file-name")
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		resources, _ := cmd.Flags().GetString("resources")
+
+		if configDir == configDirDefault {
+			configDir = configDir + "_" + subaccount
+		}
 
 		output.PrintExportStartMessage()
 		tfutils.SetupConfigDir(configDir, true)
 
 		resourcesList := tfutils.GetResourcesList(resources)
 		for _, resourceToImport := range resourcesList {
-			generateConfigForResource(resourceToImport, nil, subaccount, configDir, resourceFileName)
+			generateConfigForResource(resourceToImport, nil, subaccount, configDir, tfConfigFileName)
 		}
 
 		tfutils.FinalizeTfConfig(configDir)
