@@ -19,11 +19,19 @@ var createJsonCmd = &cobra.Command{
 	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
+		directory, _ := cmd.Flags().GetString("directory")
 		path, _ := cmd.Flags().GetString("path")
 		resources, _ := cmd.Flags().GetString("resources")
 
+		var level string
+		if directory == "" {
+			level = tfutils.SubaccountLevel
+		} else {
+			level = tfutils.DirectoryLevel
+		}
+
 		output.PrintInventoryCreationStartMessage()
-		resourcesList := tfutils.GetResourcesList(resources)
+		resourcesList := tfutils.GetResourcesList(resources, level)
 		createJson(subaccount, path, resourcesList)
 		output.PrintInventoryCreationSuccessMessage()
 	},
@@ -38,26 +46,39 @@ func init() {
 	var path string
 	var resources string
 	var subaccount string
+	//var directory string
 
 	createJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
-	_ = createJsonCmd.MarkFlagRequired("subaccount")
+	//createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
+	//createJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
+	//createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
 	createJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")
 	createJsonCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")
 
 	rootCmd.AddCommand(createJsonCmd)
-	_ = createJsonCmd.Flags()
+
 	createJsonCmd.SetUsageTemplate(generateCmdHelp(createJsonCmd, templateOptions))
 	createJsonCmd.SetHelpTemplate(generateCmdHelp(createJsonCmd, templateOptions))
+
 }
 
 func getCreateJsonCmdDescription(c *cobra.Command) string {
 
 	var resources string
-	for i, resource := range tfutils.AllowedResources {
+	for i, resource := range tfutils.AllowedResourcesSubaccount {
 		if i == 0 {
 			resources = output.ColorStringYellow(resource)
 		} else {
 			resources = resources + ", " + output.ColorStringYellow(resource)
+		}
+	}
+
+	var resourcesDir string
+	for i, resource := range tfutils.AllowedResourcesDirectory {
+		if i == 0 {
+			resources = output.ColorStringYellow(resource)
+		} else {
+			resourcesDir = resourcesDir + ", " + output.ColorStringYellow(resource)
 		}
 	}
 
@@ -67,7 +88,11 @@ func getCreateJsonCmdDescription(c *cobra.Command) string {
 				"Use this command to compile a list of all resources in a subaccount and store it into a file",
 			),
 			formatHelpNote(
-				fmt.Sprintf("Valid resources are: "+resources+" or %s (default)",
+				fmt.Sprintf("Valid resources on subaccount level are: "+resources+" or %s (default)",
+					output.ColorStringYellow("all"),
+				)),
+			formatHelpNote(
+				fmt.Sprintf("Valid resources on directory level are: "+resourcesDir+" or %s (default)",
 					output.ColorStringYellow("all"),
 				)),
 			formatHelpNote(

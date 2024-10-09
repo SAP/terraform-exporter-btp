@@ -18,7 +18,7 @@ import (
 
 var TmpFolder string
 
-var AllowedResources = []string{
+var AllowedResourcesSubaccount = []string{
 	CmdSubaccountParameter,
 	CmdEntitlementParameter,
 	CmdEnvironmentInstanceParameter,
@@ -29,6 +29,13 @@ var AllowedResources = []string{
 	CmdServiceBindingParameter,
 	CmdServiceInstanceParameter,
 	CmdSecuritySettingParameter,
+}
+
+var AllowedResourcesDirectory = []string{
+	CmdDirectoryParameter,
+	CmdDirEntitlementParameter,
+	CmdDirRoleParameter,
+	CmdDirRoleCollectionParameter,
 }
 
 func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) error {
@@ -242,19 +249,27 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 	}
 }
 
-func GetResourcesList(resourcesString string) []string {
+func GetResourcesList(resourcesString string, level string) []string {
 
 	var resources []string
 
+	var allowedResources []string
+
+	if level == SubaccountLevel {
+		allowedResources = AllowedResourcesSubaccount
+	} else {
+		allowedResources = AllowedResourcesDirectory
+	}
+
 	if resourcesString == "all" {
-		resources = AllowedResources
+		resources = allowedResources
 	} else {
 		resources = strings.Split(resourcesString, ",")
 
 		for _, resource := range resources {
-			if !(slices.Contains(AllowedResources, resource)) {
+			if !(slices.Contains(allowedResources, resource)) {
 
-				allowedResourceList := strings.Join(AllowedResources, ", ")
+				allowedResourceList := strings.Join(allowedResources, ", ")
 
 				log.Fatal("please check the resource provided. Currently supported resources are " + allowedResourceList + ". Provide 'all' to check for all resources")
 			}

@@ -20,16 +20,25 @@ import (
 const BtpProviderVersion = "v1.7.0"
 
 const (
+	SubaccountLevel = "subaccountLevel"
+	DirectoryLevel  = "directoryLevel"
+)
+
+const (
+	CmdDirectoryParameter           string = "directory"
 	CmdSubaccountParameter          string = "subaccount"
-	CmdEntitlementParameter         string = "entitlements"
-	CmdEnvironmentInstanceParameter string = "environment-instances"
-	CmdSubscriptionParameter        string = "subscriptions"
-	CmdTrustConfigurationParameter  string = "trust-configurations"
-	CmdRoleParameter                string = "roles"
-	CmdRoleCollectionParameter      string = "role-collections"
-	CmdServiceInstanceParameter     string = "service-instances"
-	CmdServiceBindingParameter      string = "service-bindings"
-	CmdSecuritySettingParameter     string = "security-settings"
+	CmdEntitlementParameter         string = "sa-entitlements"
+	CmdDirEntitlementParameter      string = "dir-entitlements"
+	CmdEnvironmentInstanceParameter string = "sa-environment-instances"
+	CmdSubscriptionParameter        string = "sa-subscriptions"
+	CmdTrustConfigurationParameter  string = "sa-trust-configurations"
+	CmdRoleParameter                string = "sa-roles"
+	CmdDirRoleParameter             string = "dir-roles"
+	CmdRoleCollectionParameter      string = "sa-role-collections"
+	CmdDirRoleCollectionParameter   string = "dir-role-collections"
+	CmdServiceInstanceParameter     string = "sa-service-instances"
+	CmdServiceBindingParameter      string = "sa-service-bindings"
+	CmdSecuritySettingParameter     string = "sa-security-settings"
 )
 
 const (
@@ -43,6 +52,13 @@ const (
 	SubaccountServiceInstanceType     string = "btp_subaccount_service_instance"
 	SubaccountServiceBindingType      string = "btp_subaccount_service_binding"
 	SubaccountSecuritySettingType     string = "btp_subaccount_security_setting"
+)
+
+const (
+	DirectoryType               string = "btp_directory"
+	DirectoryEntitlementType    string = "btp_directory_entitlement"
+	DirectoryRoleType           string = "btp_directory_role"
+	DirectoryRoleCollectionType string = "btp_directory_role_collection"
 )
 
 const DataSourcesKind DocKind = "data-sources"
@@ -126,6 +142,14 @@ func TranslateResourceParamToTechnicalName(resource string) string {
 		return SubaccountServiceBindingType
 	case CmdSecuritySettingParameter:
 		return SubaccountSecuritySettingType
+	case CmdDirectoryParameter:
+		return DirectoryType
+	case CmdDirEntitlementParameter:
+		return DirectoryEntitlementType
+	case CmdDirRoleParameter:
+		return DirectoryRoleType
+	case CmdDirRoleCollectionParameter:
+		return DirectoryRoleCollectionType
 	}
 	return ""
 }

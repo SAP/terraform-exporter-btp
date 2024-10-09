@@ -18,6 +18,7 @@ var exportByJsonCmd = &cobra.Command{
 	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
+		directory, _ := cmd.Flags().GetString("directory")
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		path, _ := cmd.Flags().GetString("path")
 
@@ -25,7 +26,7 @@ var exportByJsonCmd = &cobra.Command{
 			configDir = configDir + "_" + subaccount
 		}
 		output.PrintExportStartMessage()
-		exportByJson(subaccount, path, tfConfigFileName, configDir)
+		exportByJson(subaccount, directory, path, tfConfigFileName, configDir)
 		output.PrintExportSuccessMessage()
 	},
 }
@@ -39,8 +40,13 @@ func init() {
 	var path string
 	var configDir string
 	var subaccount string
+	var directory string
+
 	exportByJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
-	_ = exportByJsonCmd.MarkFlagRequired("subaccount")
+	createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
+	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
+	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
+
 	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "folder for config generation")
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")
 
