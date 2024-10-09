@@ -303,6 +303,9 @@ func getCmdDefaultExamples(cmd *cobra.Command) string {
 }
 
 func getDebuggerFooter(cmd *cobra.Command) string {
+
+	// the run lifecylce calls the docs generation before the command tree is fully initialized
+	// so we need to make some manual steps to add information about the parent flag
 	if cmd.HasParent() {
 
 		samples := map[string]string{
