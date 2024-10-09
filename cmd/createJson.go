@@ -18,7 +18,7 @@ var createJsonCmd = &cobra.Command{
 	Short:             "Store the list of resources in a subaccount into a JSON file",
 	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
-		subaccount, _ := cmd.InheritedFlags().GetString("subaccount")
+		subaccount, _ := cmd.Flags().GetString("subaccount")
 		path, _ := cmd.Flags().GetString("path")
 		resources, _ := cmd.Flags().GetString("resources")
 
@@ -44,10 +44,10 @@ func init() {
 	createJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")
 	createJsonCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")
 
+	rootCmd.AddCommand(createJsonCmd)
+	_ = createJsonCmd.Flags()
 	createJsonCmd.SetUsageTemplate(generateCmdHelp(createJsonCmd, templateOptions))
 	createJsonCmd.SetHelpTemplate(generateCmdHelp(createJsonCmd, templateOptions))
-
-	rootCmd.AddCommand(createJsonCmd)
 }
 
 func getCreateJsonCmdDescription(c *cobra.Command) string {

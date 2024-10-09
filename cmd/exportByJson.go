@@ -13,12 +13,12 @@ import (
 
 // exportByListCmd  represents the generate command
 var exportByJsonCmd = &cobra.Command{
-	Use:               "by-json",
+	Use:               "export-by-json",
 	Short:             "Export resources based on a JSON file.",
 	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
-		subaccount, _ := cmd.InheritedFlags().GetString("subaccount")
-		configDir, _ := cmd.InheritedFlags().GetString("config-dir")
+		subaccount, _ := cmd.Flags().GetString("subaccount")
+		configDir, _ := cmd.Flags().GetString("config-dir")
 		path, _ := cmd.Flags().GetString("path")
 
 		if configDir == configDirDefault {
@@ -39,13 +39,16 @@ func init() {
 	var path string
 	var configDir string
 	var subaccount string
-	exportCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
-	_ = exportCmd.MarkFlagRequired("subaccount")
-	exportCmd.Flags().StringVarP(&configDir, "config-dir", "o", configDirDefault, "folder for config generation")
+	exportByJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
+	_ = exportByJsonCmd.MarkFlagRequired("subaccount")
+	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "folder for config generation")
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")
+
+	rootCmd.AddCommand(exportByJsonCmd)
+
 	exportByJsonCmd.SetUsageTemplate(generateCmdHelp(exportByJsonCmd, templateOptions))
 	exportByJsonCmd.SetHelpTemplate(generateCmdHelp(exportByJsonCmd, templateOptions))
-	rootCmd.AddCommand(exportByJsonCmd)
+
 }
 
 func getExportByJsonCmdDescription(c *cobra.Command) string {

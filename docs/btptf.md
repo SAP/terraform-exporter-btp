@@ -11,7 +11,7 @@ Terraform Exporter for SAP BTP
 
 ### SEE ALSO
 
-* [btptf completion](btptf_completion.md)	 - Generate the autocompletion script for the specified shell
 * [btptf create-json](btptf_create-json.md)	 - Store the list of resources in a subaccount into a JSON file
-* [btptf export](btptf_export.md)	 - Export specific resources from an SAP BTP subaccount
+* [btptf export](btptf_export.md)	 - Export resources of a subaccount
+* [btptf export-by-json](btptf_export-by-json.md)	 - Export resources based on a JSON file.
 

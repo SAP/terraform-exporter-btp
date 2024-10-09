@@ -21,6 +21,8 @@ var rootCmd = &cobra.Command{
 
 func init() {
 
+	rootCmd.CompletionOptions.HiddenDefaultCmd = true
+
 	templateOptions := generateCmdHelpOptions{
 		Description: getRootCmdDescription,
 	}

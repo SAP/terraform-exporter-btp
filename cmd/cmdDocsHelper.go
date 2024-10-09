@@ -62,12 +62,13 @@ func generateCmdHelp(
 		return defaultOption
 	}
 
-	return fmt.Sprintf("\n%s%s%s%s%s%s%s\n",
+	return fmt.Sprintf("\n%s%s%s%s%s%s%s%s\n",
 		getGeneratorOrDefault(options.Description, getCmdHelpDefaultDescription)(cmd),
 		getGeneratorOrDefault(options.Usage, getCmdHelpDefaultUsage)(cmd),
 		getGeneratorOrDefault(options.Commands, getCmdHelpDefaultCommands)(cmd),
 		getGeneratorOrDefault(options.Flags, getCmdHelpDefaultFlags)(cmd),
 		getGeneratorOrDefault(options.Examples, getCmdDefaultExamples)(cmd),
+		getDebuggerFooter(cmd),
 		getPreFooter(cmd),
 		getGeneratorOrDefault(options.Footer, getCmdHelpDefaultFooter)(cmd),
 	)
@@ -93,18 +94,23 @@ func getCmdHelpDefaultCommands(cmd *cobra.Command) string {
 
 // getCmdHelpDefaultFlags provides the default implementation for displaying the help flags section.
 func getCmdHelpDefaultFlags(cmd *cobra.Command) (result string) {
+	cmd.InitDefaultHelpCmd()
+	cmd.InitDefaultHelpFlag()
+
 	if cmd.HasAvailableLocalFlags() {
 		flags := getFlagsDetails(cmd.LocalFlags())
 		result = fmt.Sprintf("%s\n%s\n",
 			output.BoldString("Flags"),
 			flags)
 	}
+
 	if cmd.HasAvailableInheritedFlags() {
 		globalFlags := getFlagsDetails(cmd.InheritedFlags())
 		result += fmt.Sprintf("%s\n%s\n",
 			output.BoldString("Global Flags"),
 			globalFlags)
 	}
+
 	return result
 }
 
@@ -277,10 +283,12 @@ func generateCmdHelpCustomExamplesBlock(samples map[string]string) string {
 	}
 	// sorting lines to keep a deterministic output, as map[string]string is not ordered
 	slices.Sort(lines)
+
 	return fmt.Sprintf("%s\n%s\n\n",
 		output.BoldString("Examples"),
 		strings.Join(lines, "\n\n"),
 	)
+
 }
 
 func getCmdDefaultExamples(cmd *cobra.Command) string {
@@ -292,4 +300,28 @@ func getCmdDefaultExamples(cmd *cobra.Command) string {
 		output.BoldString("Examples"),
 		"{{.Example}}",
 	)
+}
+
+func getDebuggerFooter(cmd *cobra.Command) string {
+	if cmd.HasParent() {
+
+		samples := map[string]string{
+			"Enable verbose output for debugging": output.ColorStringCyan("btptf " + cmd.Use + " --verbose"),
+		}
+
+		var lines []string
+		for title, command := range samples {
+			lines = append(lines, fmt.Sprintf("  %s\n    %s", title, command))
+		}
+		// sorting lines to keep a deterministic output, as map[string]string is not ordered
+		slices.Sort(lines)
+
+		return fmt.Sprintf("%s\n%s\n\n",
+			output.BoldString("Debugging"),
+			strings.Join(lines, "\n\n"),
+		)
+
+	}
+	return ""
+
 }

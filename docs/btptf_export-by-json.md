@@ -1,17 +1,17 @@
-## btptf export
+## btptf export-by-json
 
-Export resources of a subaccount
+Export resources based on a JSON file.
 
 ```
-btptf export [flags]
+btptf export-by-json [flags]
 ```
 
 ### Options
 
 ```
   -c, --config-dir string   folder for config generation (default "generated_configurations")
-  -h, --help                help for export
-  -r, --resources string    comma seperated string for resources (default "all")
+  -h, --help                help for export-by-json
+  -p, --path string         path to JSON file with list of resources (default "btpResources.json")
   -s, --subaccount string   Id of the subaccount
 ```
 

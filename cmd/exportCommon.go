@@ -11,6 +11,10 @@ import (
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
+const tfConfigFileName = "btp_resources.tf"
+const configDirDefault = "generated_configurations"
+
+
 func generateConfigForResource(resource string, values []string, subaccountId string, configDir string, resourceFileName string) {
 	tempConfigDir := resource + "-config"
 
