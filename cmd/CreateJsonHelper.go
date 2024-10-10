@@ -11,7 +11,7 @@ import (
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
-func createJson(subaccount string, fileName string, resources []string) {
+func createJson(subaccount string, directory string, fileName string, resources []string) {
 	if len(resources) == 0 {
 		log.Fatal("please provide the btp resources you want to get using --resources flag or provide 'all' to get all resources")
 	}
@@ -20,7 +20,7 @@ func createJson(subaccount string, fileName string, resources []string) {
 
 	spinner := output.StartSpinner("collecting resources")
 
-	result, err := tfutils.ReadDataSources(subaccount, resources)
+	result, err := tfutils.ReadDataSources(subaccount, directory, resources)
 	if err != nil {
 		tfutils.CleanupProviderConfig()
 		log.Fatalf("error reading data sources: %v", err)

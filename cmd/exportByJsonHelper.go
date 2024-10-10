@@ -52,7 +52,7 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 			}
 		}
 		if len(value) != 0 {
-			generateConfigForResource(resName, value, subaccount, configDir, resourceFile)
+			generateConfigForResource(resName, value, subaccount, directory, configDir, resourceFile)
 		}
 	}
 

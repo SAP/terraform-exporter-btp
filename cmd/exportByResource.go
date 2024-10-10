@@ -24,19 +24,14 @@ var exportByResourceCmd = &cobra.Command{
 			configDir = configDir + "_" + subaccount
 		}
 
-		var level string
-		if directory == "" {
-			level = tfutils.SubaccountLevel
-		} else {
-			level = tfutils.DirectoryLevel
-		}
+		level := tfutils.GetExecutionLevel(subaccount, directory)
 
 		output.PrintExportStartMessage()
 		tfutils.SetupConfigDir(configDir, true)
 
 		resourcesList := tfutils.GetResourcesList(resources, level)
 		for _, resourceToImport := range resourcesList {
-			generateConfigForResource(resourceToImport, nil, subaccount, configDir, tfConfigFileName)
+			generateConfigForResource(resourceToImport, nil, subaccount, directory, configDir, tfConfigFileName)
 		}
 
 		tfutils.FinalizeTfConfig(configDir)
@@ -57,9 +52,9 @@ func init() {
 	var directory string
 
 	exportByResourceCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
-	createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
-	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
-	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
+	exportByResourceCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
+	exportByResourceCmd.MarkFlagsOneRequired("subaccount", "directory")
+	exportByResourceCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
 
 	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "folder for config generation")
 	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")

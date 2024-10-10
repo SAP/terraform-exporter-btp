@@ -43,9 +43,9 @@ func init() {
 	var directory string
 
 	exportByJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
-	createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
-	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
-	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
+	exportByJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
+	exportByJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
+	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
 
 	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "folder for config generation")
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")

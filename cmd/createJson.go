@@ -23,16 +23,11 @@ var createJsonCmd = &cobra.Command{
 		path, _ := cmd.Flags().GetString("path")
 		resources, _ := cmd.Flags().GetString("resources")
 
-		var level string
-		if directory == "" {
-			level = tfutils.SubaccountLevel
-		} else {
-			level = tfutils.DirectoryLevel
-		}
+		level := tfutils.GetExecutionLevel(subaccount, directory)
 
 		output.PrintInventoryCreationStartMessage()
 		resourcesList := tfutils.GetResourcesList(resources, level)
-		createJson(subaccount, path, resourcesList)
+		createJson(subaccount, directory, path, resourcesList)
 		output.PrintInventoryCreationSuccessMessage()
 	},
 }
@@ -46,12 +41,12 @@ func init() {
 	var path string
 	var resources string
 	var subaccount string
-	//var directory string
+	var directory string
 
 	createJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
-	//createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
-	//createJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
-	//createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
+	createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
+	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
+	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
 	createJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")
 	createJsonCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")
 
@@ -59,7 +54,6 @@ func init() {
 
 	createJsonCmd.SetUsageTemplate(generateCmdHelp(createJsonCmd, templateOptions))
 	createJsonCmd.SetHelpTemplate(generateCmdHelp(createJsonCmd, templateOptions))
-
 }
 
 func getCreateJsonCmdDescription(c *cobra.Command) string {
@@ -76,7 +70,7 @@ func getCreateJsonCmdDescription(c *cobra.Command) string {
 	var resourcesDir string
 	for i, resource := range tfutils.AllowedResourcesDirectory {
 		if i == 0 {
-			resources = output.ColorStringYellow(resource)
+			resourcesDir = output.ColorStringYellow(resource)
 		} else {
 			resourcesDir = resourcesDir + ", " + output.ColorStringYellow(resource)
 		}
@@ -114,6 +108,16 @@ func getCreateJsonCmdExamples(c *cobra.Command) string {
 			output.ColorStringYellow("'subaccount,entitlements'"),
 			output.ColorStringCyan("--subaccount"),
 			output.ColorStringYellow("[Subaccount ID]"),
+		),
+		"Create a JSON file with all resources of a directory.": fmt.Sprintf("%s %s",
+			output.ColorStringCyan("btptf create-json --directory"),
+			output.ColorStringYellow("[Directory ID]"),
+		),
+		"Create a JSON file with resources 'directory' and 'entitlements' on directory level only.": fmt.Sprintf("%s%s %s %s",
+			output.ColorStringCyan("btptf create-json --resources="),
+			output.ColorStringYellow("'directory,entitlements'"),
+			output.ColorStringCyan("--directory"),
+			output.ColorStringYellow("[Directory ID]"),
 		),
 	})
 }
