@@ -286,13 +286,13 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 			trust := value.(map[string]interface{})
 			stringArr = append(stringArr, fmt.Sprintf("%v", trust["origin"]))
 		}
-	case SubaccountRoleType:
+	case SubaccountRoleType, DirectoryRoleType:
 		roles := data["values"].([]interface{})
 		for _, value := range roles {
 			role := value.(map[string]interface{})
 			stringArr = append(stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"])))
 		}
-	case SubaccountRoleCollectionType:
+	case SubaccountRoleCollectionType, DirectoryRoleCollectionType:
 		roleCollections := data["values"].([]interface{})
 		for _, value := range roleCollections {
 			roleCollection := value.(map[string]interface{})
