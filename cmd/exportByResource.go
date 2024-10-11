@@ -51,7 +51,7 @@ func init() {
 	var subaccount string
 	var directory string
 
-	exportByResourceCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
+	exportByResourceCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	exportByResourceCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
 	exportByResourceCmd.MarkFlagsOneRequired("subaccount", "directory")
 	exportByResourceCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
@@ -107,8 +107,18 @@ func getExportByResourceCmdExamples(c *cobra.Command) string {
 		"Export a subaccount with entitlements only.": fmt.Sprintf("%s %s %s%s",
 			output.ColorStringCyan("btptf export --subaccount"),
 			output.ColorStringYellow("[Subaccount ID]"),
-			output.ColorStringCyan("--resource="),
+			output.ColorStringCyan("--resources="),
 			output.ColorStringYellow("'subaccount,entitlements'"),
+		),
+		"Export a diretory together with all its contained resources.": fmt.Sprintf("%s %s",
+			output.ColorStringCyan("btptf export --directory"),
+			output.ColorStringYellow("[Directory ID]"),
+		),
+		"Export a directory with entitlements only.": fmt.Sprintf("%s %s %s%s",
+			output.ColorStringCyan("btptf export --directory"),
+			output.ColorStringYellow("[Directory ID]"),
+			output.ColorStringCyan("--resources="),
+			output.ColorStringYellow("'directory,entitlements'"),
 		),
 	})
 }

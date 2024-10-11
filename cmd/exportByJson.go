@@ -46,7 +46,7 @@ func init() {
 	var subaccount string
 	var directory string
 
-	exportByJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
+	exportByJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	exportByJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
 	exportByJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
 	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
@@ -79,12 +79,22 @@ func getExportByJsonCmdExamples(c *cobra.Command) string {
 
 	return generateCmdHelpCustomExamplesBlock(map[string]string{
 		"Export the resources of a subaccount that are listed in the JSON file from the default directory.": fmt.Sprintf("%s %s",
-			output.ColorStringCyan("btptf export by-json --subaccount"),
+			output.ColorStringCyan("btptf export-by-json --subaccount"),
 			output.ColorStringYellow("[Subaccount ID]"),
 		),
 		"Export the resources of a subaccount that are listed in a JSON file with a custom file name and in a custom directory.": fmt.Sprintf("%s %s %s %s",
-			output.ColorStringCyan("btptf export by-json --subaccount"),
+			output.ColorStringCyan("btptf export-by-json --subaccount"),
 			output.ColorStringYellow("[Subaccount ID]"),
+			output.ColorStringCyan("--path"),
+			output.ColorStringYellow("'\\BTP\\resources\\my-btp-resources.json'"),
+		),
+		"Export the resources of a directory that are listed in the JSON file from the default directory.": fmt.Sprintf("%s %s",
+			output.ColorStringCyan("btptf export-by-json --sdirectory"),
+			output.ColorStringYellow("[Directory ID]"),
+		),
+		"Export the resources of a directory that are listed in a JSON file with a custom file name and in a custom directory.": fmt.Sprintf("%s %s %s %s",
+			output.ColorStringCyan("btptf export-by-json --directory"),
+			output.ColorStringYellow("[Directory ID]"),
 			output.ColorStringCyan("--path"),
 			output.ColorStringYellow("'\\BTP\\resources\\my-btp-resources.json'"),
 		),

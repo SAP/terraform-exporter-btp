@@ -43,7 +43,7 @@ func init() {
 	var subaccount string
 	var directory string
 
-	createJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "Id of the subaccount")
+	createJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
 	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
 	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
