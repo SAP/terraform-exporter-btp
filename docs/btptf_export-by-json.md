@@ -13,7 +13,7 @@ btptf export-by-json [flags]
   -d, --directory string    ID of the directory
   -h, --help                help for export-by-json
   -p, --path string         path to JSON file with list of resources (default "btpResources.json")
-  -s, --subaccount string   Id of the subaccount
+  -s, --subaccount string   ID of the subaccount
 ```
 
 ### Options inherited from parent commands

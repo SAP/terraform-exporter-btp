@@ -13,7 +13,7 @@ btptf export [flags]
   -d, --directory string    ID of the directory
   -h, --help                help for export
   -r, --resources string    comma seperated string for resources (default "all")
-  -s, --subaccount string   Id of the subaccount
+  -s, --subaccount string   ID of the subaccount
 ```
 
 ### Options inherited from parent commands
