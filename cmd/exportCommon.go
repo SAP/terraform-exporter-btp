@@ -17,9 +17,9 @@ const configDirDefault = "generated_configurations"
 func generateConfigForResource(resource string, values []string, subaccountId string, directoryId string, configDir string, resourceFileName string) {
 	tempConfigDir := resource + "-config"
 
-	_, iD := tfutils.GetExecutionLevelAndId(subaccountId, directoryId)
+	level, iD := tfutils.GetExecutionLevelAndId(subaccountId, directoryId)
 
-	importProvider, _ := tfimportprovider.GetImportBlockProvider(resource)
+	importProvider, _ := tfimportprovider.GetImportBlockProvider(resource, level)
 	resourceType := importProvider.GetResourceType()
 	techResourceNameLong := strings.ToUpper(resourceType)
 

@@ -6,13 +6,19 @@ import (
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
-func GetImportBlockProvider(cmdResourceName string) (ITfImportProvider, error) {
+func GetImportBlockProvider(cmdResourceName string, level string) (ITfImportProvider, error) {
 
 	switch cmdResourceName {
 	case tfutils.CmdSubaccountParameter:
 		return newSubaccountImportProvider(), nil
 	case tfutils.CmdEntitlementParameter:
-		return newSubaccountEntitlementImportProvider(), nil
+		if level == tfutils.SubaccountLevel {
+			return newSubaccountEntitlementImportProvider(), nil
+		} else if level == tfutils.DirectoryLevel {
+			return newDirectoryEntitlementImportProvider(), nil
+		} else {
+			return nil, fmt.Errorf("unsupported level provided")
+		}
 	case tfutils.CmdEnvironmentInstanceParameter:
 		return newSubaccountEnvInstanceImportProvider(), nil
 	case tfutils.CmdSubscriptionParameter:

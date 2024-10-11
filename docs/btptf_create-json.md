@@ -9,6 +9,7 @@ btptf create-json [flags]
 ### Options
 
 ```
+  -d, --directory string    ID of the directory
   -h, --help                help for create-json
   -p, --path string         path to JSON file with list of resources (default "btpResources.json")
   -r, --resources string    comma seperated string for resources (default "all")

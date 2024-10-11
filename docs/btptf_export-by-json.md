@@ -10,6 +10,7 @@ btptf export-by-json [flags]
 
 ```
   -c, --config-dir string   folder for config generation (default "generated_configurations")
+  -d, --directory string    ID of the directory
   -h, --help                help for export-by-json
   -p, --path string         path to JSON file with list of resources (default "btpResources.json")
   -s, --subaccount string   Id of the subaccount

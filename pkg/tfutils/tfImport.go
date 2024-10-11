@@ -27,18 +27,15 @@ const (
 const (
 	CmdDirectoryParameter           string = "directory"
 	CmdSubaccountParameter          string = "subaccount"
-	CmdEntitlementParameter         string = "sa-entitlements"
-	CmdDirEntitlementParameter      string = "dir-entitlements"
-	CmdEnvironmentInstanceParameter string = "sa-environment-instances"
-	CmdSubscriptionParameter        string = "sa-subscriptions"
-	CmdTrustConfigurationParameter  string = "sa-trust-configurations"
-	CmdRoleParameter                string = "sa-roles"
-	CmdDirRoleParameter             string = "dir-roles"
-	CmdRoleCollectionParameter      string = "sa-role-collections"
-	CmdDirRoleCollectionParameter   string = "dir-role-collections"
-	CmdServiceInstanceParameter     string = "sa-service-instances"
-	CmdServiceBindingParameter      string = "sa-service-bindings"
-	CmdSecuritySettingParameter     string = "sa-security-settings"
+	CmdEntitlementParameter         string = "entitlements"
+	CmdEnvironmentInstanceParameter string = "environment-instances"
+	CmdSubscriptionParameter        string = "subscriptions"
+	CmdTrustConfigurationParameter  string = "trust-configurations"
+	CmdRoleParameter                string = "roles"
+	CmdRoleCollectionParameter      string = "role-collections"
+	CmdServiceInstanceParameter     string = "service-instances"
+	CmdServiceBindingParameter      string = "service-bindings"
+	CmdSecuritySettingParameter     string = "security-settings"
 )
 
 const (
@@ -120,12 +117,16 @@ func GetDocByResourceName(kind DocKind, resourceName string) (EntityDocs, error)
 	return doc, nil
 }
 
-func TranslateResourceParamToTechnicalName(resource string) string {
+func TranslateResourceParamToTechnicalName(resource string, level string) string {
 	switch resource {
 	case CmdSubaccountParameter:
 		return SubaccountType
 	case CmdEntitlementParameter:
-		return SubaccountEntitlementType
+		if level == SubaccountLevel {
+			return SubaccountEntitlementType
+		} else if level == DirectoryLevel {
+			return DirectoryEntitlementType
+		}
 	case CmdEnvironmentInstanceParameter:
 		return SubaccountEnvironmentInstanceType
 	case CmdSubscriptionParameter:
@@ -133,9 +134,17 @@ func TranslateResourceParamToTechnicalName(resource string) string {
 	case CmdTrustConfigurationParameter:
 		return SubaccountTrustConfigurationType
 	case CmdRoleParameter:
-		return SubaccountRoleType
+		if level == SubaccountLevel {
+			return SubaccountRoleType
+		} else if level == DirectoryLevel {
+			return DirectoryRoleType
+		}
 	case CmdRoleCollectionParameter:
-		return SubaccountRoleCollectionType
+		if level == SubaccountLevel {
+			return SubaccountRoleCollectionType
+		} else if level == DirectoryLevel {
+			return DirectoryRoleCollectionType
+		}
 	case CmdServiceInstanceParameter:
 		return SubaccountServiceInstanceType
 	case CmdServiceBindingParameter:
@@ -144,12 +153,6 @@ func TranslateResourceParamToTechnicalName(resource string) string {
 		return SubaccountSecuritySettingType
 	case CmdDirectoryParameter:
 		return DirectoryType
-	case CmdDirEntitlementParameter:
-		return DirectoryEntitlementType
-	case CmdDirRoleParameter:
-		return DirectoryRoleType
-	case CmdDirRoleCollectionParameter:
-		return DirectoryRoleCollectionType
 	}
 	return ""
 }
@@ -236,7 +239,7 @@ func getTfStateData(configDir string, resourceName string) ([]byte, error) {
 	// distinguish if the resourceName is entitlelement or different via case
 	var jsonBytes []byte
 	switch resourceName {
-	case SubaccountEntitlementType:
+	case SubaccountEntitlementType, DirectoryEntitlementType:
 		jsonBytes, err = json.Marshal(state.Values.RootModule.Resources[0].AttributeValues["values"])
 	default:
 		jsonBytes, err = json.Marshal(state.Values.RootModule.Resources[0].AttributeValues)
@@ -254,16 +257,16 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 	var stringArr []string
 
 	switch btpResource {
-	case CmdSubaccountParameter:
+	case SubaccountType:
 		stringArr = []string{fmt.Sprintf("%v", data["name"])}
-	case CmdDirectoryParameter:
+	case DirectoryType:
 		stringArr = []string{fmt.Sprintf("%v", data["name"])}
-	case CmdEntitlementParameter:
+	case SubaccountEntitlementType, DirectoryEntitlementType:
 		for key := range data {
 			key := strings.Replace(key, ":", "_", -1)
 			stringArr = append(stringArr, key)
 		}
-	case CmdSubscriptionParameter:
+	case SubaccountSubscriptionType:
 		subscriptions := data["values"].([]interface{})
 		for _, value := range subscriptions {
 			subscription := value.(map[string]interface{})
@@ -271,43 +274,43 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 				stringArr = append(stringArr, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 			}
 		}
-	case CmdEnvironmentInstanceParameter:
+	case SubaccountEnvironmentInstanceType:
 		environmentInstances := data["values"].([]interface{})
 		for _, value := range environmentInstances {
 			environmentInstance := value.(map[string]interface{})
 			stringArr = append(stringArr, fmt.Sprintf("%v", environmentInstance["environment_type"]))
 		}
-	case CmdTrustConfigurationParameter:
+	case SubaccountTrustConfigurationType:
 		trusts := data["values"].([]interface{})
 		for _, value := range trusts {
 			trust := value.(map[string]interface{})
 			stringArr = append(stringArr, fmt.Sprintf("%v", trust["origin"]))
 		}
-	case CmdRoleParameter:
+	case SubaccountRoleType:
 		roles := data["values"].([]interface{})
 		for _, value := range roles {
 			role := value.(map[string]interface{})
 			stringArr = append(stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"])))
 		}
-	case CmdRoleCollectionParameter:
+	case SubaccountRoleCollectionType:
 		roleCollections := data["values"].([]interface{})
 		for _, value := range roleCollections {
 			roleCollection := value.(map[string]interface{})
 			stringArr = append(stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", roleCollection["name"])))
 		}
-	case CmdServiceInstanceParameter:
+	case SubaccountServiceInstanceType:
 		instances := data["values"].([]interface{})
 		for _, value := range instances {
 			instance := value.(map[string]interface{})
 			stringArr = append(stringArr, output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["serviceplan_id"])))
 		}
-	case CmdServiceBindingParameter:
+	case SubaccountServiceBindingType:
 		bindings := data["values"].([]interface{})
 		for _, value := range bindings {
 			binding := value.(map[string]interface{})
 			stringArr = append(stringArr, fmt.Sprintf("%v", binding["name"]))
 		}
-	case CmdSecuritySettingParameter:
+	case SubaccountSecuritySettingType:
 		stringArr = []string{fmt.Sprintf("%v", data["subaccount_id"])}
 
 	}
@@ -318,7 +321,9 @@ func generateDataSourcesForList(subaccountId string, directoryId string, resourc
 	dataBlockFile := filepath.Join(TmpFolder, "main.tf")
 	var jsonBytes []byte
 
-	btpResourceType := TranslateResourceParamToTechnicalName(resourceName)
+	level, _ := GetExecutionLevelAndId(subaccountId, directoryId)
+
+	btpResourceType := TranslateResourceParamToTechnicalName(resourceName, level)
 
 	dataBlock, err := readDataSource(subaccountId, directoryId, btpResourceType)
 	if err != nil {
@@ -346,7 +351,7 @@ func generateDataSourcesForList(subaccountId string, directoryId string, resourc
 		return nil, err
 	}
 
-	return transformDataToStringArray(resourceName, data), nil
+	return transformDataToStringArray(btpResourceType, data), nil
 }
 
 func runTerraformCommand(args ...string) error {

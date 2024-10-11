@@ -10,6 +10,7 @@ btptf export [flags]
 
 ```
   -c, --config-dir string   folder for config generation (default "generated_configurations")
+  -d, --directory string    ID of the directory
   -h, --help                help for export
   -r, --resources string    comma seperated string for resources (default "all")
   -s, --subaccount string   Id of the subaccount

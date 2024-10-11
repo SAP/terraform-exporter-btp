@@ -33,9 +33,9 @@ var AllowedResourcesSubaccount = []string{
 
 var AllowedResourcesDirectory = []string{
 	CmdDirectoryParameter,
-	CmdDirEntitlementParameter,
-	CmdDirRoleParameter,
-	CmdDirRoleCollectionParameter,
+	CmdEntitlementParameter,
+	CmdRoleParameter,
+	CmdRoleCollectionParameter,
 }
 
 func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) error {
