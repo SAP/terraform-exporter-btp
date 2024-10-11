@@ -29,7 +29,7 @@ func (tf *directoryImportProvider) GetImportBlock(data map[string]interface{}, L
 		return "", err
 	}
 
-	importBlock, err := createdirectoryImportBlock(data, directoryId, filterValues, resourceDoc)
+	importBlock, err := createDirectoryImportBlock(data, directoryId, filterValues, resourceDoc)
 	if err != nil {
 		return "", err
 	}
@@ -37,7 +37,7 @@ func (tf *directoryImportProvider) GetImportBlock(data map[string]interface{}, L
 	return importBlock, nil
 }
 
-func createdirectoryImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
+func createDirectoryImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
 	if len(filterValues) != 0 {
 		if filterValues[0] != fmt.Sprintf("%v", data["name"]) {
 			err := fmt.Errorf("directory %s not found. Please adjust it in the provided file", filterValues[0])
