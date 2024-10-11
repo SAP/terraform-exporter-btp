@@ -14,8 +14,10 @@ import (
 const tfConfigFileName = "btp_resources.tf"
 const configDirDefault = "generated_configurations"
 
-func generateConfigForResource(resource string, values []string, subaccountId string, directoryId, configDir string, resourceFileName string) {
+func generateConfigForResource(resource string, values []string, subaccountId string, directoryId string, configDir string, resourceFileName string) {
 	tempConfigDir := resource + "-config"
+
+	_, iD := tfutils.GetExecutionLevelAndId(subaccountId, directoryId)
 
 	importProvider, _ := tfimportprovider.GetImportBlockProvider(resource)
 	resourceType := importProvider.GetResourceType()
@@ -32,7 +34,7 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 		log.Fatalf("error fetching impport configuration for %s: %v", resourceType, err)
 	}
 
-	importBlock, err := importProvider.GetImportBlock(data, subaccountId, values)
+	importBlock, err := importProvider.GetImportBlock(data, iD, values)
 	if err != nil {
 		tfutils.CleanupProviderConfig(tempConfigDir)
 		log.Fatalf("error crafting import block: %v", err)

@@ -21,7 +21,10 @@ func newSubaccountTrustConfigImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountTrustConfigImportProvider) GetImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
+func (tf *subaccountTrustConfigImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
+
+	subaccountId := levelId
+
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountTrustConfigurationType)
 	if err != nil {
 		log.Fatalf("read doc failed!")

@@ -29,6 +29,8 @@ func GetImportBlockProvider(cmdResourceName string) (ITfImportProvider, error) {
 		return newSubaccountServiceBindingImportProvider(), nil
 	case tfutils.CmdSecuritySettingParameter:
 		return newSubaccountSecuritySettingImportProvider(), nil
+	case tfutils.CmdDirectoryParameter:
+		return newDirectoryImportProvider(), nil
 	default:
 		return nil, fmt.Errorf("unsupported resource provided")
 	}

@@ -22,7 +22,10 @@ func newSubaccountServiceBindingImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountServiceBindingImportProvider) GetImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
+func (tf *subaccountServiceBindingImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
+
+	subaccountId := levelId
+
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountServiceBindingType)
 	if err != nil {
 		log.Fatalf("read doc failed!")

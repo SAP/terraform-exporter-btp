@@ -184,7 +184,7 @@ func readDataSource(subaccountId string, directoryId string, resourceName string
 
 	var dataBlock string
 
-	level := GetExecutionLevel(subaccountId, directoryId)
+	level, _ := GetExecutionLevelAndId(subaccountId, directoryId)
 
 	switch level {
 	case SubaccountLevel:
@@ -363,11 +363,11 @@ func runTerraformCommand(args ...string) error {
 	return cmd.Run()
 }
 
-func GetExecutionLevel(subaccountID string, directoryID string) string {
+func GetExecutionLevelAndId(subaccountID string, directoryID string) (level string, id string) {
 	if subaccountID != "" {
-		return SubaccountLevel
+		return SubaccountLevel, subaccountID
 	} else if directoryID != "" {
-		return DirectoryLevel
+		return DirectoryLevel, directoryID
 	}
-	return ""
+	return "", ""
 }

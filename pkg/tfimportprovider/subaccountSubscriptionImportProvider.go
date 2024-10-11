@@ -22,7 +22,9 @@ func newSubaccountSubscriptionImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountSubscriptionImportProvider) GetImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
+func (tf *subaccountSubscriptionImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
+
+	subaccountId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountSubscriptionType)
 	if err != nil {

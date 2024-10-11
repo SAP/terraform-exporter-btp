@@ -23,7 +23,7 @@ var createJsonCmd = &cobra.Command{
 		path, _ := cmd.Flags().GetString("path")
 		resources, _ := cmd.Flags().GetString("resources")
 
-		level := tfutils.GetExecutionLevel(subaccount, directory)
+		level, _ := tfutils.GetExecutionLevelAndId(subaccount, directory)
 
 		output.PrintInventoryCreationStartMessage()
 		resourcesList := tfutils.GetResourcesList(resources, level)

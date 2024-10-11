@@ -22,7 +22,10 @@ func newSubaccountRoleCollectionImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountRoleCollectionImportProvider) GetImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
+func (tf *subaccountRoleCollectionImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
+
+	subaccountId := levelId
+
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountRoleCollectionType)
 	if err != nil {
 		log.Fatalf("read doc failed!")

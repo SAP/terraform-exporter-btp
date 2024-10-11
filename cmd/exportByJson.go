@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
+	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 
 	"github.com/spf13/cobra"
 )
@@ -22,9 +23,12 @@ var exportByJsonCmd = &cobra.Command{
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		path, _ := cmd.Flags().GetString("path")
 
+		_, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
+
 		if configDir == configDirDefault {
-			configDir = configDir + "_" + subaccount
+			configDir = configDir + "_" + iD
 		}
+
 		output.PrintExportStartMessage()
 		exportByJson(subaccount, directory, path, tfConfigFileName, configDir)
 		output.PrintExportSuccessMessage()

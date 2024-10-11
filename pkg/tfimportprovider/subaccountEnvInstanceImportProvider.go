@@ -20,7 +20,9 @@ func newSubaccountEnvInstanceImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountEnvInstanceImportProvider) GetImportBlock(data map[string]interface{}, subaccountId string, filterValues []string) (string, error) {
+func (tf *subaccountEnvInstanceImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
+
+	subaccountId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountEnvironmentInstanceType)
 	if err != nil {

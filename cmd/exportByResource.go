@@ -20,11 +20,11 @@ var exportByResourceCmd = &cobra.Command{
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		resources, _ := cmd.Flags().GetString("resources")
 
-		if configDir == configDirDefault {
-			configDir = configDir + "_" + subaccount
-		}
+		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
 
-		level := tfutils.GetExecutionLevel(subaccount, directory)
+		if configDir == configDirDefault {
+			configDir = configDir + "_" + iD
+		}
 
 		output.PrintExportStartMessage()
 		tfutils.SetupConfigDir(configDir, true)
