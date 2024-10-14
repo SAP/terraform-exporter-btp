@@ -16,13 +16,13 @@ env:
   BTP_SUBACCOUNT: ${{ secrets.BTP_SUBACCOUNT }}
 jobs:
   setup_infrastructure:
-    name: Test
+    name: ExporterTests
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
         id: checkout_repo
         uses: actions/checkout@v4
-      - name: Build Exporter
+      - name: Install Go and Exporter
         id: build_exporter
         run: |
           make install
@@ -30,9 +30,9 @@ jobs:
         id : setup_exporter
         shell: bash
         run: |
+          export PATH=$PATH:/home/runner/go/bin/
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
-          export BTP_CLI_SERVER_URL: ${{ secrets.BTP_CLI_SERVER_URL }}
-          export BTP_GLOBALACCOUNT: ${{ secrets.BTP_GLOBALACCOUNT }}
-          export BTP_SUBACCOUNT: ${{ secrets.BTP_SUBACCOUNT }}
-          btptf resource all -s ${BTP_SUBACCOUNT}
+          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          export BTP_SUBACCOUNT=${{ secrets.BTP_SUBACCOUNT }}
+          btptf export --subaccount ${BTP_SUBACCOUNT}
