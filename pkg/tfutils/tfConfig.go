@@ -208,10 +208,11 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 			choice = "N"
 		}
 
-		if strings.ToUpper(choice) == "N" {
+		// We acccept "Yes" or "No" as entry and take the first letter only
+		if strings.ToUpper(choice[:1]) == "N" {
 			CleanupProviderConfig()
 			os.Exit(0)
-		} else if strings.ToUpper(choice) == "Y" {
+		} else if strings.ToUpper(choice[:1]) == "Y" {
 			fmt.Println(output.ColorStringCyan("existing files will be overwritten"))
 
 			// Configuration folder must be re-created, otherwiese the Terraform commands will fail
