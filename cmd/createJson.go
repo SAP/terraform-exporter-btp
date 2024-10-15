@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
@@ -23,7 +24,11 @@ var createJsonCmd = &cobra.Command{
 		path, _ := cmd.Flags().GetString("path")
 		resources, _ := cmd.Flags().GetString("resources")
 
-		level, _ := tfutils.GetExecutionLevelAndId(subaccount, directory)
+		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
+
+		if !isValidUuid(iD) {
+			log.Fatalln(getUuidError(level, iD))
+		}
 
 		output.PrintInventoryCreationStartMessage()
 		resourcesList := tfutils.GetResourcesList(resources, level)

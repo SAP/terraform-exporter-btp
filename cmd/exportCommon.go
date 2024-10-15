@@ -9,6 +9,7 @@ import (
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfimportprovider "github.com/SAP/terraform-exporter-btp/pkg/tfimportprovider"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
+	"github.com/google/uuid"
 )
 
 const tfConfigFileName = "btp_resources.tf"
@@ -61,4 +62,18 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 
 		tfutils.ExecPostExportSteps(tempConfigDir, configDir, resourceFileName, techResourceNameLong)
 	}
+}
+
+func isValidUuid(u string) bool {
+	_, err := uuid.Parse(u)
+	return err == nil
+}
+
+func getUuidError(level string, iD string) string {
+	if level == tfutils.SubaccountLevel {
+		return fmt.Sprintf("Invalid subaccount ID: %s. Please provide a valid UUID.", iD)
+	} else if level == tfutils.DirectoryLevel {
+		return fmt.Sprintf("Invalid directory ID: %s Please provide a valid UUID.", iD)
+	}
+	return ""
 }

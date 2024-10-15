@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
@@ -23,7 +24,11 @@ var exportByJsonCmd = &cobra.Command{
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		path, _ := cmd.Flags().GetString("path")
 
-		_, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
+		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
+
+		if !isValidUuid(iD) {
+			log.Fatalln(getUuidError(level, iD))
+		}
 
 		if configDir == configDirDefault {
 			configDir = configDir + "_" + iD
