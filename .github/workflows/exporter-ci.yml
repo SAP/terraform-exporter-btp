@@ -22,7 +22,12 @@ jobs:
       - name: Check out Git repository
         id: checkout_repo
         uses: actions/checkout@v4
-      - name: Install Go and Exporter
+      - uses: actions/setup-go@v5.0
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+          run: go mod download
+      - name: Build Exporter
         id: build_exporter
         run: |
           make install
