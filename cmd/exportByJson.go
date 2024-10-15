@@ -56,9 +56,7 @@ func init() {
 
 	rootCmd.AddCommand(exportByJsonCmd)
 
-	exportByJsonCmd.SetUsageTemplate(generateCmdHelp(exportByJsonCmd, templateOptions))
 	exportByJsonCmd.SetHelpTemplate(generateCmdHelp(exportByJsonCmd, templateOptions))
-
 }
 
 func getExportByJsonCmdDescription(c *cobra.Command) string {

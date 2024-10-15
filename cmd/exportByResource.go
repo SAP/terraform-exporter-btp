@@ -61,7 +61,6 @@ func init() {
 
 	rootCmd.AddCommand(exportByResourceCmd)
 
-	exportByResourceCmd.SetUsageTemplate(generateCmdHelp(exportByResourceCmd, templateOptions))
 	exportByResourceCmd.SetHelpTemplate(generateCmdHelp(exportByResourceCmd, templateOptions))
 }
 

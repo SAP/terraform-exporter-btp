@@ -30,7 +30,6 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Display verbose output in the console for debugging.")
 	_ = viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 	rootCmd.AddCommand(docCmd)
-	rootCmd.SetUsageTemplate(generateCmdHelp(rootCmd, templateOptions))
 	rootCmd.SetHelpTemplate(generateCmdHelp(rootCmd, templateOptions))
 }
 
@@ -39,7 +38,6 @@ func init() {
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }

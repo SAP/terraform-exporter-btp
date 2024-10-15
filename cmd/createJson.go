@@ -52,7 +52,6 @@ func init() {
 
 	rootCmd.AddCommand(createJsonCmd)
 
-	createJsonCmd.SetUsageTemplate(generateCmdHelp(createJsonCmd, templateOptions))
 	createJsonCmd.SetHelpTemplate(generateCmdHelp(createJsonCmd, templateOptions))
 }
 
