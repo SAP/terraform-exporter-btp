@@ -58,6 +58,10 @@ const (
 	DirectoryRoleCollectionType string = "btp_directory_role_collection"
 )
 
+const DirectoryFeatureDefault string = "DEFAULT"
+const DirectoryFeatureEntitlements string = "ENTITLEMENTS"
+const DirectoryFeatureRoles string = "AUTHORIZATIONS"
+
 const DataSourcesKind DocKind = "data-sources"
 const ResourcesKind DocKind = "resources"
 
@@ -164,6 +168,10 @@ func ReadDataSources(subaccountId string, directoryId string, resourceList []str
 
 	var btpResourcesList []BtpResource
 	for _, resource := range resourceList {
+
+		//TODO for Directories: Get the features of the directory
+		// introduce a continue depending on the supported features and the iterated resource type
+
 		values, err := generateDataSourcesForList(subaccountId, directoryId, resource)
 		if err != nil {
 			error := fmt.Errorf("error generating data sources: %v", err)
@@ -361,7 +369,7 @@ func generateDataSourcesForList(subaccountId string, directoryId string, resourc
 		log.Fatalf("error: %s", err)
 		return nil, err
 	}
-
+	// ToDo surface the features of the directory stored in data["features"].([]interface{}) analogy to subscription in transform method
 	return transformDataToStringArray(btpResourceType, data), nil
 }
 
