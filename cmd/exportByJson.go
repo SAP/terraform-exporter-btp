@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
@@ -35,7 +36,8 @@ var exportByJsonCmd = &cobra.Command{
 		}
 
 		if path == jsonFileDefault {
-			path = path + "_" + iD
+			pathParts := strings.Split(path, ".")
+			path = pathParts[0] + "_" + iD + "." + pathParts[1]
 		}
 
 		output.PrintExportStartMessage()
