@@ -283,7 +283,7 @@ func GetResourcesList(resourcesString string, level string) []string {
 
 				allowedResourceList := strings.Join(allowedResources, ", ")
 				fmt.Print("\r\n")
-				log.Fatalf("please check the resource provided. Currently supported resources are " + allowedResourceList + ". Provide 'all' to check for all resources")
+				log.Fatal("please check the resource provided. Currently supported resources are " + allowedResourceList + ". Provide 'all' to check for all resources")
 			}
 		}
 	}
