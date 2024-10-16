@@ -11,6 +11,7 @@ import (
 func DeleteSourceFolder(srcDir string) {
 	err := os.RemoveAll(srcDir)
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error deleting source folder %s: %v", srcDir, err)
 	}
 }

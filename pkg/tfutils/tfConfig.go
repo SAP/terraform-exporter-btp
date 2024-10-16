@@ -117,12 +117,14 @@ func ConfigureProvider() {
 	if !(len(strings.TrimSpace(username)) != 0 && len(strings.TrimSpace(password)) != 0) {
 		if len(strings.TrimSpace(enableSSO)) == 0 {
 			cleanup()
+			fmt.Print("\r\n")
 			log.Fatalf("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
 		}
 	}
 
 	if len(strings.TrimSpace(globalAccount)) == 0 {
 		cleanup()
+		fmt.Print("\r\n")
 		log.Fatalf("global account not set. set BTP_GLOBALACCOUNT environment variable to set global account")
 	} else {
 		providerContent = providerContent + "globalaccount = \"" + globalAccount + "\"\n"
@@ -153,6 +155,7 @@ func ConfigureProvider() {
 	err = files.CreateFileWithContent(abspath, providerContent)
 	if err != nil {
 		cleanup()
+		fmt.Print("\r\n")
 		log.Fatalf("create file %s failed!", abspath)
 	}
 
@@ -171,6 +174,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 	curWd, err := os.Getwd()
 	if err != nil {
 		CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("error getting current working directory: %v", err)
 	}
 
@@ -179,6 +183,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 	exist, err := files.Exists(configFilepath)
 	if err != nil {
 		CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("error reading configuration folder %s: %v", configFolder, err)
 	}
 
@@ -186,6 +191,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 		err = os.Mkdir(configFilepath, 0700)
 		if err != nil {
 			CleanupProviderConfig()
+			fmt.Print("\r\n")
 			log.Fatalf("error creating configuration folder %s at %s: %v", configFolder, curWd, err)
 		}
 	} else {
@@ -198,6 +204,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 				choice = "N"
 			} else {
 				CleanupProviderConfig()
+				fmt.Print("\r\n")
 				log.Fatalf("error reading input: %v", err)
 			}
 		}
@@ -218,10 +225,12 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 			err := recreateExistingConfigDir(configFilepath)
 			if err != nil {
 				CleanupProviderConfig()
+				fmt.Print("\r\n")
 				log.Fatalf("error recreating configuration folder %s at %s: %v", configFolder, curWd, err)
 			}
 		} else {
 			CleanupProviderConfig()
+			fmt.Print("\r\n")
 			log.Fatalf("invalid input. exiting the process")
 		}
 	}
@@ -229,6 +238,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 	sourceFile, err := os.Open(TmpFolder + "/provider.tf")
 	if err != nil {
 		CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("failed to open file 'provider.tf' at %s: %v", TmpFolder, err)
 	}
 	defer sourceFile.Close()
@@ -238,6 +248,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 	destinationFile, err := os.Create(fullpath + "/provider.tf")
 	if err != nil {
 		CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("failed to create file 'provider.tf' at %s: %v", fullpath, err)
 	}
 	defer destinationFile.Close()
@@ -245,6 +256,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 	_, err = io.Copy(destinationFile, sourceFile)
 	if err != nil {
 		CleanupProviderConfig(fullpath)
+		fmt.Print("\r\n")
 		log.Fatalf("failed to copy file from temporary (%s) to final configuration directory (%s): %v", TmpFolder, fullpath, err)
 	}
 }
@@ -270,8 +282,8 @@ func GetResourcesList(resourcesString string, level string) []string {
 			if !(slices.Contains(allowedResources, resource)) {
 
 				allowedResourceList := strings.Join(allowedResources, ", ")
-
-				log.Fatal("please check the resource provided. Currently supported resources are " + allowedResourceList + ". Provide 'all' to check for all resources")
+				fmt.Print("\r\n")
+				log.Fatalf("please check the resource provided. Currently supported resources are " + allowedResourceList + ". Provide 'all' to check for all resources")
 			}
 		}
 	}
@@ -294,6 +306,7 @@ func cleanup() {
 	// Cleanup temporary files on disk
 	err := os.RemoveAll(TmpFolder)
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error deleting temp files: %v", err)
 	}
 }
@@ -306,6 +319,7 @@ func FinalizeTfConfig(configFolder string) {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("error getting current directory: %v", err)
 	}
 
@@ -314,16 +328,19 @@ func FinalizeTfConfig(configFolder string) {
 	err = os.Chdir(terraformConfigPath)
 	if err != nil {
 		CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
 	}
 
 	if err := runTerraformCommand("init"); err != nil {
 		CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("error initializing Terraform: %v", err)
 	}
 
 	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
 		CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("error running Terraform fmt: %v", err)
 	}
 
@@ -331,6 +348,7 @@ func FinalizeTfConfig(configFolder string) {
 	err = os.Chdir(currentDir)
 	if err != nil {
 		CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("error changing directory to %s: %v \n", currentDir, err)
 	}
 
@@ -349,12 +367,14 @@ func ExecPostExportSteps(tempConfigDir string, targetConfigDir string, targetRes
 	err := GenerateConfig(targetResourceFileName, tempConfigDir, false, resourceNameLong)
 	if err != nil {
 		CleanupTempFiles(tempConfigDir)
+		fmt.Print("\r\n")
 		log.Fatalf("error generating Terraform configuration for %s: %v", resourceNameLong, err)
 	}
 
 	err = mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)
 	if err != nil {
 		CleanupTempFiles(tempConfigDir)
+		fmt.Print("\r\n")
 		log.Fatalf("error merging Terraform configuration for %s: %v", resourceNameLong, err)
 	}
 

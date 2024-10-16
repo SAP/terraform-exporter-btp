@@ -28,6 +28,7 @@ func (tf *directoryRoleImportProvider) GetImportBlock(data map[string]interface{
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.DirectoryRoleType)
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")
 		return "", err
 	}

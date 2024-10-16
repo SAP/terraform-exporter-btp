@@ -32,12 +32,14 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 	data, err := tfutils.FetchImportConfiguration(subaccountId, directoryId, resourceType, tfutils.TmpFolder)
 	if err != nil {
 		tfutils.CleanupProviderConfig(tempConfigDir)
+		fmt.Print("\r\n")
 		log.Fatalf("error fetching impport configuration for %s: %v", resourceType, err)
 	}
 
 	importBlock, err := importProvider.GetImportBlock(data, iD, values)
 	if err != nil {
 		tfutils.CleanupProviderConfig(tempConfigDir)
+		fmt.Print("\r\n")
 		log.Fatalf("error crafting import block: %v", err)
 	}
 
@@ -55,6 +57,7 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 		err = files.WriteImportConfiguration(tempConfigDir, resourceType, importBlock)
 		if err != nil {
 			tfutils.CleanupProviderConfig(tempConfigDir)
+			fmt.Print("\r\n")
 			log.Fatalf("error writing import configuration for %s: %v", resourceType, err)
 		}
 

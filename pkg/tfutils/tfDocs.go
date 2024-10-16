@@ -573,6 +573,7 @@ func parseTopLevelSchemaIntoDocs(
 	for _, param := range topLevelSchema.requiredParameters() {
 		oldDesc, haveOldDesc := accumulatedDocs.Attributes[param.name]
 		if haveOldDesc && oldDesc != param.desc {
+			fmt.Print("\r\n")
 			log.Fatalf("Description conflict for top-level attribute %s; candidates are `%s` and `%s`",
 				param.name,
 				oldDesc,
@@ -598,6 +599,7 @@ func parseNestedSchemaIntoDocuments(
 	for _, param := range nestedSchema.allParameters() {
 		oldDescription, hasAlready := args.arguments[param.name]
 		if hasAlready && oldDescription != param.desc {
+			fmt.Print("\r\n")
 			log.Fatalf("Description conflict for param %s from %s; candidates are `%s` and `%s`",
 				param.name,
 				nestedSchema.longName,
@@ -608,6 +610,7 @@ func parseNestedSchemaIntoDocuments(
 		fullParameterName := fmt.Sprintf("%s.%s", nestedSchema.longName, param.name)
 		paramArgs, created := accumulatedDocs.getOrCreateArgumentDocs(fullParameterName)
 		if !created && paramArgs.description != param.desc {
+			fmt.Print("\r\n")
 			log.Fatalf("Description conflict for param %s; candidates are `%s` and `%s`",
 				fullParameterName,
 				paramArgs.description,
@@ -681,6 +684,7 @@ func (p *tfMarkdownParser) reformatSubsections(lines []string) ([]string, bool, 
 
 func (p *tfMarkdownParser) parseMarkdownSections(h2Section []string) error {
 	if len(h2Section) == 0 {
+		fmt.Print("\r\n")
 		log.Fatalf("Unparseable H2 doc section for %v; consider overriding doc source location", p.rawname)
 		return nil
 	}

@@ -112,6 +112,7 @@ func GetDocByResourceName(kind DocKind, resourceName string) (EntityDocs, error)
 
 	doc, err := GetDocsForResource("SAP", "btp", "btp", kind, choice, BtpProviderVersion, "github.com")
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("read doc failed for %s, %s: %v", kind, choice, err)
 		return EntityDocs{}, err
 	}
@@ -211,30 +212,35 @@ func readDataSource(subaccountId string, directoryId string, resourceName string
 func getTfStateData(configDir string, resourceName string, identifier string) ([]byte, error) {
 	execPath, err := exec.LookPath("terraform")
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error finding Terraform: %v", err)
 		return nil, err
 	}
 	// create a new Terraform instance
 	tf, err := tfexec.NewTerraform(configDir, execPath)
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error running NewTerraform: %v", err)
 		return nil, err
 	}
 
 	err = tf.Init(context.Background(), tfexec.Upgrade(true))
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error running Init: %v", err)
 		return nil, err
 	}
 	err = tf.Apply(context.Background())
 	if err != nil {
 		err = handleNotFoundError(err, resourceName, identifier)
+		fmt.Print("\r\n")
 		log.Fatalf("error running Apply: %v", err)
 		return nil, err
 	}
 
 	state, err := tf.Show(context.Background())
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error running Show: %v", err)
 		return nil, err
 	}
@@ -249,6 +255,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 	}
 
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error json.Marshal: %v", err)
 		return nil, err
 	}
@@ -350,6 +357,7 @@ func generateDataSourcesForList(subaccountId string, directoryId string, resourc
 
 	err = json.Unmarshal(jsonBytes, &data)
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error: %s", err)
 		return nil, err
 	}
