@@ -83,7 +83,9 @@ func FetchImportConfiguration(subaccountId string, directoryId string, resourceT
 		return nil, fmt.Errorf("create file %s failed: %v", dataBlockFile, err)
 	}
 
-	jsonBytes, err := getTfStateData(tmpFolder, resourceType)
+	_, iD := GetExecutionLevelAndId(subaccountId, directoryId)
+
+	jsonBytes, err := getTfStateData(tmpFolder, resourceType, iD)
 	if err != nil {
 		return nil, fmt.Errorf("error getting Terraform state data: %v", err)
 	}
@@ -206,7 +208,7 @@ func readDataSource(subaccountId string, directoryId string, resourceName string
 	return dataBlock, nil
 }
 
-func getTfStateData(configDir string, resourceName string) ([]byte, error) {
+func getTfStateData(configDir string, resourceName string, identifier string) ([]byte, error) {
 	execPath, err := exec.LookPath("terraform")
 	if err != nil {
 		log.Fatalf("error finding Terraform: %v", err)
@@ -226,6 +228,7 @@ func getTfStateData(configDir string, resourceName string) ([]byte, error) {
 	}
 	err = tf.Apply(context.Background())
 	if err != nil {
+		err = handleNotFoundError(err, resourceName, identifier)
 		log.Fatalf("error running Apply: %v", err)
 		return nil, err
 	}
@@ -321,7 +324,7 @@ func generateDataSourcesForList(subaccountId string, directoryId string, resourc
 	dataBlockFile := filepath.Join(TmpFolder, "main.tf")
 	var jsonBytes []byte
 
-	level, _ := GetExecutionLevelAndId(subaccountId, directoryId)
+	level, iD := GetExecutionLevelAndId(subaccountId, directoryId)
 
 	btpResourceType := TranslateResourceParamToTechnicalName(resourceName, level)
 
@@ -337,7 +340,7 @@ func generateDataSourcesForList(subaccountId string, directoryId string, resourc
 		return nil, error
 	}
 
-	jsonBytes, err = getTfStateData(TmpFolder, btpResourceType)
+	jsonBytes, err = getTfStateData(TmpFolder, btpResourceType, iD)
 	if err != nil {
 		error := fmt.Errorf("error fetching Terraform data: %s", err)
 		return nil, error
@@ -375,4 +378,17 @@ func GetExecutionLevelAndId(subaccountID string, directoryID string) (level stri
 		return DirectoryLevel, directoryID
 	}
 	return "", ""
+}
+
+func handleNotFoundError(err error, resourceName string, iD string) error {
+	if strings.Contains(err.Error(), "404") {
+		// if it is a 404 error it is probably thw wrong ID, so we return a more readible error message
+		if resourceName == DirectoryType {
+			return fmt.Errorf("the directory with ID %s was not found. Check that the values for directory ID and globalaccount subdomain are valid", iD)
+
+		} else if resourceName == SubaccountType {
+			return fmt.Errorf("the subaccount with ID %s was not found. Check that the values for subaccount ID and globalaccount subdomain are valid", iD)
+		}
+	}
+	return err
 }
