@@ -1,6 +1,6 @@
 ## btptf export-by-json
 
-Export resources based on a JSON file.
+Export resources from SAP BTP via JSON file
 
 ```
 btptf export-by-json [flags]

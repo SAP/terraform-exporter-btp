@@ -1,6 +1,6 @@
 ## btptf export
 
-Export resources of a subaccount
+Export resources from SAP BTP
 
 ```
 btptf export [flags]
