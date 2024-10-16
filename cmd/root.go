@@ -24,7 +24,8 @@ func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
 	templateOptions := generateCmdHelpOptions{
-		Description: getRootCmdDescription,
+		Description:     getRootCmdDescription,
+		DescriptionNote: getRootCmdDescriptionNote,
 	}
 
 	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Display verbose output in the console for debugging.")
@@ -67,22 +68,34 @@ var docCmd = &cobra.Command{
 }
 
 func getRootCmdDescription(c *cobra.Command) string {
-	return generateCmdHelpDescription(c.Short,
-		[]string{
-			formatHelpNote(
-				"Use the btptf command line tool (Terraform Exporter for SAP BTP) to generate Terraform configuration files for your SAP BTP resources. " +
-					"These configuration files can then be used to manage SAP BTP resources with Terraform, adopting an Infrastructure-as-Code approach."),
-			formatHelpNote(
-				"The export is done based on subaccounts, so you need to specify the subaccount ID, and, optionally, a subset of resources inside the subaccount."),
-			formatHelpNote(
-				fmt.Sprintf("To help you specify the resources to be exported, you can first run the %s command to generate a .json file of all resources per subaccount. "+
-					"This JSON file can then be used for the export with the %s command.",
-					output.ColorStringCyan("create-json"),
-					output.ColorStringCyan("export by-json"),
-				)),
-			formatHelpNote(
-				fmt.Sprintf("Alternatively, you can directly specify the resources to be exported on the command line using %s.",
-					output.ColorStringCyan("export by-resource"),
-				)),
-		})
+
+	point1 := formatHelpNote("Directories")
+	point2 := formatHelpNote("Subaccounts")
+	point3 := formatHelpNote("Cloud Foundry environment instances")
+
+	list := fmt.Sprintf("%s\n%s\n%s", point1, point2, point3)
+
+	btptf := output.BoldString("btptf")
+
+	description := `The Terraform Exporter for SAP BTP, or ` + btptf + `, exports existing SAP BTP resources as Terraform code, so you can start adopting Infrastructure-as-Code with Terraform.
+
+The following SAP BTP account levels can be exported:
+` + list + `
+
+We recommend to start with 'btptf create-json', and then do the export with 'btptf export-by-json', as this lets you check and edit the resources before you export them.`
+
+	return generateCmdHelpDescription(description, nil)
+}
+
+func getRootCmdDescriptionNote(c *cobra.Command) string {
+
+	linkToRepo := output.AsLink("https://github.com/SAP/terraform-exporter-btp?tab=readme-ov-file#usage")
+
+	point1 := formatHelpNote("To work with the btptf CLI, you need to configure authentication to access your global account on SAP BTP. For instructions, see " + linkToRepo + ".")
+	point2 := formatHelpNote("To export resources, you need global account administrator permissions.")
+
+	content := fmt.Sprintf("%s\n%s", point1, point2)
+
+	return getSectionWithHeader("Prerequisites", content)
+
 }

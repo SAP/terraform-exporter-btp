@@ -17,7 +17,7 @@ import (
 // createJsonCmd represents the get command
 var createJsonCmd = &cobra.Command{
 	Use:               "create-json",
-	Short:             "Store the list of resources in a subaccount into a JSON file",
+	Short:             "Create a JSON file with a list of resources",
 	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
@@ -45,8 +45,9 @@ var createJsonCmd = &cobra.Command{
 
 func init() {
 	templateOptions := generateCmdHelpOptions{
-		Description: getCreateJsonCmdDescription,
-		Examples:    getCreateJsonCmdExamples,
+		Description:     getCreateJsonCmdDescription,
+		DescriptionNote: getCreateJsonUsageNote,
+		Examples:        getCreateJsonCmdExamples,
 	}
 
 	var path string
@@ -71,63 +72,67 @@ func getCreateJsonCmdDescription(c *cobra.Command) string {
 	var resources string
 	for i, resource := range tfutils.AllowedResourcesSubaccount {
 		if i == 0 {
-			resources = output.ColorStringYellow(resource)
+			resources = resource
 		} else {
-			resources = resources + ", " + output.ColorStringYellow(resource)
+			resources = resources + ", " + resource
 		}
 	}
 
 	var resourcesDir string
 	for i, resource := range tfutils.AllowedResourcesDirectory {
 		if i == 0 {
-			resourcesDir = output.ColorStringYellow(resource)
+			resourcesDir = resource
 		} else {
-			resourcesDir = resourcesDir + ", " + output.ColorStringYellow(resource)
+			resourcesDir = resourcesDir + ", " + resource
 		}
 	}
 
-	return generateCmdHelpDescription(c.Short,
+	mainText := `Use this command to create a JSON file that lists all the resources for a directory, subaccount, or environment instance. This lets you easily edit the resources in the file before you export them.
+
+Depending on the account level you specify, the JSON file will include the following resources:`
+
+	return generateCmdHelpDescription(mainText,
 		[]string{
 			formatHelpNote(
-				"Use this command to compile a list of all resources in a subaccount and store it into a file",
+				fmt.Sprintf("For directories: "+resourcesDir+" or %s (default)",
+					output.ColorStringYellow("all"),
+				)),
+			formatHelpNote(
+				fmt.Sprintf("For subaccounts: "+resources+" or %s (default)",
+					output.ColorStringYellow("all"),
+				)),
+			formatHelpNote(
+				"For environment instances: TBD",
 			),
-			formatHelpNote(
-				fmt.Sprintf("Valid resources on subaccount level are: "+resources+" or %s (default)",
-					output.ColorStringYellow("all"),
-				)),
-			formatHelpNote(
-				fmt.Sprintf("Valid resources on directory level are: "+resourcesDir+" or %s (default)",
-					output.ColorStringYellow("all"),
-				)),
-			formatHelpNote(
-				fmt.Sprintf("Mixing %s with other resources will throw an error.",
-					output.ColorStringYellow("all"),
-				)),
 		})
 }
 
-func getCreateJsonCmdExamples(c *cobra.Command) string {
+func getCreateJsonUsageNote(c *cobra.Command) string {
+	return getSectionWithHeader("Note", "You must specify one of --subaccount, --directory, or --environment-instance.")
+}
 
+func getCreateJsonCmdExamples(c *cobra.Command) string {
 	return generateCmdHelpCustomExamplesBlock(map[string]string{
-		"Create a JSON file with all resources of a subaccount.": fmt.Sprintf("%s %s",
-			output.ColorStringCyan("btptf create-json --subaccount"),
-			output.ColorStringYellow("[Subaccount ID]"),
+		"Create a JSON file for a directory with all of its resources": fmt.Sprintf("%s %s",
+			output.ColorStringCyan("btptf create-json --directory"),
+			output.ColorStringYellow("[directory ID]"),
 		),
-		"Create a JSON file with resources 'subaccount' and 'entitlements' only.": fmt.Sprintf("%s%s %s %s",
+		"Create a JSON file for a subaccount with all of its resources": fmt.Sprintf("%s %s",
+			output.ColorStringCyan("btptf create-json --subaccount"),
+			output.ColorStringYellow("[subaccount ID]"),
+		),
+		"Create a JSON file for the entitlements of a subaccount": fmt.Sprintf("%s%s %s %s",
 			output.ColorStringCyan("btptf create-json --resources="),
 			output.ColorStringYellow("'subaccount,entitlements'"),
 			output.ColorStringCyan("--subaccount"),
-			output.ColorStringYellow("[Subaccount ID]"),
+			output.ColorStringYellow("[subaccount ID]"),
 		),
-		"Create a JSON file with all resources of a directory.": fmt.Sprintf("%s %s",
-			output.ColorStringCyan("btptf create-json --directory"),
-			output.ColorStringYellow("[Directory ID]"),
-		),
-		"Create a JSON file with resources 'directory' and 'entitlements' on directory level only.": fmt.Sprintf("%s%s %s %s",
+
+		"Create a JSON file for the roles and role collections of a subaccount": fmt.Sprintf("%s%s %s %s",
 			output.ColorStringCyan("btptf create-json --resources="),
-			output.ColorStringYellow("'directory,entitlements'"),
-			output.ColorStringCyan("--directory"),
-			output.ColorStringYellow("[Directory ID]"),
+			output.ColorStringYellow("'roles,role-collections'"),
+			output.ColorStringCyan("--subaccount"),
+			output.ColorStringYellow("[subaccount ID]"),
 		),
 	})
 }
