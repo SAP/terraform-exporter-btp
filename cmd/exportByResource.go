@@ -40,6 +40,7 @@ var exportByResourceCmd = &cobra.Command{
 		}
 
 		tfutils.FinalizeTfConfig(configDir)
+		generateNextStepsDocument(configDir, subaccount, directory)
 		tfutils.CleanupProviderConfig()
 		output.PrintExportSuccessMessage()
 	},

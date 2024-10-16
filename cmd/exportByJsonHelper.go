@@ -60,5 +60,6 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 	}
 
 	tfutils.FinalizeTfConfig(configDir)
+	generateNextStepsDocument(configDir, subaccount, directory)
 	tfutils.CleanupProviderConfig()
 }

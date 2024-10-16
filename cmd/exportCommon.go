@@ -3,6 +3,8 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
 
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
@@ -80,4 +82,37 @@ func getUuidError(level string, iD string) string {
 		return fmt.Sprintf("Invalid directory ID: %s Please provide a valid UUID.", iD)
 	}
 	return ""
+}
+
+func generateNextStepsDocument(configDir string, subaccount string, directory string) {
+
+	level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
+
+	// remove the sring "level" from the level string
+	level = strings.ReplaceAll(level, "Level", "")
+
+	// Create a data structure to hold the data
+	inputData := output.NextStepTemplateData{
+		ConfigDir: configDir,
+		UUID:      iD,
+		Level:     level,
+	}
+
+	markdownContent := output.GetNextStepsTemplate(inputData)
+
+	currentDir, err := os.Getwd()
+
+	if err != nil {
+		fmt.Print("\r\n")
+		// Not critical, so just an informatio that this did not work
+		log.Println("error creating NextSteps.md file (getting workdir): ", err)
+	}
+
+	targetPath := filepath.Join(currentDir, configDir, "NextSteps.md")
+
+	err = files.CreateFileWithContent(targetPath, markdownContent)
+	if err != nil {
+		// Not critical, so just an informatio that this did not work
+		log.Println("error creating NextSteps.md file: ", err)
+	}
 }
