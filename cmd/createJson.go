@@ -30,6 +30,10 @@ var createJsonCmd = &cobra.Command{
 			log.Fatalln(getUuidError(level, iD))
 		}
 
+		if path == jsonFileDefault {
+			path = path + "_" + iD
+		}
+
 		output.PrintInventoryCreationStartMessage()
 		resourcesList := tfutils.GetResourcesList(resources, level)
 		createJson(subaccount, directory, path, resourcesList)

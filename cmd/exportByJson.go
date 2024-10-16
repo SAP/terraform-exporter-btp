@@ -34,6 +34,10 @@ var exportByJsonCmd = &cobra.Command{
 			configDir = configDir + "_" + iD
 		}
 
+		if path == jsonFileDefault {
+			path = path + "_" + iD
+		}
+
 		output.PrintExportStartMessage()
 		exportByJson(subaccount, directory, path, tfConfigFileName, configDir)
 		output.PrintExportSuccessMessage()
