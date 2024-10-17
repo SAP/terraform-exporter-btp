@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 	"strings"
 
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
@@ -92,12 +93,16 @@ func getExportByJsonCmdDescriptionNote(c *cobra.Command) string {
 }
 
 func getExportByJsonCmdExamples(c *cobra.Command) string {
+
+	filePathSubaccount := filepath.Join("BTP", "resources", "my-btp-subaccount.json")
+	filePathDirectory := filepath.Join("BTP", "resources", "my-btp-directory.json")
+
 	return generateCmdHelpCustomExamplesBlock(map[string]string{
 		"Export the resources of a directory that are listed in a JSON with a custom file name and in a custom directory": fmt.Sprintf("%s %s %s %s",
 			output.ColorStringCyan("btptf export-by-json --directory"),
 			output.ColorStringYellow("[directory ID]"),
 			output.ColorStringCyan("--path"),
-			output.ColorStringYellow("'\\BTP\\resources\\my-btp-directory.json'"),
+			output.ColorStringYellow("'"+filePathDirectory+"'"),
 		),
 		"Export the resources of a directory from JSON file from the default directory": fmt.Sprintf("%s %s",
 			output.ColorStringCyan("btptf export-by-json --directory"),
@@ -107,7 +112,7 @@ func getExportByJsonCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("btptf export-by-json --subaccount"),
 			output.ColorStringYellow("[subaccount ID]"),
 			output.ColorStringCyan("--path"),
-			output.ColorStringYellow("'\\BTP\\resources\\my-btp-subaccount.json'"),
+			output.ColorStringYellow("'"+filePathSubaccount+"'"),
 		),
 		"Export the resources of a subaccount that are listed in the JSON file from the default directory": fmt.Sprintf("%s %s",
 			output.ColorStringCyan("btptf export-by-json --subaccount"),
