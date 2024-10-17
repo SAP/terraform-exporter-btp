@@ -14,6 +14,7 @@ env:
   BTP_CLI_SERVER_URL: ${{ secrets.BTP_CLI_SERVER_URL }}
   BTP_GLOBALACCOUNT: ${{ secrets.BTP_GLOBALACCOUNT }}
   BTP_SUBACCOUNT: ${{ secrets.BTP_SUBACCOUNT }}
+
 jobs:
   setup_infrastructure:
     name: ExporterTests
@@ -22,17 +23,21 @@ jobs:
       - name: Check out Git repository
         id: checkout_repo
         uses: actions/checkout@v4
+
       - uses: actions/setup-go@v4
         with:
           go-version-file: 'go.mod'
           cache: true
+
       - run: go mod download
+
       - name: Build Exporter
         id: build_exporter
         run: |
           make install
+
       - name: Export All Resources
-        id : setup_exporter
+        id: setup_exporter
         shell: bash
         run: |
           export PATH=$PATH:/home/runner/go/bin/
@@ -41,3 +46,25 @@ jobs:
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
           export BTP_SUBACCOUNT=${{ secrets.BTP_SUBACCOUNT }}
           btptf export --subaccount ${BTP_SUBACCOUNT}
+
+      - name: Test Generated Output
+        id: test_output
+        shell: bash
+        run: |
+          GENERATED_FOLDER=$(find . -type d -name "generated_configurations_*" | head -n 1)
+
+          if [ -z "$GENERATED_FOLDER" ]; then
+            echo "Generated folder not found!"  
+            exit 1
+          fi
+          echo "Found generated folder: $GENERATED_FOLDER"
+
+          MATCH=$(grep -rl "${BTP_SUBACCOUNT}" "$GENERATED_FOLDER")
+
+          if [ -z "$MATCH" ]; then
+            echo "Subaccount ID ${BTP_SUBACCOUNT} not found."
+            exit 1
+          else
+            echo "Subaccount ID ${BTP_SUBACCOUNT} is found:"
+            echo "$MATCH"
+          fi
