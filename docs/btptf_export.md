@@ -9,7 +9,7 @@ btptf export [flags]
 ### Options
 
 ```
-  -c, --config-dir string   directory for the Terraform code (default "generated_configurations_<account-id>")
+  -c, --config-dir string   Directory for the Terraform code (default "generated_configurations_<account-id>")
   -d, --directory string    ID of the directory
   -h, --help                help for export
   -r, --resources string    Comma-separated list of resources to be included (default "all")
