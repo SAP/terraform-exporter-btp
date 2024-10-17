@@ -6,7 +6,7 @@ Terraform Exporter for SAP BTP
 
 ```
   -h, --help      help for btptf
-      --verbose   Display verbose output in the console for debugging.
+      --verbose    Enable verbose output for debugging
 ```
 
 ### SEE ALSO

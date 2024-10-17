@@ -11,15 +11,15 @@ btptf create-json [flags]
 ```
   -d, --directory string    ID of the directory
   -h, --help                help for create-json
-  -p, --path string         path to JSON file with list of resources (default "btpResources.json")
-  -r, --resources string    comma seperated string for resources (default "all")
+  -p, --path string         Full path to JSON file with list of resources (default: 'btpResources_<account-id>.json') (default "btpResources.json")
+  -r, --resources string    Comma-separated list of resources to be included (default: 'all') (default "all")
   -s, --subaccount string   ID of the subaccount
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --verbose   Display verbose output in the console for debugging.
+      --verbose    Enable verbose output for debugging
 ```
 
 ### SEE ALSO

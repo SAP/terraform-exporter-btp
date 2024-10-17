@@ -9,17 +9,17 @@ btptf export-by-json [flags]
 ### Options
 
 ```
-  -c, --config-dir string   folder for config generation (default "generated_configurations")
+  -c, --config-dir string   directory for the Terraform code (default "generated_configurations")
   -d, --directory string    ID of the directory
   -h, --help                help for export-by-json
-  -p, --path string         path to JSON file with list of resources (default "btpResources.json")
+  -p, --path string         Full path to JSON file with list of resources (default "btpResources.json")
   -s, --subaccount string   ID of the subaccount
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --verbose   Display verbose output in the console for debugging.
+      --verbose    Enable verbose output for debugging
 ```
 
 ### SEE ALSO

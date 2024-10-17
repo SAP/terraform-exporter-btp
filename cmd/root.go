@@ -32,6 +32,7 @@ func init() {
 	_ = viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 	rootCmd.AddCommand(docCmd)
 	rootCmd.SetHelpTemplate(generateCmdHelp(rootCmd, templateOptions))
+	rootCmd.SetUsageTemplate(generateCmdHelp(rootCmd, templateOptions))
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

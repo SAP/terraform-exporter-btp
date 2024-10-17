@@ -69,6 +69,7 @@ func init() {
 	rootCmd.AddCommand(exportByResourceCmd)
 
 	exportByResourceCmd.SetHelpTemplate(generateCmdHelp(exportByResourceCmd, templateOptions))
+	exportByResourceCmd.SetHelpTemplate(generateCmdHelp(exportByResourceCmd, templateOptions))
 }
 
 func getExportByResourceCmdDescription(c *cobra.Command) string {
