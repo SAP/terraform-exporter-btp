@@ -7,7 +7,6 @@ import (
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/cobra/doc"
 	"github.com/spf13/viper"
 )
 
@@ -49,22 +48,8 @@ var docCmd = &cobra.Command{
 	Short:  "Generate markdown documentation",
 	Hidden: true, // Hide the command from the official CLI
 	Run: func(cmd *cobra.Command, args []string) {
-		docsDir := "./docs"
-		if err := os.MkdirAll(docsDir, os.ModePerm); err != nil {
-			errorMsg := output.ColorStringLightRed("error creating docs directory:")
-			fmt.Println(errorMsg, err)
-			os.Exit(1)
-		}
 
-		err := doc.GenMarkdownTree(rootCmd, docsDir)
-		if err != nil {
-			errorMsg := output.ColorStringLightRed("error generating documentation:")
-			fmt.Println(errorMsg, err)
-			os.Exit(1)
-		}
-
-		successMsg := output.ColorStringLightGreen("Documentation generated successfully in:")
-		fmt.Println(successMsg, docsDir)
+		generateMarkdown(rootCmd)
 	},
 }
 
