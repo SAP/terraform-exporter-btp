@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
@@ -28,7 +29,8 @@ var exportByResourceCmd = &cobra.Command{
 		}
 
 		if configDir == configDirDefault {
-			configDir = configDir + "_" + iD
+			configDirParts := strings.Split(configDir, "_")
+			configDir = configDirParts[0] + "_" + configDirParts[1] + "_" + iD
 		}
 
 		output.PrintExportStartMessage()
@@ -47,10 +49,18 @@ var exportByResourceCmd = &cobra.Command{
 }
 
 func init() {
-	templateOptions := generateCmdHelpOptions{
+	templateOptionsHelp := generateCmdHelpOptions{
 		Description:     getExportByResourceCmdDescription,
 		DescriptionNote: getExportCmdDescriptionNote,
 		Examples:        getExportByResourceCmdExamples,
+	}
+
+	templateOptionsUsage := generateCmdHelpOptions{
+		Description:     getEmtptySection,
+		DescriptionNote: getEmtptySection,
+		Examples:        getCreateJsonCmdExamples,
+		Debugging:       getEmtptySection,
+		Footer:          getEmtptySection,
 	}
 
 	var resources string
@@ -63,12 +73,13 @@ func init() {
 	exportByResourceCmd.MarkFlagsOneRequired("subaccount", "directory")
 	exportByResourceCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
 
-	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "folder for config generation")
-	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")
+	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
+	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
 
 	rootCmd.AddCommand(exportByResourceCmd)
 
-	exportByResourceCmd.SetHelpTemplate(generateCmdHelp(exportByResourceCmd, templateOptions))
+	exportByResourceCmd.SetHelpTemplate(generateCmdHelp(exportByResourceCmd, templateOptionsHelp))
+	exportByResourceCmd.SetUsageTemplate(generateCmdHelp(exportByResourceCmd, templateOptionsUsage))
 }
 
 func getExportByResourceCmdDescription(c *cobra.Command) string {
@@ -95,13 +106,11 @@ func getExportByResourceCmdDescription(c *cobra.Command) string {
 	return generateCmdHelpDescription(mainText,
 		[]string{
 			formatHelpNote(
-				fmt.Sprintf("For directories: "+resourcesDir+" or %s (default)",
-					output.ColorStringYellow("all"),
-				)),
+				fmt.Sprint("For directories: " + resourcesDir),
+			),
 			formatHelpNote(
-				fmt.Sprintf("For subaccounts: "+resources+" or %s (default)",
-					output.ColorStringYellow("all"),
-				)),
+				fmt.Sprint("For subaccounts: " + resources),
+			),
 			formatHelpNote(
 				"For environment instances: TBD",
 			),

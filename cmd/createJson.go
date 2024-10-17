@@ -32,8 +32,8 @@ var createJsonCmd = &cobra.Command{
 		}
 
 		if path == jsonFileDefault {
-			pathParts := strings.Split(path, ".")
-			path = pathParts[0] + "_" + iD + "." + pathParts[1]
+			pathParts := strings.Split(path, "_")
+			path = pathParts[0] + "_" + iD + ".json"
 		}
 
 		output.PrintInventoryCreationStartMessage()
@@ -44,10 +44,18 @@ var createJsonCmd = &cobra.Command{
 }
 
 func init() {
-	templateOptions := generateCmdHelpOptions{
+	templateOptionsHelp := generateCmdHelpOptions{
 		Description:     getCreateJsonCmdDescription,
 		DescriptionNote: getCreateJsonUsageNote,
 		Examples:        getCreateJsonCmdExamples,
+	}
+
+	templateOptionsUsage := generateCmdHelpOptions{
+		Description:     getEmtptySection,
+		DescriptionNote: getEmtptySection,
+		Examples:        getCreateJsonCmdExamples,
+		Debugging:       getEmtptySection,
+		Footer:          getEmtptySection,
 	}
 
 	var path string
@@ -59,12 +67,13 @@ func init() {
 	createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
 	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
 	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
-	createJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")
-	createJsonCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")
+	createJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")
+	createJsonCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
 
 	rootCmd.AddCommand(createJsonCmd)
 
-	createJsonCmd.SetHelpTemplate(generateCmdHelp(createJsonCmd, templateOptions))
+	createJsonCmd.SetHelpTemplate(generateCmdHelp(createJsonCmd, templateOptionsHelp))
+	createJsonCmd.SetUsageTemplate(generateCmdHelp(createJsonCmd, templateOptionsUsage))
 }
 
 func getCreateJsonCmdDescription(c *cobra.Command) string {
@@ -94,13 +103,11 @@ Depending on the account level you specify, the JSON file will include the follo
 	return generateCmdHelpDescription(mainText,
 		[]string{
 			formatHelpNote(
-				fmt.Sprintf("For directories: "+resourcesDir+" or %s (default)",
-					output.ColorStringYellow("all"),
-				)),
+				fmt.Sprint("For directories: " + resourcesDir),
+			),
 			formatHelpNote(
-				fmt.Sprintf("For subaccounts: "+resources+" or %s (default)",
-					output.ColorStringYellow("all"),
-				)),
+				fmt.Sprint("For subaccounts: " + resources),
+			),
 			formatHelpNote(
 				"For environment instances: TBD",
 			),

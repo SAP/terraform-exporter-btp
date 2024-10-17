@@ -15,8 +15,8 @@ import (
 )
 
 const tfConfigFileName = "btp_resources.tf"
-const configDirDefault = "generated_configurations"
-const jsonFileDefault = "btpResources.json"
+const configDirDefault = "generated_configurations_<account-id>"
+const jsonFileDefault = "btpResources_<account-id>.json"
 
 func generateConfigForResource(resource string, values []string, subaccountId string, directoryId string, configDir string, resourceFileName string) {
 	tempConfigDir := resource + "-config"

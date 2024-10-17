@@ -26,6 +26,8 @@ type generateCmdHelpOptions struct {
 	Commands        cmdHelpGenerator
 	Examples        cmdHelpGenerator
 	Flags           cmdHelpGenerator
+	Debugging       cmdHelpGenerator
+	PreFooter       cmdHelpGenerator
 	Footer          cmdHelpGenerator
 }
 
@@ -70,8 +72,8 @@ func generateCmdHelp(
 		getGeneratorOrDefault(options.Commands, getCmdHelpDefaultCommands)(cmd),
 		getGeneratorOrDefault(options.Flags, getCmdHelpDefaultFlags)(cmd),
 		getGeneratorOrDefault(options.Examples, getCmdDefaultExamples)(cmd),
-		getDebuggerFooter(cmd),
-		getPreFooter(cmd),
+		getGeneratorOrDefault(options.Debugging, getDebuggerFooter)(cmd),
+		getGeneratorOrDefault(options.PreFooter, getPreFooter)(cmd),
 		getGeneratorOrDefault(options.Footer, getCmdHelpDefaultFooter)(cmd),
 	)
 }
@@ -337,4 +339,8 @@ func getDebuggerFooter(cmd *cobra.Command) string {
 
 func getSectionWithHeader(title, content string) string {
 	return fmt.Sprintf("%s\n%s\n\n", output.BoldString(title), content)
+}
+
+func getEmtptySection(cmd *cobra.Command) string {
+	return ""
 }

@@ -9,17 +9,17 @@ btptf export [flags]
 ### Options
 
 ```
-  -c, --config-dir string   folder for config generation (default "generated_configurations")
+  -c, --config-dir string   Directory for the Terraform code (default "generated_configurations_<account-id>")
   -d, --directory string    ID of the directory
   -h, --help                help for export
-  -r, --resources string    comma seperated string for resources (default "all")
+  -r, --resources string    Comma-separated list of resources to be included (default "all")
   -s, --subaccount string   ID of the subaccount
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --verbose   Display verbose output in the console for debugging.
+      --verbose    Enable verbose output for debugging
 ```
 
 ### SEE ALSO
