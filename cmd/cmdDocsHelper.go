@@ -20,12 +20,13 @@ type cmdHelpGenerator func(cmd *cobra.Command) string
 
 // generateCmdHelpOptions defines settings to control the text description for displaying the commands' help.
 type generateCmdHelpOptions struct {
-	Description cmdHelpGenerator
-	Usage       cmdHelpGenerator
-	Commands    cmdHelpGenerator
-	Examples    cmdHelpGenerator
-	Flags       cmdHelpGenerator
-	Footer      cmdHelpGenerator
+	Description     cmdHelpGenerator
+	DescriptionNote cmdHelpGenerator
+	Usage           cmdHelpGenerator
+	Commands        cmdHelpGenerator
+	Examples        cmdHelpGenerator
+	Flags           cmdHelpGenerator
+	Footer          cmdHelpGenerator
 }
 
 /*
@@ -62,8 +63,9 @@ func generateCmdHelp(
 		return defaultOption
 	}
 
-	return fmt.Sprintf("\n%s%s%s%s%s%s%s%s\n",
+	return fmt.Sprintf("\n%s%s%s%s%s%s%s%s%s\n",
 		getGeneratorOrDefault(options.Description, getCmdHelpDefaultDescription)(cmd),
+		getGeneratorOrDefault(options.DescriptionNote, getCmdHelpDefaultDescriptionNote)(cmd),
 		getGeneratorOrDefault(options.Usage, getCmdHelpDefaultUsage)(cmd),
 		getGeneratorOrDefault(options.Commands, getCmdHelpDefaultCommands)(cmd),
 		getGeneratorOrDefault(options.Flags, getCmdHelpDefaultFlags)(cmd),
@@ -85,6 +87,10 @@ func getCmdHelpDefaultUsage(cmd *cobra.Command) string {
 		output.BoldString("Usage"),
 		"{{if .Runnable}}{{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}{{.CommandPath}} [command]{{end}}",
 	)
+}
+
+func getCmdHelpDefaultDescriptionNote(cmd *cobra.Command) string {
+	return ""
 }
 
 // getCmdHelpDefaultCommands provides the default implementation for displaying the help commands section.
@@ -327,4 +333,8 @@ func getDebuggerFooter(cmd *cobra.Command) string {
 	}
 	return ""
 
+}
+
+func getSectionWithHeader(title, content string) string {
+	return fmt.Sprintf("%s\n%s\n\n", output.BoldString(title), content)
 }

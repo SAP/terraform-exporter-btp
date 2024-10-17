@@ -1,6 +1,6 @@
 ## btptf create-json
 
-Store the list of resources in a subaccount into a JSON file
+Create a JSON file with a list of resources
 
 ```
 btptf create-json [flags]

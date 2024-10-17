@@ -13,6 +13,12 @@ import (
 	"github.com/theckman/yacspin"
 )
 
+type NextStepTemplateData struct {
+	ConfigDir string
+	UUID      string
+	Level     string
+}
+
 func createSpinner(message string) (*yacspin.Spinner, error) {
 	cfg := yacspin.Config{
 		Frequency:         100 * time.Millisecond,
@@ -159,4 +165,41 @@ func BoldString(s string) string {
 
 func AsLink(s string) string {
 	return color.HiCyanString(s)
+}
+
+func GetNextStepsTemplate(input NextStepTemplateData) string {
+	return fmt.Sprintf(`# Next Steps
+
+## Status Quo
+
+After executing the *btptf* CLI you have now created the Terraform configuration in the directory %s as well as the Terraform [import blocks](https://developer.hashicorp.com/terraform/language/import) needed to import the state of the configuration of the %s with ID %s.
+
+With this in place you can further proceed to bring the resources under the management of Terraform. The following section will give you some advice on the next steps.
+
+## Next Steps
+
+### Review of Configuration
+
+You should in any case review the configuration. While being technically valid, the configuration might not reflect the way you would want to have the configuration be done. Therefore the first step should always be a review by one of the experts to validate the generated code. This also comprises the provider configuration especially the version constraints defined there.
+
+### CleanUp of Configuration
+
+The configuration is generated based on the information available from the provider plugin. All data including default data is added to the configuration. To reduce the amount of data you could remove optional attributes that are optional and you do not want to have set explicitly.
+
+### Addition of Variables
+
+The generated code does not contain any variables. It makes sense to put at least the value of the subdomain of the global account in the *provider.tf* file as well as the ID %s as variables. Depending on your requirements you would also want to add further parameters to the variable list.
+
+### Adding Dependencies
+
+The export is not capable of detecting explicit dependencies. This must be manually added. One typical scenario is the dependency between entitlements and the services/subscriptions that are defined in your configuration.
+
+### Adding State Backend
+
+The state of your configuration should be stored in a remote state backend. Make sure to add the corresponding configuration. You find more details in the [Terraform documentation](https://developer.hashicorp.com/terraform/language/backend)
+
+### State Import
+
+If you have finished the refinement of the configuration you can trigger the import of the state via *terraform apply*
+`, input.ConfigDir, input.Level, input.UUID, input.UUID)
 }

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -13,6 +14,7 @@ import (
 
 func createJson(subaccount string, directory string, fileName string, resources []string) {
 	if len(resources) == 0 {
+		fmt.Print("\r\n")
 		log.Fatal("please provide the btp resources you want to get using --resources flag or provide 'all' to get all resources")
 	}
 
@@ -23,18 +25,21 @@ func createJson(subaccount string, directory string, fileName string, resources 
 	result, err := tfutils.ReadDataSources(subaccount, directory, resources)
 	if err != nil {
 		tfutils.CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("error reading data sources: %v", err)
 	}
 
 	jsonBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		tfutils.CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("error processing JSON of data source: %s", err)
 	}
 
 	currentDir, err := os.Getwd()
 	if err != nil {
 		tfutils.CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("error getting current directory: %s", err)
 	}
 
@@ -42,6 +47,7 @@ func createJson(subaccount string, directory string, fileName string, resources 
 	err = files.CreateFileWithContent(dataBlockFile, string(jsonBytes))
 	if err != nil {
 		tfutils.CleanupProviderConfig()
+		fmt.Print("\r\n")
 		log.Fatalf("create file %s failed!", dataBlockFile)
 	}
 

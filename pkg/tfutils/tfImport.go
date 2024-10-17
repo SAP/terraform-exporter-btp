@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
@@ -58,6 +59,10 @@ const (
 	DirectoryRoleCollectionType string = "btp_directory_role_collection"
 )
 
+const DirectoryFeatureDefault string = "DEFAULT"
+const DirectoryFeatureEntitlements string = "ENTITLEMENTS"
+const DirectoryFeatureRoles string = "AUTHORIZATIONS"
+
 const DataSourcesKind DocKind = "data-sources"
 const ResourcesKind DocKind = "resources"
 
@@ -83,7 +88,9 @@ func FetchImportConfiguration(subaccountId string, directoryId string, resourceT
 		return nil, fmt.Errorf("create file %s failed: %v", dataBlockFile, err)
 	}
 
-	jsonBytes, err := getTfStateData(tmpFolder, resourceType)
+	_, iD := GetExecutionLevelAndId(subaccountId, directoryId)
+
+	jsonBytes, err := getTfStateData(tmpFolder, resourceType, iD)
 	if err != nil {
 		return nil, fmt.Errorf("error getting Terraform state data: %v", err)
 	}
@@ -110,6 +117,7 @@ func GetDocByResourceName(kind DocKind, resourceName string) (EntityDocs, error)
 
 	doc, err := GetDocsForResource("SAP", "btp", "btp", kind, choice, BtpProviderVersion, "github.com")
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("read doc failed for %s, %s: %v", kind, choice, err)
 		return EntityDocs{}, err
 	}
@@ -160,8 +168,23 @@ func TranslateResourceParamToTechnicalName(resource string, level string) string
 func ReadDataSources(subaccountId string, directoryId string, resourceList []string) (btpResources BtpResources, err error) {
 
 	var btpResourcesList []BtpResource
+	var featureListMemory []string
+
+	level, _ := GetExecutionLevelAndId(subaccountId, directoryId)
+
 	for _, resource := range resourceList {
-		values, err := generateDataSourcesForList(subaccountId, directoryId, resource)
+
+		if !resourceIsProcessable(level, resource, featureListMemory) {
+			continue
+		}
+
+		values, featureList, err := generateDataSourcesForList(subaccountId, directoryId, resource)
+
+		if resource == CmdDirectoryParameter {
+			// Store the features of the directory for later use
+			featureListMemory = featureList
+		}
+
 		if err != nil {
 			error := fmt.Errorf("error generating data sources: %v", err)
 			return BtpResources{}, error
@@ -206,32 +229,38 @@ func readDataSource(subaccountId string, directoryId string, resourceName string
 	return dataBlock, nil
 }
 
-func getTfStateData(configDir string, resourceName string) ([]byte, error) {
+func getTfStateData(configDir string, resourceName string, identifier string) ([]byte, error) {
 	execPath, err := exec.LookPath("terraform")
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error finding Terraform: %v", err)
 		return nil, err
 	}
 	// create a new Terraform instance
 	tf, err := tfexec.NewTerraform(configDir, execPath)
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error running NewTerraform: %v", err)
 		return nil, err
 	}
 
 	err = tf.Init(context.Background(), tfexec.Upgrade(true))
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error running Init: %v", err)
 		return nil, err
 	}
 	err = tf.Apply(context.Background())
 	if err != nil {
+		err = handleNotFoundError(err, resourceName, identifier)
+		fmt.Print("\r\n")
 		log.Fatalf("error running Apply: %v", err)
 		return nil, err
 	}
 
 	state, err := tf.Show(context.Background())
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error running Show: %v", err)
 		return nil, err
 	}
@@ -246,6 +275,7 @@ func getTfStateData(configDir string, resourceName string) ([]byte, error) {
 	}
 
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error json.Marshal: %v", err)
 		return nil, err
 	}
@@ -317,41 +347,41 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 	return stringArr
 }
 
-func generateDataSourcesForList(subaccountId string, directoryId string, resourceName string) ([]string, error) {
+func generateDataSourcesForList(subaccountId string, directoryId string, resourceName string) ([]string, []string, error) {
 	dataBlockFile := filepath.Join(TmpFolder, "main.tf")
 	var jsonBytes []byte
 
-	level, _ := GetExecutionLevelAndId(subaccountId, directoryId)
+	level, iD := GetExecutionLevelAndId(subaccountId, directoryId)
 
 	btpResourceType := TranslateResourceParamToTechnicalName(resourceName, level)
 
 	dataBlock, err := readDataSource(subaccountId, directoryId, btpResourceType)
 	if err != nil {
 		error := fmt.Errorf("error reading data source: %s", err)
-		return nil, error
+		return nil, nil, error
 	}
 
 	err = files.CreateFileWithContent(dataBlockFile, dataBlock)
 	if err != nil {
 		error := fmt.Errorf("error creating file %s", dataBlockFile)
-		return nil, error
+		return nil, nil, error
 	}
 
-	jsonBytes, err = getTfStateData(TmpFolder, btpResourceType)
+	jsonBytes, err = getTfStateData(TmpFolder, btpResourceType, iD)
 	if err != nil {
 		error := fmt.Errorf("error fetching Terraform data: %s", err)
-		return nil, error
+		return nil, nil, error
 	}
 
 	var data map[string]interface{}
 
 	err = json.Unmarshal(jsonBytes, &data)
 	if err != nil {
-		log.Fatalf("error: %s", err)
-		return nil, err
+		error := fmt.Errorf("error unmarshelling JSON: %s", err)
+		return nil, nil, error
 	}
-
-	return transformDataToStringArray(btpResourceType, data), nil
+	// TODO surface the features of the directory stored in data["features"].([]interface{}) analogy to subscription in transform method
+	return transformDataToStringArray(btpResourceType, data), extractFeatureList(data, btpResourceType), nil
 }
 
 func runTerraformCommand(args ...string) error {
@@ -375,4 +405,53 @@ func GetExecutionLevelAndId(subaccountID string, directoryID string) (level stri
 		return DirectoryLevel, directoryID
 	}
 	return "", ""
+}
+
+func handleNotFoundError(err error, resourceName string, iD string) error {
+	if strings.Contains(err.Error(), "404") {
+		// if it is a 404 error it is probably thw wrong ID, so we return a more readible error message
+		if resourceName == DirectoryType {
+			return fmt.Errorf("the directory with ID %s was not found. Check that the values for directory ID and globalaccount subdomain are valid", iD)
+
+		} else if resourceName == SubaccountType {
+			return fmt.Errorf("the subaccount with ID %s was not found. Check that the values for subaccount ID and globalaccount subdomain are valid", iD)
+		}
+	}
+	return err
+}
+
+func extractFeatureList(data map[string]interface{}, resourceName string) []string {
+
+	featureList := []string{}
+
+	if resourceName == DirectoryType {
+		features := data["features"].([]interface{})
+		var featureList []string
+		for _, feature := range features {
+			featureList = append(featureList, fmt.Sprintf("%v", feature.(string)))
+		}
+		return featureList
+	}
+
+	return featureList
+
+}
+
+func resourceIsProcessable(level string, resource string, featureList []string) bool {
+
+	// Only relevant for directory resources due to unmanaged and managed directories
+	if level != DirectoryLevel {
+		return true
+	}
+
+	// Check if the resource is processable based on the feature list
+	if resource == CmdEntitlementParameter && !slices.Contains(featureList, DirectoryFeatureEntitlements) {
+		return false
+	}
+
+	if (resource == CmdRoleParameter || resource == CmdRoleCollectionParameter) && !slices.Contains(featureList, DirectoryFeatureRoles) {
+		return false
+	}
+
+	return true
 }

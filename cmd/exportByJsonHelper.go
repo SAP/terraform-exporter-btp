@@ -14,6 +14,7 @@ import (
 func exportByJson(subaccount string, directory string, jsonfile string, resourceFile string, configDir string) {
 	jsonFile, err := os.Open(jsonfile)
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error opening JSON file with resources: %v", err)
 	}
 
@@ -21,6 +22,7 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 
 	byteValue, err := io.ReadAll(jsonFile)
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error reading JSON file: %v", err)
 	}
 
@@ -28,6 +30,7 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 
 	err = json.Unmarshal(byteValue, &resources)
 	if err != nil {
+		fmt.Print("\r\n")
 		log.Fatalf("error unmarshalling JSON file: %v", err)
 	}
 
@@ -57,5 +60,6 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 	}
 
 	tfutils.FinalizeTfConfig(configDir)
+	generateNextStepsDocument(configDir, subaccount, directory)
 	tfutils.CleanupProviderConfig()
 }

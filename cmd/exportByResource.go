@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
@@ -12,7 +13,7 @@ import (
 // exportByResourceCmd represents the exportAll command
 var exportByResourceCmd = &cobra.Command{
 	Use:               "export",
-	Short:             "Export resources of a subaccount",
+	Short:             "Export resources from SAP BTP",
 	DisableAutoGenTag: true,
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
@@ -21,6 +22,10 @@ var exportByResourceCmd = &cobra.Command{
 		resources, _ := cmd.Flags().GetString("resources")
 
 		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
+
+		if !isValidUuid(iD) {
+			log.Fatalln(getUuidError(level, iD))
+		}
 
 		if configDir == configDirDefault {
 			configDir = configDir + "_" + iD
@@ -35,6 +40,7 @@ var exportByResourceCmd = &cobra.Command{
 		}
 
 		tfutils.FinalizeTfConfig(configDir)
+		generateNextStepsDocument(configDir, subaccount, directory)
 		tfutils.CleanupProviderConfig()
 		output.PrintExportSuccessMessage()
 	},
@@ -42,8 +48,9 @@ var exportByResourceCmd = &cobra.Command{
 
 func init() {
 	templateOptions := generateCmdHelpOptions{
-		Description: getExportByResourceCmdDescription,
-		Examples:    getExportByResourceCmdExamples,
+		Description:     getExportByResourceCmdDescription,
+		DescriptionNote: getExportCmdDescriptionNote,
+		Examples:        getExportByResourceCmdExamples,
 	}
 
 	var resources string
@@ -61,7 +68,6 @@ func init() {
 
 	rootCmd.AddCommand(exportByResourceCmd)
 
-	exportByResourceCmd.SetUsageTemplate(generateCmdHelp(exportByResourceCmd, templateOptions))
 	exportByResourceCmd.SetHelpTemplate(generateCmdHelp(exportByResourceCmd, templateOptions))
 }
 
@@ -70,55 +76,83 @@ func getExportByResourceCmdDescription(c *cobra.Command) string {
 	var resources string
 	for i, resource := range tfutils.AllowedResourcesSubaccount {
 		if i == 0 {
-			resources = output.ColorStringYellow(resource)
+			resources = resource
 		} else {
-			resources = resources + ", " + output.ColorStringYellow(resource)
+			resources = resources + ", " + resource
 		}
 	}
 
-	return generateCmdHelpDescription(c.Short,
+	var resourcesDir string
+	for i, resource := range tfutils.AllowedResourcesDirectory {
+		if i == 0 {
+			resourcesDir = resource
+		} else {
+			resourcesDir = resourcesDir + ", " + resource
+		}
+	}
+
+	mainText := `Use this command to export resources from SAP BTP per account level (subaccount, directory, or environment instance). The command will create a directory with the Terraform configuration files and import blocks for the following resources in your specified account level:`
+	return generateCmdHelpDescription(mainText,
 		[]string{
 			formatHelpNote(
-				"Use this command to export SAP BTP resources specified by subaccount ID and, optionally, resource types.",
+				fmt.Sprintf("For directories: "+resourcesDir+" or %s (default)",
+					output.ColorStringYellow("all"),
+				)),
+			formatHelpNote(
+				fmt.Sprintf("For subaccounts: "+resources+" or %s (default)",
+					output.ColorStringYellow("all"),
+				)),
+			formatHelpNote(
+				"For environment instances: TBD",
 			),
-			formatHelpNote(
-				fmt.Sprintf("By default, the command will export all resources of a subaccount. "+
-					"You can specify a subset with the %s flag.",
-					output.ColorStringCyan("--resources"),
-				)),
-			formatHelpNote(
-				fmt.Sprintf("Valid resources are: "+resources+" or %s (default)",
-					output.ColorStringYellow("all"),
-				)),
-			formatHelpNote(
-				fmt.Sprintf("Mixing %s with other resources will throw an error.",
-					output.ColorStringYellow("all"),
-				)),
 		})
+}
+
+func getExportCmdDescriptionNote(c *cobra.Command) string {
+	point1 := formatHelpNote("We recommend to run this command only if you’re familiar with the Terraform resources in your SAP BTP accounts. For a safer approach, use 'btptf export-by-json'.")
+	point2 := formatHelpNote("You must specify one of --subaccount, --directory, or --environment-instance.")
+
+	content := fmt.Sprintf("%s\n%s", point1, point2)
+
+	return getSectionWithHeader("Note", content)
 }
 
 func getExportByResourceCmdExamples(c *cobra.Command) string {
 
 	return generateCmdHelpCustomExamplesBlock(map[string]string{
-		"Export a subaccount together with all its contained resources.": fmt.Sprintf("%s %s",
-			output.ColorStringCyan("btptf export --subaccount"),
-			output.ColorStringYellow("[Subaccount ID]"),
-		),
-		"Export a subaccount with entitlements only.": fmt.Sprintf("%s %s %s%s",
-			output.ColorStringCyan("btptf export --subaccount"),
-			output.ColorStringYellow("[Subaccount ID]"),
-			output.ColorStringCyan("--resources="),
-			output.ColorStringYellow("'subaccount,entitlements'"),
-		),
-		"Export a diretory together with all its contained resources.": fmt.Sprintf("%s %s",
+		"Export a directory that manages entitlements, but no users": fmt.Sprintf("%s %s %s %s",
 			output.ColorStringCyan("btptf export --directory"),
-			output.ColorStringYellow("[Directory ID]"),
-		),
-		"Export a directory with entitlements only.": fmt.Sprintf("%s %s %s%s",
-			output.ColorStringCyan("btptf export --directory"),
-			output.ColorStringYellow("[Directory ID]"),
-			output.ColorStringCyan("--resources="),
+			output.ColorStringYellow("[directory ID]"),
+			output.ColorStringCyan("--resources"),
 			output.ColorStringYellow("'directory,entitlements'"),
+		),
+		"Export a directory that doesn't manage entitlements or users": fmt.Sprintf("%s %s %s %s",
+			output.ColorStringCyan("btptf export --directory"),
+			output.ColorStringYellow("[directory ID]"),
+			output.ColorStringCyan("--resources"),
+			output.ColorStringYellow("'directory'"),
+		),
+		"Export a directory that manages entitlements and users": fmt.Sprintf("%s %s",
+			output.ColorStringCyan("btptf export-by-json --directory"),
+			output.ColorStringYellow("[directory ID]"),
+		),
+		"Export the entitlements of a subaccount": fmt.Sprintf("%s %s %s %s",
+			output.ColorStringCyan("btptf export --subaccount"),
+			output.ColorStringYellow("[subaccount ID]"),
+			output.ColorStringCyan("--resources"),
+			output.ColorStringYellow("'entitlements'"),
+		),
+		"Export the subscriptions of a subaccount": fmt.Sprintf("%s %s %s %s",
+			output.ColorStringCyan("btptf export --subaccount"),
+			output.ColorStringYellow("[subaccount ID]"),
+			output.ColorStringCyan("--resources"),
+			output.ColorStringYellow("'subscriptions'"),
+		),
+		"Export the roles and role collections of a subaccount": fmt.Sprintf("%s %s %s %s",
+			output.ColorStringCyan("btptf export --subaccount"),
+			output.ColorStringYellow("[subaccount ID]"),
+			output.ColorStringCyan("--resources"),
+			output.ColorStringYellow("'roles,role-collections'"),
 		),
 	})
 }
