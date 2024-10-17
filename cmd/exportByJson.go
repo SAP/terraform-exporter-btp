@@ -32,12 +32,13 @@ var exportByJsonCmd = &cobra.Command{
 		}
 
 		if configDir == configDirDefault {
-			configDir = configDir + "_" + iD
+			configDirParts := strings.Split(configDir, "_")
+			configDir = configDirParts[0] + "_" + configDirParts[1] + "_" + iD
 		}
 
 		if path == jsonFileDefault {
-			pathParts := strings.Split(path, ".")
-			path = pathParts[0] + "_" + iD + "." + pathParts[1]
+			pathParts := strings.Split(path, "_")
+			path = pathParts[0] + "_" + iD + ".json"
 		}
 
 		output.PrintExportStartMessage()
@@ -47,10 +48,18 @@ var exportByJsonCmd = &cobra.Command{
 }
 
 func init() {
-	templateOptions := generateCmdHelpOptions{
+	templateOptionsHelp := generateCmdHelpOptions{
 		Description:     getExportByJsonCmdDescription,
 		DescriptionNote: getExportByJsonCmdDescriptionNote,
 		Examples:        getExportByJsonCmdExamples,
+	}
+
+	templateOptionsUsage := generateCmdHelpOptions{
+		Description:     getEmtptySection,
+		DescriptionNote: getEmtptySection,
+		Examples:        getCreateJsonCmdExamples,
+		Debugging:       getEmtptySection,
+		Footer:          getEmtptySection,
 	}
 
 	var path string
@@ -63,13 +72,13 @@ func init() {
 	exportByJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
 	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
 
-	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "directory for the Terraform code")
-	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "Full path to JSON file with list of resources")
+	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
+	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")
 
 	rootCmd.AddCommand(exportByJsonCmd)
 
-	exportByJsonCmd.SetHelpTemplate(generateCmdHelp(exportByJsonCmd, templateOptions))
-	exportByJsonCmd.SetUsageTemplate(generateCmdHelp(exportByJsonCmd, templateOptions))
+	exportByJsonCmd.SetHelpTemplate(generateCmdHelp(exportByJsonCmd, templateOptionsHelp))
+	exportByJsonCmd.SetUsageTemplate(generateCmdHelp(exportByJsonCmd, templateOptionsUsage))
 }
 
 func getExportByJsonCmdDescription(c *cobra.Command) string {

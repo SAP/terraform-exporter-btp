@@ -9,10 +9,10 @@ btptf export-by-json [flags]
 ### Options
 
 ```
-  -c, --config-dir string   directory for the Terraform code (default "generated_configurations")
+  -c, --config-dir string   directory for the Terraform code (default "generated_configurations_<account-id>")
   -d, --directory string    ID of the directory
   -h, --help                help for export-by-json
-  -p, --path string         Full path to JSON file with list of resources (default "btpResources.json")
+  -p, --path string         Full path to JSON file with list of resources (default "btpResources_<account-id>.json")
   -s, --subaccount string   ID of the subaccount
 ```
 

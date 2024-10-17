@@ -11,8 +11,8 @@ btptf create-json [flags]
 ```
   -d, --directory string    ID of the directory
   -h, --help                help for create-json
-  -p, --path string         Full path to JSON file with list of resources (default: 'btpResources_<account-id>.json') (default "btpResources.json")
-  -r, --resources string    Comma-separated list of resources to be included (default: 'all') (default "all")
+  -p, --path string         Full path to JSON file with list of resources (default "btpResources_<account-id>.json")
+  -r, --resources string    Comma-separated list of resources to be included (default "all")
   -s, --subaccount string   ID of the subaccount
 ```
 
