@@ -58,7 +58,7 @@ func init() {
 	templateOptionsUsage := generateCmdHelpOptions{
 		Description:     getEmtptySection,
 		DescriptionNote: getEmtptySection,
-		Examples:        getCreateJsonCmdExamples,
+		Examples:        getExportByJsonCmdExamples,
 		Debugging:       getEmtptySection,
 		Footer:          getEmtptySection,
 	}
