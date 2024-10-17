@@ -63,8 +63,8 @@ func init() {
 	exportByResourceCmd.MarkFlagsOneRequired("subaccount", "directory")
 	exportByResourceCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
 
-	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "folder for config generation")
-	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")
+	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "directory for the Terraform code")
+	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
 
 	rootCmd.AddCommand(exportByResourceCmd)
 
@@ -95,13 +95,11 @@ func getExportByResourceCmdDescription(c *cobra.Command) string {
 	return generateCmdHelpDescription(mainText,
 		[]string{
 			formatHelpNote(
-				fmt.Sprintf("For directories: "+resourcesDir+" or %s (default)",
-					output.ColorStringYellow("all"),
-				)),
+				fmt.Sprint("For directories: " + resourcesDir),
+			),
 			formatHelpNote(
-				fmt.Sprintf("For subaccounts: "+resources+" or %s (default)",
-					output.ColorStringYellow("all"),
-				)),
+				fmt.Sprint("For subaccounts: " + resources),
+			),
 			formatHelpNote(
 				"For environment instances: TBD",
 			),

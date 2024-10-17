@@ -63,8 +63,8 @@ func init() {
 	exportByJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
 	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
 
-	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "folder for config generation")
-	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")
+	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "directory for the Terraform code")
+	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "Full path to JSON file with list of resources")
 
 	rootCmd.AddCommand(exportByJsonCmd)
 

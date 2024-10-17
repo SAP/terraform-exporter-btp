@@ -28,7 +28,7 @@ func init() {
 		DescriptionNote: getRootCmdDescriptionNote,
 	}
 
-	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Display verbose output in the console for debugging.")
+	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, " Enable verbose output for debugging")
 	_ = viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 	rootCmd.AddCommand(docCmd)
 	rootCmd.SetHelpTemplate(generateCmdHelp(rootCmd, templateOptions))

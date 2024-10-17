@@ -59,8 +59,8 @@ func init() {
 	createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
 	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
 	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
-	createJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "path to JSON file with list of resources")
-	createJsonCmd.Flags().StringVarP(&resources, "resources", "r", "all", "comma seperated string for resources")
+	createJsonCmd.Flags().StringVarP(&path, "path", "p", "btpResources.json", "Full path to JSON file with list of resources (default: 'btpResources_<account-id>.json')")
+	createJsonCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included (default: 'all')")
 
 	rootCmd.AddCommand(createJsonCmd)
 
@@ -94,13 +94,11 @@ Depending on the account level you specify, the JSON file will include the follo
 	return generateCmdHelpDescription(mainText,
 		[]string{
 			formatHelpNote(
-				fmt.Sprintf("For directories: "+resourcesDir+" or %s (default)",
-					output.ColorStringYellow("all"),
-				)),
+				fmt.Sprint("For directories: " + resourcesDir),
+			),
 			formatHelpNote(
-				fmt.Sprintf("For subaccounts: "+resources+" or %s (default)",
-					output.ColorStringYellow("all"),
-				)),
+				fmt.Sprint("For subaccounts: " + resources),
+			),
 			formatHelpNote(
 				"For environment instances: TBD",
 			),
