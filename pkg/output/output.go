@@ -168,38 +168,39 @@ func AsLink(s string) string {
 }
 
 func GetNextStepsTemplate(input NextStepTemplateData) string {
-	return fmt.Sprintf(`# Next Steps
+	return fmt.Sprintf(`## How to Work With the Exported Configuration Files
 
-## Status Quo
+You've successfully exported resources from a %s on SAP BTP using the btptf CLI.
 
-After executing the *btptf* CLI you have now created the Terraform configuration in the directory %s as well as the Terraform [import blocks](https://developer.hashicorp.com/terraform/language/import) needed to import the state of the configuration of the %s with ID %s.
+This created Terraform configuration files and import blocks for your %s with ID %s in the %s folder. You'll need these files to run '*terraform apply*'.
 
-With this in place you can further proceed to bring the resources under the management of Terraform. The following section will give you some advice on the next steps.
+But you should first review the generated code:
 
-## Next Steps
+1. Check provider version constraints
+   Check the version constraint in the provider configuration (*provider.tf*) i.e. make sure that the constraints are compliant with the rules of your company like cherry-picking one explicit version. We recommend to always use the latest version independent of the constraints you add.
 
-### Review of Configuration
+2. Cleanup configuration of resources
+   The configuration (*btp_resources.tf*) is generated based on the information about the resources available from the provider plugin. All data including optinal data that got defaulted (e.g. usage in the btp_subaccount resource) is added to the configuration. To reduce the amount of data you could remove optional attributes that are optional and you do not want to have set explicitly. --> like what for example?
 
-You should in any case review the configuration. While being technically valid, the configuration might not reflect the way you would want to have the configuration be done. Therefore the first step should always be a review by one of the experts to validate the generated code. This also comprises the provider configuration especially the version constraints defined there.
+3. Declare variables
+   The generated code doesn't contain any variables. We recommend to move the following into the *provider.tf* file
 
-### CleanUp of Configuration
+   - subdomain of the global account
+   - %s ID: %s
 
-The configuration is generated based on the information available from the provider plugin. All data including default data is added to the configuration. To reduce the amount of data you could remove optional attributes that are optional and you do not want to have set explicitly.
+    Depending on your requirements you might want to add further parameters to the variable list like the region your subaccount is created in.
 
-### Addition of Variables
+4. Add dependencies
+   As the export process doesn't detect dependencies, we recommend to add these manually. A typical scenario is the dependency between entitlements and the services/subscriptions specified in your configuration. Any more details on this?
 
-The generated code does not contain any variables. It makes sense to put at least the value of the subdomain of the global account in the *provider.tf* file as well as the ID %s as variables. Depending on your requirements you would also want to add further parameters to the variable list.
+5. Define a place for the state
+   The state of your configuration should be stored in a remote state backend. Make sure to add the corresponding configuration (e.g. the *provider.tf*). You find more details in the [Terraform documentation](https://developer.hashicorp.com/terraform/language/backend)
 
-### Adding Dependencies
+6. Validate the import
+   Validate that the import is possible by executing '*terraform plan*'. Depending on the number of resources the planing should return a message like this:
+   Plan: n to import, 0 to add, 0 to change, 0 to destroy.
 
-The export is not capable of detecting explicit dependencies. This must be manually added. One typical scenario is the dependency between entitlements and the services/subscriptions that are defined in your configuration.
+Now you're all set to run '*terraform apply*', which will import the state and thus bring your SAP BTP resources under the management of Terraform. Congrats!
 
-### Adding State Backend
-
-The state of your configuration should be stored in a remote state backend. Make sure to add the corresponding configuration. You find more details in the [Terraform documentation](https://developer.hashicorp.com/terraform/language/backend)
-
-### State Import
-
-If you have finished the refinement of the configuration you can trigger the import of the state via *terraform apply*
-`, input.ConfigDir, input.Level, input.UUID, input.UUID)
+`, input.Level, input.Level, input.UUID, input.ConfigDir, input.Level, input.UUID)
 }
