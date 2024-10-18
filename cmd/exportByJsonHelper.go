@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"slices"
+	"strings"
 
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
@@ -28,6 +30,7 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 
 	var resources tfutils.BtpResources
 
+	// Unmarshal validates basic JSON syntax and structure
 	err = json.Unmarshal(byteValue, &resources)
 	if err != nil {
 		fmt.Print("\r\n")
@@ -36,7 +39,19 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 
 	var resNames []string
 
+	level, _ := tfutils.GetExecutionLevelAndId(subaccount, directory)
+
+	allowedResources := tfutils.GetValidResourcesByLevel(level)
+
 	for i := 0; i < len(resources.BtpResources); i++ {
+
+		if !(slices.Contains(allowedResources, resources.BtpResources[i].Name)) {
+
+			allowedResourceList := strings.Join(allowedResources, ", ")
+			fmt.Print("\r\n")
+			log.Fatal("please check the resources provided in the JSON file. Currently supported resources are " + allowedResourceList + ".")
+		}
+
 		resNames = append(resNames, resources.BtpResources[i].Name)
 	}
 

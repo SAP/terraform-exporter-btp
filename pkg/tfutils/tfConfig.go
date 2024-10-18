@@ -265,13 +265,7 @@ func GetResourcesList(resourcesString string, level string) []string {
 
 	var resources []string
 
-	var allowedResources []string
-
-	if level == SubaccountLevel {
-		allowedResources = AllowedResourcesSubaccount
-	} else {
-		allowedResources = AllowedResourcesDirectory
-	}
+	allowedResources := GetValidResourcesByLevel(level)
 
 	if resourcesString == "all" {
 		resources = allowedResources
@@ -297,6 +291,14 @@ func CleanupProviderConfig(directory ...string) {
 	for _, dir := range directory {
 		CleanupTempFiles(dir)
 	}
+}
+
+func GetValidResourcesByLevel(level string) []string {
+	if level == SubaccountLevel {
+		return AllowedResourcesSubaccount
+	}
+
+	return AllowedResourcesDirectory
 }
 
 func cleanup() {
