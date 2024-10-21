@@ -21,20 +21,21 @@ func newDirectoryImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *directoryImportProvider) GetImportBlock(data map[string]interface{}, LevelId string, filterValues []string) (string, error) {
+func (tf *directoryImportProvider) GetImportBlock(data map[string]interface{}, LevelId string, filterValues []string) (string, int, error) {
 
 	directoryId := LevelId
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.DirectoryType)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	importBlock, err := createDirectoryImportBlock(data, directoryId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
-	return importBlock, nil
+	//We only export one directory at a time
+	return importBlock, 1, nil
 }
 
 func createDirectoryImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {

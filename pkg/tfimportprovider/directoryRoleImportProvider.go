@@ -22,27 +22,27 @@ func newDirectoryRoleImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *directoryRoleImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
-
+func (tf *directoryRoleImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+	count := 0
 	directoryId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.DirectoryRoleType)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")
-		return "", err
+		return "", count, err
 	}
 
-	importBlock, err := createDirectoryRoleImportBlock(data, directoryId, filterValues, resourceDoc)
+	importBlock, count, err := createDirectoryRoleImportBlock(data, directoryId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
-func createDirectoryRoleImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
-
+func createDirectoryRoleImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+	count = 0
 	roles := data["values"].([]interface{})
 
 	if len(filterValues) != 0 {
@@ -54,22 +54,24 @@ func createDirectoryRoleImportBlock(data map[string]interface{}, directoryId str
 			directoryAllRoles = append(directoryAllRoles, resourceName)
 			if slices.Contains(filterValues, resourceName) {
 				importBlock += templateDirectoryRoleImport(role, directoryId, resourceDoc)
+				count++
 			}
 		}
 
 		missingRole, subset := isSubset(directoryAllRoles, filterValues)
 
 		if !subset {
-			return "", fmt.Errorf("role %s not found in the directory. Please adjust it in the provided file", missingRole)
+			return "", 0, fmt.Errorf("role %s not found in the directory. Please adjust it in the provided file", missingRole)
 		}
 
 	} else {
 		for _, value := range roles {
 			role := value.(map[string]interface{})
 			importBlock += templateDirectoryRoleImport(role, directoryId, resourceDoc)
+			count++
 		}
 	}
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
 func templateDirectoryRoleImport(role map[string]interface{}, directoryId string, resourceDoc tfutils.EntityDocs) string {

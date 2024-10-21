@@ -22,26 +22,27 @@ func newSubaccountServiceBindingImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountServiceBindingImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
-
+func (tf *subaccountServiceBindingImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+	count := 0
 	subaccountId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountServiceBindingType)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")
-		return "", err
+		return "", count, err
 	}
 
-	importBlock, err := createServiceBindingImportBlock(data, subaccountId, filterValues, resourceDoc)
+	importBlock, count, err := createServiceBindingImportBlock(data, subaccountId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
-func createServiceBindingImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
+func createServiceBindingImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+	count = 0
 	serviceBindings := data["values"].([]interface{})
 
 	if len(filterValues) != 0 {
@@ -53,22 +54,24 @@ func createServiceBindingImportBlock(data map[string]interface{}, subaccountId s
 			subaccountAllServiceBindings = append(subaccountAllServiceBindings, resourceName)
 			if slices.Contains(filterValues, resourceName) {
 				importBlock += templateServiceBindingImport(binding, subaccountId, resourceDoc)
+				count++
 			}
 		}
 
 		missingBinding, subset := isSubset(subaccountAllServiceBindings, filterValues)
 
 		if !subset {
-			return "", fmt.Errorf("service binding %s not found in the subaccount. Please adjust it in the provided file", missingBinding)
+			return "", 0, fmt.Errorf("service binding %s not found in the subaccount. Please adjust it in the provided file", missingBinding)
 		}
 
 	} else {
 		for _, value := range serviceBindings {
 			binding := value.(map[string]interface{})
 			importBlock += templateServiceBindingImport(binding, subaccountId, resourceDoc)
+			count++
 		}
 	}
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
 func templateServiceBindingImport(binding map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {

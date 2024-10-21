@@ -24,6 +24,7 @@ func TestCreateTrustConfigurationImportBlock(t *testing.T) {
 		subaccountId  string
 		filterValues  []string
 		expectedBlock string
+		expectedCount int
 		expectError   bool
 	}{
 
@@ -33,6 +34,7 @@ func TestCreateTrustConfigurationImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{},
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_trust_configuration.trust0\n\t\t\t\tid = \"12345,terraformtest-platform\"\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -41,6 +43,7 @@ func TestCreateTrustConfigurationImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{"terraformtest-platform"},
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_trust_configuration.trust2\n\t\t\t\tid = \"12345,terraformtest-platform\"\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -49,18 +52,20 @@ func TestCreateTrustConfigurationImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{"wrong-trust-name"},
 			expectedBlock: "",
+			expectedCount: 0,
 			expectError:   true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			importBlock, err := createTrustConfigurationImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
+			importBlock, count, err := createTrustConfigurationImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expectedBlock, importBlock)
+				assert.Equal(t, tt.expectedCount, count)
 			}
 		})
 	}

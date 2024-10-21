@@ -24,6 +24,7 @@ func TestCreateServiceInstanceImportBlock(t *testing.T) {
 		subaccountId  string
 		filterValues  []string
 		expectedBlock string
+		expectedCount int
 		expectError   bool
 	}{
 
@@ -33,6 +34,7 @@ func TestCreateServiceInstanceImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{},
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_service_instance.audit-log-exporter_a50128a9-35fc-4624-9953-c79668ef3e5b\n\t\t\t\tid = \"12345,0b031c77-a995-44cf-b8ce-c7369ad2cd0f\"\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -41,6 +43,7 @@ func TestCreateServiceInstanceImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{"audit-log-exporter_a50128a9-35fc-4624-9953-c79668ef3e5b"},
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_service_instance.audit-log-exporter_a50128a9-35fc-4624-9953-c79668ef3e5b\n\t\t\t\tid = \"12345,0b031c77-a995-44cf-b8ce-c7369ad2cd0f\"\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -49,18 +52,20 @@ func TestCreateServiceInstanceImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{"wrong-instance-name"},
 			expectedBlock: "",
+			expectedCount: 0,
 			expectError:   true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			importBlock, err := createServiceInstanceImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
+			importBlock, count, err := createServiceInstanceImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expectedBlock, importBlock)
+				assert.Equal(t, tt.expectedCount, count)
 			}
 		})
 	}

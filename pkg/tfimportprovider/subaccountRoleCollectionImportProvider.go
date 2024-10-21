@@ -22,27 +22,27 @@ func newSubaccountRoleCollectionImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountRoleCollectionImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
-
+func (tf *subaccountRoleCollectionImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+	count := 0
 	subaccountId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountRoleCollectionType)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")
-		return "", err
+		return "", count, err
 	}
 
-	importBlock, err := createRoleCollectionImportBlock(data, subaccountId, filterValues, resourceDoc)
+	importBlock, count, err := createRoleCollectionImportBlock(data, subaccountId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
-func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
-
+func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+	count = 0
 	roleCollections := data["values"].([]interface{})
 
 	if len(filterValues) != 0 {
@@ -54,23 +54,25 @@ func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId s
 			subaccountAllRoleCollections = append(subaccountAllRoleCollections, resourceName)
 			if slices.Contains(filterValues, resourceName) {
 				importBlock += templateRoleCollectionImport(roleCollection, subaccountId, resourceDoc)
+				count++
 			}
 		}
 
 		missingRoleCollection, subset := isSubset(subaccountAllRoleCollections, filterValues)
 
 		if !subset {
-			return "", fmt.Errorf("role collection %s not found in the subaccount. Please adjust it in the provided file", missingRoleCollection)
+			return "", 0, fmt.Errorf("role collection %s not found in the subaccount. Please adjust it in the provided file", missingRoleCollection)
 		}
 
 	} else {
 		for _, value := range roleCollections {
 			roleCollection := value.(map[string]interface{})
 			importBlock += templateRoleCollectionImport(roleCollection, subaccountId, resourceDoc)
+			count++
 		}
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 
 }
 

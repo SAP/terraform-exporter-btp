@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/fatih/color"
+	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/viper"
 	"github.com/theckman/yacspin"
 )
@@ -133,6 +134,21 @@ func PrintInventoryCreationSuccessMessage() {
 	fmt.Println("")
 	fmt.Println("📋 Resource list successfully created")
 	fmt.Println("")
+}
+
+func RenderSummaryTable(data map[string]int) {
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.SetStyle(table.StyleColoredCyanWhiteOnBlack)
+	t.AppendHeader(table.Row{"Resource Name", "Number of exported resources"})
+
+	for key, value := range data {
+
+		t.AppendRow(table.Row{key, value})
+
+	}
+	t.AppendSeparator()
+	t.Render()
 }
 
 func ColorStringGrey(s string) string {

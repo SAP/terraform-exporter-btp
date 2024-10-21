@@ -20,22 +20,24 @@ func newSubaccountEntitlementImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountEntitlementImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
+func (tf *subaccountEntitlementImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+	count := 0
 	subaccountId := levelId
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountEntitlementType)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	importBlock, err := CreateEntitlementImportBlock(data, subaccountId, filterValues, resourceDoc)
+	importBlock, count, err := CreateEntitlementImportBlock(data, subaccountId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
-func CreateEntitlementImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
+func CreateEntitlementImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+	count = 0
 
 	if len(filterValues) != 0 {
 		var subaccountAllEntitlements []string
@@ -43,21 +45,23 @@ func CreateEntitlementImportBlock(data map[string]interface{}, subaccountId stri
 			subaccountAllEntitlements = append(subaccountAllEntitlements, strings.Replace(key, ":", "_", -1))
 			if slices.Contains(filterValues, strings.Replace(key, ":", "_", -1)) {
 				importBlock += templateEntitlementImport(key, value, subaccountId, resourceDoc)
+				count++
 			}
 		}
 
 		missingEntitlement, subset := isSubset(subaccountAllEntitlements, filterValues)
 
 		if !subset {
-			return "", fmt.Errorf("entitlement %s not found in the subaccount. Please adjust it in the provided file", missingEntitlement)
+			return "", 0, fmt.Errorf("entitlement %s not found in the subaccount. Please adjust it in the provided file", missingEntitlement)
 		}
 
 	} else {
 		for key, value := range data {
 			importBlock += templateEntitlementImport(key, value, subaccountId, resourceDoc)
+			count++
 		}
 	}
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
 func templateEntitlementImport(key string, value interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {

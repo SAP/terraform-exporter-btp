@@ -24,6 +24,7 @@ func TestCreateDirectoryRoleImportBlock(t *testing.T) {
 		directoryId   string
 		filterValues  []string
 		expectedBlock string
+		expectedCount int
 		expectError   bool
 	}{
 		{
@@ -31,6 +32,7 @@ func TestCreateDirectoryRoleImportBlock(t *testing.T) {
 			data:          dataRoles,
 			directoryId:   "12345",
 			expectedBlock: "import {\n\t\t\t\tto = btp_directory_role.directory_usage_reporting_viewer\n\t\t\t\tid = \"12345,Directory Usage Reporting Viewer,Directory_Usage_Reporting_Viewer,uas!b36585\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -39,6 +41,7 @@ func TestCreateDirectoryRoleImportBlock(t *testing.T) {
 			directoryId:   "12345",
 			filterValues:  []string{"directory_usage_reporting_viewer"},
 			expectedBlock: "import {\n\t\t\t\tto = btp_directory_role.directory_usage_reporting_viewer\n\t\t\t\tid = \"12345,Directory Usage Reporting Viewer,Directory_Usage_Reporting_Viewer,uas!b36585\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -47,18 +50,20 @@ func TestCreateDirectoryRoleImportBlock(t *testing.T) {
 			directoryId:   "12345",
 			filterValues:  []string{"wrong-role"},
 			expectedBlock: "",
+			expectedCount: 0,
 			expectError:   true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			importBlock, err := createDirectoryRoleImportBlock(tt.data, tt.directoryId, tt.filterValues, resourceDoc)
+			importBlock, count, err := createDirectoryRoleImportBlock(tt.data, tt.directoryId, tt.filterValues, resourceDoc)
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expectedBlock, importBlock)
+				assert.Equal(t, tt.expectedCount, count)
 			}
 		})
 	}

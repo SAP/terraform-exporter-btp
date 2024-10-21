@@ -20,25 +20,26 @@ func newSubaccountEnvInstanceImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountEnvInstanceImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
-
+func (tf *subaccountEnvInstanceImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+	count := 0
 	subaccountId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountEnvironmentInstanceType)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	importBlock, err := createEnvironmentInstanceImportBlock(data, subaccountId, filterValues, resourceDoc)
+	importBlock, count, err := createEnvironmentInstanceImportBlock(data, subaccountId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 
 }
 
-func createEnvironmentInstanceImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
+func createEnvironmentInstanceImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+	count = 0
 	environmentInstances := data["values"].([]interface{})
 
 	if len(filterValues) != 0 {
@@ -49,13 +50,14 @@ func createEnvironmentInstanceImportBlock(data map[string]interface{}, subaccoun
 			subaccountAllEnvInstances = append(subaccountAllEnvInstances, fmt.Sprintf("%v", environmentInstance["environment_type"]))
 			if slices.Contains(filterValues, fmt.Sprintf("%v", environmentInstance["environment_type"])) {
 				importBlock += templateEnvironmentInstanceImport(environmentInstance, subaccountId, resourceDoc)
+				count++
 			}
 		}
 
 		missingEnvInstance, subset := isSubset(subaccountAllEnvInstances, filterValues)
 
 		if !subset {
-			return "", fmt.Errorf("environment instance %s not found in the subaccount. Please adjust it in the provided file", missingEnvInstance)
+			return "", 0, fmt.Errorf("environment instance %s not found in the subaccount. Please adjust it in the provided file", missingEnvInstance)
 
 		}
 	} else {
@@ -63,9 +65,10 @@ func createEnvironmentInstanceImportBlock(data map[string]interface{}, subaccoun
 		for _, value := range environmentInstances {
 			environmentInstance := value.(map[string]interface{})
 			importBlock += templateEnvironmentInstanceImport(environmentInstance, subaccountId, resourceDoc)
+			count++
 		}
 	}
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
 func templateEnvironmentInstanceImport(environmentInstance map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {

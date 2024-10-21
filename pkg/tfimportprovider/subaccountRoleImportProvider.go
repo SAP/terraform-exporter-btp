@@ -22,27 +22,27 @@ func newSubaccountRoleImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountRoleImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
-
+func (tf *subaccountRoleImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+	count := 0
 	subaccountId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountRoleType)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")
-		return "", err
+		return "", count, err
 	}
 
-	importBlock, err := createRoleImportBlock(data, subaccountId, filterValues, resourceDoc)
+	importBlock, count, err := createRoleImportBlock(data, subaccountId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
-func createRoleImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
-
+func createRoleImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+	count = 0
 	roles := data["values"].([]interface{})
 
 	if len(filterValues) != 0 {
@@ -54,22 +54,24 @@ func createRoleImportBlock(data map[string]interface{}, subaccountId string, fil
 			subaccountAllRoles = append(subaccountAllRoles, resourceName)
 			if slices.Contains(filterValues, resourceName) {
 				importBlock += templateRoleImport(role, subaccountId, resourceDoc)
+				count++
 			}
 		}
 
 		missingRole, subset := isSubset(subaccountAllRoles, filterValues)
 
 		if !subset {
-			return "", fmt.Errorf("role %s not found in the subaccount. Please adjust it in the provided file", missingRole)
+			return "", 0, fmt.Errorf("role %s not found in the subaccount. Please adjust it in the provided file", missingRole)
 		}
 
 	} else {
 		for _, value := range roles {
 			role := value.(map[string]interface{})
 			importBlock += templateRoleImport(role, subaccountId, resourceDoc)
+			count++
 		}
 	}
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
 func templateRoleImport(role map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {

@@ -21,21 +21,21 @@ func newSubaccountImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
+func (tf *subaccountImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
 
 	subaccountId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountType)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	importBlock, err := createSubaccountImportBlock(data, subaccountId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
-
-	return importBlock, nil
+	//We only export one subaccount at a time
+	return importBlock, 1, nil
 }
 
 func createSubaccountImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {

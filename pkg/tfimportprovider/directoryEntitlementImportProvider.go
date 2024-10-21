@@ -20,22 +20,25 @@ func newDirectoryEntitlementImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *directoryEntitlementImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
+func (tf *directoryEntitlementImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+	count := 0
 	directoryId := levelId
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.DirectoryEntitlementType)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	importBlock, err := CreateDirEntitlementImportBlock(data, directoryId, filterValues, resourceDoc)
+	importBlock, count, err := CreateDirEntitlementImportBlock(data, directoryId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	return importBlock, nil
+	// we only import one directory at a time
+	return importBlock, count, nil
 }
 
-func CreateDirEntitlementImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
+func CreateDirEntitlementImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+	count = 0
 
 	if len(filterValues) != 0 {
 		var directoryAllEntitlements []string
@@ -43,21 +46,23 @@ func CreateDirEntitlementImportBlock(data map[string]interface{}, directoryId st
 			directoryAllEntitlements = append(directoryAllEntitlements, strings.Replace(key, ":", "_", -1))
 			if slices.Contains(filterValues, strings.Replace(key, ":", "_", -1)) {
 				importBlock += templateDirEntitlementImport(key, value, directoryId, resourceDoc)
+				count++
 			}
 		}
 
 		missingEntitlement, subset := isSubset(directoryAllEntitlements, filterValues)
 
 		if !subset {
-			return "", fmt.Errorf("entitlement %s not found in the directory. Please adjust it in the provided file", missingEntitlement)
+			return "", 0, fmt.Errorf("entitlement %s not found in the directory. Please adjust it in the provided file", missingEntitlement)
 		}
 
 	} else {
 		for key, value := range data {
 			importBlock += templateDirEntitlementImport(key, value, directoryId, resourceDoc)
+			count++
 		}
 	}
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
 func templateDirEntitlementImport(key string, value interface{}, directoryId string, resourceDoc tfutils.EntityDocs) string {

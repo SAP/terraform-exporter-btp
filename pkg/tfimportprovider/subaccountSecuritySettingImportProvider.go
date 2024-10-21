@@ -20,7 +20,7 @@ func newSubaccountSecuritySettingImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountSecuritySettingImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
+func (tf *subaccountSecuritySettingImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
 
 	subaccountId := levelId
 
@@ -28,15 +28,16 @@ func (tf *subaccountSecuritySettingImportProvider) GetImportBlock(data map[strin
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")
-		return "", err
+		return "", 0, err
 	}
 
 	importBlock, err := createSecuritySettingImportBlock(data, subaccountId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
-	return importBlock, nil
+	// There is only one security setting per level
+	return importBlock, 1, nil
 }
 
 func createSecuritySettingImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {

@@ -25,6 +25,7 @@ func TestCreateRoleCollectionImportBlock(t *testing.T) {
 		subaccountId  string
 		filterValues  []string
 		expectedBlock string
+		expectedCount int
 		expectError   bool
 	}{
 		{
@@ -32,6 +33,7 @@ func TestCreateRoleCollectionImportBlock(t *testing.T) {
 			data:          data,
 			subaccountId:  "12345",
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_role_collection.subaccount_administrator\n\t\t\t\tid = \"12345,Subaccount Administrator\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -40,6 +42,7 @@ func TestCreateRoleCollectionImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{"subaccount_administrator"},
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_role_collection.subaccount_administrator\n\t\t\t\tid = \"12345,Subaccount Administrator\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -48,18 +51,20 @@ func TestCreateRoleCollectionImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{"subacccount_viewer"},
 			expectedBlock: "",
+			expectedCount: 0,
 			expectError:   true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			importBlock, err := createRoleCollectionImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
+			importBlock, count, err := createRoleCollectionImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expectedBlock, importBlock)
+				assert.Equal(t, tt.expectedCount, count)
 			}
 		})
 	}

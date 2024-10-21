@@ -22,6 +22,8 @@ var exportByResourceCmd = &cobra.Command{
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		resources, _ := cmd.Flags().GetString("resources")
 
+		resultStore := make(map[string]int)
+
 		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
 
 		if !isValidUuid(iD) {
@@ -38,12 +40,14 @@ var exportByResourceCmd = &cobra.Command{
 
 		resourcesList := tfutils.GetResourcesList(resources, level)
 		for _, resourceToImport := range resourcesList {
-			generateConfigForResource(resourceToImport, nil, subaccount, directory, configDir, tfConfigFileName)
+			resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, configDir, tfConfigFileName)
+			resultStore[resourceType] = count
 		}
 
 		tfutils.FinalizeTfConfig(configDir)
 		generateNextStepsDocument(configDir, subaccount, directory)
 		tfutils.CleanupProviderConfig()
+		output.RenderSummaryTable(resultStore)
 		output.PrintExportSuccessMessage()
 	},
 }

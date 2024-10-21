@@ -21,27 +21,27 @@ func newSubaccountTrustConfigImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountTrustConfigImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
-
+func (tf *subaccountTrustConfigImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+	count := 0
 	subaccountId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountTrustConfigurationType)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")
-		return "", err
+		return "", count, err
 	}
 
-	importBlock, err := createTrustConfigurationImportBlock(data, subaccountId, filterValues, resourceDoc)
+	importBlock, count, err := createTrustConfigurationImportBlock(data, subaccountId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
-func createTrustConfigurationImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
-
+func createTrustConfigurationImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+	count = 0
 	trusts := data["values"].([]interface{})
 
 	if len(filterValues) != 0 {
@@ -52,22 +52,24 @@ func createTrustConfigurationImportBlock(data map[string]interface{}, subaccount
 			subaccountAllTrusts = append(subaccountAllTrusts, fmt.Sprintf("%v", trust["origin"]))
 			if slices.Contains(filterValues, fmt.Sprintf("%v", trust["origin"])) {
 				importBlock += templateTrustImport(x, trust, subaccountId, resourceDoc)
+				count++
 			}
 		}
 
 		missingTrust, subset := isSubset(subaccountAllTrusts, filterValues)
 
 		if !subset {
-			return "", fmt.Errorf("trust configuration %s not found in the subaccount. Please adjust it in the provided file", missingTrust)
+			return "", 0, fmt.Errorf("trust configuration %s not found in the subaccount. Please adjust it in the provided file", missingTrust)
 		}
 	} else {
 		for x, value := range trusts {
 			trust := value.(map[string]interface{})
 			importBlock += templateTrustImport(x, trust, subaccountId, resourceDoc)
+			count++
 		}
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
 func templateTrustImport(x int, trust map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {

@@ -61,6 +61,7 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 	}
 
 	tfutils.SetupConfigDir(configDir, true)
+	resultStore := make(map[string]int)
 
 	for _, resName := range resNames {
 		var value []string
@@ -70,11 +71,13 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 			}
 		}
 		if len(value) != 0 {
-			generateConfigForResource(resName, value, subaccount, directory, configDir, resourceFile)
+			resourceType, count := generateConfigForResource(resName, value, subaccount, directory, configDir, resourceFile)
+			resultStore[resourceType] = count
 		}
 	}
 
 	tfutils.FinalizeTfConfig(configDir)
 	generateNextStepsDocument(configDir, subaccount, directory)
+	output.RenderSummaryTable(resultStore)
 	tfutils.CleanupProviderConfig()
 }

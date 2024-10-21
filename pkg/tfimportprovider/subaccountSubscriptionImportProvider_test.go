@@ -30,6 +30,7 @@ func TestCreateSubscriptionImportBlock(t *testing.T) {
 		subaccountId  string
 		filterValues  []string
 		expectedBlock string
+		expectedCount int
 		expectError   bool
 	}{
 		{
@@ -37,6 +38,7 @@ func TestCreateSubscriptionImportBlock(t *testing.T) {
 			data:          dataSingleSubscription,
 			subaccountId:  "1234",
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_subscription.feature_flags_dashboard\n\t\t\t\tid = \"1234,feature-flags-dashboard,dashboard\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -45,6 +47,7 @@ func TestCreateSubscriptionImportBlock(t *testing.T) {
 			subaccountId:  "1234",
 			filterValues:  []string{"feature-flags-dashboard_dashboard"},
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_subscription.feature_flags_dashboard\n\t\t\t\tid = \"1234,feature-flags-dashboard,dashboard\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -53,6 +56,7 @@ func TestCreateSubscriptionImportBlock(t *testing.T) {
 			subaccountId:  "1234",
 			filterValues:  []string{"nonexistentapp_nonexistentplan"},
 			expectedBlock: "",
+			expectedCount: 0,
 			expectError:   true,
 		},
 		{
@@ -60,6 +64,7 @@ func TestCreateSubscriptionImportBlock(t *testing.T) {
 			data:          dataSubscriptionInProcess,
 			subaccountId:  "1234",
 			expectedBlock: "",
+			expectedCount: 0,
 			expectError:   false,
 		},
 		{
@@ -67,18 +72,20 @@ func TestCreateSubscriptionImportBlock(t *testing.T) {
 			data:          dataSubscriptionFailed,
 			subaccountId:  "1234",
 			expectedBlock: "",
+			expectedCount: 0,
 			expectError:   false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			importBlock, err := createSubscriptionImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
+			importBlock, count, err := createSubscriptionImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expectedBlock, importBlock)
+				assert.Equal(t, tt.expectedCount, count)
 			}
 		})
 	}

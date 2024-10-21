@@ -22,27 +22,27 @@ func newDirectoryRoleCollectionImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *directoryRoleCollectionImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
-
+func (tf *directoryRoleCollectionImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+	count := 0
 	directoryId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.DirectoryRoleCollectionType)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")
-		return "", err
+		return "", count, err
 	}
 
-	importBlock, err := createDirectoryRoleCollectionImportBlock(data, directoryId, filterValues, resourceDoc)
+	importBlock, count, err := createDirectoryRoleCollectionImportBlock(data, directoryId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
-func createDirectoryRoleCollectionImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
-
+func createDirectoryRoleCollectionImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+	count = 0
 	roleCollections := data["values"].([]interface{})
 
 	if len(filterValues) != 0 {
@@ -54,23 +54,25 @@ func createDirectoryRoleCollectionImportBlock(data map[string]interface{}, direc
 			directoryAllRoleCollections = append(directoryAllRoleCollections, resourceName)
 			if slices.Contains(filterValues, resourceName) {
 				importBlock += templateDirectoryRoleCollectionImport(roleCollection, directoryId, resourceDoc)
+				count++
 			}
 		}
 
 		missingRoleCollection, subset := isSubset(directoryAllRoleCollections, filterValues)
 
 		if !subset {
-			return "", fmt.Errorf("role collection %s not found in the directory. Please adjust it in the provided file", missingRoleCollection)
+			return "", 0, fmt.Errorf("role collection %s not found in the directory. Please adjust it in the provided file", missingRoleCollection)
 		}
 
 	} else {
 		for _, value := range roleCollections {
 			roleCollection := value.(map[string]interface{})
 			importBlock += templateDirectoryRoleCollectionImport(roleCollection, directoryId, resourceDoc)
+			count++
 		}
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 
 }
 

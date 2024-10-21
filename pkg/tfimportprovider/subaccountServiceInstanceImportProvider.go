@@ -22,26 +22,27 @@ func newSubaccountServiceInstanceImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountServiceInstanceImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
-
+func (tf *subaccountServiceInstanceImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+	count := 0
 	subaccountId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountServiceInstanceType)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")
-		return "", err
+		return "", count, err
 	}
 
-	importBlock, err := createServiceInstanceImportBlock(data, subaccountId, filterValues, resourceDoc)
+	importBlock, count, err := createServiceInstanceImportBlock(data, subaccountId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
-func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
+func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+	count = 0
 	serviceInstances := data["values"].([]interface{})
 
 	if len(filterValues) != 0 {
@@ -53,22 +54,24 @@ func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId 
 			subaccountAllServiceInstances = append(subaccountAllServiceInstances, resourceName)
 			if slices.Contains(filterValues, resourceName) {
 				importBlock += templateServiceInstanceImport(instance, subaccountId, resourceDoc)
+				count++
 			}
 		}
 
 		missingInstance, subset := isSubset(subaccountAllServiceInstances, filterValues)
 
 		if !subset {
-			return "", fmt.Errorf("service instance %s not found in the subaccount. Please adjust it in the provided file", missingInstance)
+			return "", 0, fmt.Errorf("service instance %s not found in the subaccount. Please adjust it in the provided file", missingInstance)
 		}
 
 	} else {
 		for _, value := range serviceInstances {
 			instance := value.(map[string]interface{})
 			importBlock += templateServiceInstanceImport(instance, subaccountId, resourceDoc)
+			count++
 		}
 	}
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
 func templateServiceInstanceImport(instance map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {

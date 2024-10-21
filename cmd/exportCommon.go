@@ -18,13 +18,13 @@ const tfConfigFileName = "btp_resources.tf"
 const configDirDefault = "generated_configurations_<account-id>"
 const jsonFileDefault = "btpResources_<account-id>.json"
 
-func generateConfigForResource(resource string, values []string, subaccountId string, directoryId string, configDir string, resourceFileName string) {
+func generateConfigForResource(resource string, values []string, subaccountId string, directoryId string, configDir string, resourceFileName string) (resourceType string, count int) {
 	tempConfigDir := resource + "-config"
 
 	level, iD := tfutils.GetExecutionLevelAndId(subaccountId, directoryId)
 
 	importProvider, _ := tfimportprovider.GetImportBlockProvider(resource, level)
-	resourceType := importProvider.GetResourceType()
+	resourceType = importProvider.GetResourceType()
 	techResourceNameLong := strings.ToUpper(resourceType)
 
 	tfutils.ExecPreExportSteps(tempConfigDir)
@@ -39,7 +39,7 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 		log.Fatalf("error fetching impport configuration for %s: %v", resourceType, err)
 	}
 
-	importBlock, err := importProvider.GetImportBlock(data, iD, values)
+	importBlock, count, err := importProvider.GetImportBlock(data, iD, values)
 	if err != nil {
 		tfutils.CleanupProviderConfig(tempConfigDir)
 		fmt.Print("\r\n")
@@ -68,6 +68,8 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 
 		tfutils.ExecPostExportSteps(tempConfigDir, configDir, resourceFileName, techResourceNameLong)
 	}
+
+	return resourceType, count
 }
 
 func isValidUuid(u string) bool {

@@ -22,24 +22,25 @@ func newSubaccountSubscriptionImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountSubscriptionImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, error) {
-
+func (tf *subaccountSubscriptionImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+	count := 0
 	subaccountId := levelId
 
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountSubscriptionType)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	importBlock, err := createSubscriptionImportBlock(data, subaccountId, filterValues, resourceDoc)
+	importBlock, count, err := createSubscriptionImportBlock(data, subaccountId, filterValues, resourceDoc)
 	if err != nil {
-		return "", err
+		return "", count, err
 	}
 
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
-func createSubscriptionImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
+func createSubscriptionImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+	count = 0
 	subscriptions := data["values"].([]interface{})
 
 	var failedSubscriptions []string
@@ -53,6 +54,7 @@ func createSubscriptionImportBlock(data map[string]interface{}, subaccountId str
 			if slices.Contains(filterValues, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"]))) {
 				if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBED" {
 					importBlock += templateSubscriptionImport(subscription, subaccountId, resourceDoc)
+					count++
 				} else if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBE_FAILED" {
 					failedSubscriptions = append(failedSubscriptions, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 				} else if fmt.Sprintf("%v", subscription["state"]) == "IN_PROCESS" {
@@ -64,7 +66,7 @@ func createSubscriptionImportBlock(data map[string]interface{}, subaccountId str
 		missingSubscription, subset := isSubset(subaccountAllSubscriptions, filterValues)
 
 		if !subset {
-			return "", fmt.Errorf("subscription %s not found in the subaccount. Please adjust it in the provided file", missingSubscription)
+			return "", 0, fmt.Errorf("subscription %s not found in the subaccount. Please adjust it in the provided file", missingSubscription)
 		}
 
 	} else {
@@ -72,6 +74,7 @@ func createSubscriptionImportBlock(data map[string]interface{}, subaccountId str
 			subscription := value.(map[string]interface{})
 			if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBED" {
 				importBlock += templateSubscriptionImport(subscription, subaccountId, resourceDoc)
+				count++
 			} else if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBE_FAILED" {
 				failedSubscriptions = append(failedSubscriptions, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 			} else if fmt.Sprintf("%v", subscription["state"]) == "IN_PROCESS" {
@@ -88,7 +91,7 @@ func createSubscriptionImportBlock(data map[string]interface{}, subaccountId str
 		inProgressSubscriptionStr := strings.Join(inProgressSubscription, ", ")
 		log.Println("Skipping in progress subscriptions: " + inProgressSubscriptionStr)
 	}
-	return importBlock, nil
+	return importBlock, count, nil
 }
 
 func templateSubscriptionImport(subscription map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {

@@ -24,6 +24,7 @@ func TestCreateDirectoryEntitlementImportBlock(t *testing.T) {
 		directoryId   string
 		filterValues  []string
 		expectedBlock string
+		expectedCount int
 		expectError   bool
 	}{
 		{
@@ -31,6 +32,7 @@ func TestCreateDirectoryEntitlementImportBlock(t *testing.T) {
 			data:          dataEntitlement,
 			directoryId:   "12345",
 			expectedBlock: "import {\n\t\t\t\tto = btp_directory_entitlement.alert-notification_build-code\n\t\t\t\tid = \"12345,alert-notification,build-code\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -39,6 +41,7 @@ func TestCreateDirectoryEntitlementImportBlock(t *testing.T) {
 			directoryId:   "12345",
 			filterValues:  []string{"alert-notification_build-code"},
 			expectedBlock: "import {\n\t\t\t\tto = btp_directory_entitlement.alert-notification_build-code\n\t\t\t\tid = \"12345,alert-notification,build-code\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -47,18 +50,20 @@ func TestCreateDirectoryEntitlementImportBlock(t *testing.T) {
 			directoryId:   "12345",
 			filterValues:  []string{"non-existent-entitlement"},
 			expectedBlock: "",
+			expectedCount: 0,
 			expectError:   true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			importBlock, err := CreateDirEntitlementImportBlock(tt.data, tt.directoryId, tt.filterValues, resourceDoc)
+			importBlock, count, err := CreateDirEntitlementImportBlock(tt.data, tt.directoryId, tt.filterValues, resourceDoc)
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expectedBlock, importBlock)
+				assert.Equal(t, tt.expectedCount, count)
 			}
 		})
 	}

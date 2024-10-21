@@ -24,6 +24,7 @@ func TestCreateEntitlementImportBlock(t *testing.T) {
 		subaccountId  string
 		filterValues  []string
 		expectedBlock string
+		expectedCount int
 		expectError   bool
 	}{
 		{
@@ -31,6 +32,7 @@ func TestCreateEntitlementImportBlock(t *testing.T) {
 			data:          dataEntitlement,
 			subaccountId:  "12345",
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_entitlement.application-logs_lite\n\t\t\t\tid = \"12345,application-logs,lite\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -39,6 +41,7 @@ func TestCreateEntitlementImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{"application-logs_lite"},
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_entitlement.application-logs_lite\n\t\t\t\tid = \"12345,application-logs,lite\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -47,18 +50,20 @@ func TestCreateEntitlementImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{"non-existent-entitlement"},
 			expectedBlock: "",
+			expectedCount: 0,
 			expectError:   true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			importBlock, err := CreateEntitlementImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
+			importBlock, count, err := CreateEntitlementImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expectedBlock, importBlock)
+				assert.Equal(t, tt.expectedCount, count)
 			}
 		})
 	}

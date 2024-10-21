@@ -24,6 +24,7 @@ func TestCreateRoleImportBlock(t *testing.T) {
 		subaccountId  string
 		filterValues  []string
 		expectedBlock string
+		expectedCount int
 		expectError   bool
 	}{
 		{
@@ -31,6 +32,7 @@ func TestCreateRoleImportBlock(t *testing.T) {
 			data:          dataRoles,
 			subaccountId:  "12345",
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_role.administrator\n\t\t\t\tid = \"12345,Administrator,Administrator,retention-manager-service!b1824\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -39,6 +41,7 @@ func TestCreateRoleImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{"businesscontextmanageradministrator"},
 			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_role.businesscontextmanageradministrator\n\t\t\t\tid = \"12345,BusinessContextManagerAdministrator,BusinessContextManagerAdministrator,business-context-manager-service!b28142\"\n\t\t\t  }\n\n",
+			expectedCount: 1,
 			expectError:   false,
 		},
 		{
@@ -47,18 +50,20 @@ func TestCreateRoleImportBlock(t *testing.T) {
 			subaccountId:  "12345",
 			filterValues:  []string{"wrong-role"},
 			expectedBlock: "",
+			expectedCount: 0,
 			expectError:   true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			importBlock, err := createRoleImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
+			importBlock, count, err := createRoleImportBlock(tt.data, tt.subaccountId, tt.filterValues, resourceDoc)
 			if tt.expectError {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 				assert.Equal(t, tt.expectedBlock, importBlock)
+				assert.Equal(t, tt.expectedCount, count)
 			}
 		})
 	}
