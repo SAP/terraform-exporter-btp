@@ -5,6 +5,7 @@ go 1.23.0
 require (
 	github.com/fatih/color v1.17.0
 	github.com/hashicorp/terraform-exec v0.21.0
+	github.com/jedib0t/go-pretty/v6 v6.6.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
@@ -13,11 +14,8 @@ require (
 	github.com/theckman/yacspin v0.13.12
 )
 
-require github.com/jedib0t/go-pretty/v6 v6.6.1 // indirect
-
 require (
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/google/uuid v1.6.0
