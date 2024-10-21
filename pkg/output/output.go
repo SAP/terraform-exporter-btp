@@ -139,7 +139,7 @@ func PrintInventoryCreationSuccessMessage() {
 func RenderSummaryTable(data map[string]int) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredCyanWhiteOnBlack)
+	t.SetStyle(table.StyleLight)
 	t.AppendHeader(table.Row{"Resource Name", "Number of exported resources"})
 
 	for key, value := range data {
@@ -148,6 +148,8 @@ func RenderSummaryTable(data map[string]int) {
 
 	}
 	t.AppendSeparator()
+	fmt.Println("")
+	fmt.Println("📋 Export Summary")
 	t.Render()
 }
 
