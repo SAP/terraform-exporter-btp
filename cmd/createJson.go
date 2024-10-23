@@ -122,24 +122,24 @@ func getCreateJsonCmdExamples(c *cobra.Command) string {
 	return generateCmdHelpCustomExamplesBlock(map[string]string{
 		"Create a JSON file for a directory with all of its resources": fmt.Sprintf("%s %s",
 			output.ColorStringCyan("btptf create-json --directory"),
-			output.ColorStringYellow("[directory ID]"),
+			output.ColorStringYellow("<directory ID>"),
 		),
 		"Create a JSON file for a subaccount with all of its resources": fmt.Sprintf("%s %s",
 			output.ColorStringCyan("btptf create-json --subaccount"),
-			output.ColorStringYellow("[subaccount ID]"),
+			output.ColorStringYellow("<subaccount ID>"),
 		),
 		"Create a JSON file for the entitlements of a subaccount": fmt.Sprintf("%s%s %s %s",
 			output.ColorStringCyan("btptf create-json --resources="),
 			output.ColorStringYellow("'subaccount,entitlements'"),
 			output.ColorStringCyan("--subaccount"),
-			output.ColorStringYellow("[subaccount ID]"),
+			output.ColorStringYellow("<subaccount ID>"),
 		),
 
 		"Create a JSON file for the roles and role collections of a subaccount": fmt.Sprintf("%s%s %s %s",
 			output.ColorStringCyan("btptf create-json --resources="),
 			output.ColorStringYellow("'roles,role-collections'"),
 			output.ColorStringCyan("--subaccount"),
-			output.ColorStringYellow("[subaccount ID]"),
+			output.ColorStringYellow("<subaccount ID>"),
 		),
 	})
 }
