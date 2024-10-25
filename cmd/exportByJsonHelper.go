@@ -9,11 +9,25 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
 func exportByJson(subaccount string, directory string, jsonfile string, resourceFile string, configDir string) {
+	// Check if file size is valid
+	validFileSize, err := files.IsFileSizeValid(jsonfile)
+
+	if err != nil {
+		fmt.Print("\r\n")
+		log.Fatalf("error checking file size: %v", err)
+	}
+
+	if !validFileSize {
+		fmt.Print("\r\n")
+		log.Fatalf("file size exceeds the limit of 5MB")
+	}
+
 	jsonFile, err := os.Open(jsonfile)
 	if err != nil {
 		fmt.Print("\r\n")

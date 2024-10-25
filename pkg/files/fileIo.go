@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 )
 
+const maxJsonFileSize = 5242880 // 5 MB
+
 func DeleteSourceFolder(srcDir string) {
 	err := os.RemoveAll(srcDir)
 	if err != nil {
@@ -81,6 +83,19 @@ func Exists(path string) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+func IsFileSizeValid(filePath string) (bool, error) {
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		fmt.Print("\r\n")
+		return false, fmt.Errorf("error reading JSON file: %v", err)
+	}
+
+	if fileInfo.Size() > maxJsonFileSize {
+		return false, nil
+	}
+	return true, nil
 }
 
 func copyFile(src, dest string) error {
