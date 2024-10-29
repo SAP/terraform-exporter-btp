@@ -1,7 +1,7 @@
 
-# Terraform exporter for SAP BTP
+# Terraform Exporter for SAP BTP
 
-This document explains the syntax and parameters for the various Terraform exporter for SAP BTP commands.
+This document explains the syntax and parameters for the various Terraform exporters for SAP BTP commands.
 
 ## btptf
 
@@ -14,11 +14,11 @@ Terraform Exporter for SAP BTP
       --verbose    Enable verbose output for debugging
 ```
 
-### See also
+### See Also
 
 * [btptf create-json](#btptf-create-json): Create a JSON file with a list of resources
 * [btptf export](#btptf-export): Export resources from SAP BTP
-* [btptf export-by-json](#btptf-export-by-json): Export resources from SAP BTP via JSON file
+* [btptf export-by-json](#btptf-export-by-json): Export resources from SAP BTP via a JSON file
 
 ## btptf create-json
 
@@ -38,17 +38,17 @@ btptf create-json [flags]
   -s, --subaccount string   ID of the subaccount
 ```
 
-### Options inherited from parent commands
+### Options Inherited From Parent Commands
 
 ```azdeveloper
       --verbose    Enable verbose output for debugging
 ```
 
-### See also
+### See Also
 
 * [Back to top](#btptf)
 
-## btptf export
+## btptf Export
 
 Export resources from SAP BTP
 
@@ -66,19 +66,19 @@ btptf export [flags]
   -s, --subaccount string   ID of the subaccount
 ```
 
-### Options inherited from parent commands
+### Options Inherited From Parent Commands
 
 ```azdeveloper
       --verbose    Enable verbose output for debugging
 ```
 
-### See also
+### See Also
 
 * [Back to top](#btptf)
 
 ## btptf export-by-json
 
-Export resources from SAP BTP via JSON file
+Export resources from SAP BTP via a JSON file
 
 ```bash
 btptf export-by-json [flags]
@@ -94,13 +94,13 @@ btptf export-by-json [flags]
   -s, --subaccount string   ID of the subaccount
 ```
 
-### Options inherited from parent commands
+### Options Inherited From Parent Commands
 
 ```azdeveloper
       --verbose    Enable verbose output for debugging
 ```
 
-### See also
+### See Also
 
 * [Back to top](#btptf)
 
