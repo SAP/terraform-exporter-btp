@@ -4,8 +4,7 @@
 # Terraform Exporter for SAP BTP
 
 ## Overview
-
-The *Terraform Exporter for SAP BTP* (btptf CLI), is a tool designed to help bring existing SAP Business Technology Platform(BTP) resources under Terraform management. This tool enables users to convert BTP resources like subaccounts and directories into Terraform state and configuration files thus allowing those resources to be maintained through Terraform's Infrastructure as Code principles. The tool is particularly helpful for teams aiming to migrate to Terraform while managing legacy infrastructure or existing SAP BTP Accounts.
+The *Terraform Exporter for SAP BTP* (btptf CLI) is a handy tool that makes it easier to bring your existing SAP Business Technology Platform (BTP) resources into Terraform. With it, you can take things like subaccounts and directories in BTP and turn them into Terraform state and configuration files. It's especially useful for teams who are moving to Terraform but still need to manage older infrastructure or SAP BTP accounts that are already set up.
 
 Here's how it works:
 
@@ -190,6 +189,26 @@ btptf export -s <subaccount id>
 
 You find a comprehensive overview of the commands and the options in the [documentation](./docs/btptf.md).
 
+## Examples
+1. Launch SAP BTP Cockpit and navigate to the subaccount for which you would like to export the Terraform configuration.
+2. In the Subaccount, navigate to the 'Overview' tab and find the 'Subaccount ID'
+3. To create json file, run the btptf command  `btptf create-json - s <subaccount id>`
+   ```bash
+   btptf create-json - s 9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1
+   ```
+   A file with the name btpResources_<subaccount id>.json e.g btpResources_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.json gets generated.
+4. Edit the json file and remove the resources which need not be exported and managed by Terraform
+   5. Run the btptf command to export Terraform configuration using the json file. btptf export-by-json -1 btpResources_<subaccount id>.json -s <subaccount id>
+   ```bash
+   btptf export-by-json -p btpResources_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.json -s 9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1
+   ```
+6. The Terraform configurations will be under the folder 'generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1'
+7. Review the readme file NextSteps.md under the folder generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1 and adapt the Terraform configuration files as mentioned in the NextSteps.md
+7. In the terminal, navigate to the folder generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1 and run the Terraform plan command.
+This will show a plan of how many resources will be imported, added, changed and destroyed.
+8. Run the command Terraform apply.
+9. This will import the Terraform state and store it in the terraform.state file in under the folder generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.
+10. Now, to modify your BTP resources in this subaccount you can change to Terraform configuration files and run a Terraform apply.
 ## Developer Guide
 
 If you want to contribute to the code of the Terraform Exporter for SAP BTP, please check our [Contribution Guidelines](CONTRIBUTING.md). The technical setup and how to get started are described in the [Developer Guide](./guidelines/DEVELOPER-GUIDE.md)
