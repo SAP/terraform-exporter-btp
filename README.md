@@ -34,15 +34,17 @@ The easiest way to get the binary is to download from the [releases section](htt
 If you want to build the binary from scratch, follow these steps:
 
 1. Open this repository inside VS Code Editor
-1. We have setup a devcontainer, so reopen the repository in the devcontainer.
-1. Open a terminal in VS Code and install the binary by running
+
+2. We have setup a devcontainer, so reopen the repository in the devcontainer.
+
+3. Open a terminal in VS Code and install the binary by running
 
    ```bash
     make install
     ```
    This will implicitly trigger a build of the source. If you want to build *without* install, execute `make build`.
 
-1. The system will store the binary as `btptf` (`btptf.exe` in case of Windows) in the default binary path of your Go installation `$GOPATH/bin`.
+4. The system will store the binary as `btptf` (`btptf.exe` in case of Windows) in the default binary path of your Go installation `$GOPATH/bin`.
 
 > [!TIP]
 > You find the value of the GOPATH via `go env GOPATH`
@@ -54,7 +56,7 @@ If you want to build the binary from scratch, follow these steps:
 In case you get an error that the binary is not executable, navigate to the location of the binary and execute the following command:
 
 ```bash
-chomd +x btptf
+chmod +x btptf
 ```
 
 ## Security Considerations
@@ -81,17 +83,21 @@ The Terraform Exporter for SAP BTP (btptf CLI) provides a convenience functional
 •	Resource configuration retrieved from the platform 
 The btptf CLI offers two options for the import:
 1.	As a one-step process via creating the import configuration by naming the resource types.
+
 2.	As a two-step process via creating a local JSON file with the resources to be imported. This file can be adjusted and then used as a configuration for the import. 
 
 To achieve these goals the btptf CLI encapsulates three major functionalities,
 1.	Fetching and parsing the markdown documentation for the resource from the provider repository (publicly available) to collect the information on the resource keys needed for the import.
+
 2.	Creating the files with the import block based on the information from the documentation and reading the data from the platform leveraging the corresponding Terraform [data sources](https://registry.terraform.io/providers/SAP/btp/latest/docs).
+
 3.	Executing the Terraform commands via Terraform CLI to generate the resource configuration and store the results in the file system.
 
 The following points should be mentioned:
-•	The authentication to be able to read the data from the platform leverages the options provided by the [Terraform Provider for SAP BTP](https://registry.terraform.io/providers/SAP/btp/latestdocumentation). The values must be provided via environment variables.
+1. The authentication to be able to read the data from the platform leverages the options provided by the [Terraform Provider for SAP BTP](https://registry.terraform.io/providers/SAP/btp/latestdocumentation). The values must be provided via environment variables.
 No value is stored in the CLI or in any of the generated configuration files. The resources the user has access are the ones that are reflected in the role collections assigned to the authenticated user.
-•	No state file is created by the btptf CLI. The reason is that we want to enable best practices and allow the user to add a remote state storage configuration (always customer specific) to the configuration before triggering the state import.
+
+2. No state file is created by the btptf CLI. The reason is that we want to enable best practices and allow the user to add a remote state storage configuration (always customer specific) to the configuration before triggering the state import.
 
 
 
@@ -100,12 +106,13 @@ No value is stored in the CLI or in any of the generated configuration files. Th
 After executing the setup of the btptf CLI, you must set some required environment variables needed for authentication.
 
 1. Set the environment variable `BTP_GLOBALACCOUNT` which specifies the *subdomain* of your SAP BTP global account.
-1. Depending on the authentication flow, set the following environment variables:
+
+2. Depending on the authentication flow, set the following environment variables:
 
    - Basic Authentication: set the environment variable `BTP_USERNAME` and `BTP_PASSWORD`
    - X509 Authentication: set the environment variables `BTP_TLS_CLIENT_CERTIFICATE`, `BTP_TLS_CLIENT_KEY`, `BTP_TLS_IDP_URL`
 
-1. In addition you can set the following optional parameters as environment variables, depending on your requirements:
+3. In addition you can set the following optional parameters as environment variables, depending on your requirements:
 
    - Specify a custom IdP for the authentication via `BTP_IDP`
    - Specify a URL of the BTP CLI server (SAP internal only) via `BTP_CLI_SERVER_URL`
@@ -190,25 +197,39 @@ btptf export -s <subaccount id>
 You find a comprehensive overview of the commands and the options in the [documentation](./docs/btptf.md).
 
 ## Examples
-1. Launch SAP BTP Cockpit and navigate to the subaccount for which you would like to export the Terraform configuration.
+The below example explains how to use the Terraform Exporter for SAP BTP to export the Terraform configuration for an existing SAP BTP Subaccount and use it to generate the Terraform state. Post this the BTP Subaccount can be managed by Terraform.
+
+1. Launch SAP BTP Cockpit and navigate to an existing subaccount or create a new subaccount. 
+
 2. In the Subaccount, navigate to the 'Overview' tab and find the 'Subaccount ID'
-3. To create json file, run the btptf command  `btptf create-json - s <subaccount id>`
+
+3. Generate the json file which contains the list of resources to be exported. This json file can be generated by running the btptf CLI command btptf create-json - s <subaccount id>
    ```bash
    btptf create-json - s 9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1
    ```
-   A file with the name btpResources_<subaccount id>.json e.g btpResources_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.json gets generated.
-4. Edit the json file and remove the resources which need not be exported and managed by Terraform
-   5. Run the btptf command to export Terraform configuration using the json file. btptf export-by-json -1 btpResources_<subaccount id>.json -s <subaccount id>
+   The resources list file with the name btpResources_<subaccount id>.json e.g btpResources_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.json gets generated.
+   ![image](./docs/img/create-json.jpg)
+
+4. Edit the json file and remove the resources which need not be exported and managed by Terraform.
+
+5. Run the btptf CLI command to export Terraform configuration using the json file. btptf export-by-json -p btpResources_<subaccount id>.json -s <subaccount id>
    ```bash
    btptf export-by-json -p btpResources_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.json -s 9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1
    ```
-6. The Terraform configurations will be under the folder 'generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1'
+6. The Terraform configurations will be generated under the folder 'generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1'. The output of the command will show an export summary which contains the information about which 'Resource Names' and their respective count. 
+![image](./docs/img/generated-config.jpg)
+
 7. Review the readme file NextSteps.md under the folder generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1 and adapt the Terraform configuration files as mentioned in the NextSteps.md
-7. In the terminal, navigate to the folder generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1 and run the Terraform plan command.
+
+8. In the terminal, navigate to the folder generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1 and run the Terraform plan command.
 This will show a plan of how many resources will be imported, added, changed and destroyed.
-8. Run the command Terraform apply.
-9. This will import the Terraform state and store it in the terraform.state file in under the folder generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.
+![image](./docs/img/tf-plan.jpg)
+
+9. Run the command Terraform apply. This will import the Terraform state and store it in the terraform.state file in under the folder generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.
+![image](./docs/img/tf-apply.jpg)
+
 10. Now, to modify your BTP resources in this subaccount you can change to Terraform configuration files and run a Terraform apply.
+
 ## Developer Guide
 
 If you want to contribute to the code of the Terraform Exporter for SAP BTP, please check our [Contribution Guidelines](CONTRIBUTING.md). The technical setup and how to get started are described in the [Developer Guide](./guidelines/DEVELOPER-GUIDE.md)
