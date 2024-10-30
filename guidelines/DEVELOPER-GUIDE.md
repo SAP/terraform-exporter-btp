@@ -8,7 +8,7 @@ By default the CLI suppresses the verbose output of the different Terraform comm
 
 We provide a configuration for debugging the `btptf` commands in VS Code. The configuration is available in the `.vscode` directory as `launch.json`
 
-Here is an example on how to debug the command `btptf create-json`:
+Here is an example of how to debug the command `btptf create-json`:
 
 1. Set a breakpoint in the file `cmd/createJson.go` in the run section of the command:
 
@@ -19,7 +19,7 @@ Here is an example on how to debug the command `btptf create-json`:
    <img src="../assets/devguide-pics/debug0b.png" alt="VS Code Debug launch configuration" width="600px">
 
    > [!WARNING]
-   > The environment values will be displayed as clear text in the debug console. If you are using your password as environment paramater this will become visible when you start debugging. We therefore highly recommend to use the SSO option.
+   > The environment values will be displayed as clear text in the debug console. If you are using your password as an environment parameter this will become visible when you start debugging. We therefore highly recommend using the SSO option.
 
 1. Open the debug perspective in the VS Code side bar:
 
@@ -33,7 +33,7 @@ Here is an example on how to debug the command `btptf create-json`:
 
    <img src="../assets/devguide-pics/debug3.png" alt="Run debug configuration" width="600px">
 
-1. VS Code will prompt you for the command via the command palette. It defaults to `resource all -s`. Enter the command and the parameters you want to use for the command execution. In our case we add a subaccount ID and confirm by pressing `Enter`:
+1. VS Code will prompt you for the command via the command palette. It defaults to `resource all -s`. Enter the command and the parameters that you want to use for the command execution. In our case we add a subaccount ID and confirm by pressing `Enter`:
 
    <img src="../assets/devguide-pics/debug4.png" alt="Prompt for parameters in debug configuration" width="600px">
 
@@ -43,35 +43,35 @@ Here is an example on how to debug the command `btptf create-json`:
 
 Happy debugging!
 
-## Generate markdown documentation
+## Generate Markdown Documentation
 
-When updating command descriptions you must generate the markdown documentation via the make file:
+When updating command descriptions, you must generate the markdown documentation via the make file:
 
 ```bash
 make docs
 ```
 
-## Adding support for new resources on subaccount level
+## Adding support for New Resources on Subaccount Level
 
-To enable new resources on subaccount level you must execute the following steps:
+To enable new resources on the subaccount level, you must execute the following steps:
 
 1. Add the corresponding *constants* for the command parameter and the technical resource name in the `tfutils/tfutils.go` file.
 1. Add the *mapping of the constants* into the function `TranslateResourceParamToTechnicalName` in the `tfutils/tfutils.go` file.
 1. Add the command constant to the slice of `AllowedResources` in the `tfutil/tfconfig.go` file.
 1. Create a new implementation for the import factory in the directory `tfimportprovider`. You can take the file `subaccountRoleCollectionImportProvider.go` as an example concerning the structure of the file.
 1. Add the new implementation to the import factory function `GetImportBlockProvider` in the file `tfimportprovider/tfImportProviderFactory.go`.
-1. Depending on the resource you must define a transformation of the data from the data source to a string array. Place this logic into the function `transformDataToStringArray` in the `tfutils/tfutils.go` file.
+1. Depending on the resource, you must define a transformation of the data from the data source to a string array. Place this logic into the function `transformDataToStringArray` in the `tfutils/tfutils.go` file.
 1. Depending on your resource you might also need to add custom formatting logic for the resource address in the Terraform configuration. Place that into the file `output/format.go`. In most cases the function `FormatResourceNameGeneric` is sufficient.
 
 ### Adding Unit Tests
 
-The main domain logic that we must test is located in the factory implementations in the directory `tfimportprovider`. Creating these tests should reflect the real world setup, so we need to extract the test data from subaccounts and store them in the tests. In the following sections we describe how to best extract this data namely the JSON string that you need as input for your test.
+The main domain logic that we must test is located in the factory implementations in the directory `tfimportprovider`. Creating these tests should reflect the real-world setup, so we need to extract the test data from subaccounts and store them in the tests. In the following sections, we describe how to best extract this data namely the JSON string that you need as input for your test.
 
 #### Prerequisites
 
 As a prerequisite you should have a Terraform account with the resource that you want to cover in your test up and running. We will use Terraform to extract the base data.
 
-#### Extracting the data
+#### Extracting the Data
 
 First create a Terraform setup that allows you to read the data via a data source. The basic setup could look like this:
 
@@ -116,7 +116,7 @@ you have two options now:
 
 - If you want to create a JSON string with all the resources contained in the `plan.out`, execute the script `guidelines/scripts/transform_all.sh` that needs to be located at the same level as the `plan.out` file.
 - If you want to adjust the result you must execute the following steps:
-   1. Generate the JSON file via: terraform show -json plan.out |  jq .planned_values.outputs.all.value > restrictedplan.json
+   1. Generate the JSON file via: Terraform show -json plan.out |  jq .planned_values.outputs.all.value > restrictedplan.json
    1. Adjust the JSON file e.g., remove some entries
    1. execute the script `guidelines/scripts/transform_json.sh` that needs to be located at the same level as the `restrictedplan.json` file.
 
@@ -129,7 +129,7 @@ GitHub Copilot can be quite useful to setup the basics for the test, but some re
 
 ## Creating Console Help
 
-We make use of the custom templating option available in the Cobra Framework to construct the output in the console. The override of the default templating flow is triggered in the commands via the function `SetHelpTemplate` and `SetUsageTemplate`.
+We use the custom templating option available in the Cobra Framework to construct the output in the console. The override of the default templating flow is triggered in the commands via the function `SetHelpTemplate` and `SetUsageTemplate`.
 
 In general, we call the `generateCmdHelp` function to generate the output that will be displayed in the console. The `generateCmdHelp` function gets the command as well as a structure of the type `generateCmdHelpOptions`.
 
