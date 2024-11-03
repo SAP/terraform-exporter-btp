@@ -1,12 +1,15 @@
 autocompletion
+APIs
 breakpoint
 BTP
 btp
 btptf
+btpResources
 CLA
 CLI
 config
 Copilot
+customizations
 DCO
 dependabot
 devcontainer
@@ -15,6 +18,9 @@ faq
 Github
 github
 Golang
+HashiCorp
+hardcoding
+HCL
 html
 https
 IdP
@@ -23,13 +29,16 @@ JSON
 jq
 macOS
 md
+NextSteps
 Pre
 pre
 PowerShell
 powershell
 README
+readme
 resourceFileName
 restrictedplan
+runtime
 spf
 SSO
 sso
@@ -42,6 +51,7 @@ TBD
 templating
 Terraform
 terraform
+Terraform's
 tf
 toolchain
 UIs
@@ -51,3 +61,4 @@ YAML
 yaml
 yml
 zsh
+

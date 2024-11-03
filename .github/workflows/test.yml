@@ -42,23 +42,6 @@ jobs:
         with:
           version: latest
 
-  generate:
-    if: github.event.pull_request.draft == false
-    name: Docu Generation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-          cache: true
-      - run: go run main.go gendoc
-      - name: git diff
-        run: |
-          git add .
-          git diff --staged --compact-summary --no-color --exit-code || \
-            (echo; echo "Unexpected difference docu generation. Run 'make docs' command and commit."; exit 1)
-
   test:
     if: github.event.pull_request.draft == false
     name: Unit Tests

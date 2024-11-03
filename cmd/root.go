@@ -29,7 +29,6 @@ func init() {
 
 	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, " Enable verbose output for debugging")
 	_ = viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
-	rootCmd.AddCommand(docCmd)
 	rootCmd.SetHelpTemplate(generateCmdHelp(rootCmd, templateOptions))
 	rootCmd.SetUsageTemplate(generateCmdHelp(rootCmd, templateOptions))
 }
@@ -41,16 +40,6 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
-}
-
-var docCmd = &cobra.Command{
-	Use:    "gendoc",
-	Short:  "Generate markdown documentation",
-	Hidden: true, // Hide the command from the official CLI
-	Run: func(cmd *cobra.Command, args []string) {
-
-		generateMarkdown(rootCmd)
-	},
 }
 
 func getRootCmdDescription(c *cobra.Command) string {
