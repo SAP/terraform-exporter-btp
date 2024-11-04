@@ -4,7 +4,7 @@ import "testing"
 
 func TestReadDataSource(t *testing.T) {
 	//data := map[string]interface {} ["id": "5163621f-6a1e-4fbf-af3a-0f530a0dc4d4", "subaccount_id": "5163621f-6a1e-4fbf-af3a-0f530a0dc4d4", "values": struct {id string, instance_name string}{"BCC1E35C-EC86-49FC-96C5-5A3BBBB248C9","terraform-integration-prod_testcf1-zazq2cbi"}]
-	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", "", SubaccountEnvironmentInstanceType)
+	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", "", "", SubaccountEnvironmentInstanceType)
 
 	if err != nil {
 		t.Errorf("error creating dataBlock")
@@ -20,7 +20,7 @@ func TestReadDataSource(t *testing.T) {
 
 func TestReadSubaccountEntilementsDataSource(t *testing.T) {
 
-	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", "", SubaccountEntitlementType)
+	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", "", "", SubaccountEntitlementType)
 
 	if err != nil {
 		t.Errorf("error creating dataBlock")
@@ -36,7 +36,7 @@ func TestReadSubaccountEntilementsDataSource(t *testing.T) {
 
 func TestReadSubaccountDataSource(t *testing.T) {
 	//data := map[string]interface {} ["id": "5163621f-6a1e-4fbf-af3a-0f530a0dc4d4", "subaccount_id": "5163621f-6a1e-4fbf-af3a-0f530a0dc4d4", "values": struct {id string, instance_name string}{"BCC1E35C-EC86-49FC-96C5-5A3BBBB248C9","terraform-integration-prod_testcf1-zazq2cbi"}]
-	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", "", SubaccountType)
+	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", "", "", SubaccountType)
 
 	if err != nil {
 		t.Errorf("error creating dataBlock")
@@ -52,7 +52,7 @@ func TestReadSubaccountDataSource(t *testing.T) {
 
 func TestReadSubaccountSubscriptionDataSource(t *testing.T) {
 	//data := map[string]interface {} ["id": "5163621f-6a1e-4fbf-af3a-0f530a0dc4d4", "subaccount_id": "5163621f-6a1e-4fbf-af3a-0f530a0dc4d4", "values": struct {id string, instance_name string}{"BCC1E35C-EC86-49FC-96C5-5A3BBBB248C9","terraform-integration-prod_testcf1-zazq2cbi"}]
-	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", "", SubaccountSubscriptionType)
+	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", "", "", SubaccountSubscriptionType)
 
 	if err != nil {
 		t.Errorf("error creating dataBlock")
@@ -68,7 +68,7 @@ func TestReadSubaccountSubscriptionDataSource(t *testing.T) {
 
 func TestReadSubaccountTrustConfigurationsDataSource(t *testing.T) {
 	//data := map[string]interface {} ["id": "5163621f-6a1e-4fbf-af3a-0f530a0dc4d4", "subaccount_id": "5163621f-6a1e-4fbf-af3a-0f530a0dc4d4", "values": struct {id string, instance_name string}{"BCC1E35C-EC86-49FC-96C5-5A3BBBB248C9","terraform-integration-prod_testcf1-zazq2cbi"}]
-	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", "", SubaccountTrustConfigurationType)
+	dataBlock, err := readDataSource("5163621f-6a1e-4fbf-af3a-0f530a0dc4d5", "", "", SubaccountTrustConfigurationType)
 
 	if err != nil {
 		t.Errorf("error creating dataBlock")

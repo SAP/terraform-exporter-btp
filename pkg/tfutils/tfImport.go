@@ -19,10 +19,12 @@ import (
 
 // Constants for TF version for Terraform providers e.g. for SAP BTP
 const BtpProviderVersion = "v1.7.0"
+const CfProviderVersion = "v1.0.0"
 
 const (
-	SubaccountLevel = "subaccountLevel"
-	DirectoryLevel  = "directoryLevel"
+	SubaccountLevel   = "subaccountLevel"
+	DirectoryLevel    = "directoryLevel"
+	OrganizationLevel = "organizationLevel"
 )
 
 const (
@@ -37,6 +39,7 @@ const (
 	CmdServiceInstanceParameter     string = "service-instances"
 	CmdServiceBindingParameter      string = "service-bindings"
 	CmdSecuritySettingParameter     string = "security-settings"
+	CmdCfSpaceParameter             string = "spaces"
 )
 
 const (
@@ -59,6 +62,10 @@ const (
 	DirectoryRoleCollectionType string = "btp_directory_role_collection"
 )
 
+const (
+	CfSpaceType string = "cloudfoundry_space"
+)
+
 const DirectoryFeatureDefault string = "DEFAULT"
 const DirectoryFeatureEntitlements string = "ENTITLEMENTS"
 const DirectoryFeatureRoles string = "AUTHORIZATIONS"
@@ -75,9 +82,9 @@ type BtpResources struct {
 	BtpResources []BtpResource
 }
 
-func FetchImportConfiguration(subaccountId string, directoryId string, resourceType string, tmpFolder string) (map[string]interface{}, error) {
+func FetchImportConfiguration(subaccountId string, directoryId string, organizationId string, resourceType string, tmpFolder string) (map[string]interface{}, error) {
 
-	dataBlock, err := readDataSource(subaccountId, directoryId, resourceType)
+	dataBlock, err := readDataSource(subaccountId, directoryId, organizationId, resourceType)
 	if err != nil {
 		return nil, fmt.Errorf("error reading data source: %v", err)
 	}
@@ -88,7 +95,7 @@ func FetchImportConfiguration(subaccountId string, directoryId string, resourceT
 		return nil, fmt.Errorf("create file %s failed: %v", dataBlockFile, err)
 	}
 
-	_, iD := GetExecutionLevelAndId(subaccountId, directoryId)
+	_, iD := GetExecutionLevelAndId(subaccountId, directoryId, organizationId)
 
 	jsonBytes, err := getTfStateData(tmpFolder, resourceType, iD)
 	if err != nil {
@@ -104,7 +111,7 @@ func FetchImportConfiguration(subaccountId string, directoryId string, resourceT
 	return data, nil
 }
 
-func GetDocByResourceName(kind DocKind, resourceName string) (EntityDocs, error) {
+func GetDocByResourceName(kind DocKind, resourceName string, level string) (EntityDocs, error) {
 	var choice string
 
 	if (kind == ResourcesKind && resourceName != SubaccountSecuritySettingType) || (kind == DataSourcesKind && resourceName == SubaccountType) || (kind == DataSourcesKind && resourceName == DirectoryType) {
@@ -115,7 +122,25 @@ func GetDocByResourceName(kind DocKind, resourceName string) (EntityDocs, error)
 		choice = resourceName + "s"
 	}
 
-	doc, err := GetDocsForResource("SAP", "btp", "btp", kind, choice, BtpProviderVersion, "github.com")
+	var ghOrg string
+	var provider string
+	var resourcePrefix string
+	var providerVersion string
+
+	if level == OrganizationLevel {
+		ghOrg = "cloudfoundry"
+		provider = "cloudfoundry"
+		resourcePrefix = "cloudfoundry"
+		providerVersion = BtpProviderVersion
+
+	} else {
+		ghOrg = "SAP"
+		provider = "btp"
+		resourcePrefix = "btp"
+		providerVersion = BtpProviderVersion
+	}
+
+	doc, err := GetDocsForResource(ghOrg, provider, resourcePrefix, kind, choice, providerVersion, "github.com")
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed for %s, %s: %v", kind, choice, err)
@@ -161,16 +186,18 @@ func TranslateResourceParamToTechnicalName(resource string, level string) string
 		return SubaccountSecuritySettingType
 	case CmdDirectoryParameter:
 		return DirectoryType
+	case CmdCfSpaceParameter:
+		return CfSpaceType
 	}
 	return ""
 }
 
-func ReadDataSources(subaccountId string, directoryId string, resourceList []string) (btpResources BtpResources, err error) {
+func ReadDataSources(subaccountId string, directoryId string, organizationId string, resourceList []string) (btpResources BtpResources, err error) {
 
 	var btpResourcesList []BtpResource
 	var featureListMemory []string
 
-	level, _ := GetExecutionLevelAndId(subaccountId, directoryId)
+	level, _ := GetExecutionLevelAndId(subaccountId, directoryId, organizationId)
 
 	for _, resource := range resourceList {
 
@@ -178,7 +205,7 @@ func ReadDataSources(subaccountId string, directoryId string, resourceList []str
 			continue
 		}
 
-		values, featureList, err := generateDataSourcesForList(subaccountId, directoryId, resource)
+		values, featureList, err := generateDataSourcesForList(subaccountId, directoryId, organizationId, resource)
 
 		if resource == CmdDirectoryParameter {
 			// Store the features of the directory for later use
@@ -201,16 +228,15 @@ func ReadDataSources(subaccountId string, directoryId string, resourceList []str
 	return btpResources, nil
 }
 
-func readDataSource(subaccountId string, directoryId string, resourceName string) (string, error) {
+func readDataSource(subaccountId string, directoryId string, organizationId string, resourceName string) (string, error) {
+	level, _ := GetExecutionLevelAndId(subaccountId, directoryId, organizationId)
 
-	doc, err := GetDocByResourceName(DataSourcesKind, resourceName)
+	doc, err := GetDocByResourceName(DataSourcesKind, resourceName, level)
 	if err != nil {
 		return "", err
 	}
 
 	var dataBlock string
-
-	level, _ := GetExecutionLevelAndId(subaccountId, directoryId)
 
 	switch level {
 	case SubaccountLevel:
@@ -347,15 +373,15 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 	return stringArr
 }
 
-func generateDataSourcesForList(subaccountId string, directoryId string, resourceName string) ([]string, []string, error) {
+func generateDataSourcesForList(subaccountId string, directoryId string, organizationId string, resourceName string) ([]string, []string, error) {
 	dataBlockFile := filepath.Join(TmpFolder, "main.tf")
 	var jsonBytes []byte
 
-	level, iD := GetExecutionLevelAndId(subaccountId, directoryId)
+	level, iD := GetExecutionLevelAndId(subaccountId, directoryId, organizationId)
 
 	btpResourceType := TranslateResourceParamToTechnicalName(resourceName, level)
 
-	dataBlock, err := readDataSource(subaccountId, directoryId, btpResourceType)
+	dataBlock, err := readDataSource(subaccountId, directoryId, organizationId, btpResourceType)
 	if err != nil {
 		error := fmt.Errorf("error reading data source: %s", err)
 		return nil, nil, error
@@ -398,11 +424,13 @@ func runTerraformCommand(args ...string) error {
 	return cmd.Run()
 }
 
-func GetExecutionLevelAndId(subaccountID string, directoryID string) (level string, id string) {
+func GetExecutionLevelAndId(subaccountID string, directoryID string, organizationID string) (level string, id string) {
 	if subaccountID != "" {
 		return SubaccountLevel, subaccountID
 	} else if directoryID != "" {
 		return DirectoryLevel, directoryID
+	} else if organizationID != "" {
+		return OrganizationLevel, organizationID
 	}
 	return "", ""
 }

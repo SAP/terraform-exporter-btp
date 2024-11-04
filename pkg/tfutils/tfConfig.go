@@ -87,7 +87,7 @@ func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool
 	return nil
 }
 
-func ConfigureProvider() {
+func ConfigureProvider(level string) {
 	tmpdir, err := os.MkdirTemp("", "provider.tf")
 	if err != nil {
 		panic(err)
@@ -102,55 +102,109 @@ func ConfigureProvider() {
 		fmt.Printf("temp file created at %s\n", abspath)
 	}
 
-	username := os.Getenv("BTP_USERNAME")
-	password := os.Getenv("BTP_PASSWORD")
-	enableSSO := os.Getenv("BTP_ENABLE_SSO")
-	cliServerUrl := os.Getenv("BTP_CLI_SERVER_URL")
-	globalAccount := os.Getenv("BTP_GLOBALACCOUNT")
-	idp := os.Getenv("BTP_IDP")
-	tlsClientCertificate := os.Getenv("BTP_TLS_CLIENT_CERTIFICATE")
-	tlsClientKey := os.Getenv("BTP_TLS_CLIENT_KEY")
-	tlsIdpURL := os.Getenv("BTP_TLS_IDP_URL")
+	var providerContent string
 
-	providerContent := "terraform {\nrequired_providers {\nbtp = {\nsource  = \"SAP/btp\"\nversion = \"" + BtpProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"btp\" {\n"
+	if level == SubaccountLevel || level == DirectoryLevel {
+		username := os.Getenv("BTP_USERNAME")
+		password := os.Getenv("BTP_PASSWORD")
+		enableSSO := os.Getenv("BTP_ENABLE_SSO")
+		cliServerUrl := os.Getenv("BTP_CLI_SERVER_URL")
+		globalAccount := os.Getenv("BTP_GLOBALACCOUNT")
+		idp := os.Getenv("BTP_IDP")
+		tlsClientCertificate := os.Getenv("BTP_TLS_CLIENT_CERTIFICATE")
+		tlsClientKey := os.Getenv("BTP_TLS_CLIENT_KEY")
+		tlsIdpURL := os.Getenv("BTP_TLS_IDP_URL")
 
-	if !(len(strings.TrimSpace(username)) != 0 && len(strings.TrimSpace(password)) != 0) {
-		if len(strings.TrimSpace(enableSSO)) == 0 {
+		providerContent = "terraform {\nrequired_providers {\nbtp = {\nsource  = \"SAP/btp\"\nversion = \"" + BtpProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"btp\" {\n"
+
+		if !(len(strings.TrimSpace(username)) != 0 && len(strings.TrimSpace(password)) != 0) {
+			if len(strings.TrimSpace(enableSSO)) == 0 {
+				cleanup()
+				fmt.Print("\r\n")
+				log.Fatalf("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
+			}
+		}
+
+		if len(strings.TrimSpace(globalAccount)) == 0 {
 			cleanup()
 			fmt.Print("\r\n")
-			log.Fatalf("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
+			log.Fatalf("global account not set. set BTP_GLOBALACCOUNT environment variable to set global account")
+		} else {
+			providerContent = providerContent + "globalaccount = \"" + globalAccount + "\"\n"
 		}
-	}
 
-	if len(strings.TrimSpace(globalAccount)) == 0 {
-		cleanup()
-		fmt.Print("\r\n")
-		log.Fatalf("global account not set. set BTP_GLOBALACCOUNT environment variable to set global account")
-	} else {
-		providerContent = providerContent + "globalaccount = \"" + globalAccount + "\"\n"
-	}
+		if len(strings.TrimSpace(cliServerUrl)) != 0 {
+			providerContent = providerContent + "cli_server_url=\"" + cliServerUrl + "\"\n"
+		}
 
-	if len(strings.TrimSpace(cliServerUrl)) != 0 {
-		providerContent = providerContent + "cli_server_url=\"" + cliServerUrl + "\"\n"
-	}
+		if len(strings.TrimSpace(idp)) != 0 {
+			providerContent = providerContent + "idp=\"" + idp + "\"\n"
+		}
 
-	if len(strings.TrimSpace(idp)) != 0 {
-		providerContent = providerContent + "idp=\"" + idp + "\"\n"
-	}
+		if len(strings.TrimSpace(tlsClientCertificate)) != 0 {
+			providerContent = providerContent + "tls_client_certificate =\"" + tlsClientCertificate + "\"\n"
+		}
 
-	if len(strings.TrimSpace(tlsClientCertificate)) != 0 {
-		providerContent = providerContent + "tls_client_certificate =\"" + tlsClientCertificate + "\"\n"
-	}
+		if len(strings.TrimSpace(tlsClientKey)) != 0 {
+			providerContent = providerContent + "tls_client_key =\"" + tlsClientKey + "\"\n"
+		}
 
-	if len(strings.TrimSpace(tlsClientKey)) != 0 {
-		providerContent = providerContent + "tls_client_key =\"" + tlsClientKey + "\"\n"
-	}
+		if len(strings.TrimSpace(tlsIdpURL)) != 0 {
+			providerContent = providerContent + "tls_idp_url =\"" + tlsIdpURL + "\"\n"
+		}
 
-	if len(strings.TrimSpace(tlsIdpURL)) != 0 {
-		providerContent = providerContent + "tls_idp_url =\"" + tlsIdpURL + "\"\n"
-	}
+		providerContent = providerContent + "}"
 
-	providerContent = providerContent + "}"
+	} else if level == OrganizationLevel {
+
+		username := os.Getenv("CF_USER")
+		password := os.Getenv("CF_PASSWORD")
+		apiUrl := os.Getenv("CF_API_URL")
+		cfOrigin := os.Getenv("CF_ORIGIN")
+		cfClientId := os.Getenv("CF_CLIENT_ID")
+		cfClientSecret := os.Getenv("CF_CLIENT_SECRET")
+		cfAccessToken := os.Getenv("CF_ACCESS_TOKEN")
+		cfRefreshToken := os.Getenv("CF_REFRESH_TOKEN")
+
+		providerContent = "terraform {\nrequired_providers {\nbtp = {\nsource  = \"cloudfoundry/cloudfoundry\"\nversion = \"" + CfProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"cloudfoundry\" {\n"
+
+		if (len(strings.TrimSpace(username)) == 0 && len(strings.TrimSpace(password)) == 0) && (len(strings.TrimSpace(cfAccessToken)) == 0 && len(strings.TrimSpace(cfRefreshToken)) == 0) && (len(strings.TrimSpace(cfClientId)) == 0 && len(strings.TrimSpace(cfClientSecret)) == 0) {
+			cleanup()
+			fmt.Print("\r\n")
+			log.Fatalf("set Cloud Foundry environment variables for login.")
+		}
+
+		if len(strings.TrimSpace(apiUrl)) == 0 {
+			cleanup()
+			fmt.Print("\r\n")
+			log.Fatalf("cf api URL not set. set CF_API_URL environment variable to set CF API endpoint")
+		} else {
+			providerContent = providerContent + "api_url = \"" + apiUrl + "\"\n"
+		}
+
+		if len(strings.TrimSpace(cfOrigin)) != 0 {
+			providerContent = providerContent + "origin=\"" + cfOrigin + "\"\n"
+		}
+
+		if len(strings.TrimSpace(cfClientId)) != 0 {
+			providerContent = providerContent + "cf_client_id =\"" + cfClientId + "\"\n"
+		}
+
+		if len(strings.TrimSpace(cfClientSecret)) != 0 {
+			providerContent = providerContent + "cf_client_secret =\"" + cfClientSecret + "\"\n"
+		}
+
+		if len(strings.TrimSpace(cfAccessToken)) != 0 {
+			providerContent = providerContent + "cf_access_token =\"" + cfAccessToken + "\"\n"
+		}
+
+		if len(strings.TrimSpace(cfRefreshToken)) != 0 {
+			providerContent = providerContent + "cf_refresh_token =\"" + cfRefreshToken + "\"\n"
+		}
+
+		providerContent = providerContent + "}"
+
+	}
 
 	err = files.CreateFileWithContent(abspath, providerContent)
 	if err != nil {
@@ -161,7 +215,7 @@ func ConfigureProvider() {
 
 }
 
-func SetupConfigDir(configFolder string, isMainCmd bool) {
+func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 
 	if isMainCmd {
 		message := "set up config directory \"" + configFolder + "\""
@@ -169,7 +223,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool) {
 	}
 
 	if len(TmpFolder) == 0 {
-		ConfigureProvider()
+		ConfigureProvider(level)
 	}
 	curWd, err := os.Getwd()
 	if err != nil {
@@ -358,8 +412,8 @@ func FinalizeTfConfig(configFolder string) {
 }
 
 // Convenience functions that wrap repetitive steps
-func ExecPreExportSteps(tempConfigDir string) {
-	SetupConfigDir(tempConfigDir, false)
+func ExecPreExportSteps(tempConfigDir string, level string) {
+	SetupConfigDir(tempConfigDir, false, level)
 }
 
 func ExecPostExportSteps(tempConfigDir string, targetConfigDir string, targetResourceFileName string, resourceNameLong string) {

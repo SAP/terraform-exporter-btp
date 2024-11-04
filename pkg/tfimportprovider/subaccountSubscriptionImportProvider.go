@@ -26,7 +26,7 @@ func (tf *subaccountSubscriptionImportProvider) GetImportBlock(data map[string]i
 	count := 0
 	subaccountId := levelId
 
-	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountSubscriptionType)
+	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountSubscriptionType, levelId)
 	if err != nil {
 		return "", count, err
 	}

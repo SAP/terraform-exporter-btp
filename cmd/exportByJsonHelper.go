@@ -14,7 +14,7 @@ import (
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
-func exportByJson(subaccount string, directory string, jsonfile string, resourceFile string, configDir string) {
+func exportByJson(subaccount string, directory string, organization string, jsonfile string, resourceFile string, configDir string) {
 	// Check if file size is valid
 	validFileSize, err := files.IsFileSizeValid(jsonfile)
 
@@ -53,7 +53,7 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 
 	var resNames []string
 
-	level, _ := tfutils.GetExecutionLevelAndId(subaccount, directory)
+	level, _ := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
 
 	allowedResources := tfutils.GetValidResourcesByLevel(level)
 
@@ -74,7 +74,7 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 		return
 	}
 
-	tfutils.SetupConfigDir(configDir, true)
+	tfutils.SetupConfigDir(configDir, true, level)
 	resultStore := make(map[string]int)
 
 	for _, resName := range resNames {
@@ -85,13 +85,13 @@ func exportByJson(subaccount string, directory string, jsonfile string, resource
 			}
 		}
 		if len(value) != 0 {
-			resourceType, count := generateConfigForResource(resName, value, subaccount, directory, configDir, resourceFile)
+			resourceType, count := generateConfigForResource(resName, value, subaccount, directory, organization, configDir, resourceFile)
 			resultStore[resourceType] = count
 		}
 	}
 
 	tfutils.FinalizeTfConfig(configDir)
-	generateNextStepsDocument(configDir, subaccount, directory)
+	generateNextStepsDocument(configDir, subaccount, directory, organization)
 	output.RenderSummaryTable(resultStore)
 	tfutils.CleanupProviderConfig()
 }

@@ -18,21 +18,21 @@ const tfConfigFileName = "btp_resources.tf"
 const configDirDefault = "generated_configurations_<account-id>"
 const jsonFileDefault = "btpResources_<account-id>.json"
 
-func generateConfigForResource(resource string, values []string, subaccountId string, directoryId string, configDir string, resourceFileName string) (resourceType string, count int) {
+func generateConfigForResource(resource string, values []string, subaccountId string, directoryId string, organizationId string, configDir string, resourceFileName string) (resourceType string, count int) {
 	tempConfigDir := resource + "-config"
 
-	level, iD := tfutils.GetExecutionLevelAndId(subaccountId, directoryId)
+	level, iD := tfutils.GetExecutionLevelAndId(subaccountId, directoryId, organizationId)
 
 	importProvider, _ := tfimportprovider.GetImportBlockProvider(resource, level)
 	resourceType = importProvider.GetResourceType()
 	techResourceNameLong := strings.ToUpper(resourceType)
 
-	tfutils.ExecPreExportSteps(tempConfigDir)
+	tfutils.ExecPreExportSteps(tempConfigDir, level)
 
 	output.AddNewLine()
 	spinner := output.StartSpinner("crafting import block for " + techResourceNameLong)
 
-	data, err := tfutils.FetchImportConfiguration(subaccountId, directoryId, resourceType, tfutils.TmpFolder)
+	data, err := tfutils.FetchImportConfiguration(subaccountId, directoryId, organizationId, resourceType, tfutils.TmpFolder)
 	if err != nil {
 		tfutils.CleanupProviderConfig(tempConfigDir)
 		fmt.Print("\r\n")
@@ -86,9 +86,9 @@ func getUuidError(level string, iD string) string {
 	return ""
 }
 
-func generateNextStepsDocument(configDir string, subaccount string, directory string) {
+func generateNextStepsDocument(configDir string, subaccount string, directory string, organization string) {
 
-	level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
+	level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
 
 	// remove the sring "level" from the level string
 	level = strings.ReplaceAll(level, "Level", "")

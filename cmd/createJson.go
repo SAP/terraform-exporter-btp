@@ -22,10 +22,11 @@ var createJsonCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		directory, _ := cmd.Flags().GetString("directory")
+		organization, _ := cmd.Flags().GetString("organization")
 		path, _ := cmd.Flags().GetString("path")
 		resources, _ := cmd.Flags().GetString("resources")
 
-		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
+		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
 
 		if !isValidUuid(iD) {
 			log.Fatalln(getUuidError(level, iD))
@@ -38,7 +39,7 @@ var createJsonCmd = &cobra.Command{
 
 		output.PrintInventoryCreationStartMessage()
 		resourcesList := tfutils.GetResourcesList(resources, level)
-		createJson(subaccount, directory, path, resourcesList)
+		createJson(subaccount, directory, organization, path, resourcesList)
 		output.PrintInventoryCreationSuccessMessage()
 	},
 }
@@ -62,11 +63,14 @@ func init() {
 	var resources string
 	var subaccount string
 	var directory string
+	var organization string
 
 	createJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
-	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
-	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
+	createJsonCmd.Flags().StringVarP(&organization, "organization", "o", "", "ID of the Cloud Foundry organization")
+
+	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory", "organization")
+	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "organization")
 	createJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")
 	createJsonCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
 

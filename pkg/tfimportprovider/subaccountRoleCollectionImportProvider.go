@@ -26,7 +26,7 @@ func (tf *subaccountRoleCollectionImportProvider) GetImportBlock(data map[string
 	count := 0
 	subaccountId := levelId
 
-	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountRoleCollectionType)
+	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountRoleCollectionType, levelId)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")

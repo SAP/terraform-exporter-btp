@@ -23,10 +23,11 @@ var exportByJsonCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		directory, _ := cmd.Flags().GetString("directory")
+		organization, _ := cmd.Flags().GetString("organization")
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		path, _ := cmd.Flags().GetString("path")
 
-		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
+		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
 
 		if !isValidUuid(iD) {
 			log.Fatalln(getUuidError(level, iD))
@@ -43,7 +44,7 @@ var exportByJsonCmd = &cobra.Command{
 		}
 
 		output.PrintExportStartMessage()
-		exportByJson(subaccount, directory, path, tfConfigFileName, configDir)
+		exportByJson(subaccount, directory, organization, path, tfConfigFileName, configDir)
 		output.PrintExportSuccessMessage()
 	},
 }
@@ -67,11 +68,13 @@ func init() {
 	var configDir string
 	var subaccount string
 	var directory string
+	var organization string
 
 	exportByJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	exportByJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
-	exportByJsonCmd.MarkFlagsOneRequired("subaccount", "directory")
-	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
+	exportByJsonCmd.Flags().StringVarP(&organization, "organization", "o", "", "ID of the Cloud Foundry organization")
+	exportByJsonCmd.MarkFlagsOneRequired("subaccount", "directory", "organization")
+	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "organization")
 
 	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")

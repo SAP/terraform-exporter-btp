@@ -25,7 +25,7 @@ func (tf *subaccountTrustConfigImportProvider) GetImportBlock(data map[string]in
 	count := 0
 	subaccountId := levelId
 
-	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountTrustConfigurationType)
+	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountTrustConfigurationType, levelId)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")

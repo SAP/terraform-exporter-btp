@@ -15,7 +15,7 @@ func TestSetupConfigDir(t *testing.T) {
 
 	curWd, _ := os.Getwd()
 
-	SetupConfigDir("configFolder", true)
+	SetupConfigDir("configFolder", true, SubaccountLevel)
 	if _, err := os.Stat(filepath.Join(curWd, "configFolder")); os.IsNotExist(err) {
 		t.Errorf("Directory should have been created")
 	}
@@ -50,7 +50,7 @@ func TestConfigureProvider(t *testing.T) {
 	t.Setenv("BTP_GLOBALACCOUNT", "testaccount")
 	t.Setenv("BTP_CLI_SERVER_URL", "https://test.com")
 
-	ConfigureProvider()
+	ConfigureProvider(SubaccountLevel)
 	expectedFilePath := filepath.Join(TmpFolder, "provider.tf")
 	if _, err := os.Stat(expectedFilePath); os.IsNotExist(err) {
 		t.Errorf("Expected file %s does not exist", expectedFilePath)
