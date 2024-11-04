@@ -16,7 +16,7 @@ type cloudfoundrySpaceImportProvider struct {
 func newcloudfoundrySpaceImportProvider() ITfImportProvider {
 	return &cloudfoundrySpaceImportProvider{
 		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.SubaccountTrustConfigurationType,
+			resourceType: tfutils.CfSpaceType,
 		},
 	}
 }
@@ -25,7 +25,7 @@ func (tf *cloudfoundrySpaceImportProvider) GetImportBlock(data map[string]interf
 	count := 0
 	orgId := levelId
 
-	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountTrustConfigurationType, tfutils.OrganizationLevel)
+	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.CfSpaceType, tfutils.OrganizationLevel)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")
@@ -73,7 +73,7 @@ func createSpaceImportBlock(data map[string]interface{}, orgId string, filterVal
 }
 
 func templateSpaceImport(x int, space map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "space"+fmt.Sprint(x), -1)
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "space-"+fmt.Sprintf("%v", space["name"]), -1)
 	template = strings.Replace(template, "<space_guid>", fmt.Sprintf("%v", space["id"]), -1)
 	return template + "\n"
 }

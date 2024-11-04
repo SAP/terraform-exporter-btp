@@ -170,5 +170,11 @@ func getExportByResourceCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("--resources"),
 			output.ColorStringYellow("'roles,role-collections'"),
 		),
+		"Export the spaces of a Cloud Foundry organization": fmt.Sprintf("%s %s %s %s",
+			output.ColorStringCyan("btptf export --organization"),
+			output.ColorStringYellow("<organization ID>"),
+			output.ColorStringCyan("--resources"),
+			output.ColorStringYellow("'spaces'"),
+		),
 	})
 }

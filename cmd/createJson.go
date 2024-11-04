@@ -100,6 +100,15 @@ func getCreateJsonCmdDescription(c *cobra.Command) string {
 		}
 	}
 
+	var resourcesEnv string
+	for i, resource := range tfutils.AllowedResourcesOrganization {
+		if i == 0 {
+			resourcesEnv = resource
+		} else {
+			resourcesEnv = resourcesEnv + ", " + resource
+		}
+	}
+
 	mainText := `Use this command to create a JSON file that lists all the resources for a directory, subaccount, or environment instance. This lets you easily edit the resources in the file before you export them.
 
 Depending on the account level you specify, the JSON file will include the following resources:`
@@ -113,7 +122,7 @@ Depending on the account level you specify, the JSON file will include the follo
 				fmt.Sprint("For subaccounts: " + resources),
 			),
 			formatHelpNote(
-				"For environment instances: TBD",
+				"For environment instances: " + resourcesEnv,
 			),
 		})
 }
@@ -144,6 +153,12 @@ func getCreateJsonCmdExamples(c *cobra.Command) string {
 			output.ColorStringYellow("'roles,role-collections'"),
 			output.ColorStringCyan("--subaccount"),
 			output.ColorStringYellow("<subaccount ID>"),
+		),
+		"Create a JSON file for the spaces of a Cloud Foundry organization": fmt.Sprintf("%s%s %s %s",
+			output.ColorStringCyan("btptf create-json --resources="),
+			output.ColorStringYellow("'spaces'"),
+			output.ColorStringCyan("--organization"),
+			output.ColorStringYellow("<organization ID>"),
 		),
 	})
 }

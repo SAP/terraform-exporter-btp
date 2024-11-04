@@ -121,5 +121,9 @@ func getExportByJsonCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("btptf export-by-json --subaccount"),
 			output.ColorStringYellow("<subaccount ID>"),
 		),
+		"Export the resources of a Cloud Foundry organization that are listed in the JSON file from the default directory": fmt.Sprintf("%s %s",
+			output.ColorStringCyan("btptf export-by-json --organization"),
+			output.ColorStringYellow("<organization ID>"),
+		),
 	})
 }
