@@ -37,6 +37,10 @@ var AllowedResourcesDirectory = []string{
 	CmdRoleCollectionParameter,
 }
 
+var AllowedResourcesOrganization = []string{
+	CmdCfSpaceParameter,
+}
+
 func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) error {
 
 	var spinner *yacspin.Spinner
@@ -166,7 +170,7 @@ func ConfigureProvider(level string) {
 		cfAccessToken := os.Getenv("CF_ACCESS_TOKEN")
 		cfRefreshToken := os.Getenv("CF_REFRESH_TOKEN")
 
-		providerContent = "terraform {\nrequired_providers {\nbtp = {\nsource  = \"cloudfoundry/cloudfoundry\"\nversion = \"" + CfProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"cloudfoundry\" {\n"
+		providerContent = "terraform {\nrequired_providers {\ncloudfoundry = {\nsource  = \"cloudfoundry/cloudfoundry\"\nversion = \"" + CfProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"cloudfoundry\" {\n"
 
 		if (len(strings.TrimSpace(username)) == 0 && len(strings.TrimSpace(password)) == 0) && (len(strings.TrimSpace(cfAccessToken)) == 0 && len(strings.TrimSpace(cfRefreshToken)) == 0) && (len(strings.TrimSpace(cfClientId)) == 0 && len(strings.TrimSpace(cfClientSecret)) == 0) {
 			cleanup()
@@ -350,9 +354,13 @@ func CleanupProviderConfig(directory ...string) {
 func GetValidResourcesByLevel(level string) []string {
 	if level == SubaccountLevel {
 		return AllowedResourcesSubaccount
+	} else if level == DirectoryLevel {
+		return AllowedResourcesDirectory
+	} else if level == OrganizationLevel {
+		return AllowedResourcesOrganization
 	}
 
-	return AllowedResourcesDirectory
+	return []string{}
 }
 
 func cleanup() {

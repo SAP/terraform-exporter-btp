@@ -131,8 +131,7 @@ func GetDocByResourceName(kind DocKind, resourceName string, level string) (Enti
 		ghOrg = "cloudfoundry"
 		provider = "cloudfoundry"
 		resourcePrefix = "cloudfoundry"
-		providerVersion = BtpProviderVersion
-
+		providerVersion = CfProviderVersion
 	} else {
 		ghOrg = "SAP"
 		provider = "btp"
@@ -251,7 +250,10 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 		} else {
 			dataBlock = strings.Replace(doc.Import, doc.Attributes["directory_id"], directoryId, -1)
 		}
+	case OrganizationLevel:
+		dataBlock = strings.Replace(doc.Import, doc.Attributes["org"], organizationId, -1)
 	}
+
 	return dataBlock, nil
 }
 
@@ -369,6 +371,12 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 	case SubaccountSecuritySettingType:
 		stringArr = []string{fmt.Sprintf("%v", data["subaccount_id"])}
 
+	case CfSpaceType:
+		spaces := data["spaces"].([]interface{})
+		for _, value := range spaces {
+			space := value.(map[string]interface{})
+			stringArr = append(stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", space["name"])))
+		}
 	}
 	return stringArr
 }
