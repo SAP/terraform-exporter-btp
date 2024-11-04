@@ -23,7 +23,7 @@ func newSubaccountEntitlementImportProvider() ITfImportProvider {
 func (tf *subaccountEntitlementImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	subaccountId := levelId
-	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountEntitlementType, levelId)
+	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountEntitlementType, tfutils.SubaccountLevel)
 	if err != nil {
 		return "", count, err
 	}

@@ -24,7 +24,7 @@ func (tf *subaccountEnvInstanceImportProvider) GetImportBlock(data map[string]in
 	count := 0
 	subaccountId := levelId
 
-	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountEnvironmentInstanceType, levelId)
+	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountEnvironmentInstanceType, tfutils.SubaccountLevel)
 	if err != nil {
 		return "", count, err
 	}
