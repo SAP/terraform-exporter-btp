@@ -19,12 +19,13 @@ var exportByResourceCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		directory, _ := cmd.Flags().GetString("directory")
+		organization, _ := cmd.Flags().GetString("organization")
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		resources, _ := cmd.Flags().GetString("resources")
 
 		resultStore := make(map[string]int)
 
-		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory)
+		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
 
 		if !isValidUuid(iD) {
 			log.Fatalln(getUuidError(level, iD))
@@ -36,16 +37,16 @@ var exportByResourceCmd = &cobra.Command{
 		}
 
 		output.PrintExportStartMessage()
-		tfutils.SetupConfigDir(configDir, true)
+		tfutils.SetupConfigDir(configDir, true, level)
 
 		resourcesList := tfutils.GetResourcesList(resources, level)
 		for _, resourceToImport := range resourcesList {
-			resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, configDir, tfConfigFileName)
+			resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, configDir, tfConfigFileName)
 			resultStore[resourceType] = count
 		}
 
 		tfutils.FinalizeTfConfig(configDir)
-		generateNextStepsDocument(configDir, subaccount, directory)
+		generateNextStepsDocument(configDir, subaccount, directory, organization)
 		tfutils.CleanupProviderConfig()
 		output.RenderSummaryTable(resultStore)
 		output.PrintExportSuccessMessage()
@@ -71,11 +72,13 @@ func init() {
 	var configDir string
 	var subaccount string
 	var directory string
+	var organization string
 
 	exportByResourceCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	exportByResourceCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
-	exportByResourceCmd.MarkFlagsOneRequired("subaccount", "directory")
-	exportByResourceCmd.MarkFlagsMutuallyExclusive("subaccount", "directory")
+	exportByResourceCmd.Flags().StringVarP(&organization, "organization", "o", "", "ID of the Cloud Foundry organization")
+	exportByResourceCmd.MarkFlagsOneRequired("subaccount", "directory", "organization")
+	exportByResourceCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "organization")
 
 	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
@@ -166,6 +169,12 @@ func getExportByResourceCmdExamples(c *cobra.Command) string {
 			output.ColorStringYellow("<subaccount ID>"),
 			output.ColorStringCyan("--resources"),
 			output.ColorStringYellow("'roles,role-collections'"),
+		),
+		"Export the spaces of a Cloud Foundry organization": fmt.Sprintf("%s %s %s %s",
+			output.ColorStringCyan("btptf export --organization"),
+			output.ColorStringYellow("<organization ID>"),
+			output.ColorStringCyan("--resources"),
+			output.ColorStringYellow("'spaces'"),
 		),
 	})
 }

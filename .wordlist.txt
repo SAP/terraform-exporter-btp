@@ -1,3 +1,4 @@
+APIs
 autocompletion
 APIs
 breakpoint
@@ -20,11 +21,10 @@ github
 Golang
 GOLANG
 GOPATH
-HashiCorp
-hardcoding
-HCL
 html
 https
+HCL
+HashiCorp
 IdP
 json
 JSON
@@ -52,6 +52,7 @@ subcommands
 TBD
 templating
 Terraform
+Terraform's
 terraform
 Terraform's
 tf

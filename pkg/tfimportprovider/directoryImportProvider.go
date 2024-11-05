@@ -24,7 +24,7 @@ func newDirectoryImportProvider() ITfImportProvider {
 func (tf *directoryImportProvider) GetImportBlock(data map[string]interface{}, LevelId string, filterValues []string) (string, int, error) {
 
 	directoryId := LevelId
-	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.DirectoryType)
+	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.DirectoryType, tfutils.DirectoryLevel)
 	if err != nil {
 		return "", 0, err
 	}

@@ -31,11 +31,12 @@ btptf create-json [flags]
 ### Options
 
 ```azdeveloper
-  -d, --directory string    ID of the directory
-  -h, --help                help for create-json
-  -p, --path string         Full path to JSON file with list of resources (default "btpResources_<account-id>.json")
-  -r, --resources string    Comma-separated list of resources to be included (default "all")
-  -s, --subaccount string   ID of the subaccount
+  -d, --directory string      ID of the directory
+  -h, --help                  help for create-json
+  -o, --organization string   ID of the Cloud Foundry organization
+  -p, --path string           Full path to JSON file with list of resources (default "btpResources_<account-id>.json")
+  -r, --resources string      Comma-separated list of resources to be included (default "all")
+  -s, --subaccount string     ID of the subaccount
 ```
 
 ### Options inherited from parent commands
@@ -59,11 +60,12 @@ btptf export [flags]
 ### Options
 
 ```azdeveloper
-  -c, --config-dir string   Directory for the Terraform code (default "generated_configurations_<account-id>")
-  -d, --directory string    ID of the directory
-  -h, --help                help for export
-  -r, --resources string    Comma-separated list of resources to be included (default "all")
-  -s, --subaccount string   ID of the subaccount
+  -c, --config-dir string     Directory for the Terraform code (default "generated_configurations_<account-id>")
+  -d, --directory string      ID of the directory
+  -h, --help                  help for export
+  -o, --organization string   ID of the Cloud Foundry organization
+  -r, --resources string      Comma-separated list of resources to be included (default "all")
+  -s, --subaccount string     ID of the subaccount
 ```
 
 ### Options inherited from parent commands
@@ -87,11 +89,12 @@ btptf export-by-json [flags]
 ### Options
 
 ```azdeveloper
-  -c, --config-dir string   Directory for the Terraform code (default "generated_configurations_<account-id>")
-  -d, --directory string    ID of the directory
-  -h, --help                help for export-by-json
-  -p, --path string         Full path to JSON file with list of resources (default "btpResources_<account-id>.json")
-  -s, --subaccount string   ID of the subaccount
+  -c, --config-dir string     Directory for the Terraform code (default "generated_configurations_<account-id>")
+  -d, --directory string      ID of the directory
+  -h, --help                  help for export-by-json
+  -o, --organization string   ID of the Cloud Foundry organization
+  -p, --path string           Full path to JSON file with list of resources (default "btpResources_<account-id>.json")
+  -s, --subaccount string     ID of the subaccount
 ```
 
 ### Options inherited from parent commands
