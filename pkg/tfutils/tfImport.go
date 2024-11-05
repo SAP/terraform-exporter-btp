@@ -18,7 +18,7 @@ import (
 )
 
 // Constants for TF version for Terraform providers e.g. for SAP BTP
-const BtpProviderVersion = "v1.7.0"
+const BtpProviderVersion = "v1.8.0"
 const CfProviderVersion = "v1.0.0"
 
 const (
