@@ -46,8 +46,8 @@ If you want to build the binary from scratch, follow these steps:
 
 4. The system will store the binary as `btptf` (`btptf.exe` in case of Windows) in the default binary path of your Go installation `$GOPATH/bin`.
 
-> [!TIP]
-> You find the value of the GOPATH via `go env GOPATH`
+
+**You find the value of the GOPATH via `go env GOPATH`**
 
 #### Troubleshooting
 
@@ -161,12 +161,12 @@ How to set the parameters depends on your setup and is OS-specific:
        export $(xargs <.env)
        ```
 
-> [!IMPORTANT]
-> There is no predefined functionality in PowerShell to achieve the same. A custom script is needed.
+
+**There is no predefined functionality in PowerShell to achieve the same. A custom script is needed.**
 
 ## Exporting SAP BTP Resources
 
-The btptf CLI offers several commands for the export of Terraform configurations of SAP BTP. Currently the CLU supports exporting of SAP BTP resources like Subaccounts and directories. The CLI supports two ways to export BTP resources
+The btptf CLI offers several commands for the export of Terraform configurations of SAP BTP. Currently the CLI supports exporting of SAP BTP resources like Subaccounts and directories. The CLI supports two ways to export BTP resources
 - Exporting resources via JSON
 - Exporting resources
 
@@ -207,7 +207,7 @@ The below example explains how to use the Terraform Exporter for SAP BTP to expo
    ```bash
    btptf create-json - s 9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1
    ```
-   The resources list file with the name btpResources_<subaccount id>.json e.g btpResources_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.json gets generated.
+   The resources list file with the name btpResources_<subaccount id>.json e.g `btpResources_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.json` gets generated.
    ![image](./docs/img/create-json.jpg)
 
 4. Edit the json file and remove the resources which need not be exported and managed by Terraform.
@@ -216,16 +216,16 @@ The below example explains how to use the Terraform Exporter for SAP BTP to expo
    ```bash
    btptf export-by-json -p btpResources_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.json -s 9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1
    ```
-6. The Terraform configurations will be generated under the folder 'generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1'. The output of the command will show an export summary which contains the information about which 'Resource Names' and their respective count. 
+6. The Terraform configurations will be generated under the folder `generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1`. The output of the command will show an export summary which contains the information about which 'Resource Names' and their respective count. 
 ![image](./docs/img/generated-config.jpg)
 
-7. Review the readme file NextSteps.md under the folder generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1 and adapt the Terraform configuration files as mentioned in the NextSteps.md
+7. Review the readme file NextSteps.md under the folder `generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1` and adapt the Terraform configuration files as mentioned in the NextSteps.md
 
-8. In the terminal, navigate to the folder generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1 and run the Terraform plan command.
+8. In the terminal, navigate to the folder `generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1` and run the Terraform plan command.
 This will show a plan of how many resources will be imported, added, changed and destroyed.
 ![image](./docs/img/tf-plan.jpg)
 
-9. Run the command Terraform apply. This will import the Terraform state and store it in the terraform.state file in under the folder generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.
+9. Run the command Terraform apply. This will import the Terraform state and store it in the terraform.state file in under the folder `generated_configurations_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1`.
 ![image](./docs/img/tf-apply.jpg)
 
 10. Now, to modify your BTP resources in this subaccount you can change to Terraform configuration files and run a Terraform apply.
