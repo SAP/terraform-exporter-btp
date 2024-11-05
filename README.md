@@ -69,7 +69,7 @@ When using Terraform Exporter for SAP BTP, following security best practices is 
 
 3. **Network Security and Encryption**: When using remote state storage, ensure that data is encrypted both in transit and at rest.
 
-4. **Terraform Code and Secrets Management**: Avoid hardcoding secrets directly in Terraform configurations. Instead, use a secure vault services to manage secrets and inject them into configurations at runtime. This reduces the risk of exposing sensitive information in code repositories​
+4. **Terraform Code and Secrets Management**: Avoid hard coding secrets directly in Terraform configurations. Instead, use a secure vault services to manage secrets and inject them into configurations at runtime. This reduces the risk of exposing sensitive information in code repositories​
 
 5. **Review and Update Terraform Configurations Regularly**: Ensure that exported configurations align with current security and compliance requirements. Regularly review and update configurations, removing any deprecated or unused resources that could expose vulnerabilities.
 
