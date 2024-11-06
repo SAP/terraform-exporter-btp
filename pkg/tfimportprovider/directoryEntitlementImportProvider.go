@@ -23,7 +23,7 @@ func newDirectoryEntitlementImportProvider() ITfImportProvider {
 func (tf *directoryEntitlementImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	directoryId := levelId
-	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.DirectoryEntitlementType)
+	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.DirectoryEntitlementType, tfutils.DirectoryLevel)
 	if err != nil {
 		return "", count, err
 	}

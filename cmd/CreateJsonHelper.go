@@ -12,17 +12,19 @@ import (
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
-func createJson(subaccount string, directory string, fileName string, resources []string) {
+func createJson(subaccount string, directory string, organization string, fileName string, resources []string) {
 	if len(resources) == 0 {
 		fmt.Print("\r\n")
 		log.Fatal("please provide the btp resources you want to get using --resources flag or provide 'all' to get all resources")
 	}
 
-	tfutils.ConfigureProvider()
+	level, _ := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
+
+	tfutils.ConfigureProvider(level)
 
 	spinner := output.StartSpinner("collecting resources")
 
-	result, err := tfutils.ReadDataSources(subaccount, directory, resources)
+	result, err := tfutils.ReadDataSources(subaccount, directory, organization, resources)
 	if err != nil {
 		tfutils.CleanupProviderConfig()
 		fmt.Print("\r\n")

@@ -14,9 +14,9 @@
       "args": "${input:cliArgs}",
       "console": "integratedTerminal",
       "env": {
-        "BTP_USERNAME": "christian.lechner@sap.com",
+        "BTP_USERNAME": "firstname.lastname@sap.com",
         "BTP_ENABLE_SSO": "true",
-        "BTP_GLOBALACCOUNT": "terraformintprod"
+        "BTP_GLOBALACCOUNT": ""
       },
       //"envFile": "${workspaceFolder}/.env"
     },
@@ -26,7 +26,7 @@
       "id": "cliArgs",
       "type": "promptString",
       "description": "Args for launching btptf CLI. Use --cwd to set the working directory.",
-      "default": "export -s 12345"
+      "default": "export -s 1234567890"
     }
   ]
 }
