@@ -8,6 +8,7 @@ btptf
 btpResources
 CLA
 CLI
+CodeQL
 config
 Copilot
 customizations
@@ -32,6 +33,7 @@ jq
 macOS
 md
 NextSteps
+OpenSSF
 Pre
 pre
 PowerShell

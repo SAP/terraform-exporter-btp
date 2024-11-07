@@ -1,5 +1,9 @@
 ![Golang](https://img.shields.io/badge/Go-1.23-informational)
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/terraform-exporter-btp)](https://api.reuse.software/info/github.com/SAP/terraform-exporter-btp)
+[![Go Report Card](https://goreportcard.com/badge/github.com/SAP/terraform-exporter-btp)](https://goreportcard.com/report/github.com/SAP/terraform-exporter-btp)
+[![CodeQL](https://github.com/SAP/terraform-exporter-btp/actions/workflows/codeql.yml/badge.svg)](https://github.com/SAP/terraform-exporter-btp/actions/workflows/codeql.yml)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9673/badge)](https://www.bestpractices.dev/projects/9673)
+
 
 # Terraform Exporter for SAP BTP
 
@@ -247,4 +251,4 @@ We as members, contributors, and leaders pledge to make participation in our com
 
 ## Licensing
 
-Copyright 2024 SAP SE or an SAP affiliate company and terraform-exporter-for-sap-btp contributors. Please see our [LICENSE](LICENSE) for copyright and license information. Detailed information including third-party components and their licensing/copyright information is available [via the REUSE tool](https://api.reuse.software/info/github.com/SAP/terraform-exporter-for-sap-btp).
+Copyright 2024 SAP SE or an SAP affiliate company and terraform-exporter-for-sap-btp contributors. Please see our [LICENSE](LICENSE) for copyright and license information. Detailed information including third-party components and their licensing/copyright information is available [via the REUSE tool](https://api.reuse.software/info/github.com/SAP/terraform-exporter-btp).
