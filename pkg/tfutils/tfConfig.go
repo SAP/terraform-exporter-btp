@@ -119,23 +119,11 @@ func ConfigureProvider(level string) {
 		tlsClientKey := os.Getenv("BTP_TLS_CLIENT_KEY")
 		tlsIdpURL := os.Getenv("BTP_TLS_IDP_URL")
 
+		validateBtpAuthenticationData(username, password, enableSSO)
+		validateGlobalAccount(globalAccount)
+
 		providerContent = "terraform {\nrequired_providers {\nbtp = {\nsource  = \"SAP/btp\"\nversion = \"" + BtpProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"btp\" {\n"
-
-		if !(len(strings.TrimSpace(username)) != 0 && len(strings.TrimSpace(password)) != 0) {
-			if len(strings.TrimSpace(enableSSO)) == 0 {
-				cleanup()
-				fmt.Print("\r\n")
-				log.Fatalf("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
-			}
-		}
-
-		if len(strings.TrimSpace(globalAccount)) == 0 {
-			cleanup()
-			fmt.Print("\r\n")
-			log.Fatalf("global account not set. set BTP_GLOBALACCOUNT environment variable to set global account")
-		} else {
-			providerContent = providerContent + "globalaccount = \"" + globalAccount + "\"\n"
-		}
+		providerContent = providerContent + "globalaccount = \"" + globalAccount + "\"\n"
 
 		if len(strings.TrimSpace(cliServerUrl)) != 0 {
 			providerContent = providerContent + "cli_server_url=\"" + cliServerUrl + "\"\n"
@@ -170,21 +158,11 @@ func ConfigureProvider(level string) {
 		cfAccessToken := os.Getenv("CF_ACCESS_TOKEN")
 		cfRefreshToken := os.Getenv("CF_REFRESH_TOKEN")
 
+		validateCfAuthenticationData(username, password, cfAccessToken, cfRefreshToken, cfClientId, cfClientSecret)
+		validateCfApiUrl(apiUrl)
+
 		providerContent = "terraform {\nrequired_providers {\ncloudfoundry = {\nsource  = \"cloudfoundry/cloudfoundry\"\nversion = \"" + CfProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"cloudfoundry\" {\n"
-
-		if (len(strings.TrimSpace(username)) == 0 && len(strings.TrimSpace(password)) == 0) && (len(strings.TrimSpace(cfAccessToken)) == 0 && len(strings.TrimSpace(cfRefreshToken)) == 0) && (len(strings.TrimSpace(cfClientId)) == 0 && len(strings.TrimSpace(cfClientSecret)) == 0) {
-			cleanup()
-			fmt.Print("\r\n")
-			log.Fatalf("set Cloud Foundry environment variables for login.")
-		}
-
-		if len(strings.TrimSpace(apiUrl)) == 0 {
-			cleanup()
-			fmt.Print("\r\n")
-			log.Fatalf("cf api URL not set. set CF_API_URL environment variable to set CF API endpoint")
-		} else {
-			providerContent = providerContent + "api_url = \"" + apiUrl + "\"\n"
-		}
+		providerContent = providerContent + "api_url = \"" + apiUrl + "\"\n"
 
 		if len(strings.TrimSpace(cfOrigin)) != 0 {
 			providerContent = providerContent + "origin=\"" + cfOrigin + "\"\n"
@@ -219,6 +197,40 @@ func ConfigureProvider(level string) {
 
 }
 
+func validateCfApiUrl(apiUrl string) {
+	if len(strings.TrimSpace(apiUrl)) == 0 {
+		cleanup()
+		fmt.Print("\r\n")
+		log.Fatalf("cf api URL not set. set CF_API_URL environment variable to set CF API endpoint")
+	}
+}
+
+func validateCfAuthenticationData(username string, password string, cfAccessToken string, cfRefreshToken string, cfClientId string, cfClientSecret string) {
+	if (len(strings.TrimSpace(username)) == 0 && len(strings.TrimSpace(password)) == 0) && (len(strings.TrimSpace(cfAccessToken)) == 0 && len(strings.TrimSpace(cfRefreshToken)) == 0) && (len(strings.TrimSpace(cfClientId)) == 0 && len(strings.TrimSpace(cfClientSecret)) == 0) {
+		cleanup()
+		fmt.Print("\r\n")
+		log.Fatalf("set Cloud Foundry environment variables for login.")
+	}
+}
+
+func validateGlobalAccount(globalAccount string) {
+	if len(strings.TrimSpace(globalAccount)) == 0 {
+		cleanup()
+		fmt.Print("\r\n")
+		log.Fatalf("global account not set. set BTP_GLOBALACCOUNT environment variable to set global account")
+	}
+}
+
+func validateBtpAuthenticationData(username string, password string, enableSSO string) {
+	if !(len(strings.TrimSpace(username)) != 0 && len(strings.TrimSpace(password)) != 0) {
+		if len(strings.TrimSpace(enableSSO)) == 0 {
+			cleanup()
+			fmt.Print("\r\n")
+			log.Fatalf("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
+		}
+	}
+}
+
 func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 
 	if isMainCmd {
@@ -246,25 +258,14 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 	}
 
 	if !exist {
-		err = os.Mkdir(configFilepath, 0700)
-		if err != nil {
-			CleanupProviderConfig()
-			fmt.Print("\r\n")
-			log.Fatalf("error creating configuration folder %s at %s: %v", configFolder, curWd, err)
-		}
+		createNewConfigDir(configFilepath, configFolder, curWd)
 	} else {
 		fmt.Print("the configuration directory already exist. Do you want to continue? If yes then the directory will be overwritten (y/N): ")
 		var choice string
 
 		_, err = fmt.Scanln(&choice)
 		if err != nil {
-			if err.Error() == "unexpected newline" {
-				choice = "N"
-			} else {
-				CleanupProviderConfig()
-				fmt.Print("\r\n")
-				log.Fatalf("error reading input: %v", err)
-			}
+			choice = handleReturnWoInput(err)
 		}
 
 		choice = strings.TrimSpace(choice)
@@ -273,24 +274,8 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 		}
 
 		// We acccept "Yes" or "No" as entry and take the first letter only
-		if strings.ToUpper(choice[:1]) == "N" {
-			CleanupProviderConfig()
-			os.Exit(0)
-		} else if strings.ToUpper(choice[:1]) == "Y" {
-			fmt.Println(output.ColorStringCyan("existing files will be overwritten"))
-
-			// Configuration folder must be re-created, otherwiese the Terraform commands will fail
-			err := recreateExistingConfigDir(configFilepath)
-			if err != nil {
-				CleanupProviderConfig()
-				fmt.Print("\r\n")
-				log.Fatalf("error recreating configuration folder %s at %s: %v", configFolder, curWd, err)
-			}
-		} else {
-			CleanupProviderConfig()
-			fmt.Print("\r\n")
-			log.Fatalf("invalid input. exiting the process")
-		}
+		// Configuration folder must be re-created, otherwiese the Terraform commands will fail
+		handleInputExistingDir(choice, configFilepath, configFolder, curWd)
 	}
 
 	sourceFile, err := os.Open(TmpFolder + "/provider.tf")
@@ -316,6 +301,46 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 		CleanupProviderConfig(fullpath)
 		fmt.Print("\r\n")
 		log.Fatalf("failed to copy file from temporary (%s) to final configuration directory (%s): %v", TmpFolder, fullpath, err)
+	}
+}
+
+func handleInputExistingDir(choice string, configFilepath string, configFolder string, curWd string) {
+	if strings.ToUpper(choice[:1]) == "N" {
+		CleanupProviderConfig()
+		os.Exit(0)
+	} else if strings.ToUpper(choice[:1]) == "Y" {
+		fmt.Println(output.ColorStringCyan("existing files will be overwritten"))
+
+		err := recreateExistingConfigDir(configFilepath)
+		if err != nil {
+			CleanupProviderConfig()
+			fmt.Print("\r\n")
+			log.Fatalf("error recreating configuration folder %s at %s: %v", configFolder, curWd, err)
+		}
+	} else {
+		CleanupProviderConfig()
+		fmt.Print("\r\n")
+		log.Fatalf("invalid input. exiting the process")
+	}
+}
+
+func handleReturnWoInput(err error) (choice string) {
+	if err.Error() == "unexpected newline" {
+		choice = "N"
+	} else {
+		CleanupProviderConfig()
+		fmt.Print("\r\n")
+		log.Fatalf("error reading input: %v", err)
+	}
+	return choice
+}
+
+func createNewConfigDir(configFilepath string, configFolder string, curWd string) {
+	err := os.Mkdir(configFilepath, 0700)
+	if err != nil {
+		CleanupProviderConfig()
+		fmt.Print("\r\n")
+		log.Fatalf("error creating configuration folder %s at %s: %v", configFolder, curWd, err)
 	}
 }
 
