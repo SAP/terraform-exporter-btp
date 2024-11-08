@@ -206,7 +206,7 @@ func validateCfApiUrl(apiUrl string) {
 }
 
 func validateCfAuthenticationData(username string, password string, cfAccessToken string, cfRefreshToken string, cfClientId string, cfClientSecret string) {
-	if (len(strings.TrimSpace(username)) == 0 && len(strings.TrimSpace(password)) == 0) && (len(strings.TrimSpace(cfAccessToken)) == 0 && len(strings.TrimSpace(cfRefreshToken)) == 0) && (len(strings.TrimSpace(cfClientId)) == 0 && len(strings.TrimSpace(cfClientSecret)) == 0) {
+	if allStringsEmtpy(username, password, cfAccessToken, cfRefreshToken, cfClientId, cfClientSecret) {
 		cleanup()
 		fmt.Print("\r\n")
 		log.Fatalf("set Cloud Foundry environment variables for login.")
@@ -214,7 +214,7 @@ func validateCfAuthenticationData(username string, password string, cfAccessToke
 }
 
 func validateGlobalAccount(globalAccount string) {
-	if len(strings.TrimSpace(globalAccount)) == 0 {
+	if allStringsEmtpy(globalAccount) {
 		cleanup()
 		fmt.Print("\r\n")
 		log.Fatalf("global account not set. set BTP_GLOBALACCOUNT environment variable to set global account")
@@ -222,13 +222,22 @@ func validateGlobalAccount(globalAccount string) {
 }
 
 func validateBtpAuthenticationData(username string, password string, enableSSO string) {
-	if !(len(strings.TrimSpace(username)) != 0 && len(strings.TrimSpace(password)) != 0) {
-		if len(strings.TrimSpace(enableSSO)) == 0 {
-			cleanup()
-			fmt.Print("\r\n")
-			log.Fatalf("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
+	if allStringsEmtpy(username, password, enableSSO) {
+		cleanup()
+		fmt.Print("\r\n")
+		log.Fatalf("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
+	}
+}
+
+func allStringsEmtpy(stringsToCheck ...string) bool {
+
+	for _, str := range stringsToCheck {
+		if len(strings.TrimSpace(str)) != 0 {
+			return false
 		}
 	}
+
+	return true
 }
 
 func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
