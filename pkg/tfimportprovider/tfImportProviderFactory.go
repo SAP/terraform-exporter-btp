@@ -12,13 +12,7 @@ func GetImportBlockProvider(cmdResourceName string, level string) (ITfImportProv
 	case tfutils.CmdSubaccountParameter:
 		return newSubaccountImportProvider(), nil
 	case tfutils.CmdEntitlementParameter:
-		if level == tfutils.SubaccountLevel {
-			return newSubaccountEntitlementImportProvider(), nil
-		} else if level == tfutils.DirectoryLevel {
-			return newDirectoryEntitlementImportProvider(), nil
-		} else {
-			return nil, fmt.Errorf("unsupported level provided")
-		}
+		return getEntitlementImportProviderByLevel(level)
 	case tfutils.CmdEnvironmentInstanceParameter:
 		return newSubaccountEnvInstanceImportProvider(), nil
 	case tfutils.CmdSubscriptionParameter:
@@ -26,21 +20,9 @@ func GetImportBlockProvider(cmdResourceName string, level string) (ITfImportProv
 	case tfutils.CmdTrustConfigurationParameter:
 		return newSubaccountTrustConfigImportProvider(), nil
 	case tfutils.CmdRoleParameter:
-		if level == tfutils.SubaccountLevel {
-			return newSubaccountRoleImportProvider(), nil
-		} else if level == tfutils.DirectoryLevel {
-			return newDirectoryRoleImportProvider(), nil
-		} else {
-			return nil, fmt.Errorf("unsupported level provided")
-		}
+		return getRoleImportProviderByLevel(level)
 	case tfutils.CmdRoleCollectionParameter:
-		if level == tfutils.SubaccountLevel {
-			return newSubaccountRoleCollectionImportProvider(), nil
-		} else if level == tfutils.DirectoryLevel {
-			return newDirectoryRoleCollectionImportProvider(), nil
-		} else {
-			return nil, fmt.Errorf("unsupported level provided")
-		}
+		return getRoleCollectionImportProviderByLevel(level)
 	case tfutils.CmdServiceInstanceParameter:
 		return newSubaccountServiceInstanceImportProvider(), nil
 	case tfutils.CmdServiceBindingParameter:
@@ -55,4 +37,34 @@ func GetImportBlockProvider(cmdResourceName string, level string) (ITfImportProv
 		return nil, fmt.Errorf("unsupported resource provided")
 	}
 
+}
+
+func getEntitlementImportProviderByLevel(level string) (ITfImportProvider, error) {
+	if level == tfutils.SubaccountLevel {
+		return newSubaccountEntitlementImportProvider(), nil
+	} else if level == tfutils.DirectoryLevel {
+		return newDirectoryEntitlementImportProvider(), nil
+	} else {
+		return nil, fmt.Errorf("unsupported level provided")
+	}
+}
+
+func getRoleImportProviderByLevel(level string) (ITfImportProvider, error) {
+	if level == tfutils.SubaccountLevel {
+		return newSubaccountRoleImportProvider(), nil
+	} else if level == tfutils.DirectoryLevel {
+		return newDirectoryRoleImportProvider(), nil
+	} else {
+		return nil, fmt.Errorf("unsupported level provided")
+	}
+}
+
+func getRoleCollectionImportProviderByLevel(level string) (ITfImportProvider, error) {
+	if level == tfutils.SubaccountLevel {
+		return newSubaccountRoleCollectionImportProvider(), nil
+	} else if level == tfutils.DirectoryLevel {
+		return newDirectoryRoleCollectionImportProvider(), nil
+	} else {
+		return nil, fmt.Errorf("unsupported level provided")
+	}
 }
