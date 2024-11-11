@@ -342,21 +342,21 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 	case SubaccountSubscriptionType:
 		transformSubscriptionsStringArray(data, &stringArr)
 	case SubaccountEnvironmentInstanceType:
-		transformEnvInstanceStringArray(data, &stringArr)
+		transformDataToStringArrayGeneric(data, &stringArr, "values", "environment_type")
 	case SubaccountTrustConfigurationType:
-		transformTrustConfigStringArray(data, &stringArr)
+		transformDataToStringArrayGeneric(data, &stringArr, "values", "origin")
 	case SubaccountRoleType, DirectoryRoleType:
-		transformRolesStringArray(data, &stringArr)
+		transformDataToStringArrayGeneric(data, &stringArr, "values", "name")
 	case SubaccountRoleCollectionType, DirectoryRoleCollectionType:
-		transformRoleCollectionStringArray(data, &stringArr)
+		transformDataToStringArrayGeneric(data, &stringArr, "values", "name")
 	case SubaccountServiceInstanceType:
 		transformServiceInstanceStringArray(data, &stringArr)
 	case SubaccountServiceBindingType:
-		transformServiceBindingStringArray(data, &stringArr)
+		transformDataToStringArrayGeneric(data, &stringArr, "values", "name")
 	case SubaccountSecuritySettingType:
 		stringArr = []string{fmt.Sprintf("%v", data["subaccount_id"])}
 	case CfSpaceType:
-		transformCfSpaceStringArray(data, &stringArr)
+		transformDataToStringArrayGeneric(data, &stringArr, "spaces", "name")
 	}
 	return stringArr
 }
@@ -472,19 +472,18 @@ func resourceIsProcessable(level string, resource string, featureList []string) 
 	return true
 }
 
-func transformCfSpaceStringArray(data map[string]interface{}, stringArr *[]string) {
-	spaces := data["spaces"].([]interface{})
-	for _, value := range spaces {
-		space := value.(map[string]interface{})
-		*stringArr = append(*stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", space["name"])))
+func transformDataToStringArrayGeneric(data map[string]interface{}, stringArr *[]string, dataSourceListKey string, resourceKey string) {
+	entities := data[dataSourceListKey].([]interface{})
+	for _, value := range entities {
+		entity := value.(map[string]interface{})
+		*stringArr = append(*stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", entity[resourceKey])))
 	}
 }
 
-func transformServiceBindingStringArray(data map[string]interface{}, stringArr *[]string) {
-	bindings := data["values"].([]interface{})
-	for _, value := range bindings {
-		binding := value.(map[string]interface{})
-		*stringArr = append(*stringArr, fmt.Sprintf("%v", binding["name"]))
+func transformEntitlementStringArray(data map[string]interface{}, stringArr *[]string) {
+	for key := range data {
+		key := strings.Replace(key, ":", "_", -1)
+		*stringArr = append(*stringArr, key)
 	}
 }
 
@@ -496,38 +495,6 @@ func transformServiceInstanceStringArray(data map[string]interface{}, stringArr 
 	}
 }
 
-func transformRoleCollectionStringArray(data map[string]interface{}, stringArr *[]string) {
-	roleCollections := data["values"].([]interface{})
-	for _, value := range roleCollections {
-		roleCollection := value.(map[string]interface{})
-		*stringArr = append(*stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", roleCollection["name"])))
-	}
-}
-
-func transformRolesStringArray(data map[string]interface{}, stringArr *[]string) {
-	roles := data["values"].([]interface{})
-	for _, value := range roles {
-		role := value.(map[string]interface{})
-		*stringArr = append(*stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"])))
-	}
-}
-
-func transformTrustConfigStringArray(data map[string]interface{}, stringArr *[]string) {
-	trusts := data["values"].([]interface{})
-	for _, value := range trusts {
-		trust := value.(map[string]interface{})
-		*stringArr = append(*stringArr, fmt.Sprintf("%v", trust["origin"]))
-	}
-}
-
-func transformEnvInstanceStringArray(data map[string]interface{}, stringArr *[]string) {
-	environmentInstances := data["values"].([]interface{})
-	for _, value := range environmentInstances {
-		environmentInstance := value.(map[string]interface{})
-		*stringArr = append(*stringArr, fmt.Sprintf("%v", environmentInstance["environment_type"]))
-	}
-}
-
 func transformSubscriptionsStringArray(data map[string]interface{}, stringArr *[]string) {
 	subscriptions := data["values"].([]interface{})
 	for _, value := range subscriptions {
@@ -535,12 +502,5 @@ func transformSubscriptionsStringArray(data map[string]interface{}, stringArr *[
 		if fmt.Sprintf("%v", subscription["state"]) != "NOT_SUBSCRIBED" {
 			*stringArr = append(*stringArr, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 		}
-	}
-}
-
-func transformEntitlementStringArray(data map[string]interface{}, stringArr *[]string) {
-	for key := range data {
-		key := strings.Replace(key, ":", "_", -1)
-		*stringArr = append(*stringArr, key)
 	}
 }
