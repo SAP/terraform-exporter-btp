@@ -1,5 +1,9 @@
 name: Deploy gh-page
-on: workflow_dispatch # For Now
+# Pages will be built against a specific tag when releases
+# Additionally trigger manually
+on:
+  workflow_dispatch:
+  workflow_call:
 permissions:
   contents: write
 jobs:

@@ -32,3 +32,12 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  generate-gh-pages:
+      uses: ./.github/workflows/create-gh-page.yml
+      secrets: inherit
+      permissions:
+        contents: write
+      needs:
+        - goreleaser
+    
+     
