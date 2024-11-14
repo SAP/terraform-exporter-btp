@@ -48,12 +48,12 @@ func createDirectoryRoleImportBlock(data map[string]interface{}, directoryId str
 	if len(filterValues) != 0 {
 		var directoryAllRoles []string
 
-		for _, value := range roles {
+		for x, value := range roles {
 			role := value.(map[string]interface{})
 			resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"]))
 			directoryAllRoles = append(directoryAllRoles, resourceName)
 			if slices.Contains(filterValues, resourceName) {
-				importBlock += templateDirectoryRoleImport(role, directoryId, resourceDoc)
+				importBlock += templateDirectoryRoleImport(x, role, directoryId, resourceDoc)
 				count++
 			}
 		}
@@ -65,20 +65,20 @@ func createDirectoryRoleImportBlock(data map[string]interface{}, directoryId str
 		}
 
 	} else {
-		for _, value := range roles {
+		for x, value := range roles {
 			role := value.(map[string]interface{})
-			importBlock += templateDirectoryRoleImport(role, directoryId, resourceDoc)
+			importBlock += templateDirectoryRoleImport(x, role, directoryId, resourceDoc)
 			count++
 		}
 	}
 	return importBlock, count, nil
 }
 
-func templateDirectoryRoleImport(role map[string]interface{}, directoryId string, resourceDoc tfutils.EntityDocs) string {
+func templateDirectoryRoleImport(x int, role map[string]interface{}, directoryId string, resourceDoc tfutils.EntityDocs) string {
 
 	resourceDoc.Import = strings.Replace(resourceDoc.Import, "'", "", -1)
-	resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"]))
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", resourceName, -1)
+	//resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"]))
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "directory_role_"+fmt.Sprint(x), -1)
 	template = strings.Replace(template, "<directory_id>", directoryId, -1)
 	template = strings.Replace(template, "<name>", fmt.Sprintf("%v", role["name"]), -1)
 	template = strings.Replace(template, "<role_template_name>", fmt.Sprintf("%v", role["role_template_name"]), -1)
