@@ -40,6 +40,7 @@ const (
 	CmdServiceBindingParameter      string = "service-bindings"
 	CmdSecuritySettingParameter     string = "security-settings"
 	CmdCfSpaceParameter             string = "spaces"
+	CmdCfUserParameter              string = "users"
 )
 
 const (
@@ -64,6 +65,7 @@ const (
 
 const (
 	CfSpaceType string = "cloudfoundry_space"
+	CfUserType  string = "cloudfoundry_user"
 )
 
 const DirectoryFeatureDefault string = "DEFAULT"
@@ -187,6 +189,8 @@ func TranslateResourceParamToTechnicalName(resource string, level string) string
 		return DirectoryType
 	case CmdCfSpaceParameter:
 		return CfSpaceType
+	case CmdCfUserParameter:
+		return CfUserType
 	}
 	return ""
 }
@@ -251,7 +255,11 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 			dataBlock = strings.Replace(doc.Import, doc.Attributes["directory_id"], directoryId, -1)
 		}
 	case OrganizationLevel:
-		dataBlock = strings.Replace(doc.Import, doc.Attributes["org"], organizationId, -1)
+		if resourceName == CfUserType {
+			dataBlock = strings.Replace(doc.Import, "The ID of the organization", organizationId, -1)
+		} else {
+			dataBlock = strings.Replace(doc.Import, doc.Attributes["org"], organizationId, -1)
+		}
 	}
 
 	return dataBlock, nil
@@ -377,6 +385,13 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 			space := value.(map[string]interface{})
 			stringArr = append(stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", space["name"])))
 		}
+	case CfUserType:
+		users := data["users"].([]interface{})
+		for _, value := range users {
+			user := value.(map[string]interface{})
+			stringArr = append(stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", user["username"])))
+		}
+
 	}
 	return stringArr
 }

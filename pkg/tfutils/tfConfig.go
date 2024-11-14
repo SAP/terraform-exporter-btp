@@ -39,6 +39,7 @@ var AllowedResourcesDirectory = []string{
 
 var AllowedResourcesOrganization = []string{
 	CmdCfSpaceParameter,
+	CmdCfUserParameter,
 }
 
 func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) error {
