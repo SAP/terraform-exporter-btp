@@ -364,9 +364,9 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 	case SubaccountSecuritySettingType:
 		stringArr = []string{fmt.Sprintf("%v", data["subaccount_id"])}
 	case CfSpaceType:
-    transformDataToStringArrayGeneric(data, &stringArr, "spaces", "name")
+		transformDataToStringArrayGeneric(data, &stringArr, "spaces", "name")
 	case CfUserType:
-    transformDataToStringArrayGeneric(data, &stringArr, "users", "username")
+		transformDataToStringArrayGeneric(data, &stringArr, "users", "username")
 	}
 	return stringArr
 }
