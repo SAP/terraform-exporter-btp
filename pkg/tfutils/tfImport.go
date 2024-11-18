@@ -19,7 +19,7 @@ import (
 
 // Constants for TF version for Terraform providers e.g. for SAP BTP
 const BtpProviderVersion = "v1.8.0"
-const CfProviderVersion = "v1.0.0"
+const CfProviderVersion = "v1.1.0"
 
 const (
 	SubaccountLevel   = "subaccountLevel"
@@ -41,6 +41,7 @@ const (
 	CmdSecuritySettingParameter     string = "security-settings"
 	CmdCfSpaceParameter             string = "spaces"
 	CmdCfUserParameter              string = "users"
+	CmdCfDomainParamater            string = "domains"
 )
 
 const (
@@ -64,8 +65,9 @@ const (
 )
 
 const (
-	CfSpaceType string = "cloudfoundry_space"
-	CfUserType  string = "cloudfoundry_user"
+	CfSpaceType  string = "cloudfoundry_space"
+	CfUserType   string = "cloudfoundry_user"
+	CfDomainType string = "cloudfoundry_domain"
 )
 
 const DirectoryFeatureDefault string = "DEFAULT"
@@ -179,6 +181,8 @@ func TranslateResourceParamToTechnicalName(resource string, level string) string
 		return CfSpaceType
 	case CmdCfUserParameter:
 		return CfUserType
+	case CmdCfDomainParamater:
+		return CfDomainType
 	}
 	return ""
 }
@@ -273,7 +277,7 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 			dataBlock = strings.Replace(doc.Import, doc.Attributes["directory_id"], directoryId, -1)
 		}
 	case OrganizationLevel:
-		if resourceName == CfUserType {
+		if resourceName == CfUserType || resourceName == CfDomainType {
 			dataBlock = strings.Replace(doc.Import, "The ID of the organization", organizationId, -1)
 		} else {
 			dataBlock = strings.Replace(doc.Import, doc.Attributes["org"], organizationId, -1)
@@ -367,6 +371,8 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		transformDataToStringArrayGeneric(data, &stringArr, "spaces", "name")
 	case CfUserType:
 		transformDataToStringArrayGeneric(data, &stringArr, "users", "username")
+	case CfDomainType:
+		transformDataToStringArrayGeneric(data, &stringArr, "domains", "name")
 	}
 	return stringArr
 }

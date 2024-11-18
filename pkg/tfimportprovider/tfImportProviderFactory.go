@@ -35,6 +35,8 @@ func GetImportBlockProvider(cmdResourceName string, level string) (ITfImportProv
 		return newcloudfoundrySpaceImportProvider(), nil
 	case tfutils.CmdCfUserParameter:
 		return newcloudfoundryUserImportProvider(), nil
+	case tfutils.CmdCfDomainParamater:
+		return newCloudfoundryDomainImportProvider(), nil
 	default:
 		return nil, fmt.Errorf("unsupported resource provided")
 	}

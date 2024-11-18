@@ -1093,7 +1093,7 @@ func cleanupDocument(name string, doc EntityDocs) (EntityDocs, bool) {
 			for attrName, attrValue := range cleanedAttributes {
 				doc.Import += fmt.Sprintf("%s = \"%s\" \n", attrName, attrValue)
 			}
-		} else if name == "cloudfoundry_users" {
+		} else if name == "cloudfoundry_users" || name == "cloudfoundry_domains" {
 			doc.Import += "org = \"The ID of the organization\" \n"
 		} else {
 			doc.Import += "id = \"The ID of the subaccount\" \n"
