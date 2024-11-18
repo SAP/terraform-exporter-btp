@@ -16,7 +16,7 @@ func TestCreateCfDomainImportBlock(t *testing.T) {
 	dataDomain, _ := GetDataFromJsonString(jsonString)
 
 	jsonStringMultipleDomains := "{\"domains\": [{\"annotations\": null,\"created_at\":\"2022-01-02T08:56:47Z\",\"id\":\"23456\",\"internal\": false,\"labels\": null,\"name\":\"test-domain1.com\",\"org\":\"12345\",\"router_group\": null,\"shared_orgs\": null,\"supported_protocols\": [\"http\"],\"updated_at\":\"2023-01-02T08:56:47Z\"},    {\"annotations\": null,\"created_at\":\"2022-01-02T09:29:59Z\",\"id\":\"34567\",\"internal\": false,\"labels\": null,\"name\":\"test-domain2.com\",\"org\":\"12345\",\"router_group\": null,\"shared_orgs\": null,\"supported_protocols\": [\"http\"],\"updated_at\":\"2023-01-02T09:29:59Z\"}],\"org\":\"12345\"}"
-	dataMultipleDomains, _ := GetDataFromJsonString(jsonStringMultipleSpaces)
+	dataMultipleDomains, _ := GetDataFromJsonString(jsonStringMultipleDomains)
 
 	tests := []struct {
 		name          string
