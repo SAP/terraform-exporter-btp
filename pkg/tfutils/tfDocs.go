@@ -51,6 +51,8 @@ var repoPaths sync.Map
 
 func getRepositoryPath(githubHost, organization, provider, version string) (string, error) {
 	relativePath := fmt.Sprintf("%s/%s/terraform-provider-%s", githubHost, organization, provider)
+	gitPath := relativePath
+
 	if version != "" {
 		relativePath = fmt.Sprintf("%s@%s", relativePath, version)
 	}
@@ -60,9 +62,10 @@ func getRepositoryPath(githubHost, organization, provider, version string) (stri
 	}
 
 	gitRepoDownloadPath := TmpFolder + "/" + relativePath
+	gitUrl := "https://" + gitPath
 
 	_, er := git.PlainClone(gitRepoDownloadPath, false, &git.CloneOptions{
-		URL: "https://github.com/SAP/terraform-provider-btp.git",
+		URL: gitUrl,
 	})
 
 	if er != nil {
