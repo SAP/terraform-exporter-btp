@@ -12,6 +12,7 @@ import (
 	"unicode"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	bf "github.com/russross/blackfriday/v2"
 )
 
@@ -65,7 +66,8 @@ func getRepositoryPath(githubHost, organization, provider, version string) (stri
 	gitUrl := "https://" + gitPath
 
 	_, er := git.PlainClone(gitRepoDownloadPath, false, &git.CloneOptions{
-		URL: gitUrl,
+		URL:           gitUrl,
+		ReferenceName: plumbing.NewTagReferenceName(version),
 	})
 
 	if er != nil {
