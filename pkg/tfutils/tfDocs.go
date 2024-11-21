@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
 	"unicode"
 
+	"github.com/go-git/go-git/v5"
 	bf "github.com/russross/blackfriday/v2"
 )
 
@@ -59,35 +59,19 @@ func getRepositoryPath(githubHost, organization, provider, version string) (stri
 		return path.(string), nil
 	}
 
-	currentWd, err := os.Getwd()
-	if err != nil {
-		return "", fmt.Errorf("error finding current directory: %w", err)
+	gitRepoDownloadPath := TmpFolder + "/" + relativePath
+
+	_, er := git.PlainClone(gitRepoDownloadPath, false, &git.CloneOptions{
+		URL: "https://github.com/SAP/terraform-provider-btp.git",
+	})
+
+	if er != nil {
+		return "", fmt.Errorf("error cloning git repo: %w", er)
 	}
 
-	command := exec.Command("go", "mod", "download", "-json", relativePath)
-	command.Dir = currentWd
-	output, err := command.CombinedOutput()
-	if err != nil {
-		return "", fmt.Errorf("error running 'go mod download -json' command in %q dir for module: %w\n\nOutput: %s", currentWd, err, output)
-	}
+	repoPaths.Store(relativePath, gitRepoDownloadPath)
 
-	target := struct {
-		Version string
-		Dir     string
-		Error   string
-	}{}
-
-	if err := json.Unmarshal(output, &target); err != nil {
-		return "", fmt.Errorf("error parsing output of 'go mod download -json' for module: %w", err)
-	}
-
-	if target.Error != "" {
-		return "", fmt.Errorf("error from 'go mod download -json' for module: %s", target.Error)
-	}
-
-	repoPaths.Store(relativePath, target.Dir)
-
-	return target.Dir, nil
+	return gitRepoDownloadPath, nil
 }
 
 func getDocsPath(repo string, kind DocKind) string {
@@ -109,31 +93,34 @@ func checkIfNewDocsExist(repo string) bool {
 }
 
 // readMarkdown searches all possible locations for the markdown content
-func readMarkdown(repository string, kind DocKind, markdownName string) ([]byte, string, bool) {
+func readMarkdown(repository string, kind DocKind, markdownName string) ([]byte, string, bool, error) {
 	locationPrefix := getDocsPath(repository, kind)
 
 	location := filepath.Join(locationPrefix, markdownName)
 	markdownBytes, err := os.ReadFile(location)
 	if err == nil {
-		return markdownBytes, markdownName, true
+		return markdownBytes, markdownName, true, nil
 	}
-	return nil, "", false
+	return nil, "", false, err
 }
 
 func getMarkdownDetails(org string, provider string, resourcePrefix string,
 	kind DocKind, rawName string, providerVersion string, githost string,
-) ([]byte, string, bool) {
+) ([]byte, string, bool, error) {
 
-	repoPath, _ := getRepositoryPath(githost, org, provider, providerVersion)
+	repoPath, err := getRepositoryPath(githost, org, provider, providerVersion)
+	if err != nil {
+		return nil, "", false, fmt.Errorf("error in getting repository path : %v", err)
+	}
 
 	markdownName := strings.TrimPrefix(rawName, resourcePrefix+"_") + ".md"
 
-	markdownBytes, markdownFileName, found := readMarkdown(repoPath, kind, markdownName)
+	markdownBytes, markdownFileName, found, err := readMarkdown(repoPath, kind, markdownName)
 	if !found {
-		return nil, "", false
+		return nil, "", false, err
 	}
 
-	return markdownBytes, markdownFileName, true
+	return markdownBytes, markdownFileName, true, nil
 }
 
 type tfMarkdownParser struct {
@@ -1155,10 +1142,10 @@ func GetDocsForResource(org string, provider string, resourcePrefix string, kind
 	rawname string /* info tfbridge.ResourceOrDataSourceInfo, */, providerModuleVersion string,
 	githost string) (EntityDocs, error) {
 
-	markdownBytes, markdownFileName, found := getMarkdownDetails(org, provider,
+	markdownBytes, markdownFileName, found, err := getMarkdownDetails(org, provider,
 		resourcePrefix, kind, rawname, providerModuleVersion, githost)
 	if !found {
-		return EntityDocs{}, fmt.Errorf("could not find docs for %v %v", kind, rawname)
+		return EntityDocs{}, fmt.Errorf("could not find docs for %v %v. err: %v", kind, rawname, err)
 	}
 
 	doc, err := parseTFMarkdown(kind, markdownBytes, markdownFileName, rawname)
