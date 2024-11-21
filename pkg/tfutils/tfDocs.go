@@ -52,26 +52,21 @@ var repoPaths sync.Map
 
 func getRepositoryPath(githubHost, organization, provider, version string) (string, error) {
 	relativePath := fmt.Sprintf("%s/%s/terraform-provider-%s", githubHost, organization, provider)
-	gitPath := relativePath
-
-	if version != "" {
-		relativePath = fmt.Sprintf("%s@%s", relativePath, version)
-	}
 
 	if path, ok := repoPaths.Load(relativePath); ok {
 		return path.(string), nil
 	}
 
 	gitRepoDownloadPath := TmpFolder + "/" + relativePath
-	gitUrl := "https://" + gitPath
+	gitUrl := "https://" + relativePath
 
-	_, er := git.PlainClone(gitRepoDownloadPath, false, &git.CloneOptions{
+	_, err := git.PlainClone(gitRepoDownloadPath, false, &git.CloneOptions{
 		URL:           gitUrl,
 		ReferenceName: plumbing.NewTagReferenceName(version),
 	})
 
-	if er != nil {
-		return "", fmt.Errorf("error cloning git repo: %w", er)
+	if err != nil {
+		return "", fmt.Errorf("error cloning git repo: %w", err)
 	}
 
 	repoPaths.Store(relativePath, gitRepoDownloadPath)
