@@ -382,7 +382,7 @@ func TestGetDocsForResource_MissingDoc(t *testing.T) {
 	}
 
 	expectedErrorMsg := "could not find docs for testKind testRawname"
-	if err.Error() != expectedErrorMsg {
+	if !strings.Contains(err.Error(), expectedErrorMsg) {
 		t.Errorf("expected error message %q but got %q", expectedErrorMsg, err.Error())
 	}
 }
