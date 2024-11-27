@@ -42,6 +42,7 @@ const (
 	CmdCfSpaceParameter             string = "spaces"
 	CmdCfUserParameter              string = "users"
 	CmdCfDomainParamater            string = "domains"
+	CmdCfOrgRoleParameter           string = "org-roles"
 )
 
 const (
@@ -65,9 +66,10 @@ const (
 )
 
 const (
-	CfSpaceType  string = "cloudfoundry_space"
-	CfUserType   string = "cloudfoundry_user"
-	CfDomainType string = "cloudfoundry_domain"
+	CfSpaceType   string = "cloudfoundry_space"
+	CfUserType    string = "cloudfoundry_user"
+	CfDomainType  string = "cloudfoundry_domain"
+	CfOrgRoleType string = "cloudfoundry_org_role"
 )
 
 const DirectoryFeatureDefault string = "DEFAULT"
@@ -183,6 +185,8 @@ func TranslateResourceParamToTechnicalName(resource string, level string) string
 		return CfUserType
 	case CmdCfDomainParamater:
 		return CfDomainType
+	case CmdCfOrgRoleParameter:
+		return CfOrgRoleType
 	}
 	return ""
 }
@@ -373,6 +377,8 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		transformDataToStringArrayGeneric(data, &stringArr, "users", "username")
 	case CfDomainType:
 		transformDataToStringArrayGeneric(data, &stringArr, "domains", "name")
+	case CfOrgRoleType:
+		transformOrgRolesStringArray(data, &stringArr)
 	}
 	return stringArr
 }
@@ -518,5 +524,13 @@ func transformSubscriptionsStringArray(data map[string]interface{}, stringArr *[
 		if fmt.Sprintf("%v", subscription["state"]) != "NOT_SUBSCRIBED" {
 			*stringArr = append(*stringArr, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 		}
+	}
+}
+
+func transformOrgRolesStringArray(data map[string]interface{}, stringArr *[]string) {
+	roles := data["roles"].([]interface{})
+	for _, value := range roles {
+		role := value.(map[string]interface{})
+		*stringArr = append(*stringArr, output.FormatOrgRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["user"])))
 	}
 }

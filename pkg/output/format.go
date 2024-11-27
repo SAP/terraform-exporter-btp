@@ -17,3 +17,7 @@ func FormatSubscriptionResourceName(appName string, planName string) string {
 func FormatServiceInstanceResourceName(serviceInstanceName string, planId string) string {
 	return serviceInstanceName + "_" + planId
 }
+
+func FormatOrgRoleResourceName(orgRoleType string, userId string) string {
+	return orgRoleType + "_" + userId
+}
