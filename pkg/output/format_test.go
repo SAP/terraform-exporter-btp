@@ -14,24 +14,24 @@ func TestFormatResourceNameGeneric(t *testing.T) {
 	}
 }
 
-func TestFormatResourceNameGenericWithDots(t *testing.T) {
+func TestFormatResourceNameRoleWithDots(t *testing.T) {
 
 	input := "ApiManagement.SelfService.Administrator"
 	expected := "apimanagement_selfservice_administrator"
 
-	result := FormatResourceNameGeneric(input)
+	result := FormatRoleResourceName(input)
 
 	if result != expected {
 		t.Errorf("got %q, wanted %q", result, expected)
 	}
 }
 
-func TestFormatResourceNameGenericMisc(t *testing.T) {
+func TestFormatResourceNameRoleMisc(t *testing.T) {
 
 	input := "SomeResource withSpaces.AndDots"
 	expected := "someresource_withspaces_anddots"
 
-	result := FormatResourceNameGeneric(input)
+	result := FormatRoleResourceName(input)
 
 	if result != expected {
 		t.Errorf("got %q, wanted %q", result, expected)

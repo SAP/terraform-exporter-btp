@@ -3,8 +3,12 @@ package output
 import "strings"
 
 func FormatResourceNameGeneric(name string) string {
-	nameNoSpaces := strings.ToLower(strings.Replace(name, " ", "_", -1))
-	return strings.Replace(nameNoSpaces, ".", "_", -1)
+	return strings.ToLower(strings.Replace(name, " ", "_", -1))
+}
+
+func FormatRoleResourceName(name string) string {
+	nameGeneric := FormatResourceNameGeneric(name)
+	return strings.Replace(nameGeneric, ".", "_", -1)
 }
 
 func FormatDirEntitlementResourceName(appName string, planName string) string {

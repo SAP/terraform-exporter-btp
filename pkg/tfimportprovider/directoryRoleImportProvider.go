@@ -50,7 +50,7 @@ func createDirectoryRoleImportBlock(data map[string]interface{}, directoryId str
 
 		for x, value := range roles {
 			role := value.(map[string]interface{})
-			resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"]))
+			resourceName := output.FormatRoleResourceName(fmt.Sprintf("%v", role["name"]))
 			directoryAllRoles = append(directoryAllRoles, resourceName)
 			if slices.Contains(filterValues, resourceName) {
 				importBlock += templateDirectoryRoleImport(x, role, directoryId, resourceDoc)
