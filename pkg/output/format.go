@@ -8,7 +8,8 @@ func FormatResourceNameGeneric(name string) string {
 
 func FormatRoleResourceName(name string) string {
 	nameGeneric := FormatResourceNameGeneric(name)
-	return strings.Replace(nameGeneric, ".", "_", -1)
+	// We replace a dot with two underscores to avoid conflicts with same role names that already contain a underscore
+	return strings.Replace(nameGeneric, ".", "__", -1)
 }
 
 func FormatDirEntitlementResourceName(appName string, planName string) string {

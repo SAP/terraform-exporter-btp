@@ -17,7 +17,7 @@ func TestFormatResourceNameGeneric(t *testing.T) {
 func TestFormatResourceNameRoleWithDots(t *testing.T) {
 
 	input := "ApiManagement.SelfService.Administrator"
-	expected := "apimanagement_selfservice_administrator"
+	expected := "apimanagement__selfservice__administrator"
 
 	result := FormatRoleResourceName(input)
 
@@ -29,7 +29,7 @@ func TestFormatResourceNameRoleWithDots(t *testing.T) {
 func TestFormatResourceNameRoleMisc(t *testing.T) {
 
 	input := "SomeResource withSpaces.AndDots"
-	expected := "someresource_withspaces_anddots"
+	expected := "someresource_withspaces__anddots"
 
 	result := FormatRoleResourceName(input)
 
