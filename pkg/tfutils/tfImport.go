@@ -358,7 +358,8 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 	case SubaccountTrustConfigurationType:
 		transformDataToStringArrayGeneric(data, &stringArr, "values", "origin")
 	case SubaccountRoleType, DirectoryRoleType:
-		transformDataToStringArrayGeneric(data, &stringArr, "values", "name")
+		// Special handling needed due to the different format of the role names
+		transformRoleStringArray(data, &stringArr, "values", "name")
 	case SubaccountRoleCollectionType, DirectoryRoleCollectionType:
 		transformDataToStringArrayGeneric(data, &stringArr, "values", "name")
 	case SubaccountServiceInstanceType:
@@ -493,6 +494,14 @@ func transformDataToStringArrayGeneric(data map[string]interface{}, stringArr *[
 	for _, value := range entities {
 		entity := value.(map[string]interface{})
 		*stringArr = append(*stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", entity[resourceKey])))
+	}
+}
+
+func transformRoleStringArray(data map[string]interface{}, stringArr *[]string, dataSourceListKey string, resourceKey string) {
+	entities := data[dataSourceListKey].([]interface{})
+	for _, value := range entities {
+		entity := value.(map[string]interface{})
+		*stringArr = append(*stringArr, output.FormatRoleResourceName(fmt.Sprintf("%v", entity[resourceKey])))
 	}
 }
 

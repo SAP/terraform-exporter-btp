@@ -13,12 +13,12 @@
       "program": "${workspaceFolder}/main.go",
       "args": "${input:cliArgs}",
       "console": "integratedTerminal",
-      "env": {
-        "BTP_USERNAME": "firstname.lastname@sap.com",
-        "BTP_ENABLE_SSO": "true",
-        "BTP_GLOBALACCOUNT": ""
-      },
-      //"envFile": "${workspaceFolder}/.env"
+      //"env": {
+      //  "BTP_USERNAME": "firstname.lastname@sap.com",
+      //  "BTP_ENABLE_SSO": "true",
+      //  "BTP_GLOBALACCOUNT": ""
+      //},
+      "envFile": "${workspaceFolder}/.env"
     },
   ],
   "inputs": [
@@ -26,7 +26,7 @@
       "id": "cliArgs",
       "type": "promptString",
       "description": "Args for launching btptf CLI. Use --cwd to set the working directory.",
-      "default": "export -s 1234567890"
+      "default": "export-by-json -s cf18dcef-5b15-4638-bd98-73f10c7f4f3a"
     }
   ]
 }
