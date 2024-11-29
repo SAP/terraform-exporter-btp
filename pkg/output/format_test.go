@@ -40,3 +40,27 @@ func TestFormatServiceInstanceResourceName(t *testing.T) {
 	}
 
 }
+
+func TestFormatRoleCollectionResourceName(t *testing.T) {
+
+	input := "Application.Destination.Administrator"
+	expected := "application__destination__administrator"
+
+	result := FormatRoleCollectionName(input)
+
+	if result != expected {
+		t.Errorf("got %q, wanted %q", result, expected)
+	}
+}
+
+func TestFormatRoleCollectionResourceNameMisc(t *testing.T) {
+
+	input := "Application Destination.Administrator"
+	expected := "application_destination__administrator"
+
+	result := FormatRoleCollectionName(input)
+
+	if result != expected {
+		t.Errorf("got %q, wanted %q", result, expected)
+	}
+}

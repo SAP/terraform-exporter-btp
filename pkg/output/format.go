@@ -17,3 +17,8 @@ func FormatSubscriptionResourceName(appName string, planName string) string {
 func FormatServiceInstanceResourceName(serviceInstanceName string, planId string) string {
 	return serviceInstanceName + "_" + planId
 }
+
+func FormatRoleCollectionName(name string) string {
+	nameGeneric := FormatResourceNameGeneric(name)
+	return strings.ToLower(strings.Replace(nameGeneric, ".", "__", -1))
+}
