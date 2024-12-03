@@ -50,7 +50,7 @@ func createRouteImportBlock(data map[string]interface{}, orgId string, filterVal
 		}
 		missingRoute, subset := isSubset(cfAllRoutes, filterValues)
 		if !subset {
-			return "", 0, fmt.Errorf("cloud foudndry route %s not found in the organization with ID %s. Please adjust it in the provided file", missingRoute, orgId)
+			return "", 0, fmt.Errorf("cloud foundry route %s not found in the organization with ID %s. Please adjust it in the provided file", missingRoute, orgId)
 		}
 	} else {
 		for x, value := range routes {
