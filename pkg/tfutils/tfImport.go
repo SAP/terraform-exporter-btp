@@ -43,6 +43,7 @@ const (
 	CmdCfUserParameter              string = "users"
 	CmdCfDomainParamater            string = "domains"
 	CmdCfRouteParameter             string = "routes"
+	CmdCfSpaceQuotaParameter        string = "space-quotas"
 )
 
 const (
@@ -66,10 +67,11 @@ const (
 )
 
 const (
-	CfSpaceType  string = "cloudfoundry_space"
-	CfUserType   string = "cloudfoundry_user"
-	CfDomainType string = "cloudfoundry_domain"
-	CfRouteType  string = "cloudfoundry_route"
+	CfSpaceType      string = "cloudfoundry_space"
+	CfUserType       string = "cloudfoundry_user"
+	CfDomainType     string = "cloudfoundry_domain"
+	CfRouteType      string = "cloudfoundry_route"
+	CfSpaceQuotaType string = "cloudfoundry_space_quota"
 )
 
 const DirectoryFeatureDefault string = "DEFAULT"
@@ -187,6 +189,8 @@ func TranslateResourceParamToTechnicalName(resource string, level string) string
 		return CfDomainType
 	case CmdCfRouteParameter:
 		return CfRouteType
+	case CmdCfSpaceQuotaParameter:
+		return CfSpaceQuotaType
 	}
 	return ""
 }
@@ -379,6 +383,8 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		transformDataToStringArrayGeneric(data, &stringArr, "domains", "name")
 	case CfRouteType:
 		transformDataToStringArrayGeneric(data, &stringArr, "routes", "url")
+	case CfSpaceQuotaType:
+		transformDataToStringArrayGeneric(data, &stringArr, "space_quotas", "name")
 	}
 	return stringArr
 }
