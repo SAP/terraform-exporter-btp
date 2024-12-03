@@ -368,7 +368,7 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 	case SubaccountRoleType, DirectoryRoleType:
 		transformDataToStringArrayGeneric(data, &stringArr, "values", "name")
 	case SubaccountRoleCollectionType, DirectoryRoleCollectionType:
-		transformRoleCollectionStringArray(data, &stringArr, "values", "name")
+		transformDataToStringArrayGeneric(data, &stringArr, "values", "name")
 	case SubaccountServiceInstanceType:
 		transformServiceInstanceStringArray(data, &stringArr)
 	case SubaccountServiceBindingType:
@@ -530,13 +530,5 @@ func transformSubscriptionsStringArray(data map[string]interface{}, stringArr *[
 		if fmt.Sprintf("%v", subscription["state"]) != "NOT_SUBSCRIBED" {
 			*stringArr = append(*stringArr, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 		}
-	}
-}
-
-func transformRoleCollectionStringArray(data map[string]interface{}, stringArr *[]string, dataSourceListKey string, resourceKey string) {
-	entities := data[dataSourceListKey].([]interface{})
-	for _, value := range entities {
-		entity := value.(map[string]interface{})
-		*stringArr = append(*stringArr, output.FormatRoleCollectionName(fmt.Sprintf("%v", entity[resourceKey])))
 	}
 }

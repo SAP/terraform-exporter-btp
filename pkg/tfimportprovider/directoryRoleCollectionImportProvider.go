@@ -48,12 +48,12 @@ func createDirectoryRoleCollectionImportBlock(data map[string]interface{}, direc
 	if len(filterValues) != 0 {
 		var directoryAllRoleCollections []string
 
-		for _, value := range roleCollections {
+		for x, value := range roleCollections {
 			roleCollection := value.(map[string]interface{})
-			resourceName := output.FormatRoleCollectionName(fmt.Sprintf("%v", roleCollection["name"]))
+			resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", roleCollection["name"]))
 			directoryAllRoleCollections = append(directoryAllRoleCollections, resourceName)
 			if slices.Contains(filterValues, resourceName) {
-				importBlock += templateDirectoryRoleCollectionImport(roleCollection, directoryId, resourceDoc)
+				importBlock += templateDirectoryRoleCollectionImport(x, roleCollection, directoryId, resourceDoc)
 				count++
 			}
 		}
@@ -65,9 +65,9 @@ func createDirectoryRoleCollectionImportBlock(data map[string]interface{}, direc
 		}
 
 	} else {
-		for _, value := range roleCollections {
+		for x, value := range roleCollections {
 			roleCollection := value.(map[string]interface{})
-			importBlock += templateDirectoryRoleCollectionImport(roleCollection, directoryId, resourceDoc)
+			importBlock += templateDirectoryRoleCollectionImport(x, roleCollection, directoryId, resourceDoc)
 			count++
 		}
 	}
@@ -76,10 +76,9 @@ func createDirectoryRoleCollectionImportBlock(data map[string]interface{}, direc
 
 }
 
-func templateDirectoryRoleCollectionImport(roleCollection map[string]interface{}, directoryId string, resourceDoc tfutils.EntityDocs) string {
+func templateDirectoryRoleCollectionImport(x int, roleCollection map[string]interface{}, directoryId string, resourceDoc tfutils.EntityDocs) string {
 	resourceDoc.Import = strings.Replace(resourceDoc.Import, "'", "", -1)
-	resourceName := output.FormatRoleCollectionName(fmt.Sprintf("%v", roleCollection["name"]))
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", resourceName, -1)
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "rolecollection_"+fmt.Sprint(x), -1)
 	template = strings.Replace(template, "<directory_id>", directoryId, -1)
 	template = strings.Replace(template, "<name>", fmt.Sprintf("%v", roleCollection["name"]), -1)
 	return template + "\n"

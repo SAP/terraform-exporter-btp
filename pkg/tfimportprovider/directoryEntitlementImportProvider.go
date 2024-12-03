@@ -45,7 +45,7 @@ func CreateDirEntitlementImportBlock(data map[string]interface{}, directoryId st
 		for key, value := range data {
 			directoryAllEntitlements = append(directoryAllEntitlements, strings.Replace(key, ":", "_", -1))
 			if slices.Contains(filterValues, strings.Replace(key, ":", "_", -1)) {
-				importBlock += templateDirEntitlementImport(key, value, directoryId, resourceDoc)
+				importBlock += templateDirEntitlementImport(count, value, directoryId, resourceDoc)
 				count++
 			}
 		}
@@ -57,16 +57,16 @@ func CreateDirEntitlementImportBlock(data map[string]interface{}, directoryId st
 		}
 
 	} else {
-		for key, value := range data {
-			importBlock += templateDirEntitlementImport(key, value, directoryId, resourceDoc)
+		for _, value := range data {
+			importBlock += templateDirEntitlementImport(count, value, directoryId, resourceDoc)
 			count++
 		}
 	}
 	return importBlock, count, nil
 }
 
-func templateDirEntitlementImport(key string, value interface{}, directoryId string, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", strings.Replace(key, ":", "_", -1), -1)
+func templateDirEntitlementImport(x int, value interface{}, directoryId string, resourceDoc tfutils.EntityDocs) string {
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "entitlement_"+fmt.Sprint(x), -1)
 	template = strings.Replace(template, "<directory_id>", directoryId, -1)
 	if subMap, ok := value.(map[string]interface{}); ok {
 		for subKey, subValue := range subMap {

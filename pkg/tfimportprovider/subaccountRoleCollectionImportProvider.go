@@ -48,12 +48,12 @@ func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId s
 	if len(filterValues) != 0 {
 		var subaccountAllRoleCollections []string
 
-		for _, value := range roleCollections {
+		for x, value := range roleCollections {
 			roleCollection := value.(map[string]interface{})
-			resourceName := output.FormatRoleCollectionName(fmt.Sprintf("%v", roleCollection["name"]))
+			resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", roleCollection["name"]))
 			subaccountAllRoleCollections = append(subaccountAllRoleCollections, resourceName)
 			if slices.Contains(filterValues, resourceName) {
-				importBlock += templateRoleCollectionImport(roleCollection, subaccountId, resourceDoc)
+				importBlock += templateRoleCollectionImport(x, roleCollection, subaccountId, resourceDoc)
 				count++
 			}
 		}
@@ -65,9 +65,9 @@ func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId s
 		}
 
 	} else {
-		for _, value := range roleCollections {
+		for x, value := range roleCollections {
 			roleCollection := value.(map[string]interface{})
-			importBlock += templateRoleCollectionImport(roleCollection, subaccountId, resourceDoc)
+			importBlock += templateRoleCollectionImport(x, roleCollection, subaccountId, resourceDoc)
 			count++
 		}
 	}
@@ -76,10 +76,9 @@ func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId s
 
 }
 
-func templateRoleCollectionImport(roleCollection map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+func templateRoleCollectionImport(x int, roleCollection map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	resourceDoc.Import = strings.Replace(resourceDoc.Import, "'", "", -1)
-	resourceName := output.FormatRoleCollectionName(fmt.Sprintf("%v", roleCollection["name"]))
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", resourceName, -1)
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "rolecollection_"+fmt.Sprint(x), -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	template = strings.Replace(template, "<name>", fmt.Sprintf("%v", roleCollection["name"]), -1)
 	return template + "\n"

@@ -44,7 +44,7 @@ func CreateEntitlementImportBlock(data map[string]interface{}, subaccountId stri
 		for key, value := range data {
 			subaccountAllEntitlements = append(subaccountAllEntitlements, strings.Replace(key, ":", "_", -1))
 			if slices.Contains(filterValues, strings.Replace(key, ":", "_", -1)) {
-				importBlock += templateEntitlementImport(key, value, subaccountId, resourceDoc)
+				importBlock += templateEntitlementImport(count, value, subaccountId, resourceDoc)
 				count++
 			}
 		}
@@ -56,16 +56,16 @@ func CreateEntitlementImportBlock(data map[string]interface{}, subaccountId stri
 		}
 
 	} else {
-		for key, value := range data {
-			importBlock += templateEntitlementImport(key, value, subaccountId, resourceDoc)
+		for _, value := range data {
+			importBlock += templateEntitlementImport(count, value, subaccountId, resourceDoc)
 			count++
 		}
 	}
 	return importBlock, count, nil
 }
 
-func templateEntitlementImport(key string, value interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", strings.Replace(key, ":", "_", -1), -1)
+func templateEntitlementImport(x int, value interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "entitlement_"+fmt.Sprint(x), -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	if subMap, ok := value.(map[string]interface{}); ok {
 		for subKey, subValue := range subMap {

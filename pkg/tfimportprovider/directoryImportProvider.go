@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
@@ -47,8 +46,7 @@ func createDirectoryImportBlock(data map[string]interface{}, directoryId string,
 		}
 	}
 
-	saName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", data["name"]))
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", saName, -1)
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "directory_0", -1)
 	template = strings.Replace(template, "<directory_id>", directoryId, -1)
 	importBlock += template + "\n"
 

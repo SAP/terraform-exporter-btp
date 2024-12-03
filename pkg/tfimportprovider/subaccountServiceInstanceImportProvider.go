@@ -48,12 +48,12 @@ func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId 
 	if len(filterValues) != 0 {
 		var subaccountAllServiceInstances []string
 
-		for _, value := range serviceInstances {
+		for x, value := range serviceInstances {
 			instance := value.(map[string]interface{})
 			resourceName := output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["serviceplan_id"]))
 			subaccountAllServiceInstances = append(subaccountAllServiceInstances, resourceName)
 			if slices.Contains(filterValues, resourceName) {
-				importBlock += templateServiceInstanceImport(instance, subaccountId, resourceDoc)
+				importBlock += templateServiceInstanceImport(x, instance, subaccountId, resourceDoc)
 				count++
 			}
 		}
@@ -65,18 +65,17 @@ func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId 
 		}
 
 	} else {
-		for _, value := range serviceInstances {
+		for x, value := range serviceInstances {
 			instance := value.(map[string]interface{})
-			importBlock += templateServiceInstanceImport(instance, subaccountId, resourceDoc)
+			importBlock += templateServiceInstanceImport(x, instance, subaccountId, resourceDoc)
 			count++
 		}
 	}
 	return importBlock, count, nil
 }
 
-func templateServiceInstanceImport(instance map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
-	resourceName := output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["serviceplan_id"]))
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", resourceName, -1)
+func templateServiceInstanceImport(x int, instance map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "serviceinstance_"+fmt.Sprint(x), -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	template = strings.Replace(template, "<service_instance_id>", fmt.Sprintf("%v", instance["id"]), -1)
 	return template + "\n"
