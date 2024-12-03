@@ -42,6 +42,7 @@ const (
 	CmdCfSpaceParameter             string = "spaces"
 	CmdCfUserParameter              string = "users"
 	CmdCfDomainParamater            string = "domains"
+	CmdCfRouteParameter             string = "routes"
 )
 
 const (
@@ -68,6 +69,7 @@ const (
 	CfSpaceType  string = "cloudfoundry_space"
 	CfUserType   string = "cloudfoundry_user"
 	CfDomainType string = "cloudfoundry_domain"
+	CfRouteType  string = "cloudfoundry_route"
 )
 
 const DirectoryFeatureDefault string = "DEFAULT"
@@ -183,6 +185,8 @@ func TranslateResourceParamToTechnicalName(resource string, level string) string
 		return CfUserType
 	case CmdCfDomainParamater:
 		return CfDomainType
+	case CmdCfRouteParameter:
+		return CfRouteType
 	}
 	return ""
 }
@@ -277,7 +281,7 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 			dataBlock = strings.Replace(doc.Import, doc.Attributes["directory_id"], directoryId, -1)
 		}
 	case OrganizationLevel:
-		if resourceName == CfUserType || resourceName == CfDomainType {
+		if resourceName == CfUserType || resourceName == CfDomainType || resourceName == CfRouteType {
 			dataBlock = strings.Replace(doc.Import, "The ID of the organization", organizationId, -1)
 		} else {
 			dataBlock = strings.Replace(doc.Import, doc.Attributes["org"], organizationId, -1)
@@ -373,6 +377,8 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		transformDataToStringArrayGeneric(data, &stringArr, "users", "username")
 	case CfDomainType:
 		transformDataToStringArrayGeneric(data, &stringArr, "domains", "name")
+	case CfRouteType:
+		transformDataToStringArrayGeneric(data, &stringArr, "routes", "url")
 	}
 	return stringArr
 }
