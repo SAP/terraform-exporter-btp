@@ -109,6 +109,15 @@ func getExportByResourceCmdDescription(c *cobra.Command) string {
 		}
 	}
 
+	var resourcesEnv string
+	for i, resource := range tfutils.AllowedResourcesOrganization {
+		if i == 0 {
+			resourcesEnv = resource
+		} else {
+			resourcesEnv = resourcesEnv + ", " + resource
+		}
+	}
+
 	mainText := `Use this command to export resources from SAP BTP per account level (subaccount, directory, or environment instance). The command will create a directory with the Terraform configuration files and import blocks for the following resources in your specified account level:`
 	return generateCmdHelpDescription(mainText,
 		[]string{
@@ -119,7 +128,7 @@ func getExportByResourceCmdDescription(c *cobra.Command) string {
 				fmt.Sprint("For subaccounts: " + resources),
 			),
 			formatHelpNote(
-				"For environment instances: TBD",
+				"For environment instances: " + resourcesEnv,
 			),
 		})
 }
