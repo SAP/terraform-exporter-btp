@@ -73,7 +73,7 @@ func createTrustConfigurationImportBlock(data map[string]interface{}, subaccount
 }
 
 func templateTrustImport(x int, trust map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "trust"+fmt.Sprint(x), -1)
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "trust_"+fmt.Sprint(x), -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	template = strings.Replace(template, "<origin>", fmt.Sprintf("%v", trust["origin"]), -1)
 	return template + "\n"

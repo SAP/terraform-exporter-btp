@@ -6,7 +6,6 @@ import (
 	"slices"
 	"strings"
 
-	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
@@ -48,12 +47,12 @@ func createServiceBindingImportBlock(data map[string]interface{}, subaccountId s
 	if len(filterValues) != 0 {
 		var subaccountAllServiceBindings []string
 
-		for _, value := range serviceBindings {
+		for x, value := range serviceBindings {
 			binding := value.(map[string]interface{})
 			resourceName := fmt.Sprintf("%v", binding["name"])
 			subaccountAllServiceBindings = append(subaccountAllServiceBindings, resourceName)
 			if slices.Contains(filterValues, resourceName) {
-				importBlock += templateServiceBindingImport(binding, subaccountId, resourceDoc)
+				importBlock += templateServiceBindingImport(x, binding, subaccountId, resourceDoc)
 				count++
 			}
 		}
@@ -65,18 +64,17 @@ func createServiceBindingImportBlock(data map[string]interface{}, subaccountId s
 		}
 
 	} else {
-		for _, value := range serviceBindings {
+		for x, value := range serviceBindings {
 			binding := value.(map[string]interface{})
-			importBlock += templateServiceBindingImport(binding, subaccountId, resourceDoc)
+			importBlock += templateServiceBindingImport(x, binding, subaccountId, resourceDoc)
 			count++
 		}
 	}
 	return importBlock, count, nil
 }
 
-func templateServiceBindingImport(binding map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
-	resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", binding["name"]))
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", resourceName, -1)
+func templateServiceBindingImport(x int, binding map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "servicebinding_"+fmt.Sprint(x), -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	template = strings.Replace(template, "<service_binding_id>", fmt.Sprintf("%v", binding["id"]), -1)
 	return template + "\n"

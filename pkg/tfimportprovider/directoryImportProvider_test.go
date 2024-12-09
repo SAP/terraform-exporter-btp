@@ -30,7 +30,7 @@ func TestCreateDirectoryImportBlock(t *testing.T) {
 			data:          dataDirectory,
 			directoryId:   "12345",
 			filterValues:  []string{},
-			expectedBlock: "import {\n\t\t\t\tto = btp_directory.btptfexporter-validate-dir\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
+			expectedBlock: "import {\n\t\t\t\tto = btp_directory.directory_0\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
 			expectError:   false,
 		},
 		{
@@ -38,7 +38,7 @@ func TestCreateDirectoryImportBlock(t *testing.T) {
 			data:          dataDirectory,
 			directoryId:   "12345",
 			filterValues:  []string{"btptfexporter-validate-dir"},
-			expectedBlock: "import {\n\t\t\t\tto = btp_directory.btptfexporter-validate-dir\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
+			expectedBlock: "import {\n\t\t\t\tto = btp_directory.directory_0\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
 			expectError:   false,
 		},
 		{

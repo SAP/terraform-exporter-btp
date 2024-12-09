@@ -30,7 +30,7 @@ func TestCreateSecuritySettingImportBlock(t *testing.T) {
 			data:          dataSecuritySettings,
 			subaccountId:  "12345",
 			filterValues:  []string{},
-			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_security_settings.sec_setting\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
+			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_security_settings.secsetting\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
 			expectError:   false,
 		},
 		{
@@ -38,7 +38,7 @@ func TestCreateSecuritySettingImportBlock(t *testing.T) {
 			data:          dataSecuritySettings,
 			subaccountId:  "12345",
 			filterValues:  []string{"12345"},
-			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_security_settings.sec_setting\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
+			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount_security_settings.secsetting\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
 			expectError:   false,
 		},
 		{
