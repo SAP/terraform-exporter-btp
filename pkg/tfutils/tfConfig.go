@@ -43,6 +43,7 @@ var AllowedResourcesOrganization = []string{
 	CmdCfDomainParamater,
 	CmdCfRouteParameter,
 	CmdCfSpaceQuotaParameter,
+	CmdCfServiceInstanceParameter,
 }
 
 func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) error {

@@ -1074,13 +1074,13 @@ func cleanupDocument(name string, doc EntityDocs) (EntityDocs, bool) {
 	cleanupText, _ := reorgenizeText(doc.Description)
 
 	var data_source_pattern = regexp.MustCompile("## Example Usage\\n\\n.{3}terraform\n?#?.*\\ndata")
-	if data_source_pattern.MatchString(cleanupText) {
+	if data_source_pattern.MatchString(cleanupText) && !containsSubstring(doc.Import, "import") {
 		doc.Import = fmt.Sprintf("data \"%s\" \"%s\"{\n  ", name, "all")
 		if len(cleanedAttributes) != 0 {
 			for attrName, attrValue := range cleanedAttributes {
 				doc.Import += fmt.Sprintf("%s = \"%s\" \n", attrName, attrValue)
 			}
-		} else if name == "cloudfoundry_users" || name == "cloudfoundry_domains" || name == "cloudfoundry_routes" {
+		} else if name == "cloudfoundry_users" || name == "cloudfoundry_domains" || name == "cloudfoundry_routes" || name == "cloudfoundry_service_instances" {
 			doc.Import += "org = \"The ID of the organization\" \n"
 		} else {
 			doc.Import += "id = \"The ID of the subaccount\" \n"
@@ -1154,4 +1154,13 @@ func GetDocsForResource(org string, provider string, resourcePrefix string, kind
 	}
 
 	return doc, nil
+}
+
+func containsSubstring(str, substr string) bool {
+	for i := 0; i < len(str)-len(substr)+1; i++ {
+		if str[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
 }
