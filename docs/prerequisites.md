@@ -2,7 +2,7 @@
 
 ## Terraform CLI
 
-The btptf CLI requires a istallation of the Terraform CLI. The Terraform CLI will be called by the btptf CLI.
+The btptf CLI requires a installation of the Terraform CLI. The Terraform CLI will be called by the btptf CLI.
 
 You find the necessary information  in the [official Terraform documentation](https://developer.hashicorp.com/terraform/install#darwin)
 
