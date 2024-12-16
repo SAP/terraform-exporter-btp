@@ -11,7 +11,7 @@ You find the necessary information  in the [official Terraform documentation](ht
 !!! info
     A full overview of available parameters is described in the next section.
 
-After executing the setup of the btptf CLI, you must set some required environment variables needed for authentication. This section describes the minimum set of environment variables that you must set to execute the btftf CLI successfully:
+After executing the setup of the btptf CLI, you must set some required environment variables needed for authentication. This section describes the minimum set of environment variables that you must set to execute the btptf CLI successfully:
 
 1. Set the environment variable `BTP_GLOBALACCOUNT` which specifies the *subdomain* of your SAP BTP global account.
 
@@ -78,23 +78,23 @@ The environment variables supported by the btptf CLI are required to configure t
 
 ### Terraform provider for SAP BTP
 
-For the sceanrios where you want to import resources defined in the [Terraform provider for SAP BTP](https://registry.terraform.io/providers/SAP/btp/latest/docs) the following parameters are available:
+For the scenarios where you want to import resources defined in the [Terraform provider for SAP BTP](https://registry.terraform.io/providers/SAP/btp/latest/docs) the following parameters are available:
 
 | Environment Variable Name  | Description |
 | --- | --- |
 | BTP_GLOBALACCOUNT | The subdomain of the global account from which you want to import resources. |
 | BTP_USERNAME | Your user name, usually an e-mail address. |
 | BTP_PASSWORD | Your password. Note that two-factor authentication is not supported.  |
-| BTP_IDP | The identity provider to be used for authentication (only required for custom idp) |
-| BTP_TLS_CLIENT_CERTIFICATE | PEM encoded certificate (only required for x509 auth) |
-| BTP_TLS_CLIENT_KEY | PEM encoded private key (only required for x509 auth) |
-| BTP_TLS_IDP_URL | The URL of the identity provider to be used for authentication (only required for x509 auth) |
+| BTP_IDP | The identity provider to be used for authentication (only required for custom IDP) |
+| BTP_TLS_CLIENT_CERTIFICATE | PEM encoded certificate (only required for x509 authentication) |
+| BTP_TLS_CLIENT_KEY | PEM encoded private key (only required for x509 authentication) |
+| BTP_TLS_IDP_URL | The URL of the identity provider to be used for authentication (only required for x509 authentication) |
 | BTP_CLI_SERVER_URL | The URL of the BTP CLI server - **Relevant for SAP internal use-cases only**  |
 | BTP_ENABLE_SSO | To use Single Sign-On (SSO) for authentication set this variable to true |
 
 ### Terraform provider for Cloud Foundry
 
-For the sceanrios where you want to import resources defined in the [Terraform provider for Cloud Foundry](https://registry.terraform.io/providers/cloudfoundry/cloudfoundry/latest/docs) the following parameters are available:
+For the scenarios where you want to import resources defined in the [Terraform provider for Cloud Foundry](https://registry.terraform.io/providers/cloudfoundry/cloudfoundry/latest/docs) the following parameters are available:
 
 | Environment Variable Name  | Description |
 | --- | --- |
