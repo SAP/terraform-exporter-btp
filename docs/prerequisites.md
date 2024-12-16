@@ -1,5 +1,13 @@
 # Prerequisite
 
+## Terraform CLI
+
+The btptf CLI requires a istallation of the Terraform CLI. The Terraform CLI will be called by the btptf CLI.
+
+You find the necessary information  in the [official Terraform documentation](https://developer.hashicorp.com/terraform/install#darwin)
+
+## Setting of Environment Variables
+
 After executing the setup of the btptf CLI, you must set some required environment variables needed for authentication.
 
 1. Set the environment variable `BTP_GLOBALACCOUNT` which specifies the *subdomain* of your SAP BTP global account.
