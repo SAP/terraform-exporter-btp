@@ -9,7 +9,7 @@ You find the necessary information  in the [official Terraform documentation](ht
 ## Setting of Environment Variables
 
 !!! info
-    A full overview of available parameters is described in the next section.
+    A complete overview of available parameters is described in the next section.
 
 After executing the setup of the btptf CLI, you must set some required environment variables needed for authentication. This section describes the minimum set of environment variables that you must set to execute the btptf CLI successfully:
 

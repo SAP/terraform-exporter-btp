@@ -1,5 +1,5 @@
 site_name: Terraform Exporter for SAP BTP
-theme: 
+theme:
   name: material
   features:
     - navigation.footer
@@ -22,9 +22,7 @@ nav:
   - Usage:
     - Prerequisites: prerequisites.md
     - Getting Started: gettingstarted.md
+    - Limitations: limitations.md
     - Commands List: btptf.md
   - Concepts: concepts.md
   - Security Considerations: security.md
-
-
-
