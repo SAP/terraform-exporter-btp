@@ -19,6 +19,7 @@ dir
 faq
 Github
 github
+GLOBALACCOUNT
 Golang
 GOLANG
 GOPATH
