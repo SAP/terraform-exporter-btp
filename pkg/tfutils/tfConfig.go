@@ -124,7 +124,7 @@ func ConfigureProvider(level string) {
 		tlsClientKey := os.Getenv("BTP_TLS_CLIENT_KEY")
 		tlsIdpURL := os.Getenv("BTP_TLS_IDP_URL")
 
-		validateBtpAuthenticationData(username, password, enableSSO)
+		validateBtpAuthenticationData(username, password, enableSSO, tlsClientCertificate, tlsClientKey, tlsIdpURL)
 		validateGlobalAccount(globalAccount)
 
 		providerContent = "terraform {\nrequired_providers {\nbtp = {\nsource  = \"SAP/btp\"\nversion = \"" + BtpProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"btp\" {\n"
@@ -226,11 +226,12 @@ func validateGlobalAccount(globalAccount string) {
 	}
 }
 
-func validateBtpAuthenticationData(username string, password string, enableSSO string) {
-	if allStringsEmtpy(username, password, enableSSO) {
+func validateBtpAuthenticationData(username string, password string, enableSSO string, tlsClientCertificate string, tlsClientKey string, tlsIdpURL string) {
+ // Check if any of the authentication data is set (username and password, username and SSO or TLS client certificate and key)
+	if allStringsEmtpy(username, password) && allStringsEmtpy(username, enableSSO) && allStringsEmtpy(tlsClientCertificate, tlsClientKey, tlsIdpURL) {
 		cleanup()
 		fmt.Print("\r\n")
-		log.Fatalf("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
+		log.Fatalf("set valid authentication data for login e.g. BTP_USERNAME and BTP_PASSWORD environment variables.")
 	}
 }
 
