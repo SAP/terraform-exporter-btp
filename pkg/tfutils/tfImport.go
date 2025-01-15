@@ -17,9 +17,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Constants for TF version for Terraform providers e.g. for SAP BTP
+// Constants for TF version for Terraform providers
 const BtpProviderVersion = "v1.9.0"
-const CfProviderVersion = "v1.1.0"
+const CfProviderVersion = "v1.2.0"
 
 const (
 	SubaccountLevel   = "subaccountLevel"
