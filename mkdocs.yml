@@ -1,5 +1,5 @@
 site_name: Terraform Exporter for SAP BTP
-theme: 
+theme:
   name: material
   features:
     - navigation.footer
@@ -15,16 +15,14 @@ markdown_extensions:
 repo_url: https://github.com/SAP/terraform-exporter-btp
 extra:
     generator: false
-copyright: Copyright © 2024 SAP SE or SAP affiliate company. All rights reserved.
+copyright: Copyright © 2025 SAP SE or SAP affiliate company. All rights reserved.
 nav:
   - Home: index.md
   - Installation: install.md
   - Usage:
     - Prerequisites: prerequisites.md
     - Getting Started: gettingstarted.md
+    - Limitations: limitations.md
     - Commands List: btptf.md
   - Concepts: concepts.md
   - Security Considerations: security.md
-
-
-

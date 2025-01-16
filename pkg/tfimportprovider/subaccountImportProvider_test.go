@@ -30,7 +30,7 @@ func TestCreateSubaccountImportBlock(t *testing.T) {
 			data:          dataSubaccount,
 			subaccountId:  "12345",
 			filterValues:  []string{},
-			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount.btp_tfexporter\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
+			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount.subaccount_0\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
 			expectError:   false,
 		},
 		{
@@ -38,7 +38,7 @@ func TestCreateSubaccountImportBlock(t *testing.T) {
 			data:          dataSubaccount,
 			subaccountId:  "12345",
 			filterValues:  []string{"BTP tfexporter"},
-			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount.btp_tfexporter\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
+			expectedBlock: "import {\n\t\t\t\tto = btp_subaccount.subaccount_0\n\t\t\t\tid = \"12345\"\"\n\t\t\t  }\n\n",
 			expectError:   false,
 		},
 		{

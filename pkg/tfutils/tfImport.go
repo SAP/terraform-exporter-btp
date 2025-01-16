@@ -17,9 +17,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Constants for TF version for Terraform providers e.g. for SAP BTP
-const BtpProviderVersion = "v1.8.0"
-const CfProviderVersion = "v1.1.0"
+// Constants for TF version for Terraform providers
+const BtpProviderVersion = "v1.9.0"
+const CfProviderVersion = "v1.2.0"
 
 const (
 	SubaccountLevel   = "subaccountLevel"
@@ -43,6 +43,9 @@ const (
 	CmdCfUserParameter              string = "users"
 	CmdCfDomainParamater            string = "domains"
 	CmdCfOrgRoleParameter           string = "org-roles"
+	CmdCfRouteParameter             string = "routes"
+	CmdCfSpaceQuotaParameter        string = "space-quotas"
+	CmdCfServiceInstanceParameter   string = "cf-service-instances"
 )
 
 const (
@@ -66,10 +69,13 @@ const (
 )
 
 const (
-	CfSpaceType   string = "cloudfoundry_space"
-	CfUserType    string = "cloudfoundry_user"
-	CfDomainType  string = "cloudfoundry_domain"
-	CfOrgRoleType string = "cloudfoundry_org_role"
+	CfSpaceType           string = "cloudfoundry_space"
+	CfUserType            string = "cloudfoundry_user"
+  CfOrgRoleType string = "cloudfoundry_org_role"
+	CfDomainType          string = "cloudfoundry_domain"
+	CfRouteType           string = "cloudfoundry_route"
+	CfSpaceQuotaType      string = "cloudfoundry_space_quota"
+	CfServiceInstanceType string = "cloudfoundry_service_instance"
 )
 
 const DirectoryFeatureDefault string = "DEFAULT"
@@ -187,6 +193,12 @@ func TranslateResourceParamToTechnicalName(resource string, level string) string
 		return CfDomainType
 	case CmdCfOrgRoleParameter:
 		return CfOrgRoleType
+	case CmdCfRouteParameter:
+		return CfRouteType
+	case CmdCfSpaceQuotaParameter:
+		return CfSpaceQuotaType
+	case CmdCfServiceInstanceParameter:
+		return CfServiceInstanceType
 	}
 	return ""
 }
@@ -281,7 +293,7 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 			dataBlock = strings.Replace(doc.Import, doc.Attributes["directory_id"], directoryId, -1)
 		}
 	case OrganizationLevel:
-		if resourceName == CfUserType || resourceName == CfDomainType {
+		if resourceName == CfUserType || resourceName == CfDomainType || resourceName == CfRouteType || resourceName == CfServiceInstanceType {
 			dataBlock = strings.Replace(doc.Import, "The ID of the organization", organizationId, -1)
 		} else {
 			dataBlock = strings.Replace(doc.Import, doc.Attributes["org"], organizationId, -1)
@@ -379,6 +391,12 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		transformDataToStringArrayGeneric(data, &stringArr, "domains", "name")
 	case CfOrgRoleType:
 		transformOrgRolesStringArray(data, &stringArr)
+	case CfRouteType:
+		transformDataToStringArrayGeneric(data, &stringArr, "routes", "url")
+	case CfSpaceQuotaType:
+		transformDataToStringArrayGeneric(data, &stringArr, "space_quotas", "name")
+	case CfServiceInstanceType:
+		transformCfServiceInstanceStringArray(data, &stringArr)
 	}
 	return stringArr
 }
@@ -532,5 +550,13 @@ func transformOrgRolesStringArray(data map[string]interface{}, stringArr *[]stri
 	for _, value := range roles {
 		role := value.(map[string]interface{})
 		*stringArr = append(*stringArr, output.FormatOrgRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["user"])))
+  }
+}
+
+func transformCfServiceInstanceStringArray(data map[string]interface{}, stringArr *[]string) {
+	instances := data["service_instances"].([]interface{})
+	for _, value := range instances {
+		instance := value.(map[string]interface{})
+		*stringArr = append(*stringArr, output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["service_plan"])))
 	}
 }

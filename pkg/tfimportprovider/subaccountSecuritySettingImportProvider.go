@@ -51,7 +51,7 @@ func createSecuritySettingImportBlock(data map[string]interface{}, subaccountId 
 
 	}
 
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "sec_setting", -1)
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "secsetting", -1)
 	template = strings.Replace(template, "'<subaccount_id>'", subaccountId, -1)
 	importBlock += template + "\n"
 

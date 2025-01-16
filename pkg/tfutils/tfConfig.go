@@ -42,6 +42,9 @@ var AllowedResourcesOrganization = []string{
 	CmdCfUserParameter,
 	CmdCfDomainParamater,
 	CmdCfOrgRoleParameter,
+	CmdCfRouteParameter,
+	CmdCfSpaceQuotaParameter,
+	CmdCfServiceInstanceParameter,
 }
 
 func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) error {
@@ -122,7 +125,7 @@ func ConfigureProvider(level string) {
 		tlsClientKey := os.Getenv("BTP_TLS_CLIENT_KEY")
 		tlsIdpURL := os.Getenv("BTP_TLS_IDP_URL")
 
-		validateBtpAuthenticationData(username, password, enableSSO)
+		validateBtpAuthenticationData(username, password, enableSSO, tlsClientCertificate, tlsClientKey, tlsIdpURL)
 		validateGlobalAccount(globalAccount)
 
 		providerContent = "terraform {\nrequired_providers {\nbtp = {\nsource  = \"SAP/btp\"\nversion = \"" + BtpProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"btp\" {\n"
@@ -224,11 +227,12 @@ func validateGlobalAccount(globalAccount string) {
 	}
 }
 
-func validateBtpAuthenticationData(username string, password string, enableSSO string) {
-	if allStringsEmtpy(username, password, enableSSO) {
+func validateBtpAuthenticationData(username string, password string, enableSSO string, tlsClientCertificate string, tlsClientKey string, tlsIdpURL string) {
+ // Check if any of the authentication data is set (username and password, username and SSO or TLS client certificate and key)
+	if allStringsEmtpy(username, password) && allStringsEmtpy(username, enableSSO) && allStringsEmtpy(tlsClientCertificate, tlsClientKey, tlsIdpURL) {
 		cleanup()
 		fmt.Print("\r\n")
-		log.Fatalf("set BTP_USERNAME and BTP_PASSWORD environment variable or enable SSO for login.")
+		log.Fatalf("set valid authentication data for login e.g. BTP_USERNAME and BTP_PASSWORD environment variables.")
 	}
 }
 
@@ -272,7 +276,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 	if !exist {
 		createNewConfigDir(configFilepath, configFolder, curWd)
 	} else {
-		fmt.Print("the configuration directory already exist. Do you want to continue? If yes then the directory will be overwritten (y/N): ")
+		fmt.Printf("the configuration directory '%s' already exist. Do you want to continue? If yes then the directory will be overwritten (y/N): ", configFolder)
 		var choice string
 
 		_, err = fmt.Scanln(&choice)

@@ -50,7 +50,7 @@ func createDomainImportBlock(data map[string]interface{}, orgId string, filterVa
 		}
 		missingSpace, subset := isSubset(cfAllDomains, filterValues)
 		if !subset {
-			return "", 0, fmt.Errorf("cloud foudndry domain %s not found in the organization with ID %s. Please adjust it in the provided file", missingSpace, orgId)
+			return "", 0, fmt.Errorf("cloud foundry domain %s not found in the organization with ID %s. Please adjust it in the provided file", missingSpace, orgId)
 		}
 	} else {
 		for x, value := range domains {

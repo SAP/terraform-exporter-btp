@@ -59,7 +59,7 @@ func createSpaceImportBlock(data map[string]interface{}, orgId string, filterVal
 		missingSpace, subset := isSubset(cfAllSpaces, filterValues)
 
 		if !subset {
-			return "", 0, fmt.Errorf("cloud foudndry space %s not found in the organization with ID %s. Please adjust it in the provided file", missingSpace, orgId)
+			return "", 0, fmt.Errorf("cloud foundry space %s not found in the organization with ID %s. Please adjust it in the provided file", missingSpace, orgId)
 		}
 	} else {
 		for x, value := range spaces {

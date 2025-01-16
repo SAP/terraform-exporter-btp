@@ -14,7 +14,7 @@ body:
     attributes:
       label: What version of the Terraform exporter are you using?
       description: What version of the Terraform exporter for SAP BTP are you using?
-      placeholder: 0.1.0-beta1
+      placeholder: 0.2.0-beta1
     validations:
       required: true
   - type: input

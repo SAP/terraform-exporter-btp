@@ -48,12 +48,12 @@ func createSubscriptionImportBlock(data map[string]interface{}, subaccountId str
 	if len(filterValues) != 0 {
 		var subaccountAllSubscriptions []string
 
-		for _, value := range subscriptions {
+		for x, value := range subscriptions {
 			subscription := value.(map[string]interface{})
 			subaccountAllSubscriptions = append(subaccountAllSubscriptions, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 			if slices.Contains(filterValues, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"]))) {
 				if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBED" {
-					importBlock += templateSubscriptionImport(subscription, subaccountId, resourceDoc)
+					importBlock += templateSubscriptionImport(x, subscription, subaccountId, resourceDoc)
 					count++
 				} else if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBE_FAILED" {
 					failedSubscriptions = append(failedSubscriptions, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
@@ -70,10 +70,10 @@ func createSubscriptionImportBlock(data map[string]interface{}, subaccountId str
 		}
 
 	} else {
-		for _, value := range subscriptions {
+		for x, value := range subscriptions {
 			subscription := value.(map[string]interface{})
 			if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBED" {
-				importBlock += templateSubscriptionImport(subscription, subaccountId, resourceDoc)
+				importBlock += templateSubscriptionImport(x, subscription, subaccountId, resourceDoc)
 				count++
 			} else if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBE_FAILED" {
 				failedSubscriptions = append(failedSubscriptions, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
@@ -94,8 +94,8 @@ func createSubscriptionImportBlock(data map[string]interface{}, subaccountId str
 	return importBlock, count, nil
 }
 
-func templateSubscriptionImport(subscription map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", strings.Replace(fmt.Sprintf("%v", subscription["app_name"]), "-", "_", -1), -1)
+func templateSubscriptionImport(x int, subscription map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "subscription_"+fmt.Sprint(x), -1)
 	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
 	template = strings.Replace(template, "<app_name>", fmt.Sprintf("%v", subscription["app_name"]), -1)
 	template = strings.Replace(template, "<plan_name>", fmt.Sprintf("%v", subscription["plan_name"]), -1)

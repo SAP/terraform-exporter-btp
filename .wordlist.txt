@@ -19,6 +19,7 @@ dir
 faq
 Github
 github
+GLOBALACCOUNT
 Golang
 GOLANG
 GOPATH
@@ -33,7 +34,9 @@ jq
 macOS
 md
 NextSteps
+OAuth
 OpenSSF
+PEM
 Pre
 pre
 PowerShell
@@ -58,6 +61,7 @@ Terraform's
 terraform
 Terraform's
 tf
+TLS
 toolchain
 UIs
 UI
