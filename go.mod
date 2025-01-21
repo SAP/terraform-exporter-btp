@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	github.com/fatih/color v1.18.0
 	github.com/go-git/go-git/v5 v5.13.1
-	github.com/hashicorp/terraform-exec v0.21.0
+	github.com/hashicorp/terraform-exec v0.22.0
 	github.com/jedib0t/go-pretty/v6 v6.6.5
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.8.1
@@ -59,7 +59,7 @@ require (
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/zclconf/go-cty v1.15.1 // indirect
+	github.com/zclconf/go-cty v1.16.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/sys v0.28.0 // indirect
