@@ -38,5 +38,30 @@ func TestFormatServiceInstanceResourceName(t *testing.T) {
 	if result != expected {
 		t.Errorf("got %q, wanted %q", result, expected)
 	}
+}
 
+func TestFormatOrgRoleResourceName(t *testing.T) {
+
+	orgRoleType := "org_manager"
+	userId := "someID"
+	expected := "org_manager_someID"
+
+	result := FormatOrgRoleResourceName(orgRoleType, userId)
+
+	if result != expected {
+		t.Errorf("got %q, wanted %q", result, expected)
+	}
+}
+
+func TestFormatDirEntitlementResourceName(t *testing.T) {
+
+	appName := "feature-flags-dashboard"
+	planName := "dashboard"
+	expected := "feature-flags-dashboard_dashboard"
+
+	result := FormatDirEntitlementResourceName(appName, planName)
+
+	if result != expected {
+		t.Errorf("got %q, wanted %q", result, expected)
+	}
 }
