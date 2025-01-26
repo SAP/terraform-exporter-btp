@@ -1,0 +1,112 @@
+name: Integration Test
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  TF_VERSION: 1.10.5
+
+jobs:
+  test-json-inventory:
+    name: Integration Test JSON Inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Install Terraform exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      # Execute the JSON inventory setup for directory
+      # Execute Diff against reference file
+      # Execute the JSON inventory setup for subaccount
+      # Execute Diff against reference file
+      # Execute the JSON inventory setup for organization
+      # Execute Diff against reference file
+
+  test-export-by-json:
+    name: Integration Test Export by JSON
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Install Terraform exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      # Execute the export by JSON for directory with curated inventory
+      # Execute Diff against reference file
+      # Execute the export by JSON for subaccount with curated inventory
+      # Execute Diff against reference file
+      # Execute the export by JSON for CF org with curated inventory
+      # Execute Diff against reference file
+
+  test-export-by-resource:
+    name: Integration Test Export by JSON
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Install Terraform exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+
+      # Execute the export by resource for directory with curated inventory
+      # Execute Diff against reference file
+      # Execute the export by resource for subaccount with curated inventory
+      # Execute Diff against reference file
+      # Execute the export by resource for CF org with curated inventory
+      # Execute Diff against reference file

@@ -125,7 +125,7 @@ btptf create-json -o <organizationID> -p integrationTestCfOrg.json
 For integration test:
 
 ```bash
-btptf create-json -d <directoryID> -c directory-export-by-resource
+btptf export -d <directoryID> -c directory-export-by-resource -r=directory
 terraform -chdir=directory-export-by-resource init
 terraform -chdir=directory-export-by-resource apply -auto-approve
 ```
@@ -135,7 +135,7 @@ terraform -chdir=directory-export-by-resource apply -auto-approve
 For integration test:
 
 ```bash
-btptf create-json -s <subaccountID> -c subaccount-export-by-resource
+btptf export -s <subaccountID> -c subaccount-export-by-resource -r='subaccount,subscriptions'
 terraform -chdir=subaccount-export-by-resource init
 terraform -chdir=subaccount-export-by-resource apply -auto-approve
 ```
@@ -145,7 +145,7 @@ terraform -chdir=subaccount-export-by-resource apply -auto-approve
 For integration test:
 
 ```bash
-btptf create-json -o <organizationID> -c cforg-export-by-resource
+btptf export -o <organizationID> -c cforg-export-by-resource -r='spaces'
 terraform -chdir=cforg-export-by-resource init
 terraform -chdir=cforg-export-by-resource apply -auto-approve
 ```
