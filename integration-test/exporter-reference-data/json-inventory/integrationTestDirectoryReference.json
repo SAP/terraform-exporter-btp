@@ -1,0 +1,70 @@
+{
+  "BtpResources": [
+    {
+      "Name": "directory",
+      "Values": [
+        "Directory for DEV Inttest Exporter (DO NOT DELETE)"
+      ]
+    },
+    {
+      "Name": "entitlements",
+      "Values": [
+        "cias_standard",
+        "destination_lite",
+        "html5-apps-repo_app-host",
+        "service-manager_container",
+        "service-manager_service-operator-access",
+        "xsuaa_application",
+        "html5-apps-repo_app-runtime",
+        "mdo-one-mds-master_standard",
+        "autoscaler_standard",
+        "connectivity_connectivity_proxy",
+        "feature-flags-dashboard_dashboard",
+        "feature-flags_lite",
+        "service-manager_subaccount-admin",
+        "feature-flags_standard",
+        "xsuaa_apiaccess",
+        "application-logs_lite",
+        "auditlog-api_default",
+        "auditlog-management_default",
+        "cias_oauth2",
+        "connectivity_lite",
+        "one-mds_sap-integration",
+        "service-manager_subaccount-audit",
+        "content-agent_application",
+        "content-agent_standard",
+        "credstore_proxy",
+        "one-mds-master_standard",
+        "print_receiver",
+        "sap-identity-services-onboarding_default",
+        "alert-notification_standard",
+        "content-agent-ui_free",
+        "identity_application",
+        "saas-registry_application",
+        "service-manager_global-offerings-audit",
+        "xsuaa_broker",
+        "xsuaa_space"
+      ]
+    },
+    {
+      "Name": "roles",
+      "Values": [
+        "directory_admin",
+        "directory_usage_reporting_viewer",
+        "directory_viewer",
+        "global_account_admin",
+        "global_account_usage_reporting_viewer",
+        "global_account_viewer",
+        "user_and_role_administrator",
+        "user_and_role_auditor"
+      ]
+    },
+    {
+      "Name": "role-collections",
+      "Values": [
+        "directory_administrator",
+        "directory_viewer"
+      ]
+    }
+  ]
+}
