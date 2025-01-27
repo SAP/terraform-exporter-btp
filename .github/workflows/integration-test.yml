@@ -52,7 +52,7 @@ jobs:
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
-          btptf create-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubacount.json
+          btptf create-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubaccount.json
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccount.json > temp.json && mv temp.json integrationTestSubaccount.json
           diff <(jq -S . integrationTestSubaccount.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestSubaccountReference.json) || echo "JSON inventory for subaccount is not as expected"
 
