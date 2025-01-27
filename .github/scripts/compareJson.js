@@ -30,6 +30,8 @@ function compareJsonFiles(file1Path, file2Path) {
             allMatched = false;
         }
     });
+
+    return allMatched;
 }
 
 // Check if the script is run directly from the command line
@@ -43,7 +45,7 @@ if (require.main === module) {
 
     const allMatched = compareJsonFiles(file1Path, file2Path);
 
-    console.log(`Value of allMatched: ${allMatched}`);
+    console.log(allMatched ? 'Summary: All resources matched after import.' : 'Summary: Some resources did not match after import.');
 
     if (!allMatched) {
         process.exit(1);
