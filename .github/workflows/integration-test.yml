@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 env:
   TF_VERSION: 1.10.5
@@ -14,7 +15,11 @@ jobs:
   test-json-inventory:
     name: Integration Test JSON Inventory
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    outputs:
+      outputDir: ${{ steps.json-inventory-directory.outputs.result }}
+      outputSubacount: ${{ steps.json-inventory-subaccount.outputs.result }}
+      outputCforg: ${{ steps.json-inventory-cforg.outputs.result }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -38,38 +43,51 @@ jobs:
           terraform_wrapper: false
 
       - name: JSON inventory for Directory
+        id: json-inventory-directory
         run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
           btptf create-json -d ${{ secrets.BTP_DIRECTORY }} -p integrationTestDirectory.json
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestDirectory.json > temp.json && mv temp.json integrationTestDirectory.json
-          diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json) || echo "JSON inventory for directory is not as expected"
+          diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json)
+          echo "result=success" >> "$GITHUB_OUTPUT"
 
       - name: JSON inventory for Subaccount
+        id: json-inventory-subaccount
         if: ${{ success() }} || ${{ failure() }}
         run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
           btptf create-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubaccount.json
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccount.json > temp.json && mv temp.json integrationTestSubaccount.json
           diff <(jq -S . integrationTestSubaccount.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestSubaccountReference.json) || echo "JSON inventory for subaccount is not as expected"
+          echo "result=success" >> "$GITHUB_OUTPUT"
 
       - name: JSON inventory for Cloud Foundry Org
+        id: json-inventory-cforg
         if: ${{ success() }} || ${{ failure() }}
         run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           export CF_USER=${{ secrets.BTP_USERNAME }}
           export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export CF_API_URL=${{ secrets.CF_API_URL }}
           btptf create-json -o ${{ secrets.CF_ORGANIZATION }} -p integrationTestCfOrg.json
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestCfOrg.json > temp.json && mv temp.json integrationTestCfOrg.json
           diff <(jq -S . integrationTestCfOrg.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestCfOrgReference.json) || echo "JSON inventory for Cloud Foundry Org is not as expected"
+          echo "result=success" >> "$GITHUB_OUTPUT"
 
   test-export-by-json:
     name: Integration Test Export by JSON
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    outputs:
+      outputDir: ${{ steps.export-by-json-directory.outputs.result }}
+      outputSubacount: ${{ steps.export-by-json-subaccount.outputs.result }}
+      outputCforg: ${{ steps.export-by-json-cforg.outputs.result }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -98,7 +116,9 @@ jobs:
           node-version: 22
 
       - name: Export by JSON for Directory
+        id: export-by-json-directory
         run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
           echo "Export by JSON for Directory"
           echo "====================================="
@@ -118,10 +138,13 @@ jobs:
           echo "Execute comparison of state files for Directory"
           echo "====================================="
           node .github/scripts/compareJson.js directory-export-by-json-state-reference.json directory-export-by-json-state.json
-
+          echo "result=success" >> "$GITHUB_OUTPUT"
 
       - name: Export by JSON for Subaccount
+        id: export-by-json-subaccount
+        if: ${{ success() }} || ${{ failure() }}
         run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
           echo "Export by JSON for Subaccount"
           echo "====================================="
@@ -141,9 +164,13 @@ jobs:
           echo "Execute comparison of state files for Subaccount"
           echo "====================================="
           node .github/scripts/compareJson.js subaccount-export-by-json-state-reference.json subaccount-export-by-json-state.json
+          echo "result=success" >> "$GITHUB_OUTPUT"
 
       - name: Export by JSON for Cloud Foundry Organization
+        id: export-by-json-cforg
+        if: ${{ success() }} || ${{ failure() }}
         run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
           echo "Export by JSON for CF Organization"
           echo "====================================="
@@ -163,11 +190,16 @@ jobs:
           echo "Execute comparison of state files for CF Organization"
           echo "====================================="
           node .github/scripts/compareJson.js cforg-export-by-json-state-reference.json cforg-export-by-json-state.json
+          echo "result=success" >> "$GITHUB_OUTPUT"
 
   test-export-by-resource:
     name: Integration Test Export by Ressource
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    outputs:
+      outputDir: ${{ steps.export-by-resource-directory.outputs.result }}
+      outputSubacount: ${{ steps.export-by-resource-subaccount.outputs.result }}
+      outputCforg: ${{ steps.export-by-resource-cforg.outputs.result }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -196,7 +228,9 @@ jobs:
           node-version: 22
 
       - name: Export by Resource for Directory
+        id: export-by-resource-directory
         run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
           echo "Export by Resource for Directory"
           echo "====================================="
@@ -216,10 +250,14 @@ jobs:
           echo "Execute comparison of state files for Directory"
           echo "====================================="
           node .github/scripts/compareJson.js directory-export-by-resource-state-reference.json directory-export-by-resource-state.json
+          echo "result=success" >> "$GITHUB_OUTPUT"
 
 
       - name: Export by Resource for Subaccount
+        id: export-by-resource-subaccount
+        if: ${{ success() }} || ${{ failure() }}
         run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
           echo "Export by Resource for Subaccount"
           echo "====================================="
@@ -239,9 +277,13 @@ jobs:
           echo "Execute comparison of state files for Subaccount"
           echo "====================================="
           node .github/scripts/compareJson.js subaccount-export-by-resource-state-reference.json subaccount-export-by-resource-state.json
+          echo "result=success" >> "$GITHUB_OUTPUT"
 
       - name: Export by Resource for Cloud Foundry Organization
+        id: export-by-resource-cforg
+        if: ${{ success() }} || ${{ failure() }}
         run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
           echo "Export by Resource for CF Organization"
           echo "====================================="
@@ -261,3 +303,23 @@ jobs:
           echo "Execute comparison of state files for CF Organization"
           echo "====================================="
           node .github/scripts/compareJson.js cforg-export-by-resource-state-reference.json cforg-export-by-resource-state.json
+          echo "result=success" >> "$GITHUB_OUTPUT"
+
+  test-result-handling:
+    name: Handle Test Results
+    runs-on: ubuntu-latest
+    needs: [test-json-inventory, test-export-by-json, test-export-by-resource]
+    steps:
+    - name: Build Test Result
+      run: |
+        echo '${{ toJSON(needs.test-json-inventory.outputs) }}'
+        echo '${{ toJSON(needs.test-export-by-json.outputs) }}'
+        echo '${{ toJSON(needs.test-export-by-resource.outputs) }}'
+
+    - name: Create or update issue for broken links
+      if: failure()
+      uses: peter-evans/create-issue-from-file@v5
+      with:
+          title: Regression Test Report
+          content-filepath: out.md
+          labels: automated issue
