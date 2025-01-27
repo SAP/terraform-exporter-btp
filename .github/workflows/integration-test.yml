@@ -11,8 +11,63 @@ env:
   TF_VERSION: 1.10.5
 
 jobs:
-  test-json-inventory:
-    name: Integration Test JSON Inventory
+#  test-json-inventory:
+#    name: Integration Test JSON Inventory
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 5
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v4
+#
+#      - name: Setup Go
+#        uses: actions/setup-go@v5
+#        with:
+#          go-version-file: 'go.mod'
+#          cache: true
+#
+#      - name: Download dependencies
+#        run: go mod download
+#
+#      - name: Install Terraform Exporter CLI
+#        run: make install
+#
+#      - name: Setup Terraform CLI
+#        uses: hashicorp/setup-terraform@v3.1.2
+#        with:
+#          terraform_version: ${{ env.TF_VERSION }}
+#          terraform_wrapper: false
+#
+#      - name: JSON inventory for Directory
+#        run: |
+#          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
+#          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
+#          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+#          btptf create-json -d ${{ secrets.BTP_DIRECTORY }} -p integrationTestDirectory.json
+#          jq '.BtpResources[] |= (.Values |= sort)' integrationTestDirectory.json > temp.json && mv temp.json integrationTestDirectory.json
+#          diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json) || echo "JSON inventory for directory is not as expected"
+#
+#      - name: JSON inventory for Subaccount
+#        if: ${{ success() }} || ${{ failure() }}
+#        run: |
+#          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
+#          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
+#          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+#          btptf create-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubaccount.json
+#          jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccount.json > temp.json && mv temp.json integrationTestSubaccount.json
+#          diff <(jq -S . integrationTestSubaccount.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestSubaccountReference.json) || echo "JSON inventory for subaccount is not as expected"
+#
+#      - name: JSON inventory for Cloud Foundry Org
+#        if: ${{ success() }} || ${{ failure() }}
+#        run: |
+#          export CF_USER=${{ secrets.BTP_USERNAME }}
+#          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
+#          export CF_API_URL=${{ secrets.CF_API_URL }}
+#          btptf create-json -o ${{ secrets.CF_ORGANIZATION }} -p integrationTestCfOrg.json
+#          jq '.BtpResources[] |= (.Values |= sort)' integrationTestCfOrg.json > temp.json && mv temp.json integrationTestCfOrg.json
+#          diff <(jq -S . integrationTestCfOrg.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestCfOrgReference.json) || echo "JSON inventory for Cloud Foundry Org is not as expected"
+#
+  test-export-by-json:
+    name: Integration Test Export by JSON
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -37,67 +92,17 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
-      - name: JSON inventory for directory
+      - name: Export by JSON for Directory
         run: |
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
-          btptf create-json -d ${{ secrets.BTP_DIRECTORY }} -p integrationTestDirectory.json
-          jq '.BtpResources[] |= (.Values |= sort)' integrationTestDirectory.json > temp.json && mv temp.json integrationTestDirectory.json
-          diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json) || echo "JSON inventory for directory is not as expected"
-
-      - name: JSON inventory for subaccount
-        if: ${{ success() }} || ${{ failure() }}
-        run: |
-          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
-          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
-          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
-          btptf create-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubaccount.json
-          jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccount.json > temp.json && mv temp.json integrationTestSubaccount.json
-          diff <(jq -S . integrationTestSubaccount.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestSubaccountReference.json) || echo "JSON inventory for subaccount is not as expected"
-
-      - name: JSON inventory for Cloud Foundry org
-        if: ${{ success() }} || ${{ failure() }}
-        run: |
-          export CF_USER=${{ secrets.BTP_USERNAME }}
-          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
-          export CF_API_URL=${{ secrets.CF_API_URL }}
-          btptf create-json -o ${{ secrets.CF_ORGANIZATION }} -p integrationTestCfOrg.json
-          jq '.BtpResources[] |= (.Values |= sort)' integrationTestCfOrg.json > temp.json && mv temp.json integrationTestCfOrg.json
-          diff <(jq -S . integrationTestCfOrg.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestCfOrgReference.json) || echo "JSON inventory for Cloud Foundry Org is not as expected"
-
-#  test-export-by-json:
-#    name: Integration Test Export by JSON
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 5
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#
-#      - name: Setup Go
-#        uses: actions/setup-go@v5
-#        with:
-#          go-version-file: 'go.mod'
-#          cache: true
-#
-#      - name: Download dependencies
-#        run: go mod download
-#
-#      - name: Install Terraform exporter CLI
-#        run: make install
-#
-#      - name: Setup Terraform CLI
-#        uses: hashicorp/setup-terraform@v3.1
-#        with:
-#          terraform_version: ${{ env.TF_VERSION }}
-#          terraform_wrapper: false
-
-      # Execute the export by JSON for directory with curated inventory
-      # Execute Diff against reference file
-      # Execute the export by JSON for subaccount with curated inventory
-      # Execute Diff against reference file
-      # Execute the export by JSON for CF org with curated inventory
-      # Execute Diff against reference file
+          btptf export-by-json -d ${{ secrets.BTP_DIRECTORY }} -p integration-test/exporter-reference-data/import-by-json/integrationTestDirectoryCurated.json -c directory-export-by-json
+          terraform -chdir=directory-export-by-json init
+          terraform -chdir=directory-export-by-json apply -auto-approve
+          terraform -chdir=directory-export-by-json-ref show -json > directory-export-by-json-state.json
+          base64 -d -i ${{ secrets.DIRECTORY_EXPORT_BY_JSON_REFERENCE }} > directory-export-by-json-state-reference.json
+          diff <(jq . directory-export-by-json-state.json) <(jq -S . directory-export-by-json-state-reference.json) || echo "State for import by JSON for directory is not as expected"
 
 #  test-export-by-resource:
 #    name: Integration Test Export by JSON

@@ -204,7 +204,7 @@ For reference data (state created by Terramate setup):
 btptf export-by-json -d <directoryID> -p integrationTestDirectoryCurated.json -c directory-export-by-json
 terraform -chdir=directory-export-by-json init
 terraform -chdir=directory-export-by-json apply -auto-approve
-terraform -chdir=cforg-export-by-json-ref show -json > cforg-export-by-resource-ref.json
+terraform -chdir=cforg-export-by-json-ref show -json > directory-export-by-json-ref.json
 base64 -i cforg-export-by-json-ref.json > cforg-export-by-json-ref
 ```
 
@@ -226,7 +226,7 @@ For reference data:
 btptf export-by-json -s <subaccountID> -p integrationTestSubaccountCurated.json -c subaccount-export-by-json
 terraform -chdir=subaccount-export-by-json init
 terraform -chdir=subaccount-export-by-json apply -auto-approve
-terraform -chdir=subaccount-export-by-json-ref show -json > subaccount-export-by-resource-ref.json
+terraform -chdir=subaccount-export-by-json-ref show -json > subaccount-export-by-rjson-ref.json
 base64 -i subaccount-export-by-json-ref.json > subaccount-export-by-json-ref
 ```
 
@@ -248,7 +248,7 @@ For reference data:
 btptf export-by-json -o <organizationID> -p integrationTestCfOrgCurated.json -c cforg-export-by-json
 terraform -chdir=cforg-export-by-json init
 terraform -chdir=cforg-export-by-json apply -auto-approve
-terraform -chdir=cforg-export-by-json-ref show -json > cforg-export-by-resource-ref.json
+terraform -chdir=cforg-export-by-json-ref show -json > cforg-export-by-json-ref.json
 base64 -i cforg-export-by-json-ref.json > cforg-export-by-json-ref
 ```
 
