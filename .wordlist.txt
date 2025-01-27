@@ -67,6 +67,8 @@ toolchain
 UIs
 UI
 VS
+workspace
+workspaces
 YAML
 yaml
 yml
