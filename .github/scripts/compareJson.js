@@ -43,6 +43,8 @@ if (require.main === module) {
 
     const allMatched = compareJsonFiles(file1Path, file2Path);
 
+    console.log(`Value of allMatched: ${allMatched}`);
+
     if (!allMatched) {
         process.exit(1);
     }

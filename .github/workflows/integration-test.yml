@@ -99,14 +99,26 @@ jobs:
 
       - name: Export by JSON for Directory
         run: |
+          echo "====================================="
+          echo "Export by JSON for Directory"
+          echo "====================================="
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
           btptf export-by-json -d ${{ secrets.BTP_DIRECTORY }} -p integration-test/exporter-reference-data/import-by-json/integrationTestDirectoryCurated.json -c directory-export-by-json
+          echo "====================================="
+          echo "Executing state import for Directory"
+          echo "====================================="
           terraform -chdir=directory-export-by-json init
           terraform -chdir=directory-export-by-json apply -auto-approve
+          echo "====================================="
+          echo "Preparing state file for Directory in JSON format"
+          echo "====================================="
           terraform -chdir=directory-export-by-json show -json > directory-export-by-json-state.json
           echo '${{ secrets.DIRECTORY_EXPORT_BY_JSON_REF}}' | base64 -d > directory-export-by-json-state-reference.json
+          echo "====================================="
+          echo "Execute comparison of state files for Directory"
+          echo "====================================="
           node .github/scripts/compareJson.js directory-export-by-json-state.json directory-export-by-json-state-reference.json
 
 #  test-export-by-resource:
