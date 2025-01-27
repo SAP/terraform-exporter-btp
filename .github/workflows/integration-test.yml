@@ -38,7 +38,6 @@ jobs:
           terraform_wrapper: false
 
       - name: JSON inventory for directory
-        continue-on-error: true
         run: |
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
@@ -47,24 +46,23 @@ jobs:
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestDirectory.json > temp.json && mv temp.json integrationTestDirectory.json
           diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json) || echo "JSON inventory for directory is not as expected"
 
-
       - name: JSON inventory for subaccount
-        continue-on-error: true
+        if: ${{ success() }} || ${{ failure() }}
         run: |
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
-          btptf create-json -d ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubacount.json
+          btptf create-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubacount.json
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccount.json > temp.json && mv temp.json integrationTestSubaccount.json
           diff <(jq -S . integrationTestSubaccount.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestSubaccountReference.json) || echo "JSON inventory for subaccount is not as expected"
 
       - name: JSON inventory for Cloud Foundry org
-        continue-on-error: true
+        if: ${{ success() }} || ${{ failure() }}
         run: |
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
-          btptf create-json -d ${{ secrets.CF_ORGANIZATION }} -p integrationTestCfOrg.json
+          btptf create-json -o ${{ secrets.CF_ORGANIZATION }} -p integrationTestCfOrg.json
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestCfOrg.json > temp.json && mv temp.json integrationTestCfOrg.json
           diff <(jq -S . integrationTestCfOrg.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestCfOrgReference.json) || echo "JSON inventory for Cloud Foundry Org is not as expected"
 

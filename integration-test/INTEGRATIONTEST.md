@@ -48,9 +48,13 @@ For the JSON inventory this is achieved via the the following statement
 diff <(jq -S . btpResources_new.json) <(jq -S . btpResources_reference.json)
 ```
 
-In case of the exports we must compare the resulting Terraform states after executing the import. As the state contains sensitive data, the reference state is stored as a GitHub secret. As it is JSON format, we transfer it into a string using base64 encoding.
+In case of the exports we must compare the resulting Terraform states after executing the import. To make the state files comparable it must be transfered to the canonical JSON format as the `tfstate` format is an internal representation and we cannot rely on the structure. Hence, the reference state files as well as the ones form the test must be transformed via:
 
-The resulting comparison is then done in analogy to the JSON inventory file after decoding the string from the secret
+```bash
+terraform show -json > <Some Name>state.json
+```
+
+As the state contains sensitive data, the reference state is stored as a GitHub secret. As it is JSON format, we transfer it into a string using base64 encoding. The resulting comparison is then done in analogy to the JSON inventory file after decoding the string from the secret.
 
 ### Flows and levels to check
 
