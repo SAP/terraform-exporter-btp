@@ -30,6 +30,9 @@ In case of a local storage of the state you can use the `teardown` script via
 terramate script run --tags dev -X --reverse teardown
 ```
 
+> [!NOTE]
+> While the setup on SAP BTP could be done automatically, it makes sense to keep it static as we do not want to test if the setup via Terraform works, but if the Terraform Exporter for BTP is working as expected.
+
 ## Integration test
 
 The integration test for the exporter is based on the reference setup described in the previous section
@@ -61,7 +64,8 @@ terraform show -json > <Some Name>state.json
 
 As the state contains sensitive data, the reference state is stored as a GitHub secret. As it is JSON format, we transfer it into a base64-encoded.
 
-> **Note** Be aware that a GitHub Secret can only contain up to 48 kb of data
+> [!NOTE]
+> Be aware that a GitHub Secret can only contain up to 48 kb of data
 
 For the comparison we cannot rely on a simple `diff` as the sequence of the resources might differ. The same is true for the metadata of the resources like `address` or `name` of the resource in the state file. Consequently we provide a JS script that compares the `value` and `sensitive` value part of the state files in JSON format. If all entries match, the validation passes.
 
@@ -150,7 +154,8 @@ terraform -chdir=directory-export-by-resource-ref show -json > directory-export-
 base64 -i directory-export-by-resource-ref.json > directory-export-by-resource-ref
 ```
 
-> **Note** The base 64 encoded string gets stored as a GitHub secret
+> [!NOTE]
+> The base 64 encoded string gets stored as a GitHub secret
 
 For integration test:
 
@@ -173,7 +178,8 @@ terraform -chdir=subaccount-export-by-resource-ref show -json > subaccount-expor
 base64 -i subaccount-export-by-resource-ref.json > subaccount-export-by-resource-ref
 ```
 
-> **Note** The base 64 encoded string gets stored as a GitHub secret
+> [!NOTE]
+> The base 64 encoded string gets stored as a GitHub secret
 
 For integration test:
 
@@ -195,7 +201,8 @@ terraform -chdir=cforg-export-by-resource-ref show -json > cforg-export-by-resou
 base64 -i cforg-export-by-resource-ref.json > cforg-export-by-resource-ref
 ```
 
-> **Note** The base 64 encoded string gets stored as a GitHub secret
+> [!NOTE]
+> The base 64 encoded string gets stored as a GitHub secret
 
 For integration test:
 
@@ -219,7 +226,8 @@ terraform -chdir=directory-export-by-json show -json > directory-export-by-json-
 base64 -i directory-export-by-json-ref.json > directory-export-by-json-ref
 ```
 
-> **Note** The base 64 encoded string gets stored as a GitHub secret
+> [!NOTE]
+> The base 64 encoded string gets stored as a GitHub secret
 
 For integration test:
 
@@ -241,7 +249,8 @@ terraform -chdir=subaccount-export-by-json-ref show -json > subaccount-export-by
 base64 -i subaccount-export-by-json-ref.json > subaccount-export-by-json-ref
 ```
 
-> **Note** The base 64 encoded string gets stored as a GitHub secret
+> [!NOTE]
+> The base 64 encoded string gets stored as a GitHub secret
 
 For integration test:
 
@@ -263,7 +272,8 @@ terraform -chdir=cforg-export-by-json-ref show -json > cforg-export-by-json-ref.
 base64 -i cforg-export-by-json-ref.json > cforg-export-by-json-ref
 ```
 
-> **Note** The base 64 encoded string gets stored as a GitHub secret
+> [!NOTE]
+> The base 64 encoded string gets stored as a GitHub secret
 
 For integration test:
 

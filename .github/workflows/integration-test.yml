@@ -11,61 +11,61 @@ env:
   TF_VERSION: 1.10.5
 
 jobs:
-#  test-json-inventory:
-#    name: Integration Test JSON Inventory
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 5
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#
-#      - name: Setup Go
-#        uses: actions/setup-go@v5
-#        with:
-#          go-version-file: 'go.mod'
-#          cache: true
-#
-#      - name: Download dependencies
-#        run: go mod download
-#
-#      - name: Install Terraform Exporter CLI
-#        run: make install
-#
-#      - name: Setup Terraform CLI
-#        uses: hashicorp/setup-terraform@v3.1.2
-#        with:
-#          terraform_version: ${{ env.TF_VERSION }}
-#          terraform_wrapper: false
-#
-#      - name: JSON inventory for Directory
-#        run: |
-#          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
-#          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
-#          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
-#          btptf create-json -d ${{ secrets.BTP_DIRECTORY }} -p integrationTestDirectory.json
-#          jq '.BtpResources[] |= (.Values |= sort)' integrationTestDirectory.json > temp.json && mv temp.json integrationTestDirectory.json
-#          diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json) || echo "JSON inventory for directory is not as expected"
-#
-#      - name: JSON inventory for Subaccount
-#        if: ${{ success() }} || ${{ failure() }}
-#        run: |
-#          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
-#          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
-#          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
-#          btptf create-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubaccount.json
-#          jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccount.json > temp.json && mv temp.json integrationTestSubaccount.json
-#          diff <(jq -S . integrationTestSubaccount.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestSubaccountReference.json) || echo "JSON inventory for subaccount is not as expected"
-#
-#      - name: JSON inventory for Cloud Foundry Org
-#        if: ${{ success() }} || ${{ failure() }}
-#        run: |
-#          export CF_USER=${{ secrets.BTP_USERNAME }}
-#          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
-#          export CF_API_URL=${{ secrets.CF_API_URL }}
-#          btptf create-json -o ${{ secrets.CF_ORGANIZATION }} -p integrationTestCfOrg.json
-#          jq '.BtpResources[] |= (.Values |= sort)' integrationTestCfOrg.json > temp.json && mv temp.json integrationTestCfOrg.json
-#          diff <(jq -S . integrationTestCfOrg.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestCfOrgReference.json) || echo "JSON inventory for Cloud Foundry Org is not as expected"
-#
+  test-json-inventory:
+    name: Integration Test JSON Inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Install Terraform Exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: JSON inventory for Directory
+        run: |
+          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
+          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          btptf create-json -d ${{ secrets.BTP_DIRECTORY }} -p integrationTestDirectory.json
+          jq '.BtpResources[] |= (.Values |= sort)' integrationTestDirectory.json > temp.json && mv temp.json integrationTestDirectory.json
+          diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json) || echo "JSON inventory for directory is not as expected"
+
+      - name: JSON inventory for Subaccount
+        if: ${{ success() }} || ${{ failure() }}
+        run: |
+          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
+          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          btptf create-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubaccount.json
+          jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccount.json > temp.json && mv temp.json integrationTestSubaccount.json
+          diff <(jq -S . integrationTestSubaccount.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestSubaccountReference.json) || echo "JSON inventory for subaccount is not as expected"
+
+      - name: JSON inventory for Cloud Foundry Org
+        if: ${{ success() }} || ${{ failure() }}
+        run: |
+          export CF_USER=${{ secrets.BTP_USERNAME }}
+          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export CF_API_URL=${{ secrets.CF_API_URL }}
+          btptf create-json -o ${{ secrets.CF_ORGANIZATION }} -p integrationTestCfOrg.json
+          jq '.BtpResources[] |= (.Values |= sort)' integrationTestCfOrg.json > temp.json && mv temp.json integrationTestCfOrg.json
+          diff <(jq -S . integrationTestCfOrg.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestCfOrgReference.json) || echo "JSON inventory for Cloud Foundry Org is not as expected"
+
   test-export-by-json:
     name: Integration Test Export by JSON
     runs-on: ubuntu-latest
@@ -99,7 +99,6 @@ jobs:
 
       - name: Export by JSON for Directory
         run: |
-          echo -e "\n"
           echo "====================================="
           echo "Export by JSON for Directory"
           echo "====================================="
@@ -107,17 +106,14 @@ jobs:
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
           btptf export-by-json -d ${{ secrets.BTP_DIRECTORY }} -p integration-test/exporter-reference-data/import-by-json/integrationTestDirectoryCurated.json -c directory-export-by-json
-          echo -e "\n"
           echo "====================================="
           echo "Executing state import for Directory"
           echo "====================================="
           terraform -chdir=directory-export-by-json init
           terraform -chdir=directory-export-by-json apply -auto-approve
-          echo -e "\n"
           echo "Preparing state file for Directory in JSON format"
           terraform -chdir=directory-export-by-json show -json > directory-export-by-json-state.json
           echo '${{ secrets.DIRECTORY_EXPORT_BY_JSON_REF}}' | base64 -d > directory-export-by-json-state-reference.json
-          echo -e "\n"
           echo "====================================="
           echo "Execute comparison of state files for Directory"
           echo "====================================="
@@ -126,7 +122,6 @@ jobs:
 
       - name: Export by JSON for Subaccount
         run: |
-          echo -e "\n"
           echo "====================================="
           echo "Export by JSON for Subaccount"
           echo "====================================="
@@ -134,17 +129,14 @@ jobs:
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
           btptf export-by-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integration-test/exporter-reference-data/import-by-json/integrationTestSubaccountCurated.json -c subaccount-export-by-json
-          echo -e "\n"
           echo "====================================="
           echo "Executing state import for Subaccount"
           echo "====================================="
           terraform -chdir=subaccount-export-by-json init
           terraform -chdir=subaccount-export-by-json apply -auto-approve
-          echo -e "\n"
           echo "Preparing state file for Subaccount in JSON format"
           terraform -chdir=subaccount-export-by-json show -json > subaccount-export-by-json-state.json
           echo '${{ secrets.SUBACCOUNT_EXPORT_BY_JSON_REF}}' | base64 -d > subaccount-export-by-json-state-reference.json
-          echo -e "\n"
           echo "====================================="
           echo "Execute comparison of state files for Subaccount"
           echo "====================================="
@@ -152,7 +144,6 @@ jobs:
 
       - name: Export by JSON for Cloud Foundry Organization
         run: |
-          echo -e "\n"
           echo "====================================="
           echo "Export by JSON for CF Organization"
           echo "====================================="
@@ -160,53 +151,113 @@ jobs:
           export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export CF_API_URL=${{ secrets.CF_API_URL }}
           btptf export-by-json -o ${{ secrets.CF_ORGANIZATION }} -p integration-test/exporter-reference-data/import-by-json/integrationTestCfOrgCurated.json -c cforg-export-by-json
-          echo -e "\n"
           echo "====================================="
           echo "Executing state import for CF Organization"
           echo "====================================="
           terraform -chdir=cforg-export-by-json init
           terraform -chdir=cforg-export-by-json apply -auto-approve
-          echo -e "\n"
           echo "Preparing state file for CF Organization in JSON format"
           terraform -chdir=cforg-export-by-json show -json > cforg-export-by-json-state.json
           echo '${{ secrets.CFORG_EXPORT_BY_JSON_REF}}' | base64 -d > cforg-export-by-json-state-reference.json
-          echo -e "\n"
           echo "====================================="
           echo "Execute comparison of state files for CF Organization"
           echo "====================================="
           node .github/scripts/compareJson.js cforg-export-by-json-state-reference.json cforg-export-by-json-state.json
 
+  test-export-by-resource:
+    name: Integration Test Export by Ressource
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-#  test-export-by-resource:
-#    name: Integration Test Export by JSON
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 5
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#
-#      - name: Setup Go
-#        uses: actions/setup-go@v5
-#        with:
-#          go-version-file: 'go.mod'
-#          cache: true
-#
-#      - name: Download dependencies
-#        run: go mod download
-#
-#      - name: Install Terraform exporter CLI
-#        run: make install
-#
-#      - name: Setup Terraform CLI
-#        uses: hashicorp/setup-terraform@v3.1
-#        with:
-#          terraform_version: ${{ env.TF_VERSION }}
-#          terraform_wrapper: false
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Install Terraform exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Export by Resource for Directory
+        run: |
+          echo "====================================="
+          echo "Export by Resource for Directory"
+          echo "====================================="
+          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
+          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          btptf export -d ${{ secrets.BTP_DIRECTORY }} -c directory-export-by-resource -r=directory
+          echo "====================================="
+          echo "Executing state import for Directory"
+          echo "====================================="
+          terraform -chdir=directory-export-by-resource init
+          terraform -chdir=directory-export-by-resource apply -auto-approve
+          echo "Preparing state file for Directory in JSON format"
+          terraform -chdir=directory-export-by-resource show -json > directory-export-by-resource-state.json
+          echo '${{ secrets.DIRECTORY_EXPORT_BY_RESOURCE_REF}}' | base64 -d > directory-export-by-resource-state-reference.json
+          echo "====================================="
+          echo "Execute comparison of state files for Directory"
+          echo "====================================="
+          node .github/scripts/compareJson.js directory-export-by-resource-state-reference.json directory-export-by-resource-state.json
 
 
-      # Execute the export by resource for directory with curated inventory
-      # Execute Diff against reference file
-      # Execute the export by resource for subaccount with curated inventory
-      # Execute Diff against reference file
-      # Execute the export by resource for CF org with curated inventory
-      # Execute Diff against reference file
+      - name: Export by Resource for Subaccount
+        run: |
+          echo "====================================="
+          echo "Export by Resource for Subaccount"
+          echo "====================================="
+          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
+          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          btptf export -s ${{ secrets.BTP_SUBACCOUNT }} -c subaccount-export-by-resource -r='subaccount,subscriptions'
+          echo "====================================="
+          echo "Executing state import for Subaccount"
+          echo "====================================="
+          terraform -chdir=subaccount-export-by-resource init
+          terraform -chdir=subaccount-export-by-resource apply -auto-approve
+          echo "Preparing state file for Subaccount in JSON format"
+          terraform -chdir=subaccount-export-by-resource show -json > subaccount-export-by-resource-state.json
+          echo '${{ secrets.SUBACCOUNT_EXPORT_BY_RESOURCE_REF}}' | base64 -d > subaccount-export-by-resource-state-reference.json
+          echo "====================================="
+          echo "Execute comparison of state files for Subaccount"
+          echo "====================================="
+          node .github/scripts/compareJson.js subaccount-export-by-resource-state-reference.json subaccount-export-by-resource-state.json
+
+      - name: Export by Resource for Cloud Foundry Organization
+        run: |
+          echo "====================================="
+          echo "Export by Resource for CF Organization"
+          echo "====================================="
+          export CF_USER=${{ secrets.BTP_USERNAME }}
+          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export CF_API_URL=${{ secrets.CF_API_URL }}
+          btptf export -o ${{ secrets.CF_ORGANIZATION }} -c cforg-export-by-resource -r='spaces'
+          echo "====================================="
+          echo "Executing state import for CF Organization"
+          echo "====================================="
+          terraform -chdir=cforg-export-by-resource init
+          terraform -chdir=cforg-export-by-resource apply -auto-approve
+          echo "Preparing state file for CF Organization in JSON format"
+          terraform -chdir=cforg-export-by-resource show -json > cforg-export-by-resource-state.json
+          echo '${{ secrets.CFORG_EXPORT_BY_RESOURCE_REF}}' | base64 -d > cforg-export-by-resource-state-reference.json
+          echo "====================================="
+          echo "Execute comparison of state files for CF Organization"
+          echo "====================================="
+          node .github/scripts/compareJson.js cforg-export-by-resource-state-reference.json cforg-export-by-resource-state.json
