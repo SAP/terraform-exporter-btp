@@ -19,12 +19,7 @@
       "Values": [
         "directory_admin",
         "directory_usage_reporting_viewer",
-        "directory_viewer",
-        "global_account_admin",
-        "global_account_usage_reporting_viewer",
-        "global_account_viewer",
-        "user_and_role_administrator",
-        "user_and_role_auditor"
+        "global_account_admin"
       ]
     },
     {
