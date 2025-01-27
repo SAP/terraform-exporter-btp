@@ -92,6 +92,11 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Export by JSON for Directory
         run: |
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
@@ -102,7 +107,7 @@ jobs:
           terraform -chdir=directory-export-by-json apply -auto-approve
           terraform -chdir=directory-export-by-json show -json > directory-export-by-json-state.json
           echo '${{ secrets.DIRECTORY_EXPORT_BY_JSON_REF}}' | base64 -d > directory-export-by-json-state-reference.json
-          diff <(jq . directory-export-by-json-state.json) <(jq -S . directory-export-by-json-state-reference.json) || echo "State for import by JSON for directory is not as expected"
+          node .github/scripts/compareJson.js directory-export-by-json-state.json directory-export-by-json-state-reference.json
 
 #  test-export-by-resource:
 #    name: Integration Test Export by JSON
