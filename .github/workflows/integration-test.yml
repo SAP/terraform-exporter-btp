@@ -59,9 +59,9 @@ jobs:
       - name: JSON inventory for Cloud Foundry org
         if: ${{ success() }} || ${{ failure() }}
         run: |
-          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
-          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
-          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          export CF_USER=${{ secrets.BTP_USERNAME }}
+          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export CF_API_URL=${{ secrets.CF_API_URL }}
           btptf create-json -o ${{ secrets.CF_ORGANIZATION }} -p integrationTestCfOrg.json
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestCfOrg.json > temp.json && mv temp.json integrationTestCfOrg.json
           diff <(jq -S . integrationTestCfOrg.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestCfOrgReference.json) || echo "JSON inventory for Cloud Foundry Org is not as expected"
