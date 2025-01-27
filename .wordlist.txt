@@ -60,6 +60,7 @@ Terraform
 Terraform's
 terraform
 Terraform's
+Terramate
 tf
 TLS
 toolchain

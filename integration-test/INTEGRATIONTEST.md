@@ -4,13 +4,13 @@
 
 The setup comprises:
 
-- A managed dircetory on SAP BTP
-- A subaccount inclusinga Cloud Foundry runtime
+- A managed directory on SAP BTP
+- A subaccount including a Cloud Foundry runtime
 - A Cloud Foundry organization with two spaces
 
 The setup of the infrastructure is handled via Terramate. The following steps are needed to execute the setup of the sample used for integration testing:
 
-1. Initialize the workpsaces via
+1. Initialize the workspaces via
 
   ```bash
   terramate run -X --tags dev --parallel 2 terraform init
@@ -24,7 +24,7 @@ The setup of the infrastructure is handled via Terramate. The following steps ar
   terramate script run --tags dev -X deploy
   ```
 
-In case of a local storage of the state you can use the *teardown* scrtipt via
+In case of a local storage of the state you can use the `teardown` script via
 
 ```bash
 terramate script run --tags dev -X --reverse teardown
@@ -32,23 +32,23 @@ terramate script run --tags dev -X --reverse teardown
 
 ## Integration test
 
-The integration test for the exporter is based on the refernce setup described in the previous section
+The integration test for the exporter is based on the reference setup described in the previous section
 
-The test comprises the different flows and copmpares the results with a reference file:
+The test comprises the different flows and compares the results with a reference file:
 
 - JSON inventory: reference file for the resulting JSON
 - Export: reference state file
 
 
-The check if the export is working at the point in time of the creation of the reference file is done by comparing a newly created file with the refernence files using `diff`.
+The check if the export is working at the point in time of the creation of the reference file is done by comparing a newly created file with the reference files using `diff`.
 
-For the JSON inventory this is achieved vai the the following statement
+For the JSON inventory this is achieved via the the following statement
 
 ```
 diff <(jq -S . btpResources_new.json) <(jq -S . btpResources_reference.json)
 ```
 
-In coase of the exports we must compare the resulting Terraform states after executing the import. As the state contains sensitive data, the reference state is stored as a GitHub secret. As it is JSON format, we transfer it into a string using base64 encoding.
+In case of the exports we must compare the resulting Terraform states after executing the import. As the state contains sensitive data, the reference state is stored as a GitHub secret. As it is JSON format, we transfer it into a string using base64 encoding.
 
 The resulting comparison is then done in analogy to the JSON inventory file after decoding the string from the secret
 
@@ -184,4 +184,4 @@ terraform -chdir=cforg-export-by-json apply -auto-approve
 
 ### Terraform metadata
 
-As the Terraform state contains some metadata e.g., around the used Terraform CLI version, we must make sure that the setup in the Gh Action comprises the same Terraform version as the one used to record the reference data
+As the Terraform state contains some metadata e.g., around the used Terraform CLI version, we must make sure that the setup in the GitHub Action comprises the same Terraform version as the one used to record the reference data
