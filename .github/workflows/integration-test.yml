@@ -119,7 +119,7 @@ jobs:
           echo "====================================="
           echo "Execute comparison of state files for Directory"
           echo "====================================="
-          node .github/scripts/compareJson.js directory-export-by-json-state.json directory-export-by-json-state-reference.json
+          node .github/scripts/compareJson.js directory-export-by-json-state-reference.json directory-export-by-json-state.json
 
 #  test-export-by-resource:
 #    name: Integration Test Export by JSON
