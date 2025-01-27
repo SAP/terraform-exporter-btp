@@ -100,7 +100,7 @@ jobs:
           btptf export-by-json -d ${{ secrets.BTP_DIRECTORY }} -p integration-test/exporter-reference-data/import-by-json/integrationTestDirectoryCurated.json -c directory-export-by-json
           terraform -chdir=directory-export-by-json init
           terraform -chdir=directory-export-by-json apply -auto-approve
-          terraform -chdir=directory-export-by-json-ref show -json > directory-export-by-json-state.json
+          terraform -chdir=directory-export-by-json show -json > directory-export-by-json-state.json
           base64 -d -i ${{ secrets.DIRECTORY_EXPORT_BY_JSON_REFERENCE }} > directory-export-by-json-state-reference.json
           diff <(jq . directory-export-by-json-state.json) <(jq -S . directory-export-by-json-state-reference.json) || echo "State for import by JSON for directory is not as expected"
 
