@@ -101,7 +101,7 @@ jobs:
           terraform -chdir=directory-export-by-json init
           terraform -chdir=directory-export-by-json apply -auto-approve
           terraform -chdir=directory-export-by-json show -json > directory-export-by-json-state.json
-          base64 -d -i ${{ secrets.DIRECTORY_EXPORT_BY_JSON_REFERENCE }} > directory-export-by-json-state-reference.json
+          echo '${{ secrets.DIRECTORY_EXPORT_BY_JSON_REF}}' | base64 -d > directory-export-by-json-state-reference.json
           diff <(jq . directory-export-by-json-state.json) <(jq -S . directory-export-by-json-state-reference.json) || echo "State for import by JSON for directory is not as expected"
 
 #  test-export-by-resource:
