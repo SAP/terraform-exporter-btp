@@ -43,6 +43,7 @@ jobs:
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
           btptf create-json -d ${{ secrets.BTP_DIRECTORY }} -p integrationTestDirectory.json
+          jq '.BtpResources[] |= (.Values |= sort)' integrationTestDirectory.json > temp.json && mv temp.json integrationTestDirectory.json
           diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json)
 
       # Execute the JSON inventory setup for directory
