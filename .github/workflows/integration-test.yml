@@ -32,7 +32,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1
+        uses: hashicorp/setup-terraform@v3.1.2
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
