@@ -42,7 +42,7 @@ jobs:
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
-          $(GOBIN)/btptf create-json -d ${{ secrets.BTP_DIRECTORY }} -p integrationTestDirectory.json
+          btptf create-json -d ${{ secrets.BTP_DIRECTORY }} -p integrationTestDirectory.json
           diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json)
 
       # Execute the JSON inventory setup for directory
