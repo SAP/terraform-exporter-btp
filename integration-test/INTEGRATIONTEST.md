@@ -39,22 +39,33 @@ The test comprises the different flows and compares the results with a reference
 - JSON inventory: reference file for the resulting JSON
 - Export: reference state file
 
+We must distinguish the two scenarios with respect to the checks in the integration test.
 
-The check if the export is working at the point in time of the creation of the reference file is done by comparing a newly created file with the reference files using `diff`.
+### Validation of the JSON inventory
 
-For the JSON inventory this is achieved via the the following statement
+The check if the export is valid namely if the reference JSON inventory corresponds to the current export can be done using `diff`:
 
 ```
 diff <(jq -S . btpResources_new.json) <(jq -S . btpResources_reference.json)
 ```
 
-In case of the exports we must compare the resulting Terraform states after executing the import. To make the state files comparable it must be transfered to the canonical JSON format as the `tfstate` format is an internal representation and we cannot rely on the structure. Hence, the reference state files as well as the ones form the test must be transformed via:
+As the JSON files are flat and contain no metadata the `diff` is sufficient.
+
+### Validation of the "Export By" flows
+
+In case of the exports we must compare the resulting Terraform states after executing the import. As the `tfstate` format is an internal representation we must make the the state files comparable by transfering them to the canonical JSON format:
 
 ```bash
 terraform show -json > <Some Name>state.json
 ```
 
-As the state contains sensitive data, the reference state is stored as a GitHub secret. As it is JSON format, we transfer it into a string using base64 encoding. The resulting comparison is then done in analogy to the JSON inventory file after decoding the string from the secret.
+As the state contains sensitive data, the reference state is stored as a GitHub secret. As it is JSON format, we transfer it into a base64-encoded.
+
+> **Note** Be aware that a GitHub Secret can only contain up to 48 kb of data
+
+For the comparison we cannot rely on a simple `diff` as the sequence of the resources might differ. The same is true for the metadata of the resources like `address` or `name` of the resource in the state file. Consequently we provide a JS script that compares the `value` and `sensitive` value part of the state files in JSON format. If all entries match, the validation passes.
+
+The script is available at [`.github/scripts/compareJson.js`](../.github/scripts/compareJson.js).
 
 ### Flows and levels to check
 
@@ -262,6 +273,6 @@ terraform -chdir=cforg-export-by-json init
 terraform -chdir=cforg-export-by-json apply -auto-approve
 ```
 
-### Terraform metadata
+### Terraform metadata and JSON format
 
-As the Terraform state contains some metadata e.g., around the used Terraform CLI version, we must make sure that the setup in the GitHub Action comprises the same Terraform version as the one used to record the reference data
+To keep the reference files comparable with the newly created files, we must pin the Terraform CLI version to a specific version to avoid inconsistencies especially regarding the JSON format of the state.

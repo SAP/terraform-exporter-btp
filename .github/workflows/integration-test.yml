@@ -99,7 +99,7 @@ jobs:
 
       - name: Export by JSON for Directory
         run: |
-          echo
+          echo -e "\n"
           echo "====================================="
           echo "Export by JSON for Directory"
           echo "====================================="
@@ -107,23 +107,75 @@ jobs:
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
           btptf export-by-json -d ${{ secrets.BTP_DIRECTORY }} -p integration-test/exporter-reference-data/import-by-json/integrationTestDirectoryCurated.json -c directory-export-by-json
-          echo
+          echo -e "\n"
           echo "====================================="
           echo "Executing state import for Directory"
           echo "====================================="
           terraform -chdir=directory-export-by-json init
           terraform -chdir=directory-export-by-json apply -auto-approve
-          echo
-          echo "====================================="
+          echo -e "\n"
           echo "Preparing state file for Directory in JSON format"
-          echo "====================================="
           terraform -chdir=directory-export-by-json show -json > directory-export-by-json-state.json
           echo '${{ secrets.DIRECTORY_EXPORT_BY_JSON_REF}}' | base64 -d > directory-export-by-json-state-reference.json
-          echo
+          echo -e "\n"
           echo "====================================="
           echo "Execute comparison of state files for Directory"
           echo "====================================="
           node .github/scripts/compareJson.js directory-export-by-json-state-reference.json directory-export-by-json-state.json
+
+
+      - name: Export by JSON for Subaccount
+        run: |
+          echo -e "\n"
+          echo "====================================="
+          echo "Export by JSON for Subaccount"
+          echo "====================================="
+          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
+          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          btptf export-by-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integration-test/exporter-reference-data/import-by-json/integrationTestSubaccountCurated.json -c subaccount-export-by-json
+          echo -e "\n"
+          echo "====================================="
+          echo "Executing state import for Subaccount"
+          echo "====================================="
+          terraform -chdir=subaccount-export-by-json init
+          terraform -chdir=subaccount-export-by-json apply -auto-approve
+          echo -e "\n"
+          echo "Preparing state file for Subaccount in JSON format"
+          terraform -chdir=subaccount-export-by-json show -json > subaccount-export-by-json-state.json
+          echo '${{ secrets.SUBACCOUNT_EXPORT_BY_JSON_REF}}' | base64 -d > subaccount-export-by-json-state-reference.json
+          echo -e "\n"
+          echo "====================================="
+          echo "Execute comparison of state files for Subaccount"
+          echo "====================================="
+          node .github/scripts/compareJson.js subaccount-export-by-json-state-reference.json subaccount-export-by-json-state.json
+
+      - name: Export by JSON for Cloud Foundry Organization
+        run: |
+          echo -e "\n"
+          echo "====================================="
+          echo "Export by JSON for CF Organization"
+          echo "====================================="
+          export CF_USER=${{ secrets.BTP_USERNAME }}
+          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export CF_API_URL=${{ secrets.CF_API_URL }}
+          btptf export-by-json -o ${{ secrets.CF_ORGANIZATION }} -p integration-test/exporter-reference-data/import-by-json/integrationTestCfOrgCurated.json -c cforg-export-by-json
+          echo -e "\n"
+          echo "====================================="
+          echo "Executing state import for CF Organization"
+          echo "====================================="
+          terraform -chdir=cforg-export-by-json init
+          terraform -chdir=cforg-export-by-json apply -auto-approve
+          echo -e "\n"
+          echo "Preparing state file for CF Organization in JSON format"
+          terraform -chdir=cforg-export-by-json show -json > cforg-export-by-json-state.json
+          echo '${{ secrets.CFORG_EXPORT_BY_JSON_REF}}' | base64 -d > cforg-export-by-json-state-reference.json
+          echo -e "\n"
+          echo "====================================="
+          echo "Execute comparison of state files for CF Organization"
+          echo "====================================="
+          node .github/scripts/compareJson.js cforg-export-by-json-state-reference.json cforg-export-by-json-state.json
+
 
 #  test-export-by-resource:
 #    name: Integration Test Export by JSON
