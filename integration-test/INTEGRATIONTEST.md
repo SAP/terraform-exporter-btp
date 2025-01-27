@@ -86,6 +86,7 @@ For reference data:
 
 ```bash
 btptf create-json -d <directoryID> -p integrationTestDirectoryReference.json
+jq '.BtpResources[] |= (.Values |= sort)' integrationTestDirectoryReference.json > temp.json && mv temp.json integrationTestDirectoryReference.json
 ```
 
 For integration test data:
@@ -100,6 +101,7 @@ For reference data:
 
 ```bash
 btptf create-json -s <subaccountID> -p integrationTestSubaccountReference.json
+jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccountReference.json > temp.json && mv temp.json integrationTestSubaccountReference.json
 ```
 
 For integration test data:
@@ -114,6 +116,7 @@ For reference data:
 
 ```bash
 btptf create-json -o <organizationID> -p integrationTestCfOrgReference.json
+jq '.BtpResources[] |= (.Values |= sort)' integrationTestCfOrgReference.json > temp.json && mv temp.json integrationTestCfOrgReference.json
 ```
 
 For integration test data:
@@ -126,15 +129,40 @@ btptf create-json -o <organizationID> -p integrationTestCfOrg.json
 
 #### Directory
 
+For reference data:
+
+```bash
+btptf export -d <directoryID> -c directory-export-by-resource-ref -r=directory
+terraform -chdir=directory-export-by-resource-ref init
+terraform -chdir=directory-export-by-resource-ref apply -auto-approve
+terraform -chdir=directory-export-by-resource-ref show -json > directory-export-by-resource-ref.json
+base64 -i directory-export-by-resource-ref.json > directory-export-by-resource-ref
+```
+
+> **Note** The base 64 encoded string gets stored as a GitHub secret
+
 For integration test:
 
 ```bash
 btptf export -d <directoryID> -c directory-export-by-resource -r=directory
 terraform -chdir=directory-export-by-resource init
 terraform -chdir=directory-export-by-resource apply -auto-approve
+terraform -chdir=directory-export-by-resource show -json > directory-export-by-resource.json
 ```
 
 #### Subaccount
+
+For reference data:
+
+```bash
+btptf export -s <subaccountID> -c subaccount-export-by-resource-ref -r='subaccount,subscriptions'
+terraform -chdir=subaccount-export-by-resource-ref init
+terraform -chdir=subaccount-export-by-resource-ref apply -auto-approve
+terraform -chdir=subaccount-export-by-resource-ref show -json > subaccount-export-by-resource-ref.json
+base64 -i subaccount-export-by-resource-ref.json > subaccount-export-by-resource-ref
+```
+
+> **Note** The base 64 encoded string gets stored as a GitHub secret
 
 For integration test:
 
@@ -145,6 +173,18 @@ terraform -chdir=subaccount-export-by-resource apply -auto-approve
 ```
 
 #### Cloud Foundry Organization
+
+For reference data:
+
+```bash
+btptf export -o <organizationID> -c cforg-export-by-resource-ref -r='spaces'
+terraform -chdir=cforg-export-by-resource-ref init
+terraform -chdir=cforg-export-by-resource-ref apply -auto-approve
+terraform -chdir=cforg-export-by-resource-ref show -json > cforg-export-by-resource-ref.json
+base64 -i cforg-export-by-resource-ref.json > cforg-export-by-resource-ref
+```
+
+> **Note** The base 64 encoded string gets stored as a GitHub secret
 
 For integration test:
 
@@ -158,6 +198,18 @@ terraform -chdir=cforg-export-by-resource apply -auto-approve
 
 #### Directory
 
+For reference data (state created by Terramate setup):
+
+```bash
+btptf export-by-json -d <directoryID> -p integrationTestDirectoryCurated.json -c directory-export-by-json
+terraform -chdir=directory-export-by-json init
+terraform -chdir=directory-export-by-json apply -auto-approve
+terraform -chdir=cforg-export-by-json-ref show -json > cforg-export-by-resource-ref.json
+base64 -i cforg-export-by-json-ref.json > cforg-export-by-json-ref
+```
+
+> **Note** The base 64 encoded string gets stored as a GitHub secret
+
 For integration test:
 
 ```bash
@@ -168,6 +220,18 @@ terraform -chdir=directory-export-by-json apply -auto-approve
 
 #### Subaccount
 
+For reference data:
+
+```bash
+btptf export-by-json -s <subaccountID> -p integrationTestSubaccountCurated.json -c subaccount-export-by-json
+terraform -chdir=subaccount-export-by-json init
+terraform -chdir=subaccount-export-by-json apply -auto-approve
+terraform -chdir=subaccount-export-by-json-ref show -json > subaccount-export-by-resource-ref.json
+base64 -i subaccount-export-by-json-ref.json > subaccount-export-by-json-ref
+```
+
+> **Note** The base 64 encoded string gets stored as a GitHub secret
+
 For integration test:
 
 ```bash
@@ -177,6 +241,18 @@ terraform -chdir=subaccount-export-by-json apply -auto-approve
 ```
 
 #### Cloud Foundry Organization
+
+For reference data:
+
+```bash
+btptf export-by-json -o <organizationID> -p integrationTestCfOrgCurated.json -c cforg-export-by-json
+terraform -chdir=cforg-export-by-json init
+terraform -chdir=cforg-export-by-json apply -auto-approve
+terraform -chdir=cforg-export-by-json-ref show -json > cforg-export-by-resource-ref.json
+base64 -i cforg-export-by-json-ref.json > cforg-export-by-json-ref
+```
+
+> **Note** The base 64 encoded string gets stored as a GitHub secret
 
 For integration test:
 
