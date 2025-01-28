@@ -303,7 +303,7 @@ jobs:
           echo "Execute comparison of state files for CF Organization"
           echo "====================================="
           node .github/scripts/compareJson.js cforg-export-by-resource-state-reference.json cforg-export-by-resource-state.json
-          echo "result=failure" >> "$GITHUB_OUTPUT"
+          echo "result=success" >> "$GITHUB_OUTPUT"
 
   test-result-handling:
     name: Handle Test Results
