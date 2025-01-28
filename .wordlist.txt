@@ -30,6 +30,8 @@ HashiCorp
 IdP
 json
 JSON
+js
+JS
 jq
 macOS
 md

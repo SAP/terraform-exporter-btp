@@ -56,7 +56,7 @@ As the JSON files are flat and contain no metadata the `diff` is sufficient.
 
 ### Validation of the "Export By" flows
 
-In case of the exports we must compare the resulting Terraform states after executing the import. As the `tfstate` format is an internal representation we must make the the state files comparable by transfering them to the canonical JSON format:
+In case of the exports we must compare the resulting Terraform states after executing the import. As the `tfstate` format is an internal representation we must make the the state files comparable by transforming them to the canonical JSON format:
 
 ```bash
 terraform show -json > <Some Name>state.json
