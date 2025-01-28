@@ -17,9 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      outputDir: ${{ steps.json-inventory-directory.outputs.result }}
-      outputSubacount: ${{ steps.json-inventory-subaccount.outputs.result }}
-      outputCforg: ${{ steps.json-inventory-cforg.outputs.result }}
+      output_dir_json_inventory: ${{ steps.json-inventory-directory.outputs.result }}
+      output_subacount_json_inventory: ${{ steps.json-inventory-subaccount.outputs.result }}
+      output_cforg_json_inventory: ${{ steps.json-inventory-cforg.outputs.result }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -85,9 +85,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      outputDir: ${{ steps.export-by-json-directory.outputs.result }}
-      outputSubacount: ${{ steps.export-by-json-subaccount.outputs.result }}
-      outputCforg: ${{ steps.export-by-json-cforg.outputs.result }}
+      output_dir_export_by_json: ${{ steps.export-by-json-directory.outputs.result }}
+      output_subacount_export_by_json: ${{ steps.export-by-json-subaccount.outputs.result }}
+      output_cforg_export_by_json: ${{ steps.export-by-json-cforg.outputs.result }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -197,9 +197,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      outputDir: ${{ steps.export-by-resource-directory.outputs.result }}
-      outputSubacount: ${{ steps.export-by-resource-subaccount.outputs.result }}
-      outputCforg: ${{ steps.export-by-resource-cforg.outputs.result }}
+      output_dir_export_by_res: ${{ steps.export-by-resource-directory.outputs.result }}
+      output_subacount_export_by_res: ${{ steps.export-by-resource-subaccount.outputs.result }}
+      output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -312,12 +312,19 @@ jobs:
     steps:
     - name: Build Test Result
       run: |
-        echo '${{ toJSON(needs.test-json-inventory.outputs) }}'
-        echo '${{ toJSON(needs.test-export-by-json.outputs) }}'
-        echo '${{ toJSON(needs.test-export-by-resource.outputs) }}'
+        echo '${{ toJSON(needs.test-json-inventory.outputs) }}' > inventory.json
+        echo '${{ toJSON(needs.test-export-by-json.outputs) }}' > export-by-json.json
+        echo '${{ toJSON(needs.test-export-by-resource.outputs) }}' > export-by-resource.json
+        jq -s '.[0] + .[1] + .[2]' inventory.json export-by-json.json export-by-resource.json > out.json
+        if jq -e 'to_entries[] | select(.value.result == "failure")' out.json > /dev/null; then
+          echo "failure=true" >> "$GITHUB_ENV"
+          jq -r 'to_entries[] | "## " + .key + "\n" + .value.result' out.json > out.md
+        else
+          echo "failure=false" >> "$GITHUB_ENV"
+        fi
 
     - name: Create or update issue for broken links
-      if: failure()
+      if: env.failure == 'true'
       uses: peter-evans/create-issue-from-file@v5
       with:
           title: Regression Test Report
