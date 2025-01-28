@@ -318,7 +318,7 @@ jobs:
         jq -s '.[0] + .[1] + .[2]' inventory.json export-by-json.json export-by-resource.json > out.json
         if jq -e 'to_entries[] | select(.value == "failure")' out.json > /dev/null; then
           echo "failure=true" >> "$GITHUB_ENV"
-          jq -r 'to_entries[] | "## " + .key + "\n" + .value.result' out.json > out.md
+          jq -r 'to_entries[] | "## " + .key + "\n" + .value' out.json > out.md
         else
           echo "failure=false" >> "$GITHUB_ENV"
         fi
