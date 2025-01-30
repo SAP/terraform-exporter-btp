@@ -5,12 +5,6 @@ import "encoding/json"
 // Reduced definition of state as provided by https://github.com/hashicorp/terraform-json
 
 type State struct {
-	// useJSONNumber opts into the behavior of calling
-	// json.Decoder.UseNumber prior to decoding the state, which turns
-	// numbers into json.Numbers instead of float64s. Set it using
-	// State.UseJSONNumber.
-	useJSONNumber bool
-
 	// The version of the state format. This should always match the
 	// StateFormatVersion constant in this package, or else am
 	// unmarshal will be unstable.

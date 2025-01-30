@@ -1,5 +1,5 @@
 {
-	"name": "Terraform exporter for SAP BTP - Development",
+	"name": "Terraform exporter for SAP BTP - Dev",
 	//https://mcr.microsoft.com/en-us/product/devcontainers/go/tags
 	"image": "mcr.microsoft.com/devcontainers/go:1.23-bullseye",
 	// Features to add to the dev container. More info: https://containers.dev/features.

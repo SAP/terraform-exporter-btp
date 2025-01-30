@@ -68,16 +68,16 @@ func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool
 		return fmt.Errorf("error changing directory to %s: %v", terraformConfigPath, err)
 	}
 
-	if err := runTerraformCommand("init"); err != nil {
+	if err := runTfCmdGeneric("init"); err != nil {
 		return fmt.Errorf("error running Terraform init: %v", err)
 	}
 
 	planOption := "--generate-config-out=" + resourceFileName
-	if err := runTerraformCommand("plan", planOption); err != nil {
+	if err := runTfCmdGeneric("plan", planOption); err != nil {
 		return fmt.Errorf("error running Terraform plan: %v", err)
 	}
 
-	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
+	if err := runTfCmdGeneric("fmt", "-recursive", "-list=false"); err != nil {
 		return fmt.Errorf("error running Terraform fmt: %v", err)
 	}
 
@@ -436,13 +436,13 @@ func FinalizeTfConfig(configFolder string) {
 		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
 	}
 
-	if err := runTerraformCommand("init"); err != nil {
+	if err := runTfCmdGeneric("init"); err != nil {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
 		log.Fatalf("error initializing Terraform: %v", err)
 	}
 
-	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
+	if err := runTfCmdGeneric("fmt", "-recursive", "-list=false"); err != nil {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
 		log.Fatalf("error running Terraform fmt: %v", err)

@@ -1,21 +1,16 @@
 package tfutils
 
 import (
-	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
 
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
-	"github.com/hashicorp/terraform-exec/tfexec"
-	"github.com/spf13/viper"
 )
 
 // Constants for TF version for Terraform providers
@@ -305,34 +300,15 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 }
 
 func getTfStateData(configDir string, resourceName string, identifier string) ([]byte, error) {
-	execPath, err := exec.LookPath("terraform")
-	if err != nil {
-		fmt.Print("\r\n")
-		log.Fatalf("error finding Terraform: %v", err)
-		return nil, err
-	}
+
+	chDir := fmt.Sprintf("-chdir=%s", configDir)
+	err := runTfCmdGeneric(chDir, "init", "-upgrade")
 
 	// Set custom user agent for call of TF Provider via exporter
 	addUserAgent()
 	defer removeUserAgent()
 
-	// create a new Terraform instance
-	tf, err := tfexec.NewTerraform(configDir, execPath)
-	if err != nil {
-		removeUserAgent()
-		fmt.Print("\r\n")
-		log.Fatalf("error running NewTerraform: %v", err)
-		return nil, err
-	}
-
-	err = tf.Init(context.Background(), tfexec.Upgrade(true))
-	if err != nil {
-		removeUserAgent()
-		fmt.Print("\r\n")
-		log.Fatalf("error running Init: %v", err)
-		return nil, err
-	}
-	err = tf.Apply(context.Background())
+	err = runTfCmdGeneric(chDir, "apply", "-auto-approve")
 	if err != nil {
 		err = handleNotFoundError(err, resourceName, identifier)
 		removeUserAgent()
@@ -341,7 +317,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 		return nil, err
 	}
 
-	state, err := tf.Show(context.Background())
+	state, err := runTfShowJson(configDir)
 	if err != nil {
 		removeUserAgent()
 		fmt.Print("\r\n")
@@ -447,84 +423,6 @@ func generateDataSourcesForList(subaccountId string, directoryId string, organiz
 	}
 	// TODO surface the features of the directory stored in data["features"].([]interface{}) analogy to subscription in transform method
 	return transformDataToStringArray(btpResourceType, data), extractFeatureList(data, btpResourceType), nil
-}
-
-func runTerraformCommand(args ...string) error {
-
-	verbose := viper.GetViper().GetBool("verbose")
-	cmd := exec.Command("terraform", args...)
-	if verbose {
-		cmd.Stdout = os.Stdout
-	} else {
-		cmd.Stdout = nil
-	}
-
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func getIaCTool() (tool string, err error) {
-
-	_, localerr := exec.LookPath("terraform")
-	if localerr == nil {
-		tool = "terraform"
-		return tool, nil
-	}
-
-	_, localerr = exec.LookPath("tofu")
-	if localerr == nil {
-		tool = "tofu"
-		return tool, nil
-	}
-
-	fmt.Print("\r\n")
-	log.Fatalf("error finding Terraform or OpenTofu executable: %v", err)
-	return "", err
-}
-
-func runTf(args ...string) error {
-
-	tool, err := getIaCTool()
-
-	if err != nil {
-		return err
-	}
-
-	verbose := viper.GetViper().GetBool("verbose")
-	cmd := exec.Command(tool, args...)
-	if verbose {
-		cmd.Stdout = os.Stdout
-	} else {
-		cmd.Stdout = nil
-	}
-
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func runTfShow(args ...string) (tfState State, err error) {
-	tool, err := getIaCTool()
-	cmd := exec.Command(tool, "show", "-json")
-
-	var outBuffer bytes.Buffer
-	cmd.Stdout = &outBuffer
-	cmd.Stderr = &outBuffer
-
-	err = cmd.Run()
-	if err != nil {
-		fmt.Println("Error executing command:", err)
-		return err
-	}
-
-	var state State
-
-	err = json.Unmarshal(outBuffer.Bytes(), &state)
-	if err != nil {
-		fmt.Println("Error unmarshalling JSON:", err)
-		return err
-	}
-
-	return state, nil
 }
 
 func GetExecutionLevelAndId(subaccountID string, directoryID string, organizationID string) (level string, id string) {
