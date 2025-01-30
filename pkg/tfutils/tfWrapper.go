@@ -37,7 +37,6 @@ func getIaCTool() (tool string, err error) {
 }
 
 func runTfCmdGeneric(args ...string) error {
-
 	tool, err := getIaCTool()
 	if err != nil {
 		return err
