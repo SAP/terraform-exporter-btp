@@ -1,10 +1,16 @@
 # Prerequisite
 
-## Terraform CLI
+## Terraform/OpenTofu CLI
 
-The btptf CLI requires a installation of the Terraform CLI. The Terraform CLI will be called by the btptf CLI.
+The btptf CLI requires a installation of the Terraform CLI or the OpenTofu CLI. The corresponding CLI will be detected and called by the btptf CLI.
 
-You find the necessary information  in the [official Terraform documentation](https://developer.hashicorp.com/terraform/install#darwin).
+You find the necessary information in the official documentation:
+
+- [Terraform](https://developer.hashicorp.com/terraform/install).
+- [OpenTofu](https://opentofu.org/docs/intro/install/).
+
+!!! info
+    If you have both CLIs installed you can enforce the usage of one via the environment variable `BTPTF_IAC_TOOL` namely setting its value to `terraform`or `tofu`.
 
 ## Setting of Environment Variables
 

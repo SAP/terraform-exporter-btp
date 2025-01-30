@@ -2,7 +2,7 @@
 
 ## Supported Resources for Import
 
-The btptf CLI can create import blocks and the corresponding configurations only for resources that support the import functionality of Terraform. Not all resources available in the Terraform providers support this feature and can hence not be imported.
+The btptf CLI can create import blocks and the corresponding configurations only for resources that support the import functionality of Terraform/OpenTofu. Not all resources available in the Terraform providers support this feature and can hence not be imported.
 
 You find a list of supported resources for the Terraform Provider for SAP BTP in the corresponding repository on GitHub under the [Overview on importable resources](https://github.com/SAP/terraform-provider-btp/blob/main/guides/IMPORT.md).
 

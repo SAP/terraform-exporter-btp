@@ -2,7 +2,7 @@
 
 You have two options to install the btptf CLI:
 
-1. Download the pre-built binary. 
+1. Download the pre-built binary.
 2. Local build
 
 The following sections describe the details for the two options.
@@ -19,7 +19,7 @@ If you want to build the binary from scratch, follow these steps:
 
 1. Open [this](https://github.com/SAP/terraform-exporter-btp) repository inside VS Code Editor
 
-2. We have setup a [devcontainer](https://code.visualstudio.com/docs/devcontainers/tutorial), so reopen the repository in the devcontainer.
+2. We have setup a [devcontainer](https://code.visualstudio.com/docs/devcontainers/tutorial), so reopen the repository in the devcontainer. We provide devcontainers for Terraform and OpenTofu.
 
 3. Open a terminal in VS Code and install the binary by running
 
