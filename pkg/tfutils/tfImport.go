@@ -71,7 +71,7 @@ const (
 const (
 	CfSpaceType           string = "cloudfoundry_space"
 	CfUserType            string = "cloudfoundry_user"
-  CfOrgRoleType string = "cloudfoundry_org_role"
+	CfOrgRoleType         string = "cloudfoundry_org_role"
 	CfDomainType          string = "cloudfoundry_domain"
 	CfRouteType           string = "cloudfoundry_route"
 	CfSpaceQuotaType      string = "cloudfoundry_space_quota"
@@ -310,9 +310,15 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 		log.Fatalf("error finding Terraform: %v", err)
 		return nil, err
 	}
+
+	// Set custom user agent for call of TF Provider via exporter
+	addUserAgent()
+	defer removeUserAgent()
+
 	// create a new Terraform instance
 	tf, err := tfexec.NewTerraform(configDir, execPath)
 	if err != nil {
+		removeUserAgent()
 		fmt.Print("\r\n")
 		log.Fatalf("error running NewTerraform: %v", err)
 		return nil, err
@@ -320,6 +326,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 
 	err = tf.Init(context.Background(), tfexec.Upgrade(true))
 	if err != nil {
+		removeUserAgent()
 		fmt.Print("\r\n")
 		log.Fatalf("error running Init: %v", err)
 		return nil, err
@@ -327,6 +334,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 	err = tf.Apply(context.Background())
 	if err != nil {
 		err = handleNotFoundError(err, resourceName, identifier)
+		removeUserAgent()
 		fmt.Print("\r\n")
 		log.Fatalf("error running Apply: %v", err)
 		return nil, err
@@ -334,6 +342,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 
 	state, err := tf.Show(context.Background())
 	if err != nil {
+		removeUserAgent()
 		fmt.Print("\r\n")
 		log.Fatalf("error running Show: %v", err)
 		return nil, err
@@ -349,6 +358,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 	}
 
 	if err != nil {
+		removeUserAgent()
 		fmt.Print("\r\n")
 		log.Fatalf("error json.Marshal: %v", err)
 		return nil, err
@@ -550,7 +560,7 @@ func transformOrgRolesStringArray(data map[string]interface{}, stringArr *[]stri
 	for _, value := range roles {
 		role := value.(map[string]interface{})
 		*stringArr = append(*stringArr, output.FormatOrgRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["user"])))
-  }
+	}
 }
 
 func transformCfServiceInstanceStringArray(data map[string]interface{}, stringArr *[]string) {
@@ -559,4 +569,12 @@ func transformCfServiceInstanceStringArray(data map[string]interface{}, stringAr
 		instance := value.(map[string]interface{})
 		*stringArr = append(*stringArr, output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["service_plan"])))
 	}
+}
+
+func addUserAgent() {
+	os.Setenv("BTP_APPEND_USER_AGENT", "terraform_exporter_btp")
+}
+
+func removeUserAgent() {
+	os.Unsetenv("BTP_APPEND_USER_AGENT")
 }
