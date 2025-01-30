@@ -28,10 +28,12 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-          cache: true
+          cache: false
 
       - name: Download dependencies
-        run: go mod download
+        run: |
+          go mod download
+          go mod tidy
 
       - name: Install Terraform Exporter CLI
         run: make install
@@ -96,10 +98,12 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-          cache: true
+          cache: false
 
       - name: Download dependencies
-        run: go mod download
+        run: |
+          go mod download
+          go mod tidy
 
       - name: Install Terraform exporter CLI
         run: make install
@@ -208,10 +212,12 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-          cache: true
+          cache: false
 
       - name: Download dependencies
-        run: go mod download
+        run: |
+          go mod download
+          go mod tidy
 
       - name: Install Terraform exporter CLI
         run: make install
