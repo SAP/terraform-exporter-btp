@@ -302,11 +302,17 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 func getTfStateData(configDir string, resourceName string, identifier string) ([]byte, error) {
 
 	chDir := fmt.Sprintf("-chdir=%s", configDir)
-	err := runTfCmdGeneric(chDir, "init", "-upgrade")
-
-	// Set custom user agent for call of TF Provider via exporter
 	addUserAgent()
 	defer removeUserAgent()
+
+	err := runTfCmdGeneric(chDir, "init", "-upgrade")
+  if err != nil {
+		removeUserAgent()
+		fmt.Print("\r\n")
+		log.Fatalf("error running Init: %v", err)
+		return nil, err
+	}
+	// Set custom user agent for call of TF Provider via exporter
 
 	err = runTfCmdGeneric(chDir, "apply", "-auto-approve")
 	if err != nil {
