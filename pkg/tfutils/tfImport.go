@@ -305,6 +305,10 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 	addUserAgent()
 	defer removeUserAgent()
 
+	// Set custom user agent for call of TF Provider via exporter
+	addUserAgent()
+	defer removeUserAgent()
+
 	err := runTfCmdGeneric(chDir, "init", "-upgrade")
   if err != nil {
 		removeUserAgent()
