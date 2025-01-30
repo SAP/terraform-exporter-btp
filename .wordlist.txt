@@ -8,6 +8,7 @@ btptf
 btpResources
 CLA
 CLI
+CLIs
 CodeQL
 config
 Copilot
@@ -15,6 +16,7 @@ customizations
 DCO
 dependabot
 devcontainer
+devcontainers
 dir
 faq
 Github
@@ -38,6 +40,7 @@ md
 NextSteps
 OAuth
 OpenSSF
+OpenTofu
 PEM
 Pre
 pre
