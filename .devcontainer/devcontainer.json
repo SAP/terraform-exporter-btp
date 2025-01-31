@@ -18,7 +18,6 @@
 		},
 		"codespaces": {}
 	},
-	// If you want to use SSO in the devcontainer, you must install the xdg-utils package (see .devcontainer/scripts/install-xdg.sh).
 	"hostRequirements": {
 		"memory": "4gb"
 	},
