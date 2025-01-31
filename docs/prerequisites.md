@@ -24,7 +24,6 @@ After executing the setup of the btptf CLI, you must set some required environme
 
     - Specify a custom IdP for the authentication via `BTP_IDP`
     - Specify a URL of the BTP CLI server (SAP internal only) via `BTP_CLI_SERVER_URL`
-    - Specify the login using SSO via `BTP_ENABLE_SSO` (true/false)
 
 The parameters correspond to the Terraform provider configuration options that you find in the [BTP Terraform Provider documentation](https://registry.terraform.io/providers/SAP/btp/latest/docs)
 
@@ -90,7 +89,6 @@ For the scenarios where you want to import resources defined in the [Terraform p
 | BTP_TLS_CLIENT_KEY | PEM encoded private key (only required for x509 authentication) |
 | BTP_TLS_IDP_URL | The URL of the identity provider to be used for authentication (only required for x509 authentication) |
 | BTP_CLI_SERVER_URL | The URL of the BTP CLI server - **Relevant for SAP internal use-cases only**  |
-| BTP_ENABLE_SSO | To use Single Sign-On (SSO) for authentication set this variable to true |
 
 ### Terraform provider for Cloud Foundry
 

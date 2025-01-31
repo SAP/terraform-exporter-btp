@@ -146,7 +146,6 @@ func TestValidateCfAuthenticationData(t *testing.T) {
 		validateCfAuthenticationData("username", "password", "accessToken", "refreshToken", "clientId", "clientSecret")
 	})
 
-
 	// Test case where only username and password are provided
 	t.Run("Only username and password provided", func(t *testing.T) {
 		defer func() {
@@ -157,7 +156,6 @@ func TestValidateCfAuthenticationData(t *testing.T) {
 		validateCfAuthenticationData("username", "password", "", "", "", "")
 	})
 
-	
 	// Test case where only client ID and client secret are provided
 	t.Run("Only client ID and client secret provided", func(t *testing.T) {
 		defer func() {
@@ -188,17 +186,7 @@ func TestValidateBtpAuthenticationData(t *testing.T) {
 				t.Errorf("validateBtpAuthenticationData() panicked when username and password were provided")
 			}
 		}()
-		validateBtpAuthenticationData("username", "password", "", "", "", "")
-	})
-
-	// Test case where username and SSO are provided
-	t.Run("Username and SSO provided", func(t *testing.T) {
-		defer func() {
-			if r := recover(); r != nil {
-				t.Errorf("validateBtpAuthenticationData() panicked when username and SSO were provided")
-			}
-		}()
-		validateBtpAuthenticationData("username", "", "enableSSO", "", "", "")
+		validateBtpAuthenticationData("username", "password", "", "", "")
 	})
 
 	// Test case where TLS client certificate, key, and IDP URL are provided
@@ -208,7 +196,7 @@ func TestValidateBtpAuthenticationData(t *testing.T) {
 				t.Errorf("validateBtpAuthenticationData() panicked when TLS client certificate, key, and IDP URL were provided")
 			}
 		}()
-		validateBtpAuthenticationData("", "", "", "tlsClientCertificate", "tlsClientKey", "tlsIdpURL")
+		validateBtpAuthenticationData("", "", "tlsClientCertificate", "tlsClientKey", "tlsIdpURL")
 	})
 
 }

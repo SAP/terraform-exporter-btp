@@ -14,12 +14,12 @@ Here is an example of how to debug the command `btptf create-json`:
 
    <img src="../assets/devguide-pics/debug0.png" alt="Set a breakpoint in VS Code" width="600px">
 
-1. Adjust the `launch.json` configuration to consider your environment variable values. The default are single variables using SSO in the root of the repository:
+1. Adjust the `launch.json` configuration to consider your environment variable values. The default is an `.env` fle in the root folder (=working dirctory) of the repository:
 
    <img src="../assets/devguide-pics/debug0b.png" alt="VS Code Debug launch configuration" width="600px">
 
    > [!WARNING]
-   > The environment values will be displayed as clear text in the debug console. If you are using your password as an environment parameter this will become visible when you start debugging. We therefore highly recommend using the SSO option.
+   > The environment values will be displayed as clear text in the debug console. If you are using your password as an environment parameter this will become visible when you start debugging. We therefore highly recommend using the env-file option.
 
 1. Open the debug perspective in the VS Code side bar:
 
