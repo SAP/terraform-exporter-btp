@@ -14,7 +14,7 @@ Here is an example of how to debug the command `btptf create-json`:
 
    <img src="../assets/devguide-pics/debug0.png" alt="Set a breakpoint in VS Code" width="600px">
 
-1. Adjust the `launch.json` configuration to consider your environment variable values. The default is an `.env` fle in the root folder (=working dirctory) of the repository:
+1. Adjust the `launch.json` configuration to consider your environment variable values. The default is an `.env` file in the root folder (=working directory) of the repository:
 
    <img src="../assets/devguide-pics/debug0b.png" alt="VS Code Debug launch configuration" width="600px">
 
