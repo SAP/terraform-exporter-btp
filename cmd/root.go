@@ -75,7 +75,7 @@ We recommend to start with 'btptf create-json', and then do the export with 'btp
 
 func getRootCmdDescriptionNote(c *cobra.Command) string {
 
-	linkToRepo := output.AsLink("https://github.com/SAP/terraform-exporter-btp?tab=readme-ov-file#usage")
+	linkToRepo := output.AsLink("https://sap.github.io/terraform-exporter-btp/prerequisites/")
 
 	point1 := formatHelpNote("To work with the btptf CLI, you need to configure authentication to access your global account on SAP BTP. For instructions, see " + linkToRepo + ".")
 	point2 := formatHelpNote("To export resources, you need global account administrator permissions.")
