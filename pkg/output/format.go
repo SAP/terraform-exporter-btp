@@ -1,6 +1,10 @@
 package output
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/SAP/terraform-exporter-btp/pkg/cfcli"
+)
 
 func FormatResourceNameGeneric(name string) string {
 	return strings.ToLower(strings.Replace(name, " ", "_", -1))
@@ -20,4 +24,13 @@ func FormatServiceInstanceResourceName(serviceInstanceName string, planId string
 
 func FormatOrgRoleResourceName(orgRoleType string, userId string) string {
 	return orgRoleType + "_" + userId
+}
+
+func FormatSpaceRoleResourceName(spaceRoleType string, spaceId string, userId string) string {
+	spaceName, _ := cfcli.GetSpaceName(spaceId)
+	userName, _ := cfcli.GetUser(userId)
+	cleanSpaceName := strings.ReplaceAll(spaceName, "_", "-")
+	cleanUserName := strings.ReplaceAll(userName, "_", "-")
+	cleanRoleType := strings.ReplaceAll(spaceRoleType, "_", "-")
+	return cleanSpaceName + "_" + cleanRoleType + "_" + cleanUserName + "_" + spaceId
 }

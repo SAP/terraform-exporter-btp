@@ -105,7 +105,7 @@ func copyFile(src, dest string) error {
 	}
 	defer sourceFile.Close()
 
-	destFile, err := os.Create(dest)
+	destFile, err := os.OpenFile(dest, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}

@@ -24,7 +24,7 @@ var exportByJsonCmd = &cobra.Command{
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		path, _ := cmd.Flags().GetString("path")
 
-		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
+		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization, "")
 
 		if !isValidUuid(iD) {
 			log.Fatalln(getUuidError(level, iD))

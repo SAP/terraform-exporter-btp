@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/cfcli"
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 
@@ -22,10 +23,11 @@ var exportByResourceCmd = &cobra.Command{
 		organization, _ := cmd.Flags().GetString("organization")
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		resources, _ := cmd.Flags().GetString("resources")
+		space := ""
 
 		resultStore := make(map[string]int)
 
-		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
+		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization, space)
 
 		if !isValidUuid(iD) {
 			log.Fatalln(getUuidError(level, iD))
@@ -41,12 +43,29 @@ var exportByResourceCmd = &cobra.Command{
 
 		resourcesList := tfutils.GetResourcesList(resources, level)
 		for _, resourceToImport := range resourcesList {
-			resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, configDir, tfConfigFileName)
-			resultStore[resourceType] = count
+			if resourceToImport == tfutils.CmdCfSpaceRoleParameter {
+				var finalCount int
+				var resourceType string
+				spaces, err := cfcli.GetSpaceList(organization)
+				if err != nil {
+					log.Fatalln(fmt.Errorf("unable to get space list for space role. err = %s", err))
+				}
+				for _, spaceID := range spaces {
+					space := spaceID
+					var count int
+					resourceType, count = generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName)
+					finalCount = finalCount + count
+				}
+				resultStore[resourceType] = finalCount
+
+			} else {
+				resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName)
+				resultStore[resourceType] = count
+			}
 		}
 
 		tfutils.FinalizeTfConfig(configDir)
-		generateNextStepsDocument(configDir, subaccount, directory, organization)
+		generateNextStepsDocument(configDir, subaccount, directory, organization, space)
 		tfutils.CleanupProviderConfig()
 		output.RenderSummaryTable(resultStore)
 		output.PrintExportSuccessMessage()

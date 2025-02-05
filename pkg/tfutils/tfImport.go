@@ -11,6 +11,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/cfcli"
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	"github.com/hashicorp/terraform-exec/tfexec"
@@ -25,6 +26,7 @@ const (
 	SubaccountLevel   = "subaccountLevel"
 	DirectoryLevel    = "directoryLevel"
 	OrganizationLevel = "organizationLevel"
+	SpaceLevel        = "spaceLevel"
 )
 
 const (
@@ -46,6 +48,7 @@ const (
 	CmdCfRouteParameter             string = "routes"
 	CmdCfSpaceQuotaParameter        string = "space-quotas"
 	CmdCfServiceInstanceParameter   string = "cf-service-instances"
+	CmdCfSpaceRoleParameter         string = "space-roles"
 )
 
 const (
@@ -71,11 +74,12 @@ const (
 const (
 	CfSpaceType           string = "cloudfoundry_space"
 	CfUserType            string = "cloudfoundry_user"
-  CfOrgRoleType string = "cloudfoundry_org_role"
+	CfOrgRoleType         string = "cloudfoundry_org_role"
 	CfDomainType          string = "cloudfoundry_domain"
 	CfRouteType           string = "cloudfoundry_route"
 	CfSpaceQuotaType      string = "cloudfoundry_space_quota"
 	CfServiceInstanceType string = "cloudfoundry_service_instance"
+	CfSpaceRoleType       string = "cloudfoundry_space_role"
 )
 
 const DirectoryFeatureDefault string = "DEFAULT"
@@ -94,9 +98,9 @@ type BtpResources struct {
 	BtpResources []BtpResource
 }
 
-func FetchImportConfiguration(subaccountId string, directoryId string, organizationId string, resourceType string, tmpFolder string) (map[string]interface{}, error) {
+func FetchImportConfiguration(subaccountId string, directoryId string, organizationId string, spaceId string, resourceType string, tmpFolder string) (map[string]interface{}, error) {
 
-	dataBlock, err := readDataSource(subaccountId, directoryId, organizationId, resourceType)
+	dataBlock, err := readDataSource(subaccountId, directoryId, organizationId, spaceId, resourceType)
 	if err != nil {
 		return nil, fmt.Errorf("error reading data source: %v", err)
 	}
@@ -107,7 +111,7 @@ func FetchImportConfiguration(subaccountId string, directoryId string, organizat
 		return nil, fmt.Errorf("create file %s failed: %v", dataBlockFile, err)
 	}
 
-	_, iD := GetExecutionLevelAndId(subaccountId, directoryId, organizationId)
+	_, iD := GetExecutionLevelAndId(subaccountId, directoryId, organizationId, spaceId)
 
 	jsonBytes, err := getTfStateData(tmpFolder, resourceType, iD)
 	if err != nil {
@@ -139,7 +143,7 @@ func GetDocByResourceName(kind DocKind, resourceName string, level string) (Enti
 	var resourcePrefix string
 	var providerVersion string
 
-	if level == OrganizationLevel {
+	if level == OrganizationLevel || level == SpaceLevel {
 		ghOrg = "cloudfoundry"
 		provider = "cloudfoundry"
 		resourcePrefix = "cloudfoundry"
@@ -199,6 +203,8 @@ func TranslateResourceParamToTechnicalName(resource string, level string) string
 		return CfSpaceQuotaType
 	case CmdCfServiceInstanceParameter:
 		return CfServiceInstanceType
+	case CmdCfSpaceRoleParameter:
+		return CfSpaceRoleType
 	}
 	return ""
 }
@@ -238,15 +244,29 @@ func ReadDataSources(subaccountId string, directoryId string, organizationId str
 	var btpResourcesList []BtpResource
 	var featureListMemory []string
 
-	level, _ := GetExecutionLevelAndId(subaccountId, directoryId, organizationId)
+	level, _ := GetExecutionLevelAndId(subaccountId, directoryId, organizationId, "")
 
 	for _, resource := range resourceList {
+		var values []string
+		var featureList []string
+		var err error
+		var spaceId = ""
 
 		if !resourceIsProcessable(level, resource, featureListMemory) {
 			continue
 		}
 
-		values, featureList, err := generateDataSourcesForList(subaccountId, directoryId, organizationId, resource)
+		if resource == CmdCfSpaceRoleParameter {
+			var spaces map[string]string
+			spaces, err = cfcli.GetSpaceList(organizationId)
+			for _, spaceID := range spaces {
+				var spaceRoles []string
+				spaceRoles, featureList, err = generateDataSourcesForList(subaccountId, directoryId, organizationId, spaceID, resource)
+				values = append(values, spaceRoles...)
+			}
+		} else {
+			values, featureList, err = generateDataSourcesForList(subaccountId, directoryId, organizationId, spaceId, resource)
+		}
 
 		if resource == CmdDirectoryParameter {
 			// Store the features of the directory for later use
@@ -269,8 +289,8 @@ func ReadDataSources(subaccountId string, directoryId string, organizationId str
 	return btpResources, nil
 }
 
-func readDataSource(subaccountId string, directoryId string, organizationId string, resourceName string) (string, error) {
-	level, _ := GetExecutionLevelAndId(subaccountId, directoryId, organizationId)
+func readDataSource(subaccountId string, directoryId string, organizationId string, spaceId string, resourceName string) (string, error) {
+	level, _ := GetExecutionLevelAndId(subaccountId, directoryId, organizationId, spaceId)
 
 	doc, err := GetDocByResourceName(DataSourcesKind, resourceName, level)
 	if err != nil {
@@ -297,6 +317,10 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 			dataBlock = strings.Replace(doc.Import, "The ID of the organization", organizationId, -1)
 		} else {
 			dataBlock = strings.Replace(doc.Import, doc.Attributes["org"], organizationId, -1)
+		}
+	case SpaceLevel:
+		if resourceName == CfSpaceRoleType {
+			dataBlock = strings.Replace(doc.Import, doc.Attributes["space"], spaceId, -1)
 		}
 	}
 
@@ -397,19 +421,21 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		transformDataToStringArrayGeneric(data, &stringArr, "space_quotas", "name")
 	case CfServiceInstanceType:
 		transformCfServiceInstanceStringArray(data, &stringArr)
+	case CfSpaceRoleType:
+		transformCfSpaceRolesStringArray(data, &stringArr)
 	}
 	return stringArr
 }
 
-func generateDataSourcesForList(subaccountId string, directoryId string, organizationId string, resourceName string) ([]string, []string, error) {
+func generateDataSourcesForList(subaccountId string, directoryId string, organizationId string, spaceID string, resourceName string) ([]string, []string, error) {
 	dataBlockFile := filepath.Join(TmpFolder, "main.tf")
 	var jsonBytes []byte
 
-	level, iD := GetExecutionLevelAndId(subaccountId, directoryId, organizationId)
+	level, iD := GetExecutionLevelAndId(subaccountId, directoryId, organizationId, spaceID)
 
 	btpResourceType := TranslateResourceParamToTechnicalName(resourceName, level)
 
-	dataBlock, err := readDataSource(subaccountId, directoryId, organizationId, btpResourceType)
+	dataBlock, err := readDataSource(subaccountId, directoryId, organizationId, spaceID, btpResourceType)
 	if err != nil {
 		error := fmt.Errorf("error reading data source: %s", err)
 		return nil, nil, error
@@ -452,12 +478,15 @@ func runTerraformCommand(args ...string) error {
 	return cmd.Run()
 }
 
-func GetExecutionLevelAndId(subaccountID string, directoryID string, organizationID string) (level string, id string) {
+func GetExecutionLevelAndId(subaccountID string, directoryID string, organizationID string, spaceID string) (level string, id string) {
 	if subaccountID != "" {
 		return SubaccountLevel, subaccountID
 	} else if directoryID != "" {
 		return DirectoryLevel, directoryID
 	} else if organizationID != "" {
+		if spaceID != "" {
+			return SpaceLevel, spaceID
+		}
 		return OrganizationLevel, organizationID
 	}
 	return "", ""
@@ -550,7 +579,7 @@ func transformOrgRolesStringArray(data map[string]interface{}, stringArr *[]stri
 	for _, value := range roles {
 		role := value.(map[string]interface{})
 		*stringArr = append(*stringArr, output.FormatOrgRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["user"])))
-  }
+	}
 }
 
 func transformCfServiceInstanceStringArray(data map[string]interface{}, stringArr *[]string) {
@@ -558,5 +587,13 @@ func transformCfServiceInstanceStringArray(data map[string]interface{}, stringAr
 	for _, value := range instances {
 		instance := value.(map[string]interface{})
 		*stringArr = append(*stringArr, output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["service_plan"])))
+	}
+}
+
+func transformCfSpaceRolesStringArray(data map[string]interface{}, stringArr *[]string) {
+	roles := data["roles"].([]interface{})
+	for _, value := range roles {
+		role := value.(map[string]interface{})
+		*stringArr = append(*stringArr, output.FormatSpaceRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["space"]), fmt.Sprintf("%v", role["user"])))
 	}
 }

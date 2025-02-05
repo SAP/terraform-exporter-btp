@@ -53,7 +53,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 
 	var resNames []string
 
-	level, _ := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
+	level, _ := tfutils.GetExecutionLevelAndId(subaccount, directory, organization, "")
 
 	allowedResources := tfutils.GetValidResourcesByLevel(level)
 
@@ -85,13 +85,30 @@ func exportByJson(subaccount string, directory string, organization string, json
 			}
 		}
 		if len(value) != 0 {
-			resourceType, count := generateConfigForResource(resName, value, subaccount, directory, organization, configDir, resourceFile)
-			resultStore[resourceType] = count
+			if resName == tfutils.CmdCfSpaceRoleParameter {
+				spaceRoles := make(map[string][]string)
+				var finalCount int
+				var resourceType string
+				for _, spaceRole := range value {
+					spaceID := (strings.Split(spaceRole, "_"))[3]
+					spaceRoles[spaceID] = append(spaceRoles[spaceID], spaceRole)
+				}
+				for spaceRolesKey, spaceRolesValue := range spaceRoles {
+					var count int
+					resourceType, count = generateConfigForResource(resName, spaceRolesValue, subaccount, directory, organization, spaceRolesKey, configDir, resourceFile)
+					finalCount = finalCount + count
+				}
+				resultStore[resourceType] = finalCount
+
+			} else {
+				resourceType, count := generateConfigForResource(resName, value, subaccount, directory, organization, "", configDir, resourceFile)
+				resultStore[resourceType] = count
+			}
 		}
 	}
 
 	tfutils.FinalizeTfConfig(configDir)
-	generateNextStepsDocument(configDir, subaccount, directory, organization)
+	generateNextStepsDocument(configDir, subaccount, directory, organization, "")
 	output.RenderSummaryTable(resultStore)
 	tfutils.CleanupProviderConfig()
 }

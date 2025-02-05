@@ -45,6 +45,7 @@ var AllowedResourcesOrganization = []string{
 	CmdCfRouteParameter,
 	CmdCfSpaceQuotaParameter,
 	CmdCfServiceInstanceParameter,
+	CmdCfSpaceRoleParameter,
 }
 
 func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) error {
@@ -153,7 +154,7 @@ func ConfigureProvider(level string) {
 
 		providerContent = providerContent + "}"
 
-	} else if level == OrganizationLevel {
+	} else if level == OrganizationLevel || level == SpaceLevel {
 
 		username := os.Getenv("CF_USER")
 		password := os.Getenv("CF_PASSWORD")
@@ -228,7 +229,7 @@ func validateGlobalAccount(globalAccount string) {
 }
 
 func validateBtpAuthenticationData(username string, password string, enableSSO string, tlsClientCertificate string, tlsClientKey string, tlsIdpURL string) {
- // Check if any of the authentication data is set (username and password, username and SSO or TLS client certificate and key)
+	// Check if any of the authentication data is set (username and password, username and SSO or TLS client certificate and key)
 	if allStringsEmtpy(username, password) && allStringsEmtpy(username, enableSSO) && allStringsEmtpy(tlsClientCertificate, tlsClientKey, tlsIdpURL) {
 		cleanup()
 		fmt.Print("\r\n")

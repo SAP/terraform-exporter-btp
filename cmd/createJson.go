@@ -22,8 +22,9 @@ var createJsonCmd = &cobra.Command{
 		organization, _ := cmd.Flags().GetString("organization")
 		path, _ := cmd.Flags().GetString("path")
 		resources, _ := cmd.Flags().GetString("resources")
+		space := ""
 
-		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
+		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization, space)
 
 		if !isValidUuid(iD) {
 			log.Fatalln(getUuidError(level, iD))

@@ -7,21 +7,23 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/cfcli"
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfimportprovider "github.com/SAP/terraform-exporter-btp/pkg/tfimportprovider"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 	"github.com/google/uuid"
+	"github.com/theckman/yacspin"
 )
 
 const tfConfigFileName = "btp_resources.tf"
 const configDirDefault = "generated_configurations_<account-id>"
 const jsonFileDefault = "btpResources_<account-id>.json"
 
-func generateConfigForResource(resource string, values []string, subaccountId string, directoryId string, organizationId string, configDir string, resourceFileName string) (resourceType string, count int) {
+func generateConfigForResource(resource string, values []string, subaccountId string, directoryId string, organizationId string, spaceId string, configDir string, resourceFileName string) (resourceType string, count int) {
 	tempConfigDir := resource + "-config"
 
-	level, iD := tfutils.GetExecutionLevelAndId(subaccountId, directoryId, organizationId)
+	level, iD := tfutils.GetExecutionLevelAndId(subaccountId, directoryId, organizationId, spaceId)
 
 	importProvider, _ := tfimportprovider.GetImportBlockProvider(resource, level)
 	resourceType = importProvider.GetResourceType()
@@ -30,9 +32,15 @@ func generateConfigForResource(resource string, values []string, subaccountId st
 	tfutils.ExecPreExportSteps(tempConfigDir, level)
 
 	output.AddNewLine()
-	spinner := output.StartSpinner("crafting import block for " + techResourceNameLong)
+	var spinner *yacspin.Spinner
+	if level == tfutils.SpaceLevel {
+		spaceName, _ := cfcli.GetSpaceName(spaceId)
+		spinner = output.StartSpinner("crafting import block for " + techResourceNameLong + " under " + strings.ToUpper(spaceName) + " space")
+	} else {
+		spinner = output.StartSpinner("crafting import block for " + techResourceNameLong)
+	}
 
-	data, err := tfutils.FetchImportConfiguration(subaccountId, directoryId, organizationId, resourceType, tfutils.TmpFolder)
+	data, err := tfutils.FetchImportConfiguration(subaccountId, directoryId, organizationId, spaceId, resourceType, tfutils.TmpFolder)
 	if err != nil {
 		tfutils.CleanupProviderConfig(tempConfigDir)
 		fmt.Print("\r\n")
@@ -86,9 +94,9 @@ func getUuidError(level string, iD string) string {
 	return ""
 }
 
-func generateNextStepsDocument(configDir string, subaccount string, directory string, organization string) {
+func generateNextStepsDocument(configDir string, subaccount string, directory string, organization string, space string) {
 
-	level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
+	level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization, space)
 
 	// remove the sring "level" from the level string
 	level = strings.ReplaceAll(level, "Level", "")

@@ -18,7 +18,7 @@ func createJson(subaccount string, directory string, organization string, fileNa
 		log.Fatal("please provide the btp resources you want to get using --resources flag or provide 'all' to get all resources")
 	}
 
-	level, _ := tfutils.GetExecutionLevelAndId(subaccount, directory, organization)
+	level, _ := tfutils.GetExecutionLevelAndId(subaccount, directory, organization, "")
 
 	tfutils.ConfigureProvider(level)
 
