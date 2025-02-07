@@ -24,20 +24,20 @@ func newCloudfoundrySpaceRolesImportProvider() ITfImportProvider {
 
 func (tf *cloudfoundrySpaceRolesImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
 	count := 0
-	orgId := levelId
+	spaceId := levelId
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.CfSpaceRoleType, tfutils.OrganizationLevel)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("read doc failed!")
 		return "", count, err
 	}
-	importBlock, count, err := createSpaceRoleImportBlock(data, orgId, filterValues, resourceDoc)
+	importBlock, count, err := createSpaceRoleImportBlock(data, spaceId, filterValues, resourceDoc)
 	if err != nil {
 		return "", count, err
 	}
 	return importBlock, count, nil
 }
-func createSpaceRoleImportBlock(data map[string]interface{}, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createSpaceRoleImportBlock(data map[string]interface{}, spaceId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
 	roles := data["roles"].([]interface{})
 	if len(filterValues) != 0 {
@@ -52,7 +52,7 @@ func createSpaceRoleImportBlock(data map[string]interface{}, orgId string, filte
 		}
 		missingRole, subset := isSubset(cfAllSpaceRoles, filterValues)
 		if !subset {
-			return "", 0, fmt.Errorf("cloud foudndry org role %s not found in the organization with ID %s. Please adjust it in the provided file", missingRole, orgId)
+			return "", 0, fmt.Errorf("cloud foudndry space role %s not found in the space with ID %s. Please adjust it in the provided file", missingRole, spaceId)
 		}
 	} else {
 		for x, value := range roles {

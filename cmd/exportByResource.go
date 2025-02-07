@@ -48,6 +48,7 @@ var exportByResourceCmd = &cobra.Command{
 				var resourceType string
 				spaces, err := cfcli.GetSpaceList(organization)
 				if err != nil {
+					tfutils.CleanupProviderConfig()
 					log.Fatalln(fmt.Errorf("unable to get space list for space role. err = %s", err))
 				}
 				for _, spaceID := range spaces {
