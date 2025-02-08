@@ -10,9 +10,7 @@ import (
 	resourceprocessor "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/resource_processor"
 )
 
-func orchestrateCodeCleanup(dir string) error {
-	// Code to orchestrate the cleanup
-
+func OrchestrateCodeCleanup(dir string) error {
 	dir = filepath.Clean(dir)
 
 	_, err := os.Lstat(dir)

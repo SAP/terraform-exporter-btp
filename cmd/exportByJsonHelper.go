@@ -90,6 +90,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 		}
 	}
 
+	tfutils.CleanUpGeneratedCode(configDir)
 	tfutils.FinalizeTfConfig(configDir)
 	generateNextStepsDocument(configDir, subaccount, directory, organization)
 	output.RenderSummaryTable(resultStore)

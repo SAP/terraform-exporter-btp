@@ -45,6 +45,7 @@ var exportByResourceCmd = &cobra.Command{
 			resultStore[resourceType] = count
 		}
 
+		tfutils.CleanUpGeneratedCode(configDir)
 		tfutils.FinalizeTfConfig(configDir)
 		generateNextStepsDocument(configDir, subaccount, directory, organization)
 		tfutils.CleanupProviderConfig()
