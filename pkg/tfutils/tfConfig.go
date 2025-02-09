@@ -11,7 +11,6 @@ import (
 
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
-	"github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/orchestrator"
 	"github.com/spf13/viper"
 	"github.com/theckman/yacspin"
 )
@@ -414,29 +413,6 @@ func cleanup() {
 		fmt.Print("\r\n")
 		log.Fatalf("error deleting temp files: %v", err)
 	}
-}
-
-func CleanUpGeneratedCode(configFolder string) {
-
-	spinner := output.StartSpinner("🧪 making the Terraform configuration even better")
-
-	currentDir, err := os.Getwd()
-	if err != nil {
-		CleanupProviderConfig()
-		fmt.Print("\r\n")
-		log.Fatalf("error getting current directory: %v", err)
-	}
-
-	terraformConfigPath := filepath.Join(currentDir, configFolder)
-
-	err = orchestrator.OrchestrateCodeCleanup(terraformConfigPath)
-
-	if err != nil {
-		fmt.Print("\r\n")
-		log.Printf("error improving Terraform configuration: %v", err)
-	}
-
-	output.StopSpinner(spinner)
 }
 
 func FinalizeTfConfig(configFolder string) {

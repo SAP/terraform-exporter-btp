@@ -1,16 +1,43 @@
 package orchestrator
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	providerprocessor "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/provider_processor"
 	resourceprocessor "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/resource_processor"
+	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
-func OrchestrateCodeCleanup(dir string) error {
+func CleanUpGeneratedCode(configFolder string, level string) {
+
+	spinner := output.StartSpinner("🧪 making the Terraform configuration even better")
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		tfutils.CleanupProviderConfig()
+		fmt.Print("\r\n")
+		log.Fatalf("error getting current directory: %v", err)
+	}
+
+	terraformConfigPath := filepath.Join(currentDir, configFolder)
+
+	err = orchestrateCodeCleanup(terraformConfigPath, level)
+
+	if err != nil {
+		fmt.Print("\r\n")
+		log.Printf("error improving Terraform configuration: %v", err)
+		log.Println("skipping improvement steps")
+	}
+
+	output.StopSpinner(spinner)
+}
+
+func orchestrateCodeCleanup(dir string, level string) error {
 	dir = filepath.Clean(dir)
 
 	_, err := os.Lstat(dir)
@@ -33,7 +60,7 @@ func OrchestrateCodeCleanup(dir string) error {
 
 		if file.Name() == "btp_resources.tf" {
 			f := generictools.GetHclFile(path)
-			resourceprocessor.ProcessResources(f, &contentToCreate)
+			resourceprocessor.ProcessResources(f, &contentToCreate, level)
 			generictools.ProcessChanges(f, path)
 		} else if file.Name() == "provider.tf" {
 			f := generictools.GetHclFile(path)

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
+	tfcleanorchestrator "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/orchestrator"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 
 	"github.com/spf13/cobra"
@@ -45,7 +46,7 @@ var exportByResourceCmd = &cobra.Command{
 			resultStore[resourceType] = count
 		}
 
-		tfutils.CleanUpGeneratedCode(configDir)
+		tfcleanorchestrator.CleanUpGeneratedCode(configDir, level)
 		tfutils.FinalizeTfConfig(configDir)
 		generateNextStepsDocument(configDir, subaccount, directory, organization)
 		tfutils.CleanupProviderConfig()
