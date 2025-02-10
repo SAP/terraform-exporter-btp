@@ -38,7 +38,7 @@ func configureClient() (*Session, error) {
 	cloudFoundryClientConfig := getAndSetValues()
 	session, err := cloudFoundryClientConfig.NewSession()
 	if err != nil {
-
+		return nil, fmt.Errorf("error creating session: %v", err)
 	}
 	return session, nil
 }
