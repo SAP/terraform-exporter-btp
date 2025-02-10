@@ -3,17 +3,18 @@ package resourceprocessor
 import (
 	"log"
 
+	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
-func ProcessResources(hclFile *hclwrite.File, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses) {
+func ProcessResources(hclFile *hclwrite.File, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade) {
 
-	processResourceAttributes(hclFile.Body(), nil, level, variables, dependencyAddresses)
+	processResourceAttributes(hclFile.Body(), nil, level, variables, dependencyAddresses, btpClient)
 }
 
-func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses) {
+func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade) {
 
 	if len(inBlocks) > 0 {
 
@@ -23,9 +24,9 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 
 		switch level {
 		case tfutils.SubaccountLevel:
-			processSubaccountLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress)
+			processSubaccountLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient)
 		case tfutils.DirectoryLevel:
-			processDirectoryLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress)
+			processDirectoryLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient)
 		case tfutils.OrganizationLevel:
 			log.Println("Organization level is not supported yet")
 		}
@@ -34,7 +35,7 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 	blocks := body.Blocks()
 	for _, block := range blocks {
 		inBlocks := append(inBlocks, block.Type()+","+block.Labels()[0]+","+block.Labels()[1])
-		processResourceAttributes(block.Body(), inBlocks, level, variables, dependencyAddresses)
+		processResourceAttributes(block.Body(), inBlocks, level, variables, dependencyAddresses, btpClient)
 	}
 }
 
@@ -78,15 +79,11 @@ func replaceMainDependency(body *hclwrite.Body, mainIdentifier string, mainAddre
 	}
 }
 
-func processSubaccountLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string) {
+func processSubaccountLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade) {
 	if blockIdentifier == subaccountBlockIdentifier {
-		processSubaccountAttributes(body, variables)
+		processSubaccountAttributes(body, variables, btpClient)
 
 		dependencyAddresses.SubaccountAddress = resourceAddress
-	}
-
-	if blockIdentifier != subaccountBlockIdentifier {
-		replaceMainDependency(body, subaccountIdentifier, dependencyAddresses.SubaccountAddress)
 	}
 
 	if blockIdentifier == subaccountEntitlementBlockIdentifier {
@@ -96,9 +93,14 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 	if blockIdentifier == subscriptionBlockIdentifier {
 		addEntitlementDependency(body, dependencyAddresses)
 	}
+
+	// We add the reference to the subaccount at the end to have the subaccount ID available
+	if blockIdentifier != subaccountBlockIdentifier {
+		replaceMainDependency(body, subaccountIdentifier, dependencyAddresses.SubaccountAddress)
+	}
 }
 
-func processDirectoryLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string) {
+func processDirectoryLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade) {
 	if blockIdentifier == directoryBlockIdentifier {
 		processDirectoryAttributes(body, variables)
 

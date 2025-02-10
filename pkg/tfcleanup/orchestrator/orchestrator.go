@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	providerprocessor "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/provider_processor"
@@ -59,13 +60,19 @@ func orchestrateCodeCleanup(dir string, level string) error {
 	contentToCreate := make(generictools.VariableContent)
 	dependencyAddresses := generictools.NewDepedendcyAddresses()
 
+	btpClient, err := btpcli.GetLoggedInClient()
+
+	if err != nil {
+		return err
+	}
+
 	for _, file := range files {
 		// We only process the resources and the provider files
 		path := filepath.Join(dir, file.Name())
 
 		if file.Name() == "btp_resources.tf" {
 			f := generictools.GetHclFile(path)
-			resourceprocessor.ProcessResources(f, level, &contentToCreate, &dependencyAddresses)
+			resourceprocessor.ProcessResources(f, level, &contentToCreate, &dependencyAddresses, btpClient)
 			generictools.ProcessChanges(f, path)
 		} else if file.Name() == "provider.tf" {
 			f := generictools.GetHclFile(path)

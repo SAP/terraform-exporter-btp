@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
@@ -158,4 +159,14 @@ func checkForChanges(f *hclwrite.File, path string) (changed bool) {
 		changed = true
 	}
 	return changed
+}
+
+func IsGlobalAccountParent(btpClient *btpcli.ClientFacade, parentId string) (isParent bool) {
+
+	globalAccountId, _ := btpcli.GetGlobalAccountId(btpClient)
+
+	if parentId == globalAccountId {
+		isParent = true
+	}
+	return
 }
