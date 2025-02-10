@@ -47,7 +47,7 @@ func configureClient() (*Session, error) {
 func GetSpaceList(OrgId string) (map[string]string, error) {
 	session, err := configureClient()
 	if err != nil {
-		return nil, fmt.Errorf("error configure client")
+		return nil, fmt.Errorf("error configure client: %v", err)
 	}
 
 	options := client.NewSpaceListOptions()
