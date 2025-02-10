@@ -14,7 +14,7 @@ import (
 )
 
 func CleanUpGeneratedCode(configFolder string, level string) {
-	if os.Getenv("BTPTF_BETA") == "" {
+	if os.Getenv("BTPTF_EXPERIMENTAL") == "" {
 		return
 	}
 
@@ -57,7 +57,7 @@ func orchestrateCodeCleanup(dir string, level string) error {
 	}
 
 	contentToCreate := make(generictools.VariableContent)
-	dependencyAddresses := generictools.DepedendcyAddresses{}
+	dependencyAddresses := generictools.NewDepedendcyAddresses()
 
 	for _, file := range files {
 		// We only process the resources and the provider files

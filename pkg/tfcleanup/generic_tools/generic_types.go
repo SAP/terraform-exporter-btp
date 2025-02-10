@@ -17,6 +17,12 @@ type VariableContent map[string]VariableInfo
 
 type DepedendcyAddresses struct {
 	SubaccountAddress  string
-	DirectoyAddress    string
+	DirectoryAddress   string
 	EntitlementAddress map[EntilementKey]string
+}
+
+func NewDepedendcyAddresses() DepedendcyAddresses {
+	return DepedendcyAddresses{
+		EntitlementAddress: make(map[EntilementKey]string),
+	}
 }

@@ -24,6 +24,17 @@ func processProviderAttributes(body *hclwrite.Body, inBlocks []string, variables
 			}
 			body.SetAttributeRaw(name, replacedTokens)
 		}
+
+		if name == cfApiEndpointIdentifier && len(tokens) == 3 {
+			replacedTokens, cfApiValue := generictools.ReplaceStringToken(tokens, cfApiEndpointIdentifier)
+			if cfApiValue != "" {
+				(*variables)[name] = generictools.VariableInfo{
+					Description: "Cloud Foundry API endpoint",
+					Value:       cfApiValue,
+				}
+			}
+			body.SetAttributeRaw(name, replacedTokens)
+		}
 	}
 
 	blocks := body.Blocks()

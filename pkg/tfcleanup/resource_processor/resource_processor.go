@@ -2,7 +2,6 @@ package resourceprocessor
 
 import (
 	"log"
-	"strings"
 
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
@@ -17,42 +16,21 @@ func ProcessResources(hclFile *hclwrite.File, level string, variables *genericto
 func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses) {
 
 	if len(inBlocks) > 0 {
-		// remove empty values for all resources
+
 		removeEmptyAttributes(body)
 
-		// Get the first part of the block until the comma
-		blockIdentifier := strings.Split(inBlocks[0], ",")[1]
-		blockAddress := strings.Split(inBlocks[0], ",")[2]
-		resourceAddress := blockIdentifier + "." + blockAddress
+		blockIdentifier, resourceAddress := generictools.ExtractBlockInformation(inBlocks)
 
 		switch level {
 		case tfutils.SubaccountLevel:
-			if blockIdentifier == subaccountBlockIdentifier {
-				processSubaccountAttributes(body, variables)
-				//Add Address of subaccount to the dependencyAddresses
-				dependencyAddresses.SubaccountAddress = resourceAddress
-			}
-
-			if blockIdentifier != subaccountBlockIdentifier {
-				replaceMainDependency(body, subaccountIdentifier, dependencyAddresses.SubaccountAddress)
-			}
-
-			if inBlocks[0] == subaccountEntitlementBlockIdentifier {
-				fillSubaccountEntitlementDependencyAddresses(body, resourceAddress, dependencyAddresses)
-			}
-
-			if inBlocks[0] == subscriptionBlockIdentifier {
-				addEntitlementDependency(body, dependencyAddresses)
-			}
-
+			processSubaccountLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress)
 		case tfutils.DirectoryLevel:
-			if blockIdentifier != directoryBlockIdentifier {
-				replaceMainDependency(body, directoryIdentifier, dependencyAddresses.SubaccountAddress)
-			}
+			processDirectoryLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress)
 		case tfutils.OrganizationLevel:
 			log.Println("Organization level is not supported yet")
 		}
 	}
+
 	blocks := body.Blocks()
 	for _, block := range blocks {
 		inBlocks := append(inBlocks, block.Type()+","+block.Labels()[0]+","+block.Labels()[1])
@@ -82,6 +60,10 @@ func removeEmptyAttributes(body *hclwrite.Body) {
 }
 
 func replaceMainDependency(body *hclwrite.Body, mainIdentifier string, mainAddress string) {
+	if mainAddress == "" {
+		return
+	}
+
 	attrs := body.Attributes()
 	for name, attr := range attrs {
 		tokens := attr.Expr().BuildTokens(nil)
@@ -90,5 +72,37 @@ func replaceMainDependency(body *hclwrite.Body, mainIdentifier string, mainAddre
 			replacedTokens := generictools.ReplaceDependency(tokens, mainAddress)
 			body.SetAttributeRaw(name, replacedTokens)
 		}
+	}
+}
+
+func processSubaccountLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string) {
+	if blockIdentifier == subaccountBlockIdentifier {
+		processSubaccountAttributes(body, variables)
+
+		dependencyAddresses.SubaccountAddress = resourceAddress
+	}
+
+	if blockIdentifier != subaccountBlockIdentifier {
+		replaceMainDependency(body, subaccountIdentifier, dependencyAddresses.SubaccountAddress)
+	}
+
+	if blockIdentifier == subaccountEntitlementBlockIdentifier {
+		fillSubaccountEntitlementDependencyAddresses(body, resourceAddress, dependencyAddresses)
+	}
+
+	if blockIdentifier == subscriptionBlockIdentifier {
+		addEntitlementDependency(body, dependencyAddresses)
+	}
+}
+
+func processDirectoryLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string) {
+	if blockIdentifier == directoryBlockIdentifier {
+		processDirectoryAttributes(body, variables)
+
+		dependencyAddresses.DirectoryAddress = resourceAddress
+	}
+
+	if blockIdentifier != directoryBlockIdentifier {
+		replaceMainDependency(body, directoryIdentifier, dependencyAddresses.DirectoryAddress)
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -114,7 +115,7 @@ func ReplaceDependency(tokens hclwrite.Tokens, dependencyAddress string) (replac
 		return hclwrite.Tokens{
 			{
 				Type:  hclsyntax.TokenIdent,
-				Bytes: []byte(dependencyAddress),
+				Bytes: []byte(dependencyAddress + ".id"),
 			},
 		}
 	}
@@ -132,6 +133,14 @@ func GetStringToken(tokens hclwrite.Tokens) (value string) {
 	}
 
 	return value
+}
+
+func ExtractBlockInformation(inBlocks []string) (blockIdentifier string, resourceAddress string) {
+	blockIdentifier = strings.Split(inBlocks[0], ",")[1]
+	blockAddress := strings.Split(inBlocks[0], ",")[2]
+	resourceAddress = blockIdentifier + "." + blockAddress
+
+	return blockIdentifier, resourceAddress
 }
 
 func checkForChanges(f *hclwrite.File, path string) (changed bool) {
