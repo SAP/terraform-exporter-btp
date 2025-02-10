@@ -14,7 +14,11 @@ import (
 )
 
 func CleanUpGeneratedCode(configFolder string, level string) {
+	if os.Getenv("BTPTF_BETA") == "" {
+		return
+	}
 
+	output.AddNewLine()
 	spinner := output.StartSpinner("🧪 making the Terraform configuration even better")
 
 	currentDir, err := os.Getwd()
