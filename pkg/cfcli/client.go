@@ -77,7 +77,7 @@ func GetSpaceList(OrgId string) (map[string]string, error) {
 func GetUser(userId string) (string, error) {
 	session, err := configureClient()
 	if err != nil {
-		return "", fmt.Errorf("error configure client")
+		return "", fmt.Errorf("error configure client: %s", err)
 	}
 
 	userListOption := client.NewUserListOptions()
