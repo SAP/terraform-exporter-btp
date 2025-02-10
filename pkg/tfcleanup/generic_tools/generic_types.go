@@ -2,6 +2,7 @@ package generictools
 
 const EmptyString = "null"
 const EmptyJson = "jsonencode({})"
+const EmptyMap = "{}"
 
 type VariableInfo struct {
 	Description string

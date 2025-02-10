@@ -43,18 +43,21 @@ func removeEmptyAttributes(body *hclwrite.Body) {
 	for name, attr := range attrs {
 		tokens := attr.Expr().BuildTokens(nil)
 
+		// Check for a NULL value
 		if len(tokens) == 1 && string(tokens[0].Bytes) == generictools.EmptyString {
 			body.RemoveAttribute(name)
 		}
 
-		if len(tokens) == 5 {
-			var combinedString string
+		// Check for an empty JSON encoded string or an empty Map
+		var combinedString string
+		if len(tokens) == 5 || len(tokens) == 2 {
 			for _, token := range tokens {
 				combinedString += string(token.Bytes)
 			}
-			if combinedString == generictools.EmptyJson {
-				body.RemoveAttribute(name)
-			}
+		}
+
+		if combinedString == generictools.EmptyJson || combinedString == generictools.EmptyMap {
+			body.RemoveAttribute(name)
 		}
 	}
 }
