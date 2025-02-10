@@ -1,0 +1,24 @@
+{
+  "BtpResources": [
+    {
+      "Name": "spaces",
+      "Values": [
+        "dev-project-abc",
+        "dev-test-space"
+      ]
+    },
+    {
+      "Name": "users",
+      "Values": [
+        "christian.lechner@sap.com"
+      ]
+    },
+    {
+      "Name": "org-roles",
+      "Values": [
+        "organization_manager_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac",
+        "organization_user_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac"
+      ]
+    }
+  ]
+}

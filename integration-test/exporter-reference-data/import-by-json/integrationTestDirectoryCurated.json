@@ -1,0 +1,33 @@
+{
+  "BtpResources": [
+    {
+      "Name": "directory",
+      "Values": [
+        "Directory for DEV Inttest Exporter (DO NOT DELETE)"
+      ]
+    },
+    {
+      "Name": "entitlements",
+      "Values": [
+        "feature-flags-dashboard_dashboard",
+        "feature-flags_standard",
+        "alert-notification_standard"
+      ]
+    },
+    {
+      "Name": "roles",
+      "Values": [
+        "directory_admin",
+        "directory_usage_reporting_viewer",
+        "global_account_admin"
+      ]
+    },
+    {
+      "Name": "role-collections",
+      "Values": [
+        "directory_administrator",
+        "directory_viewer"
+      ]
+    }
+  ]
+}

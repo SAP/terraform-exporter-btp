@@ -8,6 +8,7 @@ btptf
 btpResources
 CLA
 CLI
+CLIs
 CodeQL
 config
 Copilot
@@ -15,6 +16,7 @@ customizations
 DCO
 dependabot
 devcontainer
+devcontainers
 dir
 faq
 Github
@@ -30,12 +32,15 @@ HashiCorp
 IdP
 json
 JSON
+js
+JS
 jq
 macOS
 md
 NextSteps
 OAuth
 OpenSSF
+OpenTofu
 PEM
 Pre
 pre
@@ -60,12 +65,15 @@ Terraform
 Terraform's
 terraform
 Terraform's
+Terramate
 tf
 TLS
 toolchain
 UIs
 UI
 VS
+workspace
+workspaces
 YAML
 yaml
 yml

@@ -32,8 +32,9 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-          cache: true
+          cache: false
       - run: go mod download
+      - run: go mod tidy
       - name: Build CLI
         run: go build -v ./...
 
@@ -41,6 +42,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
+          skip-cache: true
 
   generate:
     if: github.event.pull_request.draft == false
@@ -51,7 +53,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-          cache: true
+          cache: false
       - run: go run main.go gendoc
       - name: git diff
         run: |
@@ -70,8 +72,9 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-          cache: true
+          cache: false
       - run: go mod download
+      - run: go mod tidy
       - run: go test -v -cover -coverprofile=cover.out -timeout=900s -parallel=4 ./...
         timeout-minutes: 10
       # Upload coverage report
@@ -92,7 +95,6 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: coverage-report
-          path: cover.out
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v4
         env:

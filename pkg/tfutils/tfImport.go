@@ -1,12 +1,10 @@
 package tfutils
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -14,8 +12,6 @@ import (
 	"github.com/SAP/terraform-exporter-btp/pkg/cfcli"
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
-	"github.com/hashicorp/terraform-exec/tfexec"
-	"github.com/spf13/viper"
 )
 
 // Constants for TF version for Terraform providers
@@ -328,36 +324,32 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 }
 
 func getTfStateData(configDir string, resourceName string, identifier string) ([]byte, error) {
-	execPath, err := exec.LookPath("terraform")
-	if err != nil {
-		fmt.Print("\r\n")
-		log.Fatalf("error finding Terraform: %v", err)
-		return nil, err
-	}
-	// create a new Terraform instance
-	tf, err := tfexec.NewTerraform(configDir, execPath)
-	if err != nil {
-		fmt.Print("\r\n")
-		log.Fatalf("error running NewTerraform: %v", err)
-		return nil, err
-	}
 
-	err = tf.Init(context.Background(), tfexec.Upgrade(true))
+	chDir := fmt.Sprintf("-chdir=%s", configDir)
+	// Set custom user agent for call of TF Provider via exporter
+	addUserAgent()
+	defer removeUserAgent()
+
+	err := runTfCmdGeneric(chDir, "init", "-upgrade")
 	if err != nil {
+		removeUserAgent()
 		fmt.Print("\r\n")
 		log.Fatalf("error running Init: %v", err)
 		return nil, err
 	}
-	err = tf.Apply(context.Background())
+
+	err = runTfCmdGeneric(chDir, "apply", "-auto-approve")
 	if err != nil {
 		err = handleNotFoundError(err, resourceName, identifier)
+		removeUserAgent()
 		fmt.Print("\r\n")
 		log.Fatalf("error running Apply: %v", err)
 		return nil, err
 	}
 
-	state, err := tf.Show(context.Background())
+	state, err := runTfShowJson(configDir)
 	if err != nil {
+		removeUserAgent()
 		fmt.Print("\r\n")
 		log.Fatalf("error running Show: %v", err)
 		return nil, err
@@ -373,6 +365,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 	}
 
 	if err != nil {
+		removeUserAgent()
 		fmt.Print("\r\n")
 		log.Fatalf("error json.Marshal: %v", err)
 		return nil, err
@@ -462,20 +455,6 @@ func generateDataSourcesForList(subaccountId string, directoryId string, organiz
 	}
 	// TODO surface the features of the directory stored in data["features"].([]interface{}) analogy to subscription in transform method
 	return transformDataToStringArray(btpResourceType, data), extractFeatureList(data, btpResourceType), nil
-}
-
-func runTerraformCommand(args ...string) error {
-
-	verbose := viper.GetViper().GetBool("verbose")
-	cmd := exec.Command("terraform", args...)
-	if verbose {
-		cmd.Stdout = os.Stdout
-	} else {
-		cmd.Stdout = nil
-	}
-
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
 }
 
 func GetExecutionLevelAndId(subaccountID string, directoryID string, organizationID string, spaceID string) (level string, id string) {
@@ -596,4 +575,12 @@ func transformCfSpaceRolesStringArray(data map[string]interface{}, stringArr *[]
 		role := value.(map[string]interface{})
 		*stringArr = append(*stringArr, output.FormatSpaceRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["space"]), fmt.Sprintf("%v", role["user"])))
 	}
+}
+
+func addUserAgent() {
+	os.Setenv("BTP_APPEND_USER_AGENT", "terraform_exporter_btp")
+}
+
+func removeUserAgent() {
+	os.Unsetenv("BTP_APPEND_USER_AGENT")
 }

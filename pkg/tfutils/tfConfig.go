@@ -69,16 +69,16 @@ func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool
 		return fmt.Errorf("error changing directory to %s: %v", terraformConfigPath, err)
 	}
 
-	if err := runTerraformCommand("init"); err != nil {
+	if err := runTfCmdGeneric("init"); err != nil {
 		return fmt.Errorf("error running Terraform init: %v", err)
 	}
 
 	planOption := "--generate-config-out=" + resourceFileName
-	if err := runTerraformCommand("plan", planOption); err != nil {
+	if err := runTfCmdGeneric("plan", planOption); err != nil {
 		return fmt.Errorf("error running Terraform plan: %v", err)
 	}
 
-	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
+	if err := runTfCmdGeneric("fmt", "-recursive", "-list=false"); err != nil {
 		return fmt.Errorf("error running Terraform fmt: %v", err)
 	}
 
@@ -118,7 +118,6 @@ func ConfigureProvider(level string) {
 	if level == SubaccountLevel || level == DirectoryLevel {
 		username := os.Getenv("BTP_USERNAME")
 		password := os.Getenv("BTP_PASSWORD")
-		enableSSO := os.Getenv("BTP_ENABLE_SSO")
 		cliServerUrl := os.Getenv("BTP_CLI_SERVER_URL")
 		globalAccount := os.Getenv("BTP_GLOBALACCOUNT")
 		idp := os.Getenv("BTP_IDP")
@@ -126,7 +125,7 @@ func ConfigureProvider(level string) {
 		tlsClientKey := os.Getenv("BTP_TLS_CLIENT_KEY")
 		tlsIdpURL := os.Getenv("BTP_TLS_IDP_URL")
 
-		validateBtpAuthenticationData(username, password, enableSSO, tlsClientCertificate, tlsClientKey, tlsIdpURL)
+		validateBtpAuthenticationData(username, password, tlsClientCertificate, tlsClientKey, tlsIdpURL)
 		validateGlobalAccount(globalAccount)
 
 		providerContent = "terraform {\nrequired_providers {\nbtp = {\nsource  = \"SAP/btp\"\nversion = \"" + BtpProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"btp\" {\n"
@@ -213,7 +212,7 @@ func validateCfApiUrl(apiUrl string) {
 }
 
 func validateCfAuthenticationData(username string, password string, cfAccessToken string, cfRefreshToken string, cfClientId string, cfClientSecret string) {
-	if allStringsEmtpy(username, password, cfAccessToken, cfRefreshToken, cfClientId, cfClientSecret) {
+	if allStringsEmpty(username, password, cfAccessToken, cfRefreshToken, cfClientId, cfClientSecret) {
 		cleanup()
 		fmt.Print("\r\n")
 		log.Fatalf("set Cloud Foundry environment variables for login.")
@@ -221,23 +220,24 @@ func validateCfAuthenticationData(username string, password string, cfAccessToke
 }
 
 func validateGlobalAccount(globalAccount string) {
-	if allStringsEmtpy(globalAccount) {
+	if allStringsEmpty(globalAccount) {
 		cleanup()
 		fmt.Print("\r\n")
 		log.Fatalf("global account not set. set BTP_GLOBALACCOUNT environment variable to set global account")
 	}
 }
 
-func validateBtpAuthenticationData(username string, password string, enableSSO string, tlsClientCertificate string, tlsClientKey string, tlsIdpURL string) {
-	// Check if any of the authentication data is set (username and password, username and SSO or TLS client certificate and key)
-	if allStringsEmtpy(username, password) && allStringsEmtpy(username, enableSSO) && allStringsEmtpy(tlsClientCertificate, tlsClientKey, tlsIdpURL) {
+
+func validateBtpAuthenticationData(username string, password string, tlsClientCertificate string, tlsClientKey string, tlsIdpURL string) {
+	// Check if any of the authentication data is set (username and password or TLS client certificate and key)
+	if allStringsEmpty(username, password) && allStringsEmpty(tlsClientCertificate, tlsClientKey, tlsIdpURL) {
 		cleanup()
 		fmt.Print("\r\n")
 		log.Fatalf("set valid authentication data for login e.g. BTP_USERNAME and BTP_PASSWORD environment variables.")
 	}
 }
 
-func allStringsEmtpy(stringsToCheck ...string) bool {
+func allStringsEmpty(stringsToCheck ...string) bool {
 
 	for _, str := range stringsToCheck {
 		if len(strings.TrimSpace(str)) != 0 {
@@ -438,13 +438,13 @@ func FinalizeTfConfig(configFolder string) {
 		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
 	}
 
-	if err := runTerraformCommand("init"); err != nil {
+	if err := runTfCmdGeneric("init"); err != nil {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
 		log.Fatalf("error initializing Terraform: %v", err)
 	}
 
-	if err := runTerraformCommand("fmt", "-recursive", "-list=false"); err != nil {
+	if err := runTfCmdGeneric("fmt", "-recursive", "-list=false"); err != nil {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
 		log.Fatalf("error running Terraform fmt: %v", err)

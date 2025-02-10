@@ -1,0 +1,11 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "main": "compareJSON.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "BTPTF Exporter Team",
+  "license": "Apache-2.0",
+  "description": "Tool to compare Terraform state in JSON representation after Export"
+}

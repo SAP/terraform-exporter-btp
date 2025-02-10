@@ -1,0 +1,130 @@
+{
+  "BtpResources": [
+    {
+      "Name": "subaccount",
+      "Values": [
+        "DEV Inttest Exporter (DO NOT DELETE)"
+      ]
+    },
+    {
+      "Name": "entitlements",
+      "Values": [
+        "alert-notification_standard",
+        "application-logs_lite",
+        "auditlog-api_default",
+        "auditlog-management_default",
+        "autoscaler_standard",
+        "cias_oauth2",
+        "cias_standard",
+        "connectivity_connectivity_proxy",
+        "connectivity_lite",
+        "content-agent-ui_free",
+        "content-agent_application",
+        "content-agent_standard",
+        "credstore_proxy",
+        "destination_lite",
+        "feature-flags-dashboard_dashboard",
+        "feature-flags_lite",
+        "feature-flags_standard",
+        "html5-apps-repo_app-host",
+        "html5-apps-repo_app-runtime",
+        "identity_application",
+        "mdo-one-mds-master_standard",
+        "one-mds-master_standard",
+        "one-mds_sap-integration",
+        "print_receiver",
+        "saas-registry_application",
+        "sap-identity-services-onboarding_default",
+        "service-manager_container",
+        "service-manager_global-offerings-audit",
+        "service-manager_service-operator-access",
+        "service-manager_subaccount-admin",
+        "service-manager_subaccount-audit",
+        "xsuaa_apiaccess",
+        "xsuaa_application",
+        "xsuaa_broker",
+        "xsuaa_space"
+      ]
+    },
+    {
+      "Name": "environment-instances",
+      "Values": [
+        "cloudfoundry"
+      ]
+    },
+    {
+      "Name": "subscriptions",
+      "Values": [
+        "feature-flags-dashboard_dashboard"
+      ]
+    },
+    {
+      "Name": "trust-configurations",
+      "Values": [
+        "sap.default",
+        "terraformeds-platform"
+      ]
+    },
+    {
+      "Name": "roles",
+      "Values": [
+        "application_destination_administrator",
+        "application_destination_viewer",
+        "application_subscriptions_viewer",
+        "cloud_connector_administrator",
+        "cloud_connector_auditor",
+        "destination_administrator",
+        "destination_administrator_instance",
+        "destination_certificate_administrator",
+        "destination_certificate_instance_administrator",
+        "destination_certificate_instance_viewer",
+        "destination_certificate_viewer",
+        "destination_configuration_administrator",
+        "destination_configuration_instance_administrator",
+        "destination_configuration_instance_viewer",
+        "destination_configuration_viewer",
+        "destination_subaccount_trust_administrator",
+        "destination_subaccount_trust_viewer",
+        "destination_viewer",
+        "destination_viewer_instance",
+        "end_user",
+        "feature_flags_service_dashboard_administrator",
+        "feature_flags_service_dashboard_auditor",
+        "service_credentials_viewer",
+        "service_instances_viewer",
+        "subaccount_admin",
+        "subaccount_service_admin",
+        "subaccount_service_administrator",
+        "subaccount_service_auditor",
+        "subaccount_service_viewer",
+        "subaccount_viewer",
+        "tenant_admin",
+        "user_and_role_administrator",
+        "user_and_role_auditor"
+      ]
+    },
+    {
+      "Name": "role-collections",
+      "Values": [
+        "cloud_connector_administrator",
+        "connectivity_and_destination_administrator",
+        "destination_administrator",
+        "subaccount_administrator",
+        "subaccount_service_administrator",
+        "subaccount_viewer"
+      ]
+    },
+    {
+      "Name": "service-instances",
+      "Values": [
+        "dev-inttest-exporter-alert-notification_1a92101d-2e60-46f8-b41d-63489003dcd3"
+      ]
+    },
+    {
+      "Name": "security-settings",
+      "Values": [
+        "23fe9a1b-923d-4ab0-ae24-86ff3384cf93"
+      ]
+    }
+  ]
+}

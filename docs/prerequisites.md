@@ -1,10 +1,16 @@
 # Prerequisite
 
-## Terraform CLI
+## Terraform/OpenTofu CLI
 
-The btptf CLI requires a installation of the Terraform CLI. The Terraform CLI will be called by the btptf CLI.
+The btptf CLI requires a installation of the Terraform CLI or the OpenTofu CLI. The corresponding CLI will be detected and called by the btptf CLI.
 
-You find the necessary information  in the [official Terraform documentation](https://developer.hashicorp.com/terraform/install#darwin).
+You find the necessary information in the official documentation:
+
+- [Terraform](https://developer.hashicorp.com/terraform/install).
+- [OpenTofu](https://opentofu.org/docs/intro/install/).
+
+!!! info
+    If you have both CLIs installed you can enforce the usage of one via the environment variable `BTPTF_IAC_TOOL` namely setting its value to `terraform`or `tofu`.
 
 ## Setting of Environment Variables
 
@@ -24,7 +30,6 @@ After executing the setup of the btptf CLI, you must set some required environme
 
     - Specify a custom IdP for the authentication via `BTP_IDP`
     - Specify a URL of the BTP CLI server (SAP internal only) via `BTP_CLI_SERVER_URL`
-    - Specify the login using SSO via `BTP_ENABLE_SSO` (true/false)
 
 The parameters correspond to the Terraform provider configuration options that you find in the [BTP Terraform Provider documentation](https://registry.terraform.io/providers/SAP/btp/latest/docs)
 
@@ -90,7 +95,6 @@ For the scenarios where you want to import resources defined in the [Terraform p
 | BTP_TLS_CLIENT_KEY | PEM encoded private key (only required for x509 authentication) |
 | BTP_TLS_IDP_URL | The URL of the identity provider to be used for authentication (only required for x509 authentication) |
 | BTP_CLI_SERVER_URL | The URL of the BTP CLI server - **Relevant for SAP internal use-cases only**  |
-| BTP_ENABLE_SSO | To use Single Sign-On (SSO) for authentication set this variable to true |
 
 ### Terraform provider for Cloud Foundry
 
