@@ -1,11 +1,11 @@
 # Terraform Configuration Improvements
 
 !!! info
-    As of now this is an experimental feature and needs to be activated by setting the environment varibale `BTPTF_EXPERIMENTAL` to a non-empty value.
+    As of now this is an experimental feature and needs to be activated by setting the environment variable `BTPTF_EXPERIMENTAL` to a non-empty value.
 
-The Terraform Exporter for SAP BTP creates the Terraform configuration based on the data available on SAP BTP. This means that the resulting configuration needs manual adjustements before beeing in a decent state.
+The Terraform Exporter for SAP BTP creates the Terraform configuration based on the data available on SAP BTP. This means that the resulting configuration needs manual adjustments before being in a decent state.
 
-We are continously improving this situation by refining the configuration after it gets generated. The following sections give an overview of the improvements.
+We are constantly improving this situation by refining the configuration after it gets generated. The following sections give an overview of the improvements.
 
 ## General Configuration Improvements
 
@@ -14,13 +14,13 @@ We are continously improving this situation by refining the configuration after 
 In general we clean up empty values from the configuration namely if attributes are:
 
 - `null`
-- emtpy JSON strings
+- empty JSON strings
 
 ### Extract Provider configuration
 
 We extract the value of the provider configuration (`provider.tf` file) as a variable namely:
 
-- The subdomain of the SAP BTP global acccount for the Terraform provider for SAP BTP
+- The subdomain of the SAP BTP global account for the Terraform provider for SAP BTP
 - The API URL of Cloud Foundry for the Terraform provider for Cloud Foundry
 
 ## Improvements on Subaccount Level

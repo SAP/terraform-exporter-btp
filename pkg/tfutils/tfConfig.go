@@ -211,7 +211,7 @@ func validateCfApiUrl(apiUrl string) {
 }
 
 func validateCfAuthenticationData(username string, password string, cfAccessToken string, cfRefreshToken string, cfClientId string, cfClientSecret string) {
-	if allStringsEmtpy(username, password, cfAccessToken, cfRefreshToken, cfClientId, cfClientSecret) {
+	if allStringsEmpty(username, password, cfAccessToken, cfRefreshToken, cfClientId, cfClientSecret) {
 		cleanup()
 		fmt.Print("\r\n")
 		log.Fatalf("set Cloud Foundry environment variables for login.")
@@ -219,7 +219,7 @@ func validateCfAuthenticationData(username string, password string, cfAccessToke
 }
 
 func validateGlobalAccount(globalAccount string) {
-	if allStringsEmtpy(globalAccount) {
+	if allStringsEmpty(globalAccount) {
 		cleanup()
 		fmt.Print("\r\n")
 		log.Fatalf("global account not set. set BTP_GLOBALACCOUNT environment variable to set global account")
@@ -228,14 +228,14 @@ func validateGlobalAccount(globalAccount string) {
 
 func validateBtpAuthenticationData(username string, password string, tlsClientCertificate string, tlsClientKey string, tlsIdpURL string) {
 	// Check if any of the authentication data is set (username and password or TLS client certificate and key)
-	if allStringsEmtpy(username, password) && allStringsEmtpy(tlsClientCertificate, tlsClientKey, tlsIdpURL) {
+	if allStringsEmpty(username, password) && allStringsEmpty(tlsClientCertificate, tlsClientKey, tlsIdpURL) {
 		cleanup()
 		fmt.Print("\r\n")
 		log.Fatalf("set valid authentication data for login e.g. BTP_USERNAME and BTP_PASSWORD environment variables.")
 	}
 }
 
-func allStringsEmtpy(stringsToCheck ...string) bool {
+func allStringsEmpty(stringsToCheck ...string) bool {
 
 	for _, str := range stringsToCheck {
 		if len(strings.TrimSpace(str)) != 0 {

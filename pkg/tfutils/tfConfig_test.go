@@ -203,7 +203,7 @@ func TestValidateBtpAuthenticationData(t *testing.T) {
 func TestAllStringsEmpty(t *testing.T) {
 	// Test case where all strings are empty
 	t.Run("All strings empty", func(t *testing.T) {
-		result := allStringsEmtpy("", " ", "   ")
+		result := allStringsEmpty("", " ", "   ")
 		if !result {
 			t.Errorf("Expected true, got false")
 		}
@@ -211,7 +211,7 @@ func TestAllStringsEmpty(t *testing.T) {
 
 	// Test case where one string is not empty
 	t.Run("One string not empty", func(t *testing.T) {
-		result := allStringsEmtpy("", "not empty", "   ")
+		result := allStringsEmpty("", "not empty", "   ")
 		if result {
 			t.Errorf("Expected false, got true")
 		}
@@ -219,7 +219,7 @@ func TestAllStringsEmpty(t *testing.T) {
 
 	// Test case where all strings are not empty
 	t.Run("All strings not empty", func(t *testing.T) {
-		result := allStringsEmtpy("a", "b", "c")
+		result := allStringsEmpty("a", "b", "c")
 		if result {
 			t.Errorf("Expected false, got true")
 		}
@@ -227,7 +227,7 @@ func TestAllStringsEmpty(t *testing.T) {
 
 	// Test case where no strings are provided
 	t.Run("No strings provided", func(t *testing.T) {
-		result := allStringsEmtpy()
+		result := allStringsEmpty()
 		if !result {
 			t.Errorf("Expected true, got false")
 		}
