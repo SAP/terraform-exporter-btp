@@ -23,30 +23,27 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 		// Get the first part of the block until the comma
 		blockIdentifier := strings.Split(inBlocks[0], ",")[1]
 		blockAddress := strings.Split(inBlocks[0], ",")[2]
+		resourceAddress := blockIdentifier + "." + blockAddress
 
 		switch level {
 		case tfutils.SubaccountLevel:
 			if blockIdentifier == subaccountBlockIdentifier {
 				processSubaccountAttributes(body, variables)
 				//Add Address of subaccount to the dependencyAddresses
-				dependencyAddresses.SubaccountAddress = blockIdentifier + "." + blockAddress
+				dependencyAddresses.SubaccountAddress = resourceAddress
 			}
 
 			if blockIdentifier != subaccountBlockIdentifier {
 				replaceMainDependency(body, subaccountIdentifier, dependencyAddresses.SubaccountAddress)
 			}
-			/*	if inBlocks[0] == subscriptionBlockIdentifier {
-					attrs := body.Attributes()
-					for name, attr := range attrs {
-						tokens := attr.Expr().BuildTokens(nil)
 
-						fmt.Println("Name: ", name)
-						fmt.Println("Tokens: ", tokens)
-						fmt.Println("Value of first token: ", string(tokens[0].Bytes))
-						fmt.Println("=====================================")
-					}
-				}
-			*/
+			if inBlocks[0] == subaccountEntitlementBlockIdentifier {
+				fillSubaccountEntitlementDependencyAddresses(body, resourceAddress, dependencyAddresses)
+			}
+
+			if inBlocks[0] == subscriptionBlockIdentifier {
+				addEntitlementDependency(body, dependencyAddresses)
+			}
 
 		case tfutils.DirectoryLevel:
 			if blockIdentifier != directoryBlockIdentifier {
@@ -77,7 +74,7 @@ func removeEmptyAttributes(body *hclwrite.Body) {
 			for _, token := range tokens {
 				combinedString += string(token.Bytes)
 			}
-			if combinedString == generictools.EmptyString {
+			if combinedString == generictools.EmptyJson {
 				body.RemoveAttribute(name)
 			}
 		}
