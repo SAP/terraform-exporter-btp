@@ -44,8 +44,9 @@ func createSpaceRoleImportBlock(data map[string]interface{}, spaceId string, fil
 		var cfAllSpaceRoles []string
 		for x, value := range roles {
 			role := value.(map[string]interface{})
-			cfAllSpaceRoles = append(cfAllSpaceRoles, output.FormatSpaceRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["space"]), fmt.Sprintf("%v", role["user"])))
-			if slices.Contains(filterValues, output.FormatSpaceRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["space"]), fmt.Sprintf("%v", role["user"]))) {
+			var formattedRoleName = output.FormatRoles
+			cfAllSpaceRoles = append(cfAllSpaceRoles, formattedRoleName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["space"]), fmt.Sprintf("%v", role["user"])))
+			if slices.Contains(filterValues, formattedRoleName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["space"]), fmt.Sprintf("%v", role["user"]))) {
 				importBlock += templateSpaceRoleImport(x, role, resourceDoc)
 				count++
 			}

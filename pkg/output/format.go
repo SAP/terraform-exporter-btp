@@ -26,6 +26,8 @@ func FormatOrgRoleResourceName(orgRoleType string, userId string) string {
 	return orgRoleType + "_" + userId
 }
 
+var FormatRoles = FormatSpaceRoleResourceName
+
 func FormatSpaceRoleResourceName(spaceRoleType string, spaceId string, userId string) string {
 	spaceName, _ := cfcli.GetSpaceName(spaceId)
 	userName, _ := cfcli.GetUser(userId)
