@@ -105,6 +105,23 @@ func ReplaceStringToken(tokens hclwrite.Tokens, identifier string) (replacedToke
 	return tokens, ""
 }
 
+func ReplaceDependency(tokens hclwrite.Tokens, dependencyAddress string) (replacedTokens hclwrite.Tokens) {
+
+	oQuote := tokens[0]
+	strTok := tokens[1]
+	cQuote := tokens[2]
+	if oQuote.Type == hclsyntax.TokenOQuote && strTok.Type == hclsyntax.TokenQuotedLit && cQuote.Type == hclsyntax.TokenCQuote {
+		return hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenIdent,
+				Bytes: []byte(dependencyAddress),
+			},
+		}
+	}
+
+	return tokens
+}
+
 func checkForChanges(f *hclwrite.File, path string) (changed bool) {
 
 	changed = false

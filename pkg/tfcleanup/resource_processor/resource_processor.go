@@ -2,29 +2,39 @@ package resourceprocessor
 
 import (
 	"log"
+	"strings"
 
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
-func ProcessResources(hclFile *hclwrite.File, variables *generictools.VariableContent, level string) {
+func ProcessResources(hclFile *hclwrite.File, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses) {
 
-	processResourceAttributes(hclFile.Body(), nil, variables, level)
+	processResourceAttributes(hclFile.Body(), nil, level, variables, dependencyAddresses)
 }
 
-func processResourceAttributes(body *hclwrite.Body, inBlocks []string, variables *generictools.VariableContent, level string) {
+func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses) {
 
 	if len(inBlocks) > 0 {
 		// remove empty values for all resources
 		removeEmptyAttributes(body)
 
+		// Get the first part of the block until the comma
+		blockIdentifier := strings.Split(inBlocks[0], ",")[1]
+		blockAddress := strings.Split(inBlocks[0], ",")[2]
+
 		switch level {
 		case tfutils.SubaccountLevel:
-			if inBlocks[0] == subaccountBlockIdentifier {
+			if blockIdentifier == subaccountBlockIdentifier {
 				processSubaccountAttributes(body, variables)
+				//Add Address of subaccount to the dependencyAddresses
+				dependencyAddresses.SubaccountAddress = blockIdentifier + "." + blockAddress
 			}
 
+			if blockIdentifier != subaccountBlockIdentifier {
+				replaceMainDependency(body, subaccountIdentifier, dependencyAddresses.SubaccountAddress)
+			}
 			/*	if inBlocks[0] == subscriptionBlockIdentifier {
 					attrs := body.Attributes()
 					for name, attr := range attrs {
@@ -39,15 +49,17 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, variables
 			*/
 
 		case tfutils.DirectoryLevel:
-			log.Println("Directory level is not supported yet")
+			if blockIdentifier != directoryBlockIdentifier {
+				replaceMainDependency(body, directoryIdentifier, dependencyAddresses.SubaccountAddress)
+			}
 		case tfutils.OrganizationLevel:
 			log.Println("Organization level is not supported yet")
 		}
 	}
 	blocks := body.Blocks()
 	for _, block := range blocks {
-		inBlocks := append(inBlocks, block.Type()+"_"+block.Labels()[0])
-		processResourceAttributes(block.Body(), inBlocks, variables, level)
+		inBlocks := append(inBlocks, block.Type()+","+block.Labels()[0]+","+block.Labels()[1])
+		processResourceAttributes(block.Body(), inBlocks, level, variables, dependencyAddresses)
 	}
 }
 
@@ -68,6 +80,18 @@ func removeEmptyAttributes(body *hclwrite.Body) {
 			if combinedString == generictools.EmptyString {
 				body.RemoveAttribute(name)
 			}
+		}
+	}
+}
+
+func replaceMainDependency(body *hclwrite.Body, mainIdentifier string, mainAddress string) {
+	attrs := body.Attributes()
+	for name, attr := range attrs {
+		tokens := attr.Expr().BuildTokens(nil)
+
+		if name == mainIdentifier && len(tokens) == 3 {
+			replacedTokens := generictools.ReplaceDependency(tokens, mainAddress)
+			body.SetAttributeRaw(name, replacedTokens)
 		}
 	}
 }

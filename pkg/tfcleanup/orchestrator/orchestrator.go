@@ -53,6 +53,7 @@ func orchestrateCodeCleanup(dir string, level string) error {
 	}
 
 	contentToCreate := make(generictools.VariableContent)
+	dependencyAddresses := generictools.DepedendcyAddresses{}
 
 	for _, file := range files {
 		// We only process the resources and the provider files
@@ -60,7 +61,7 @@ func orchestrateCodeCleanup(dir string, level string) error {
 
 		if file.Name() == "btp_resources.tf" {
 			f := generictools.GetHclFile(path)
-			resourceprocessor.ProcessResources(f, &contentToCreate, level)
+			resourceprocessor.ProcessResources(f, level, &contentToCreate, &dependencyAddresses)
 			generictools.ProcessChanges(f, path)
 		} else if file.Name() == "provider.tf" {
 			f := generictools.GetHclFile(path)
