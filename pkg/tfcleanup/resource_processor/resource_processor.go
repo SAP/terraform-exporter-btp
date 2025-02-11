@@ -18,12 +18,7 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 
 		removeEmptyAttributes(body)
 
-		blockType, blockIdentifier, resourceAddress := generictools.ExtractBlockInformation(inBlocks)
-
-		if blockType != "resource" {
-			// Generated code only contains resources, data source do not need to be processed
-			return
-		}
+		_, blockIdentifier, resourceAddress := generictools.ExtractBlockInformation(inBlocks)
 
 		switch level {
 		case tfutils.SubaccountLevel:
@@ -39,6 +34,11 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 	for _, block := range blocks {
 		inBlocks := append(inBlocks, block.Type()+","+block.Labels()[0]+","+block.Labels()[1])
 		processResourceAttributes(block.Body(), inBlocks, level, variables, dependencyAddresses, btpClient, levelIds)
+	}
+
+	// Add datasource for service instances is necessary
+	for _, datasourceInfo := range dependencyAddresses.DataSourceInfo {
+		addServicePlanDataSources(body, datasourceInfo)
 	}
 }
 

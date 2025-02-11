@@ -9,9 +9,17 @@ type VariableInfo struct {
 	Value       string
 }
 
-type EntilementKey struct {
+type EntitlementKey struct {
 	ServiceName string
 	PlanName    string
+}
+
+type DataSourceInfo struct {
+	DatasourceAddress  string
+	SubaccountAddress  string
+	Offering_name      string
+	Name               string
+	EntitlementAddress string
 }
 
 type LevelIds struct {
@@ -25,11 +33,12 @@ type VariableContent map[string]VariableInfo
 type DepedendcyAddresses struct {
 	SubaccountAddress  string
 	DirectoryAddress   string
-	EntitlementAddress map[EntilementKey]string
+	EntitlementAddress map[EntitlementKey]string
+	DataSourceInfo     []DataSourceInfo
 }
 
 func NewDepedendcyAddresses() DepedendcyAddresses {
 	return DepedendcyAddresses{
-		EntitlementAddress: make(map[EntilementKey]string),
+		EntitlementAddress: make(map[EntitlementKey]string),
 	}
 }

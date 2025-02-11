@@ -9,14 +9,7 @@
     {
       "Name": "entitlements",
       "Values": [
-        "alert-notification_standard",
-        "feature-flags-dashboard_dashboard"
-      ]
-    },
-    {
-      "Name": "subscriptions",
-      "Values": [
-        "feature-flags-dashboard_dashboard"
+        "alert-notification_standard"
       ]
     },
     {

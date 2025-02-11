@@ -21,7 +21,7 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 
 	for name, attr := range attrs {
 		tokens := attr.Expr().BuildTokens(nil)
-		if name == serviceInstancePlanIdentifier && len(tokens) == 1 {
+		if name == serviceInstancePlanIdentifier && len(tokens) == 3 {
 			planId = generictools.GetStringToken(tokens)
 		}
 	}
@@ -38,7 +38,7 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 		return
 	}
 
-	key := generictools.EntilementKey{
+	key := generictools.EntitlementKey{
 		ServiceName: serviceName,
 		PlanName:    planName,
 	}
@@ -56,32 +56,42 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 	body.SetAttributeRaw(serviceInstancePlanIdentifier, hclwrite.Tokens{
 		{
 			Type:  hclsyntax.TokenStringLit,
-			Bytes: []byte("\"data.btp_subaccount_service_plan." + datasourceAddress + ".id\""),
+			Bytes: []byte("data.btp_subaccount_service_plan." + datasourceAddress + ".id"),
 		},
 	})
 
-	// Add the block for the data source
-	body.AppendNewline()
-	dsBlock := body.AppendNewBlock("data", []string{"btp_subaccount_service_plan", datasourceAddress})
+	(*dependencyAddresses).DataSourceInfo = append((*dependencyAddresses).DataSourceInfo, generictools.DataSourceInfo{
+		DatasourceAddress:  datasourceAddress,
+		SubaccountAddress:  "var." + (*dependencyAddresses).SubaccountAddress + ".id",
+		Offering_name:      serviceName,
+		Name:               planName,
+		EntitlementAddress: dependencyAddress,
+	},
+	)
+}
+
+func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.DataSourceInfo) {
+
+	dsBlock := body.AppendNewBlock("data", []string{"btp_subaccount_service_plan", datasourceInfo.DatasourceAddress})
 
 	dsBlock.Body().SetAttributeRaw("subaccount_id", hclwrite.Tokens{
 		{
 			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte([]byte("var." + (*dependencyAddresses).SubaccountAddress)),
+			Bytes: []byte(datasourceInfo.SubaccountAddress),
 		},
 	})
 
 	dsBlock.Body().SetAttributeRaw("offering_name", hclwrite.Tokens{
 		{
 			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte(serviceName),
+			Bytes: []byte(datasourceInfo.Offering_name),
 		},
 	})
 
 	dsBlock.Body().SetAttributeRaw("name", hclwrite.Tokens{
 		{
 			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte(planName),
+			Bytes: []byte(datasourceInfo.Name),
 		},
 	})
 
@@ -91,7 +101,7 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 			Bytes: []byte("["),
 		},
 		{Type: hclsyntax.TokenStringLit,
-			Bytes: []byte(dependencyAddress),
+			Bytes: []byte(datasourceInfo.EntitlementAddress),
 		},
 		{
 			Type:  hclsyntax.TokenCBrack,
@@ -99,4 +109,5 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 		},
 	},
 	)
+
 }

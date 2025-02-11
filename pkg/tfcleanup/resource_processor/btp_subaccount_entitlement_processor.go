@@ -23,7 +23,7 @@ func fillSubaccountEntitlementDependencyAddresses(body *hclwrite.Body, resourceA
 	}
 
 	if planName != "" && serviceName != "" {
-		key := generictools.EntilementKey{
+		key := generictools.EntitlementKey{
 			ServiceName: serviceName,
 			PlanName:    planName,
 		}

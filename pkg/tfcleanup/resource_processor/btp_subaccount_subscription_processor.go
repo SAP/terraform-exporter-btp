@@ -24,7 +24,7 @@ func addEntitlementDependency(body *hclwrite.Body, dependencyAddresses *generict
 	}
 
 	if appName != "" && planName != "" {
-		key := generictools.EntilementKey{
+		key := generictools.EntitlementKey{
 			ServiceName: appName,
 			PlanName:    planName,
 		}
