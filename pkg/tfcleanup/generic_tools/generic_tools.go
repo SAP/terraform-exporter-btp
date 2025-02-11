@@ -77,6 +77,7 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 				Bytes: []byte("\"" + value.Value + "\""),
 			},
 		})
+		rootBody.AppendNewline()
 	}
 
 	variablesSrc := hclwrite.Format(f.Bytes())
@@ -136,12 +137,13 @@ func GetStringToken(tokens hclwrite.Tokens) (value string) {
 	return value
 }
 
-func ExtractBlockInformation(inBlocks []string) (blockIdentifier string, resourceAddress string) {
+func ExtractBlockInformation(inBlocks []string) (blockType string, blockIdentifier string, resourceAddress string) {
+	blockType = strings.Split(inBlocks[0], ",")[0]
 	blockIdentifier = strings.Split(inBlocks[0], ",")[1]
 	blockAddress := strings.Split(inBlocks[0], ",")[2]
 	resourceAddress = blockIdentifier + "." + blockAddress
 
-	return blockIdentifier, resourceAddress
+	return blockType, blockIdentifier, resourceAddress
 }
 
 func checkForChanges(f *hclwrite.File, path string) (changed bool) {

@@ -18,7 +18,12 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 
 		removeEmptyAttributes(body)
 
-		blockIdentifier, resourceAddress := generictools.ExtractBlockInformation(inBlocks)
+		blockType, blockIdentifier, resourceAddress := generictools.ExtractBlockInformation(inBlocks)
+
+		if blockType == "resource" {
+			// Generated code only contains resources, data source do not need to be processed
+			return
+		}
 
 		switch level {
 		case tfutils.SubaccountLevel:
@@ -92,7 +97,10 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 		addEntitlementDependency(body, dependencyAddresses)
 	}
 
-	// We add the reference to the subaccount at the end to have the subaccount ID available
+	if blockIdentifier == serviceInstanceBlockIdentifier {
+		addServiceInstanceDependency(body, dependencyAddresses, btpClient, levelIds.SubaccountId)
+	}
+
 	if blockIdentifier != subaccountBlockIdentifier {
 		replaceMainDependency(body, subaccountIdentifier, dependencyAddresses.SubaccountAddress)
 	}
