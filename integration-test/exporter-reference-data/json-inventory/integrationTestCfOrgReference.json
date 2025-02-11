@@ -16,8 +16,15 @@
     {
       "Name": "org-roles",
       "Values": [
-        "organization_manager_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac",
-        "organization_user_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac"
+        "organization_user_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac",
+        "organization_manager_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac"
+      ]
+    },
+    {
+      "Name": "space-roles",
+      "Values": [
+        "dev-project-abc_space-developer_christian.lechner@sap.com_ea325b7e-179e-442f-aec2-5e692dfdb884",
+        "dev-project-abc_space-manager_christian.lechner@sap.com_ea325b7e-179e-442f-aec2-5e692dfdb884"
       ]
     }
   ]
