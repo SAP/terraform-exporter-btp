@@ -39,4 +39,4 @@ The Terraform configuration on subaccount level gets improved via the following 
 
 ## Improvements on Cloud Foundry Organizational Level
 
-No improvements available yet
+- The ID of the organization is extracted as a variable
