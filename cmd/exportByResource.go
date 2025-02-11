@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/SAP/terraform-exporter-btp/pkg/cfcli"
+	"github.com/SAP/terraform-exporter-btp/internal/cfcli"
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfcleanorchestrator "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/orchestrator"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"

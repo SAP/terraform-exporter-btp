@@ -3,7 +3,7 @@ package output
 import (
 	"strings"
 
-	"github.com/SAP/terraform-exporter-btp/pkg/cfcli"
+	"github.com/SAP/terraform-exporter-btp/internal/cfcli"
 )
 
 func FormatResourceNameGeneric(name string) string {

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/SAP/terraform-exporter-btp/pkg/cfcli"
+	"github.com/SAP/terraform-exporter-btp/internal/cfcli"
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfimportprovider "github.com/SAP/terraform-exporter-btp/pkg/tfimportprovider"

@@ -227,7 +227,6 @@ func validateGlobalAccount(globalAccount string) {
 	}
 }
 
-
 func validateBtpAuthenticationData(username string, password string, tlsClientCertificate string, tlsClientKey string, tlsIdpURL string) {
 	// Check if any of the authentication data is set (username and password or TLS client certificate and key)
 	if allStringsEmpty(username, password) && allStringsEmpty(tlsClientCertificate, tlsClientKey, tlsIdpURL) {

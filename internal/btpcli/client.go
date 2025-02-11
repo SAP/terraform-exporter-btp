@@ -137,10 +137,6 @@ func (v2 *v2Client) doPostRequest(ctx context.Context, endpoint string, body any
 	return v2.doRequest(ctx, http.MethodPost, endpoint, body)
 }
 
-func (v2 *v2Client) doGetRequest(ctx context.Context, endpoint string) (*http.Response, error) {
-	return v2.doRequest(ctx, http.MethodGet, endpoint, nil)
-}
-
 func (v2 *v2Client) parseResponse(ctx context.Context, res *http.Response, targetObj any, goodState int, knownErrorStates map[int]string) error {
 	if err := v2.checkResponseForErrors(ctx, res, goodState, knownErrorStates); err != nil {
 		return err
