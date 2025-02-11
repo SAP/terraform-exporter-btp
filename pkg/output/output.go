@@ -198,7 +198,7 @@ But you should first review the generated code:
    Check the version constraint in the provider configuration (*provider.tf*) i.e. make sure that the constraints are compliant with the rules of your company like cherry-picking one explicit version. We recommend to always use the latest version independent of the constraints you add.
 
 2. Cleanup configuration of resources
-   The configuration (*btp_resources.tf*) is generated based on the information about the resources available from the provider plugin. All data including optinal data that got defaulted (e.g. usage in the btp_subaccount resource) is added to the configuration. To reduce the amount of data you could remove optional attributes that are optional and you do not want to have set explicitly. --> like what for example?
+   The configuration (*btp_resources.tf*) is generated based on the information about the resources available from the provider plugin. All data including optinal data that got defaulted (e.g. usage in the btp_subaccount resource) is added to the configuration. To reduce the amount of data you could remove optional attributes that are optional and you do not want to have set explicitly.
 
 3. Declare variables
    The generated code doesn't contain any variables. We recommend to move the following into the *provider.tf* file
