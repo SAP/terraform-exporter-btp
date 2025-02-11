@@ -27,14 +27,14 @@ We extract the value of the provider configuration (`provider.tf` file) as a var
 
 The Terraform configuration on subaccount level gets improved via the following measures:
 
-- The `region` is extracted as a variable for the `btp_subaccount` resources.
-- All resources that reference a `subaccount_id` get transformed to reference the `btp_subaccount` resource if available.
-- The attribute `parent_id` of the resource `btp_subaccount` gets extracted as a variable.
+- The `region` is extracted as a variable for the resource `btp_subaccount`.
+- All resources that reference a `subaccount_id` get transformed to reference the resource `btp_subaccount` if available.
+- If the attribute `parent_id` is the global account, it gets removed from the resource `btp_subaccount`. If not it gets extracted as a variable.
 - If a dependency between the resource `btp_subaccount_entitlement` and the resource `btp_subaccount_subscription` exists, a corresponding `depends_on` block will be added to the resource `btp_subaccount_subscription`.
 
 ## Improvements on Directory Level
 
-- The attribute `parent_id` of the resource `btp_directory` gets extracted as a variable.
+- If the attribute `parent_id` is the global account, it gets removed from the resource `btp_directory`. If not it gets extracted as a variable.
 - All resources that reference a `directory_id` get transformed to reference the `btp_directory` resource if available.
 
 ## Improvements on Cloud Foundry Organizational Level

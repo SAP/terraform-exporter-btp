@@ -102,7 +102,7 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 
 func processDirectoryLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade) {
 	if blockIdentifier == directoryBlockIdentifier {
-		processDirectoryAttributes(body, variables)
+		processDirectoryAttributes(body, variables, btpClient)
 
 		dependencyAddresses.DirectoryAddress = resourceAddress
 	}

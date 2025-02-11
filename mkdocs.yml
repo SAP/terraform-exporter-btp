@@ -22,8 +22,8 @@ nav:
   - Usage:
     - Prerequisites: prerequisites.md
     - Getting Started: gettingstarted.md
-    - Terraform Configuration Improvements: tfcodeimprovements.md
     - Limitations: limitations.md
     - Commands List: btptf.md
   - Concepts: concepts.md
   - Security Considerations: security.md
+  - Terraform Configuration Improvements: tfcodeimprovements.md
