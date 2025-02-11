@@ -1,20 +1,18 @@
 package resourceprocessor
 
 import (
-	"log"
-
 	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
-func ProcessResources(hclFile *hclwrite.File, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade) {
+func ProcessResources(hclFile *hclwrite.File, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
 
-	processResourceAttributes(hclFile.Body(), nil, level, variables, dependencyAddresses, btpClient)
+	processResourceAttributes(hclFile.Body(), nil, level, variables, dependencyAddresses, btpClient, levelIds)
 }
 
-func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade) {
+func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
 
 	if len(inBlocks) > 0 {
 
@@ -24,18 +22,18 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 
 		switch level {
 		case tfutils.SubaccountLevel:
-			processSubaccountLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient)
+			processSubaccountLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient, levelIds)
 		case tfutils.DirectoryLevel:
-			processDirectoryLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient)
+			processDirectoryLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient, levelIds)
 		case tfutils.OrganizationLevel:
-			log.Println("Organization level is not supported yet")
+			processCfOrgLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient, levelIds)
 		}
 	}
 
 	blocks := body.Blocks()
 	for _, block := range blocks {
 		inBlocks := append(inBlocks, block.Type()+","+block.Labels()[0]+","+block.Labels()[1])
-		processResourceAttributes(block.Body(), inBlocks, level, variables, dependencyAddresses, btpClient)
+		processResourceAttributes(block.Body(), inBlocks, level, variables, dependencyAddresses, btpClient, levelIds)
 	}
 }
 
@@ -79,7 +77,7 @@ func replaceMainDependency(body *hclwrite.Body, mainIdentifier string, mainAddre
 	}
 }
 
-func processSubaccountLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade) {
+func processSubaccountLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
 	if blockIdentifier == subaccountBlockIdentifier {
 		processSubaccountAttributes(body, variables, btpClient)
 
@@ -100,7 +98,7 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 	}
 }
 
-func processDirectoryLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade) {
+func processDirectoryLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
 	if blockIdentifier == directoryBlockIdentifier {
 		processDirectoryAttributes(body, variables, btpClient)
 
@@ -110,4 +108,8 @@ func processDirectoryLevel(body *hclwrite.Body, variables *generictools.Variable
 	if blockIdentifier != directoryBlockIdentifier {
 		replaceMainDependency(body, directoryIdentifier, dependencyAddresses.DirectoryAddress)
 	}
+}
+
+func processCfOrgLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
+	extractOrgIds(body, variables, levelIds.CfOrgId)
 }

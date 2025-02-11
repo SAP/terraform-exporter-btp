@@ -7,6 +7,7 @@ import (
 
 	"github.com/SAP/terraform-exporter-btp/internal/cfcli"
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
+	tfcleantypes "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	tfcleanorchestrator "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/orchestrator"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 
@@ -66,7 +67,13 @@ var exportByResourceCmd = &cobra.Command{
 			}
 		}
 
-		tfcleanorchestrator.CleanUpGeneratedCode(configDir, level)
+		levelIds := tfcleantypes.LevelIds{
+			SubaccountId: subaccount,
+			DirectoryId:  directory,
+			CfOrgId:      organization,
+		}
+
+		tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds)
 		tfutils.FinalizeTfConfig(configDir)
 		generateNextStepsDocument(configDir, subaccount, directory, organization, space)
 		tfutils.CleanupProviderConfig()

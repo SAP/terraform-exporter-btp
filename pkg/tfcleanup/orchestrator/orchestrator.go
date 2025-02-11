@@ -14,7 +14,7 @@ import (
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
-func CleanUpGeneratedCode(configFolder string, level string) {
+func CleanUpGeneratedCode(configFolder string, level string, levelIds generictools.LevelIds) {
 	if os.Getenv("BTPTF_EXPERIMENTAL") == "" {
 		return
 	}
@@ -31,7 +31,7 @@ func CleanUpGeneratedCode(configFolder string, level string) {
 
 	terraformConfigPath := filepath.Join(currentDir, configFolder)
 
-	err = orchestrateCodeCleanup(terraformConfigPath, level)
+	err = orchestrateCodeCleanup(terraformConfigPath, level, levelIds)
 
 	if err != nil {
 		fmt.Print("\r\n")
@@ -42,7 +42,7 @@ func CleanUpGeneratedCode(configFolder string, level string) {
 	output.StopSpinner(spinner)
 }
 
-func orchestrateCodeCleanup(dir string, level string) error {
+func orchestrateCodeCleanup(dir string, level string, levelIds generictools.LevelIds) error {
 	dir = filepath.Clean(dir)
 
 	_, err := os.Lstat(dir)
@@ -72,7 +72,7 @@ func orchestrateCodeCleanup(dir string, level string) error {
 
 		if file.Name() == "btp_resources.tf" {
 			f := generictools.GetHclFile(path)
-			resourceprocessor.ProcessResources(f, level, &contentToCreate, &dependencyAddresses, btpClient)
+			resourceprocessor.ProcessResources(f, level, &contentToCreate, &dependencyAddresses, btpClient, levelIds)
 			generictools.ProcessChanges(f, path)
 		} else if file.Name() == "provider.tf" {
 			f := generictools.GetHclFile(path)

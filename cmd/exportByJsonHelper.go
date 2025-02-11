@@ -11,6 +11,7 @@ import (
 
 	"github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
+	tfcleantypes "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	tfcleanorchestrator "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/orchestrator"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
@@ -108,7 +109,13 @@ func exportByJson(subaccount string, directory string, organization string, json
 		}
 	}
 
-	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level)
+	levelIds := tfcleantypes.LevelIds{
+		SubaccountId: subaccount,
+		DirectoryId:  directory,
+		CfOrgId:      organization,
+	}
+
+	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds)
 	tfutils.FinalizeTfConfig(configDir)
 	generateNextStepsDocument(configDir, subaccount, directory, organization, "")
 	output.RenderSummaryTable(resultStore)

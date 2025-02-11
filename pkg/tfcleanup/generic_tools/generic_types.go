@@ -14,6 +14,12 @@ type EntilementKey struct {
 	PlanName    string
 }
 
+type LevelIds struct {
+	SubaccountId string
+	DirectoryId  string
+	CfOrgId      string
+}
+
 type VariableContent map[string]VariableInfo
 
 type DepedendcyAddresses struct {
