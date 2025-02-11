@@ -67,13 +67,19 @@ func GetGlobalAccountId(client *ClientFacade) (string, error) {
 	return cliRes.Guid, nil
 }
 
-func GetServicePlanNameById(client *ClientFacade, subaccountId string, planId string) (string, error) {
+func GetServiceDataByPlanId(client *ClientFacade, subaccountId string, planId string) (planName string, serviceName string, err error) {
 
 	cliRes, _, err := client.Services.Plan.GetById(context.Background(), subaccountId, planId)
 
 	if err != nil {
-		return "", fmt.Errorf("error getting service plan name: %w", err)
+		return "", "", fmt.Errorf("error getting service plan name: %w", err)
 	}
 
-	return cliRes.Name, nil
+	cliRes2, _, err := client.Services.Offering.GetById(context.Background(), subaccountId, cliRes.ServiceOfferingId)
+
+	if err != nil {
+		return "", "", fmt.Errorf("error getting service offering name: %w", err)
+	}
+
+	return cliRes.Name, cliRes2.Name, nil
 }

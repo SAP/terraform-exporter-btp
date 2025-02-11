@@ -20,7 +20,7 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 
 		blockType, blockIdentifier, resourceAddress := generictools.ExtractBlockInformation(inBlocks)
 
-		if blockType == "resource" {
+		if blockType != "resource" {
 			// Generated code only contains resources, data source do not need to be processed
 			return
 		}

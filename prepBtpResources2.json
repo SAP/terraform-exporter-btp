@@ -1,0 +1,29 @@
+{
+  "BtpResources": [
+    {
+      "Name": "subaccount",
+      "Values": [
+        "DEV Inttest Exporter (DO NOT DELETE)"
+      ]
+    },
+    {
+      "Name": "entitlements",
+      "Values": [
+        "alert-notification_standard",
+        "feature-flags-dashboard_dashboard"
+      ]
+    },
+    {
+      "Name": "subscriptions",
+      "Values": [
+        "feature-flags-dashboard_dashboard"
+      ]
+    },
+    {
+      "Name": "service-instances",
+      "Values": [
+        "dev-inttest-exporter-alert-notification_1a92101d-2e60-46f8-b41d-63489003dcd3"
+      ]
+    }
+  ]
+}

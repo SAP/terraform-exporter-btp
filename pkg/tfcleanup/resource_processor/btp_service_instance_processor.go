@@ -17,26 +17,21 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 	// 4: If we find such a dependenceny: Create a data source for the service plan that depends on the entitlement
 	// 5: Exchange the explicit plan ID with the data source reference
 
-	var serviceName string
 	var planId string
 
 	for name, attr := range attrs {
 		tokens := attr.Expr().BuildTokens(nil)
-		if name == serviceInstanceServiceNameIdentifier && len(tokens) == 3 {
-			serviceName = generictools.GetStringToken(tokens)
-		}
-
 		if name == serviceInstancePlanIdentifier && len(tokens) == 1 {
 			planId = generictools.GetStringToken(tokens)
 		}
 	}
 
-	if serviceName == "" || planId == "" {
+	if planId == "" {
 		// Nothing found, no further action will be taken
 		return
 	}
 
-	planName, err := btpcli.GetServicePlanNameById(btpClient, subaccountId, planId)
+	planName, serviceName, err := btpcli.GetServiceDataByPlanId(btpClient, subaccountId, planId)
 
 	if err != nil {
 		// No plan name found, no refinement of the code will be done
