@@ -31,6 +31,10 @@ The Terraform configuration on subaccount level gets improved via the following 
 - All resources that reference a `subaccount_id` get transformed to reference the resource `btp_subaccount` if available.
 - If the attribute `parent_id` is the global account, it gets removed from the resource `btp_subaccount`. If not it gets extracted as a variable.
 - If a dependency between the resource `btp_subaccount_entitlement` and the resource `btp_subaccount_subscription` exists, a corresponding `depends_on` block will be added to the resource `btp_subaccount_subscription`.
+- If a dependency between the resource `btp_subaccount_entitlement` and the resource `btp_subaccount_service_instance` exists:
+   - a data source `btp_subaccount_service_plan` is added to fetch the identifier of the service plan
+   - a `depends_on` block is added to the data source to make it explicitly dependent to the corresponding entitlement
+   - the technical identifier of the service plan is replaced by the reference to the data source
 
 ## Improvements on Directory Level
 
