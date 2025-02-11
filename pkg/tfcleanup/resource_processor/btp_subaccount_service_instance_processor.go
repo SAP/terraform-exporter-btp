@@ -63,7 +63,7 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 	(*dependencyAddresses).DataSourceInfo = append((*dependencyAddresses).DataSourceInfo, generictools.DataSourceInfo{
 		DatasourceAddress:  datasourceAddress,
 		SubaccountAddress:  "var." + (*dependencyAddresses).SubaccountAddress + ".id",
-		Offering_name:      serviceName,
+		OfferingName:       serviceName,
 		Name:               planName,
 		EntitlementAddress: dependencyAddress,
 	},
@@ -71,6 +71,7 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 }
 
 func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.DataSourceInfo) {
+	body.AppendNewline()
 
 	dsBlock := body.AppendNewBlock("data", []string{"btp_subaccount_service_plan", datasourceInfo.DatasourceAddress})
 
@@ -83,19 +84,35 @@ func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.
 
 	dsBlock.Body().SetAttributeRaw("offering_name", hclwrite.Tokens{
 		{
-			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte(datasourceInfo.Offering_name),
+			Type:  hclsyntax.TokenOQuote,
+			Bytes: []byte((`"`)),
+		},
+		{
+			Type:  hclsyntax.TokenStringLit,
+			Bytes: []byte(datasourceInfo.OfferingName),
+		},
+		{
+			Type:  hclsyntax.TokenOQuote,
+			Bytes: []byte((`"`)),
 		},
 	})
 
 	dsBlock.Body().SetAttributeRaw("name", hclwrite.Tokens{
 		{
-			Type:  hclsyntax.TokenIdent,
+			Type:  hclsyntax.TokenOQuote,
+			Bytes: []byte(`"`),
+		},
+		{
+			Type:  hclsyntax.TokenStringLit,
 			Bytes: []byte(datasourceInfo.Name),
+		},
+		{
+			Type:  hclsyntax.TokenOQuote,
+			Bytes: []byte(`"`),
 		},
 	})
 
-	body.SetAttributeRaw("depends_on", hclwrite.Tokens{
+	dsBlock.Body().SetAttributeRaw("depends_on", hclwrite.Tokens{
 		{
 			Type:  hclsyntax.TokenOBrack,
 			Bytes: []byte("["),
@@ -109,5 +126,4 @@ func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.
 		},
 	},
 	)
-
 }

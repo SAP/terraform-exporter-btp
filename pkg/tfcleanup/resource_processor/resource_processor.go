@@ -10,6 +10,10 @@ import (
 func ProcessResources(hclFile *hclwrite.File, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
 
 	processResourceAttributes(hclFile.Body(), nil, level, variables, dependencyAddresses, btpClient, levelIds)
+	// Add datasource for service instances is necessary - Outer loop to have the main body object available
+	for _, datasourceInfo := range dependencyAddresses.DataSourceInfo {
+		addServicePlanDataSources(hclFile.Body(), datasourceInfo)
+	}
 }
 
 func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
@@ -34,11 +38,6 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 	for _, block := range blocks {
 		inBlocks := append(inBlocks, block.Type()+","+block.Labels()[0]+","+block.Labels()[1])
 		processResourceAttributes(block.Body(), inBlocks, level, variables, dependencyAddresses, btpClient, levelIds)
-	}
-
-	// Add datasource for service instances is necessary
-	for _, datasourceInfo := range dependencyAddresses.DataSourceInfo {
-		addServicePlanDataSources(body, datasourceInfo)
 	}
 }
 

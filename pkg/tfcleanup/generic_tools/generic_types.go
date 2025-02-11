@@ -17,7 +17,7 @@ type EntitlementKey struct {
 type DataSourceInfo struct {
 	DatasourceAddress  string
 	SubaccountAddress  string
-	Offering_name      string
+	OfferingName       string
 	Name               string
 	EntitlementAddress string
 }
