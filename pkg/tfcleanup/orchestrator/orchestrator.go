@@ -14,6 +14,28 @@ import (
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
+func CleanUpJson(resources tfutils.BtpResources) (cleanedResources tfutils.BtpResources) {
+	// Remove default trust configuration
+	for _, resource := range resources.BtpResources {
+		if resource.Name == "trust-configurations" {
+			var newValues []string
+			for _, value := range resource.Values {
+				if value != "sap.default" {
+					newValues = append(newValues, value)
+				}
+			}
+			if len(newValues) > 0 {
+				resource.Values = newValues
+				cleanedResources.BtpResources = append(cleanedResources.BtpResources, resource)
+			}
+		} else {
+			// Add other resources to cleanedResources
+			cleanedResources.BtpResources = append(cleanedResources.BtpResources, resource)
+		}
+	}
+	return cleanedResources
+}
+
 func CleanUpGeneratedCode(configFolder string, level string, levelIds generictools.LevelIds) {
 	if os.Getenv("BTPTF_EXPERIMENTAL") == "" {
 		return
