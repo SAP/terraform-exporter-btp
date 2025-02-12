@@ -5,6 +5,10 @@ import (
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
+const subaccountEntitlementBlockIdentifier = "btp_subaccount_entitlement"
+const entitlementPlanNameIdentifier = "plan_name"
+const entitlementServiceNameIdentifier = "service_name"
+
 func fillSubaccountEntitlementDependencyAddresses(body *hclwrite.Body, resourceAddress string, dependencyAddresses *generictools.DepedendcyAddresses) {
 	attrs := body.Attributes()
 

@@ -6,12 +6,15 @@ import (
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
+const directoryBlockIdentifier = "btp_directory"
+const directoryIdentifier = "directory_id"
+
 func processDirectoryAttributes(body *hclwrite.Body, variables *generictools.VariableContent, btpClient *btpcli.ClientFacade) {
 	attrs := body.Attributes()
 	for name, attr := range attrs {
 		tokens := attr.Expr().BuildTokens(nil)
 
-		if name == parentIdentifier && len(tokens) == 3 {
+		if name == generictools.ParentIdentifier && len(tokens) == 3 {
 
 			parentId := generictools.GetStringToken(tokens)
 
@@ -19,7 +22,7 @@ func processDirectoryAttributes(body *hclwrite.Body, variables *generictools.Var
 				body.RemoveAttribute(name)
 			} else {
 
-				replacedTokens, parentValue := generictools.ReplaceStringToken(tokens, parentIdentifier)
+				replacedTokens, parentValue := generictools.ReplaceStringToken(tokens, generictools.ParentIdentifier)
 				if parentValue != "" {
 					(*variables)[name] = generictools.VariableInfo{
 						Description: "ID of the parent of the SAP BTP directory",

@@ -15,6 +15,9 @@ import (
 )
 
 func CleanUpJson(resources tfutils.BtpResources) (cleanedResources tfutils.BtpResources) {
+	if os.Getenv("BTPTF_EXPERIMENTAL") == "" {
+		return resources
+	}
 	// Remove default trust configuration
 	for _, resource := range resources.BtpResources {
 		if resource.Name == "trust-configurations" {

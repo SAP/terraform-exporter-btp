@@ -10,6 +10,10 @@ import (
 func ProcessResources(hclFile *hclwrite.File, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
 
 	processResourceAttributes(hclFile.Body(), nil, level, variables, dependencyAddresses, btpClient, levelIds)
+	// Remove blocks that point to defaulted resources that get created by the platform automagically
+	for _, blockToRemove := range dependencyAddresses.BlocksToRemove {
+		removeBlock(hclFile.Body(), blockToRemove.BlockIdentifier, blockToRemove.ResourceAddress)
+	}
 	// Add datasource for service instances is necessary - Outer loop to have the main body object available
 	for _, datasourceInfo := range dependencyAddresses.DataSourceInfo {
 		addServicePlanDataSources(hclFile.Body(), datasourceInfo)
@@ -100,6 +104,10 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 		addServiceInstanceDependency(body, dependencyAddresses, btpClient, levelIds.SubaccountId)
 	}
 
+	if blockIdentifier == trustConfigBlockIdentifier {
+		processTrustConfigurationAttributes(body, blockIdentifier, resourceAddress, dependencyAddresses)
+	}
+
 	if blockIdentifier != subaccountBlockIdentifier {
 		replaceMainDependency(body, subaccountIdentifier, dependencyAddresses.SubaccountAddress)
 	}
@@ -119,4 +127,14 @@ func processDirectoryLevel(body *hclwrite.Body, variables *generictools.Variable
 
 func processCfOrgLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
 	extractOrgIds(body, variables, levelIds.CfOrgId)
+}
+
+func removeBlock(body *hclwrite.Body, blockIdentifier string, resourceAddress string) {
+	blocks := body.Blocks()
+	for _, block := range blocks {
+		if block.Labels()[0] == blockIdentifier && block.Labels()[1] == resourceAddress {
+			body.RemoveBlock(block)
+			break
+		}
+	}
 }

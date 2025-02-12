@@ -5,6 +5,8 @@ import (
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
+const cfOrgIdentifier = "org"
+
 func extractOrgIds(body *hclwrite.Body, variables *generictools.VariableContent, orgId string) {
 	attrs := body.Attributes()
 	for name, attr := range attrs {

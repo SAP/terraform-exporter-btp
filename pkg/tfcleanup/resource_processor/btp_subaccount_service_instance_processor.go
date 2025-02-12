@@ -7,6 +7,9 @@ import (
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
+const serviceInstanceBlockIdentifier = "btp_subaccount_service_instance"
+const serviceInstancePlanIdentifier = "serviceplan_id"
+
 func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade, subaccountId string) {
 
 	attrs := body.Attributes()

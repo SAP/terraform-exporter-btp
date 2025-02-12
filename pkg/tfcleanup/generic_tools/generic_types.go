@@ -3,6 +3,7 @@ package generictools
 const EmptyString = "null"
 const EmptyJson = "jsonencode({})"
 const EmptyMap = "{}"
+const ParentIdentifier = "parent_id"
 
 type VariableInfo struct {
 	Description string
@@ -12,6 +13,11 @@ type VariableInfo struct {
 type EntitlementKey struct {
 	ServiceName string
 	PlanName    string
+}
+
+type BlockSpecifier struct {
+	BlockIdentifier string
+	ResourceAddress string
 }
 
 type DataSourceInfo struct {
@@ -35,6 +41,7 @@ type DepedendcyAddresses struct {
 	DirectoryAddress   string
 	EntitlementAddress map[EntitlementKey]string
 	DataSourceInfo     []DataSourceInfo
+	BlocksToRemove     []BlockSpecifier
 }
 
 func NewDepedendcyAddresses() DepedendcyAddresses {

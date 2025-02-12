@@ -6,6 +6,10 @@ import (
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
+const subaccountBlockIdentifier = "btp_subaccount"
+const subaccountIdentifier = "subaccount_id"
+const regionIdentifier = "region"
+
 func processSubaccountAttributes(body *hclwrite.Body, variables *generictools.VariableContent, btpClient *btpcli.ClientFacade) {
 	attrs := body.Attributes()
 	for name, attr := range attrs {
@@ -22,14 +26,14 @@ func processSubaccountAttributes(body *hclwrite.Body, variables *generictools.Va
 			body.SetAttributeRaw(name, replacedTokens)
 		}
 
-		if name == parentIdentifier && len(tokens) == 3 {
+		if name == generictools.ParentIdentifier && len(tokens) == 3 {
 
 			parentId := generictools.GetStringToken(tokens)
 
 			if generictools.IsGlobalAccountParent(btpClient, parentId) {
 				body.RemoveAttribute(name)
 			} else {
-				replacedTokens, parentValue := generictools.ReplaceStringToken(tokens, parentIdentifier)
+				replacedTokens, parentValue := generictools.ReplaceStringToken(tokens, generictools.ParentIdentifier)
 				if parentValue != "" {
 					(*variables)[name] = generictools.VariableInfo{
 						Description: "ID of the parent of the SAP BTP subaccount",

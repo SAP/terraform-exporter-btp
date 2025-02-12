@@ -6,6 +6,10 @@ import (
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
+const subscriptionBlockIdentifier = "btp_subaccount_subscription"
+const subscriptionAppNameIdentifier = "app_name"
+const subscriptionPlanNameIdentifier = "plan_name"
+
 func addEntitlementDependency(body *hclwrite.Body, dependencyAddresses *generictools.DepedendcyAddresses) {
 	attrs := body.Attributes()
 
