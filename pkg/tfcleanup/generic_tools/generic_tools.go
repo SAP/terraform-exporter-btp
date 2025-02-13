@@ -144,7 +144,6 @@ func ExtractBlockInformation(inBlocks []string) (blockType string, blockIdentifi
 }
 
 func checkForChanges(f *hclwrite.File, path string) (changed bool) {
-
 	changed = false
 
 	originalContent, err := os.ReadFile(path)
@@ -161,7 +160,6 @@ func checkForChanges(f *hclwrite.File, path string) (changed bool) {
 }
 
 func IsGlobalAccountParent(btpClient *btpcli.ClientFacade, parentId string) (isParent bool) {
-
 	globalAccountId, _ := btpcli.GetGlobalAccountId(btpClient)
 
 	if parentId == globalAccountId {
@@ -171,8 +169,7 @@ func IsGlobalAccountParent(btpClient *btpcli.ClientFacade, parentId string) (isP
 }
 
 func RemoveConfigBlock(body *hclwrite.Body, blockIdentifier string, resourceAddress string) {
-	blocks := body.Blocks()
-	for _, block := range blocks {
+	for _, block := range body.Blocks() {
 		if block.Labels()[0] == blockIdentifier && block.Labels()[1] == resourceAddress {
 			body.RemoveBlock(block)
 			break
@@ -181,8 +178,7 @@ func RemoveConfigBlock(body *hclwrite.Body, blockIdentifier string, resourceAddr
 }
 
 func RemoveEmptyAttributes(body *hclwrite.Body) {
-	attrs := body.Attributes()
-	for name, attr := range attrs {
+	for name, attr := range body.Attributes() {
 		tokens := attr.Expr().BuildTokens(nil)
 
 		// Check for a NULL value
@@ -209,8 +205,7 @@ func ReplaceMainDependency(body *hclwrite.Body, mainIdentifier string, mainAddre
 		return
 	}
 
-	attrs := body.Attributes()
-	for name, attr := range attrs {
+	for name, attr := range body.Attributes() {
 		tokens := attr.Expr().BuildTokens(nil)
 
 		if name == mainIdentifier && len(tokens) == 3 {
@@ -234,7 +229,6 @@ func ProcessParentAttribute(body *hclwrite.Body, description string, btpClient *
 		if IsGlobalAccountParent(btpClient, parentId) {
 			body.RemoveAttribute(ParentIdentifier)
 		} else {
-
 			replacedTokens, parentValue := ReplaceStringTokenVar(tokens, ParentIdentifier)
 			if parentValue != "" {
 				(*variables)[ParentIdentifier] = VariableInfo{
@@ -245,11 +239,9 @@ func ProcessParentAttribute(body *hclwrite.Body, description string, btpClient *
 			body.SetAttributeRaw(ParentIdentifier, replacedTokens)
 		}
 	}
-
 }
 
 func ReplaceAttribute(body *hclwrite.Body, identifier string, description string, variables *VariableContent) {
-
 	attribute := body.GetAttribute(identifier)
 
 	if attribute != nil {

@@ -8,14 +8,11 @@ import (
 )
 
 func ProcessResources(hclFile *hclwrite.File, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
-
 	processResourceAttributes(hclFile.Body(), nil, level, variables, dependencyAddresses, btpClient, levelIds)
-
 	processDependencies(hclFile.Body(), dependencyAddresses)
 }
 
 func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
-
 	if len(inBlocks) > 0 {
 
 		generictools.RemoveEmptyAttributes(body)
@@ -42,7 +39,6 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 func processSubaccountLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
 	if blockIdentifier == subaccountBlockIdentifier {
 		processSubaccountAttributes(body, variables, btpClient)
-
 		dependencyAddresses.SubaccountAddress = resourceAddress
 	}
 
@@ -70,7 +66,6 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 func processDirectoryLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
 	if blockIdentifier == directoryBlockIdentifier {
 		processDirectoryAttributes(body, variables, btpClient)
-
 		dependencyAddresses.DirectoryAddress = resourceAddress
 	}
 

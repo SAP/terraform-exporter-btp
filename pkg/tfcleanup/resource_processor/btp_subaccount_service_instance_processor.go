@@ -17,7 +17,6 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 	// 3: Check if there is a dependency address for the plan name in the entitlements
 	// 4: If we find such a dependenceny: Create a data source for the service plan that depends on the entitlement
 	// 5: Exchange the explicit plan ID with the data source reference
-
 	planIdAttr := body.GetAttribute(serviceInstancePlanIdentifier)
 
 	if planIdAttr == nil {
@@ -39,7 +38,6 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 	}
 
 	planName, serviceName, err := btpcli.GetServiceDataByPlanId(btpClient, subaccountId, planId)
-
 	if err != nil {
 		// No plan name found, no refinement of the code will be done
 		return
@@ -51,7 +49,6 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 	}
 
 	dependencyAddress := (*dependencyAddresses).EntitlementAddress[key]
-
 	if dependencyAddress == "" {
 		//No entitlement exported that fits the service instance
 		return
@@ -131,6 +128,5 @@ func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.
 			Type:  hclsyntax.TokenCBrack,
 			Bytes: []byte("]"),
 		},
-	},
-	)
+	})
 }

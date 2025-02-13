@@ -11,7 +11,6 @@ const trustDefaultIdentifier = "sap.default"
 
 func processTrustConfigurationAttributes(body *hclwrite.Body, blockIdentifier string, resourceAddress string, dependencyAddresses *generictools.DepedendcyAddresses) {
 	trustNameAttr := body.GetAttribute(trustNameIdentifier)
-
 	if trustNameAttr == nil {
 		return
 	}
