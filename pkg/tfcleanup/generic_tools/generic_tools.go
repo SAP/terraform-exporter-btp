@@ -172,3 +172,103 @@ func IsGlobalAccountParent(btpClient *btpcli.ClientFacade, parentId string) (isP
 	}
 	return
 }
+
+func RemoveConfigBlock(body *hclwrite.Body, blockIdentifier string, resourceAddress string) {
+	blocks := body.Blocks()
+	for _, block := range blocks {
+		if block.Labels()[0] == blockIdentifier && block.Labels()[1] == resourceAddress {
+			body.RemoveBlock(block)
+			break
+		}
+	}
+}
+
+func RemoveEmptyAttributes(body *hclwrite.Body) {
+	attrs := body.Attributes()
+	for name, attr := range attrs {
+		tokens := attr.Expr().BuildTokens(nil)
+
+		// Check for a NULL value
+		if len(tokens) == 1 && string(tokens[0].Bytes) == EmptyString {
+			body.RemoveAttribute(name)
+		}
+
+		// Check for an empty JSON encoded string or an empty Map
+		var combinedString string
+		if len(tokens) == 5 || len(tokens) == 2 {
+			for _, token := range tokens {
+				combinedString += string(token.Bytes)
+			}
+		}
+
+		if combinedString == EmptyJson || combinedString == EmptyMap {
+			body.RemoveAttribute(name)
+		}
+	}
+}
+
+func ReplaceMainDependency(body *hclwrite.Body, mainIdentifier string, mainAddress string) {
+	if mainAddress == "" {
+		return
+	}
+
+	attrs := body.Attributes()
+	for name, attr := range attrs {
+		tokens := attr.Expr().BuildTokens(nil)
+
+		if name == mainIdentifier && len(tokens) == 3 {
+			replacedTokens := ReplaceDependency(tokens, mainAddress)
+			body.SetAttributeRaw(name, replacedTokens)
+		}
+	}
+}
+
+func ProcessParentAttribute(body *hclwrite.Body, description string, btpClient *btpcli.ClientFacade, variables *VariableContent) {
+
+	parentAttr := body.GetAttribute(ParentIdentifier)
+
+	if parentAttr == nil {
+		return
+	}
+
+	tokens := parentAttr.Expr().BuildTokens(nil)
+	if len(tokens) == 3 {
+
+		parentId := GetStringToken(tokens)
+
+		if IsGlobalAccountParent(btpClient, parentId) {
+			body.RemoveAttribute(ParentIdentifier)
+		} else {
+
+			replacedTokens, parentValue := ReplaceStringToken(tokens, ParentIdentifier)
+			if parentValue != "" {
+				(*variables)[ParentIdentifier] = VariableInfo{
+					Description: description,
+					Value:       parentValue,
+				}
+			}
+			body.SetAttributeRaw(ParentIdentifier, replacedTokens)
+		}
+	}
+
+}
+
+func ReplaceAttribute(body *hclwrite.Body, identifier string, description string, variables *VariableContent) {
+
+	attribute := body.GetAttribute(identifier)
+
+	if attribute != nil {
+		tokens := attribute.Expr().BuildTokens(nil)
+
+		if len(tokens) == 3 {
+			replacedTokens, attrValue := ReplaceStringToken(tokens, identifier)
+			if attrValue != "" {
+				(*variables)[identifier] = VariableInfo{
+					Description: description,
+					Value:       attrValue,
+				}
+			}
+			body.SetAttributeRaw(identifier, replacedTokens)
+		}
+	}
+}

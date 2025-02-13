@@ -12,21 +12,25 @@ const serviceInstancePlanIdentifier = "serviceplan_id"
 
 func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade, subaccountId string) {
 
-	attrs := body.Attributes()
-
 	// 1: Iterate over attributes to find the value for the service name and the plan ID
 	// 2: Fetch the plan name via ID using the BTP CLI client
 	// 3: Check if there is a dependency address for the plan name in the entitlements
 	// 4: If we find such a dependenceny: Create a data source for the service plan that depends on the entitlement
 	// 5: Exchange the explicit plan ID with the data source reference
 
+	planIdAttr := body.GetAttribute(serviceInstancePlanIdentifier)
+
+	if planIdAttr == nil {
+		// No plan ID found, no further action will be taken
+		return
+	}
+
 	var planId string
 
-	for name, attr := range attrs {
-		tokens := attr.Expr().BuildTokens(nil)
-		if name == serviceInstancePlanIdentifier && len(tokens) == 3 {
-			planId = generictools.GetStringToken(tokens)
-		}
+	planIdAttrTokens := planIdAttr.Expr().BuildTokens(nil)
+
+	if len(planIdAttrTokens) == 3 {
+		planId = generictools.GetStringToken(planIdAttrTokens)
 	}
 
 	if planId == "" {

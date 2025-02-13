@@ -10,20 +10,25 @@ const entitlementPlanNameIdentifier = "plan_name"
 const entitlementServiceNameIdentifier = "service_name"
 
 func fillSubaccountEntitlementDependencyAddresses(body *hclwrite.Body, resourceAddress string, dependencyAddresses *generictools.DepedendcyAddresses) {
-	attrs := body.Attributes()
+	planNameAttr := body.GetAttribute(entitlementPlanNameIdentifier)
+	serviceNameAttr := body.GetAttribute(entitlementServiceNameIdentifier)
+
+	if planNameAttr == nil || serviceNameAttr == nil {
+		return
+	}
+
+	planNameTokens := planNameAttr.Expr().BuildTokens(nil)
+	serviceNameTokens := serviceNameAttr.Expr().BuildTokens(nil)
 
 	var planName string
 	var serviceName string
 
-	for name, attr := range attrs {
-		tokens := attr.Expr().BuildTokens(nil)
-		if name == entitlementPlanNameIdentifier && len(tokens) == 3 {
-			planName = generictools.GetStringToken(tokens)
-		}
+	if len(planNameTokens) == 3 {
+		planName = generictools.GetStringToken(planNameTokens)
+	}
 
-		if name == entitlementServiceNameIdentifier && len(tokens) == 3 {
-			serviceName = generictools.GetStringToken(tokens)
-		}
+	if len(serviceNameTokens) == 3 {
+		serviceName = generictools.GetStringToken(serviceNameTokens)
 	}
 
 	if planName != "" && serviceName != "" {
@@ -33,6 +38,5 @@ func fillSubaccountEntitlementDependencyAddresses(body *hclwrite.Body, resourceA
 		}
 
 		(*dependencyAddresses).EntitlementAddress[key] = resourceAddress
-
 	}
 }

@@ -10,21 +10,15 @@ const trustNameIdentifier = "name"
 const trustDefaultIdentifier = "sap.default"
 
 func processTrustConfigurationAttributes(body *hclwrite.Body, blockIdentifier string, resourceAddress string, dependencyAddresses *generictools.DepedendcyAddresses) {
-	removeEntry := false
-	attrs := body.Attributes()
-	for name, attr := range attrs {
-		tokens := attr.Expr().BuildTokens(nil)
+	trustNameAttr := body.GetAttribute(trustNameIdentifier)
 
-		if name == trustNameIdentifier {
-			identityProviderName := generictools.GetStringToken(tokens)
-			if identityProviderName == trustDefaultIdentifier {
-				removeEntry = true
-				break
-			}
-		}
+	if trustNameAttr == nil {
+		return
 	}
 
-	if removeEntry {
+	identityProviderName := generictools.GetStringToken(trustNameAttr.Expr().BuildTokens(nil))
+
+	if identityProviderName == trustDefaultIdentifier {
 		identifier := generictools.BlockSpecifier{
 			BlockIdentifier: blockIdentifier,
 			ResourceAddress: resourceAddress,
