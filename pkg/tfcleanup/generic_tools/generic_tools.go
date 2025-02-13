@@ -199,7 +199,7 @@ func RemoveImportBlock(body *hclwrite.Body, resourceAddress string, resultStore 
 
 	for _, block := range taintedBlocks {
 		body.RemoveBlock(block)
-		(*resultStore)[resourceAddress] -= 1
+		(*resultStore)[strings.Split(resourceAddress, ".")[0]] -= 1
 	}
 }
 
