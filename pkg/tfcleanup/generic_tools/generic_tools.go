@@ -168,12 +168,37 @@ func IsGlobalAccountParent(btpClient *btpcli.ClientFacade, parentId string) (isP
 	return
 }
 
-func RemoveConfigBlock(body *hclwrite.Body, blockIdentifier string, resourceAddress string) {
+func RemoveConfigBlock(body *hclwrite.Body, resourceAddress string) {
 	for _, block := range body.Blocks() {
-		if block.Labels()[0] == blockIdentifier && block.Labels()[1] == resourceAddress {
+		address := block.Labels()[0] + "." + block.Labels()[1]
+		if address == resourceAddress {
 			body.RemoveBlock(block)
-			break
 		}
+	}
+}
+
+func RemoveImportBlock(body *hclwrite.Body, resourceAddress string, inBlocks []string) {
+
+	taintedBlocks := []*hclwrite.Block{}
+
+	for _, block := range body.Blocks() {
+
+		importTargetAttr := block.Body().GetAttribute("to")
+
+		if importTargetAttr == nil {
+			return
+		}
+
+		tokens := importTargetAttr.Expr().BuildTokens(nil)
+		address := string(tokens[0].Bytes) + string(tokens[1].Bytes) + string(tokens[2].Bytes)
+
+		if address == resourceAddress {
+			taintedBlocks = append(taintedBlocks, block)
+		}
+	}
+
+	for _, block := range taintedBlocks {
+		body.RemoveBlock(block)
 	}
 }
 
@@ -256,4 +281,31 @@ func ReplaceAttribute(body *hclwrite.Body, identifier string, description string
 			body.SetAttributeRaw(identifier, replacedTokens)
 		}
 	}
+}
+
+func RemoveUnusedImports(directory string, blocksToRemove *[]BlockSpecifier) {
+	for _, block := range *blocksToRemove {
+		filePath := filepath.Join(directory, block.BlockIdentifier+"_import.tf")
+		f := GetHclFile(filePath)
+		body := f.Body()
+		RemoveImportBlock(body, block.ResourceAddress, nil)
+		ProcessChanges(f, filePath)
+	}
+}
+
+func RemoveEmptyFiles(dir string) error {
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		log.Printf("Failed to read directory %q: %s", dir, err)
+		return err
+	}
+
+	for _, file := range files {
+		path := filepath.Join(dir, file.Name())
+		info, _ := os.Lstat(path)
+		if info.Size() == 0 {
+			os.Remove(path)
+		}
+	}
+	return nil
 }

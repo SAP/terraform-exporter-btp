@@ -81,7 +81,7 @@ func processCfOrgLevel(body *hclwrite.Body, variables *generictools.VariableCont
 func processDependencies(body *hclwrite.Body, dependencyAddresses *generictools.DepedendcyAddresses) {
 	// Remove blocks that point to defaulted resources that get created by the platform automagically
 	for _, blockToRemove := range dependencyAddresses.BlocksToRemove {
-		generictools.RemoveConfigBlock(body, blockToRemove.BlockIdentifier, blockToRemove.ResourceAddress)
+		generictools.RemoveConfigBlock(body, blockToRemove.ResourceAddress)
 	}
 	// Add datasource for service instances is necessary - Outer loop to have the main body object available
 	for _, datasourceInfo := range dependencyAddresses.DataSourceInfo {

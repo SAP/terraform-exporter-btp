@@ -13,9 +13,11 @@ func ProcessProvider(hclFile *hclwrite.File, variables *generictools.VariableCon
 }
 
 func processProviderAttributes(body *hclwrite.Body, inBlocks []string, variables *generictools.VariableContent) {
-	if len(body.Attributes()) > 0 {
-		generictools.ReplaceAttribute(body, "gGlobal account subdomain", globalAccountIdentifier, variables)
-		generictools.ReplaceAttribute(body, "Cloud Foundry API endpoint", cfApiEndpointIdentifier, variables)
+	attributes := body.Attributes()
+
+	if len(attributes) > 0 {
+		generictools.ReplaceAttribute(body, globalAccountIdentifier, "Global account subdomain", variables)
+		generictools.ReplaceAttribute(body, cfApiEndpointIdentifier, "Cloud Foundry API endpoint", variables)
 	}
 
 	for _, block := range body.Blocks() {
