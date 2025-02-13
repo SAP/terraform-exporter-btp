@@ -5,36 +5,18 @@ import (
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
+const globalAccountIdentifier = "globalaccount"
+const cfApiEndpointIdentifier = "api_url"
+
 func ProcessProvider(hclFile *hclwrite.File, variables *generictools.VariableContent) {
 	processProviderAttributes(hclFile.Body(), nil, variables)
 }
 
 func processProviderAttributes(body *hclwrite.Body, inBlocks []string, variables *generictools.VariableContent) {
-	attrs := body.Attributes()
-	for name, attr := range attrs {
-		tokens := attr.Expr().BuildTokens(nil)
 
-		if name == globalAccountIdentifier && len(tokens) == 3 {
-			replacedTokens, globalAccountValue := generictools.ReplaceStringToken(tokens, globalAccountIdentifier)
-			if globalAccountValue != "" {
-				(*variables)[name] = generictools.VariableInfo{
-					Description: "Global account subdomain",
-					Value:       globalAccountValue,
-				}
-			}
-			body.SetAttributeRaw(name, replacedTokens)
-		}
-
-		if name == cfApiEndpointIdentifier && len(tokens) == 3 {
-			replacedTokens, cfApiValue := generictools.ReplaceStringToken(tokens, cfApiEndpointIdentifier)
-			if cfApiValue != "" {
-				(*variables)[name] = generictools.VariableInfo{
-					Description: "Cloud Foundry API endpoint",
-					Value:       cfApiValue,
-				}
-			}
-			body.SetAttributeRaw(name, replacedTokens)
-		}
+	if len(body.Attributes()) > 0 {
+		generictools.ReplaceAttribute(body, "gGlobal account subdomain", globalAccountIdentifier, variables)
+		generictools.ReplaceAttribute(body, "Cloud Foundry API endpoint", cfApiEndpointIdentifier, variables)
 	}
 
 	blocks := body.Blocks()
