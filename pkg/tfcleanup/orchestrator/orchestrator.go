@@ -39,7 +39,7 @@ func CleanUpJson(resources tfutils.BtpResources) (cleanedResources tfutils.BtpRe
 	return cleanedResources
 }
 
-func CleanUpGeneratedCode(configFolder string, level string, levelIds generictools.LevelIds) {
+func CleanUpGeneratedCode(configFolder string, level string, levelIds generictools.LevelIds, resultStore *map[string]int) {
 	if os.Getenv("BTPTF_EXPERIMENTAL") == "" {
 		return
 	}
@@ -56,7 +56,7 @@ func CleanUpGeneratedCode(configFolder string, level string, levelIds generictoo
 
 	terraformConfigPath := filepath.Join(currentDir, configFolder)
 
-	err = orchestrateCodeCleanup(terraformConfigPath, level, levelIds)
+	err = orchestrateCodeCleanup(terraformConfigPath, level, levelIds, resultStore)
 
 	if err != nil {
 		fmt.Print("\r\n")
@@ -67,7 +67,7 @@ func CleanUpGeneratedCode(configFolder string, level string, levelIds generictoo
 	output.StopSpinner(spinner)
 }
 
-func orchestrateCodeCleanup(dir string, level string, levelIds generictools.LevelIds) error {
+func orchestrateCodeCleanup(dir string, level string, levelIds generictools.LevelIds, resultStore *map[string]int) error {
 	dir = filepath.Clean(dir)
 
 	_, err := os.Lstat(dir)
@@ -107,7 +107,7 @@ func orchestrateCodeCleanup(dir string, level string, levelIds generictools.Leve
 	}
 
 	// Remove unused imports
-	generictools.RemoveUnusedImports(dir, &dependencyAddresses.BlocksToRemove)
+	generictools.RemoveUnusedImports(dir, &dependencyAddresses.BlocksToRemove, resultStore)
 
 	err = generictools.RemoveEmptyFiles(dir)
 	if err != nil {

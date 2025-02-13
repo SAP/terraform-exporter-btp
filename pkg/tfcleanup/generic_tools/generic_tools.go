@@ -177,7 +177,7 @@ func RemoveConfigBlock(body *hclwrite.Body, resourceAddress string) {
 	}
 }
 
-func RemoveImportBlock(body *hclwrite.Body, resourceAddress string, inBlocks []string) {
+func RemoveImportBlock(body *hclwrite.Body, resourceAddress string, resultStore *map[string]int) {
 
 	taintedBlocks := []*hclwrite.Block{}
 
@@ -199,6 +199,7 @@ func RemoveImportBlock(body *hclwrite.Body, resourceAddress string, inBlocks []s
 
 	for _, block := range taintedBlocks {
 		body.RemoveBlock(block)
+		(*resultStore)[resourceAddress] -= 1
 	}
 }
 
@@ -283,12 +284,12 @@ func ReplaceAttribute(body *hclwrite.Body, identifier string, description string
 	}
 }
 
-func RemoveUnusedImports(directory string, blocksToRemove *[]BlockSpecifier) {
+func RemoveUnusedImports(directory string, blocksToRemove *[]BlockSpecifier, resultStore *map[string]int) {
 	for _, block := range *blocksToRemove {
 		filePath := filepath.Join(directory, block.BlockIdentifier+"_import.tf")
 		f := GetHclFile(filePath)
 		body := f.Body()
-		RemoveImportBlock(body, block.ResourceAddress, nil)
+		RemoveImportBlock(body, block.ResourceAddress, resultStore)
 		ProcessChanges(f, filePath)
 	}
 }

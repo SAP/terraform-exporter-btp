@@ -115,7 +115,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 		CfOrgId:      organization,
 	}
 
-	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds)
+	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore)
 	tfutils.FinalizeTfConfig(configDir)
 	generateNextStepsDocument(configDir, subaccount, directory, organization, "")
 	output.RenderSummaryTable(resultStore)

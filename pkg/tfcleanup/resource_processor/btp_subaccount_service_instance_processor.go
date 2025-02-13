@@ -18,7 +18,6 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 	// 4: If we find such a dependenceny: Create a data source for the service plan that depends on the entitlement
 	// 5: Exchange the explicit plan ID with the data source reference
 	planIdAttr := body.GetAttribute(serviceInstancePlanIdentifier)
-
 	if planIdAttr == nil {
 		// No plan ID found, no further action will be taken
 		return
@@ -66,7 +65,7 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 
 	(*dependencyAddresses).DataSourceInfo = append((*dependencyAddresses).DataSourceInfo, generictools.DataSourceInfo{
 		DatasourceAddress:  datasourceAddress,
-		SubaccountAddress:  "var." + (*dependencyAddresses).SubaccountAddress + ".id",
+		SubaccountAddress:  (*dependencyAddresses).SubaccountAddress + ".id",
 		OfferingName:       serviceName,
 		Name:               planName,
 		EntitlementAddress: dependencyAddress,

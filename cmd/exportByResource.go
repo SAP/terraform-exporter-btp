@@ -73,7 +73,7 @@ var exportByResourceCmd = &cobra.Command{
 			CfOrgId:      organization,
 		}
 
-		tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds)
+		tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore)
 		tfutils.FinalizeTfConfig(configDir)
 		generateNextStepsDocument(configDir, subaccount, directory, organization, space)
 		tfutils.CleanupProviderConfig()
