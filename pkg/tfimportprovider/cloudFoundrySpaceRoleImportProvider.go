@@ -65,10 +65,7 @@ func createSpaceRoleImportBlock(data map[string]interface{}, spaceId string, fil
 	return importBlock, count, nil
 }
 func templateSpaceRoleImport(x int, role map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
-	//Needs to be removed once import statement in document is fixed
-	template := strings.Replace(resourceDoc.Import, "cloudfoundry_role", "cloudfoundry_space_role", -1)
-
-	template = strings.Replace(template, "<resource_name>", "role_"+fmt.Sprintf("%v", role["id"])+"_"+fmt.Sprintf("%v", role["type"])+"_"+fmt.Sprintf("%v", x), -1)
+	template := strings.Replace(resourceDoc.Import, "<resource_name>", "role_"+fmt.Sprintf("%v", role["id"])+"_"+fmt.Sprintf("%v", role["type"])+"_"+fmt.Sprintf("%v", x), -1)
 	template = strings.Replace(template, "<role_guid>", fmt.Sprintf("%v", role["id"]), -1)
 	return template + "\n"
 }
