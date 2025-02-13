@@ -90,8 +90,7 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 	}
 }
 
-func ReplaceStringToken(tokens hclwrite.Tokens, identifier string) (replacedTokens hclwrite.Tokens, valueForVariable string) {
-
+func ReplaceStringTokenVar(tokens hclwrite.Tokens, identifier string) (replacedTokens hclwrite.Tokens, valueForVariable string) {
 	oQuote := tokens[0]
 	strTok := tokens[1]
 	cQuote := tokens[2]
@@ -109,7 +108,6 @@ func ReplaceStringToken(tokens hclwrite.Tokens, identifier string) (replacedToke
 }
 
 func ReplaceDependency(tokens hclwrite.Tokens, dependencyAddress string) (replacedTokens hclwrite.Tokens) {
-
 	oQuote := tokens[0]
 	strTok := tokens[1]
 	cQuote := tokens[2]
@@ -126,7 +124,6 @@ func ReplaceDependency(tokens hclwrite.Tokens, dependencyAddress string) (replac
 }
 
 func GetStringToken(tokens hclwrite.Tokens) (value string) {
-
 	oQuote := tokens[0]
 	strTok := tokens[1]
 	cQuote := tokens[2]
@@ -224,9 +221,7 @@ func ReplaceMainDependency(body *hclwrite.Body, mainIdentifier string, mainAddre
 }
 
 func ProcessParentAttribute(body *hclwrite.Body, description string, btpClient *btpcli.ClientFacade, variables *VariableContent) {
-
 	parentAttr := body.GetAttribute(ParentIdentifier)
-
 	if parentAttr == nil {
 		return
 	}
@@ -240,7 +235,7 @@ func ProcessParentAttribute(body *hclwrite.Body, description string, btpClient *
 			body.RemoveAttribute(ParentIdentifier)
 		} else {
 
-			replacedTokens, parentValue := ReplaceStringToken(tokens, ParentIdentifier)
+			replacedTokens, parentValue := ReplaceStringTokenVar(tokens, ParentIdentifier)
 			if parentValue != "" {
 				(*variables)[ParentIdentifier] = VariableInfo{
 					Description: description,
@@ -261,12 +256,10 @@ func ReplaceAttribute(body *hclwrite.Body, identifier string, description string
 		tokens := attribute.Expr().BuildTokens(nil)
 
 		if len(tokens) == 3 {
-			replacedTokens, attrValue := ReplaceStringToken(tokens, identifier)
-			if attrValue != "" {
-				(*variables)[identifier] = VariableInfo{
-					Description: description,
-					Value:       attrValue,
-				}
+			replacedTokens, attrValue := ReplaceStringTokenVar(tokens, identifier)
+			(*variables)[identifier] = VariableInfo{
+				Description: description,
+				Value:       attrValue,
 			}
 			body.SetAttributeRaw(identifier, replacedTokens)
 		}
