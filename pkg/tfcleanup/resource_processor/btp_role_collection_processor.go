@@ -3,6 +3,7 @@ package resourceprocessor
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
@@ -30,7 +31,6 @@ func addRoleDependency(body *hclwrite.Body, dependencyAddresses *generictools.De
 	roleAttrTokens := roleAttr.Expr().BuildTokens(nil)
 
 	var roleString string
-
 	for _, token := range roleAttrTokens {
 		roleString = roleString + string(token.Bytes)
 	}
@@ -44,6 +44,65 @@ func addRoleDependency(body *hclwrite.Body, dependencyAddresses *generictools.De
 		return
 	}
 
+	dependencies := buildDependencyString(roles, dependencyAddresses)
+
+	if dependencies != "" {
+		body.SetAttributeRaw("depends_on", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenOBrack,
+				Bytes: []byte("["),
+			},
+			{
+				Type:  hclsyntax.TokenStringLit,
+				Bytes: []byte(dependencies),
+			},
+			{
+				Type:  hclsyntax.TokenCBrack,
+				Bytes: []byte("]"),
+			},
+		})
+	}
+}
+
+func preprocessString(input string) string {
+	// We must process the raw string extracted from the HCL file to make it a valid JSON string
+	input = strings.ReplaceAll(input, "=", ":")
+
+	// Add double quotes around keys and values
+	re := regexp.MustCompile(`(\w+):`)
+	input = re.ReplaceAllString(input, `"$1":`)
+
+	re = regexp.MustCompile(`:"([^"]+)"`)
+	input = re.ReplaceAllString(input, `:"$1"`)
+
+	// Replace newlines with commas
+	input = strings.ReplaceAll(input, "\n", ",")
+	input = strings.ReplaceAll(input, ",,", ",")
+
+	// Remove trailing commas before closing braces }
+	re = regexp.MustCompile(`,(\s*})`)
+	input = re.ReplaceAllString(input, `$1`)
+
+	// Remove trailing commas after opening braces {
+	re = regexp.MustCompile(`({\s*),`)
+	input = re.ReplaceAllString(input, `$1`)
+
+	// Remove trailing commas before closing braces ]
+	re = regexp.MustCompile(`,(\s*])`)
+	input = re.ReplaceAllString(input, `$1`)
+
+	// remove a comma after [ if it exists
+	re = regexp.MustCompile(`\[\s*,`)
+	input = re.ReplaceAllString(input, `[`)
+
+	// remove anything that comes after ] as this is the end of the array
+	re = regexp.MustCompile(`\].*`)
+	input = re.ReplaceAllString(input, `]`)
+
+	return input
+}
+
+func buildDependencyString(roles []Role, dependencyAddresses *generictools.DepedendcyAddresses) string {
 	var builder strings.Builder
 	first := true
 
@@ -65,27 +124,5 @@ func addRoleDependency(body *hclwrite.Body, dependencyAddresses *generictools.De
 		}
 	}
 
-	dependencies := builder.String()
-
-	if dependencies != "" {
-		body.SetAttributeRaw("depends_on", hclwrite.Tokens{
-			{
-				Type:  hclsyntax.TokenOBrack,
-				Bytes: []byte("["),
-			},
-			{
-				Type:  hclsyntax.TokenStringLit,
-				Bytes: []byte(dependencies),
-			},
-			{
-				Type:  hclsyntax.TokenCBrack,
-				Bytes: []byte("]"),
-			},
-		})
-	}
-}
-
-func preprocessString(input string) string {
-	input = strings.ReplaceAll(input, "=", ":")
-	return input
+	return builder.String()
 }
