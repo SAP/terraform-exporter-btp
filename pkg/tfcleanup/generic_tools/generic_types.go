@@ -15,6 +15,12 @@ type EntitlementKey struct {
 	PlanName    string
 }
 
+type RoleKey struct {
+	AppId            string
+	Name             string
+	RoleTemplateName string
+}
+
 type BlockSpecifier struct {
 	BlockIdentifier string
 	ResourceAddress string
@@ -40,6 +46,7 @@ type DepedendcyAddresses struct {
 	SubaccountAddress  string
 	DirectoryAddress   string
 	EntitlementAddress map[EntitlementKey]string
+	RoleAddress        map[RoleKey]string
 	DataSourceInfo     []DataSourceInfo
 	BlocksToRemove     []BlockSpecifier
 }
@@ -47,5 +54,6 @@ type DepedendcyAddresses struct {
 func NewDepedendcyAddresses() DepedendcyAddresses {
 	return DepedendcyAddresses{
 		EntitlementAddress: make(map[EntitlementKey]string),
+		RoleAddress:        make(map[RoleKey]string),
 	}
 }

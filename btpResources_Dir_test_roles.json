@@ -1,0 +1,18 @@
+{
+  "BtpResources": [
+    {
+      "Name": "roles",
+      "Values": [
+        "directory_admin",
+        "directory_viewer"
+      ]
+    },
+    {
+      "Name": "role-collections",
+      "Values": [
+        "directory_administrator",
+        "directory_viewer"
+      ]
+    }
+  ]
+}

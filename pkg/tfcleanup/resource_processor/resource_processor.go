@@ -58,6 +58,14 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 		processTrustConfigurationAttributes(body, blockIdentifier, resourceAddress, dependencyAddresses)
 	}
 
+	if blockIdentifier == subaccountRoleBlockIdentifier {
+		fillRoleDependencyAddresses(body, resourceAddress, dependencyAddresses)
+	}
+
+	if blockIdentifier == subaccountRoleCollectionBlockIdentifier {
+		addRoleDependency(body, dependencyAddresses)
+	}
+
 	if blockIdentifier != subaccountBlockIdentifier {
 		generictools.ReplaceMainDependency(body, subaccountIdentifier, dependencyAddresses.SubaccountAddress)
 	}
@@ -67,6 +75,14 @@ func processDirectoryLevel(body *hclwrite.Body, variables *generictools.Variable
 	if blockIdentifier == directoryBlockIdentifier {
 		processDirectoryAttributes(body, variables, btpClient)
 		dependencyAddresses.DirectoryAddress = resourceAddress
+	}
+
+	if blockIdentifier == directoryRoleBlockIdentifier {
+		fillRoleDependencyAddresses(body, resourceAddress, dependencyAddresses)
+	}
+
+	if blockIdentifier == directoryRoleCollectionBlockIdentifier {
+		addRoleDependency(body, dependencyAddresses)
 	}
 
 	if blockIdentifier != directoryBlockIdentifier {

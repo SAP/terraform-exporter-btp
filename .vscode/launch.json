@@ -26,7 +26,7 @@
       "id": "cliArgs",
       "type": "promptString",
       "description": "Args for launching btptf CLI. Use --cwd to set the working directory.",
-      "default": "export -s 12345"
+      "default": "export-by-json -d 5cdf9dfc-2f5e-4717-a988-2848312f2f63 -p btpResources_Dir_test_roles.json"
     }
   ]
 }
