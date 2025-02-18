@@ -1,5 +1,7 @@
 # Visit https://goreleaser.com for documentation on how to customize this
 # behavior.
+version: 2
+
 before:
   hooks:
     # this is just an example and not a requirement for provider building/publishing
@@ -25,7 +27,7 @@ builds:
         goarch: "386"
     binary: "btptf_v{{ .Version }}"
 archives:
-  - format: binary
+  - formats: ["binary"]
     name_template: "btptf_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 checksum:
   algorithm: sha256
@@ -47,7 +49,6 @@ nfpms:
     #
     # Default: inferred from global metadata.
     homepage: https://github.com/SAP/terraform-exporter-btp
-
 
     # Your app's description.
     #
@@ -85,4 +86,4 @@ nfpms:
     # When set to `true`, the `builds` option is ignored.
     meta: false
 
-    maintainer: 'See GitHub <https://github.com/SAP/terraform-exporter-btp>'
+    maintainer: "See GitHub <https://github.com/SAP/terraform-exporter-btp>"
