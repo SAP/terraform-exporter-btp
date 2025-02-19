@@ -6,8 +6,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 
 	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
+	"github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/testutils"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
@@ -91,6 +93,10 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 }
 
 func ReplaceStringTokenVar(tokens hclwrite.Tokens, identifier string) (replacedTokens hclwrite.Tokens, valueForVariable string) {
+	if len(tokens) != 3 {
+		return tokens, ""
+	}
+
 	oQuote := tokens[0]
 	strTok := tokens[1]
 	cQuote := tokens[2]
@@ -108,6 +114,10 @@ func ReplaceStringTokenVar(tokens hclwrite.Tokens, identifier string) (replacedT
 }
 
 func ReplaceDependency(tokens hclwrite.Tokens, dependencyAddress string) (replacedTokens hclwrite.Tokens) {
+	if len(tokens) != 3 {
+		return tokens
+	}
+
 	oQuote := tokens[0]
 	strTok := tokens[1]
 	cQuote := tokens[2]
@@ -124,6 +134,10 @@ func ReplaceDependency(tokens hclwrite.Tokens, dependencyAddress string) (replac
 }
 
 func GetStringToken(tokens hclwrite.Tokens) (value string) {
+	if len(tokens) != 3 {
+		return ""
+	}
+
 	oQuote := tokens[0]
 	strTok := tokens[1]
 	cQuote := tokens[2]
@@ -135,10 +149,18 @@ func GetStringToken(tokens hclwrite.Tokens) (value string) {
 }
 
 func ExtractBlockInformation(inBlocks []string) (blockType string, blockIdentifier string, resourceAddress string) {
+
+	if len(strings.Split(inBlocks[0], ",")) < 3 {
+		return
+	}
+
 	blockType = strings.Split(inBlocks[0], ",")[0]
 	blockIdentifier = strings.Split(inBlocks[0], ",")[1]
 	blockAddress := strings.Split(inBlocks[0], ",")[2]
-	resourceAddress = blockIdentifier + "." + blockAddress
+
+	if blockIdentifier != "" && blockAddress != "" {
+		resourceAddress = blockIdentifier + "." + blockAddress
+	}
 
 	return blockType, blockIdentifier, resourceAddress
 }
@@ -160,6 +182,11 @@ func checkForChanges(f *hclwrite.File, path string) (changed bool) {
 }
 
 func IsGlobalAccountParent(btpClient *btpcli.ClientFacade, parentId string) (isParent bool) {
+	// Execute Mock in case of testing
+	if testing.Testing() {
+		return testutils.GetGlobalAccountMockParentData(parentId)
+	}
+
 	globalAccountId, _ := btpcli.GetGlobalAccountId(btpClient)
 
 	if parentId == globalAccountId {

@@ -36,6 +36,14 @@ var testFiles = testFileMapping{
 		sourceFilePath: "resource_subaccount_trust_configuration_no_replace.tf",
 		targetFilePath: "resource_subaccount_trust_configuration_no_replace.tf",
 	},
+	"sa_with_ga_parent": {
+		sourceFilePath: "resource_subaccount_with_ga_parent_source.tf",
+		targetFilePath: "resource_subaccount_with_ga_parent_target.tf",
+	},
+	"sa_without_ga_parent": {
+		sourceFilePath: "resource_subaccount_wo_ga_parent_source.tf",
+		targetFilePath: "resource_subaccount_wo_ga_parent_target.tf",
+	},
 }
 
 // Read a hcl files from disc
@@ -101,4 +109,8 @@ func AreHclFilesEqual(testResultHclFile *hclwrite.File, targetHclFile *hclwrite.
 
 func getFilePathsbyId(id string) (sourceFilePath string, targetFilePath string) {
 	return testFiles[id].sourceFilePath, testFiles[id].targetFilePath
+}
+
+func GetGlobalAccountMockParentData(parentId string) bool {
+	return parentId == "GlobalAccountSubdomain"
 }
