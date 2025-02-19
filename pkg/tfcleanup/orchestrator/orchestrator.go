@@ -83,7 +83,7 @@ func orchestrateCodeCleanup(dir string, level string, levelIds generictools.Leve
 	}
 
 	contentToCreate := make(generictools.VariableContent)
-	dependencyAddresses := generictools.NewDepedendcyAddresses()
+	dependencyAddresses := generictools.NewDependencyAddresses()
 
 	btpClient, err := btpcli.GetLoggedInClient()
 

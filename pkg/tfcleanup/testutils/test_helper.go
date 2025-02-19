@@ -28,6 +28,14 @@ var testFiles = testFileMapping{
 		sourceFilePath: "provider_cf_source.tf",
 		targetFilePath: "provider_cf_target.tf",
 	},
+	"sa_trust_config_replace": {
+		sourceFilePath: "resource_subaccount_trust_configuration_replace.tf",
+		targetFilePath: "resource_subaccount_trust_configuration_replace.tf",
+	},
+	"sa_trust_config_no_replace": {
+		sourceFilePath: "resource_subaccount_trust_configuration_no_replace.tf",
+		targetFilePath: "resource_subaccount_trust_configuration_no_replace.tf",
+	},
 }
 
 // Read a hcl files from disc
@@ -38,8 +46,8 @@ func GetHclFilesById(id string) (sourceHclFile *hclwrite.File, targetHclFile *hc
 	currentDir, _ := os.Getwd()
 	// We navigate up one level to land in the tfcleanup directory
 	currentDir = filepath.Dir(currentDir)
+
 	srcPath := filepath.Join(currentDir, "testutils", "testdata", sourceFilePath)
-	trgtPath := filepath.Join(currentDir, "testutils", "testdata", targetFilePath)
 
 	srcFile, err := os.ReadFile(srcPath)
 	if err != nil {
@@ -47,6 +55,7 @@ func GetHclFilesById(id string) (sourceHclFile *hclwrite.File, targetHclFile *hc
 		return
 	}
 
+	trgtPath := filepath.Join(currentDir, "testutils", "testdata", targetFilePath)
 	trgtFile, err := os.ReadFile(trgtPath)
 	if err != nil {
 		log.Printf("Failed to read file %q: %s", trgtPath, err)

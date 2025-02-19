@@ -52,7 +52,7 @@ type DepedendcyAddresses struct {
 	BlocksToRemove     []BlockSpecifier
 }
 
-func NewDepedendcyAddresses() DepedendcyAddresses {
+func NewDependencyAddresses() DepedendcyAddresses {
 	return DepedendcyAddresses{
 		EntitlementAddress: make(map[EntitlementKey]string),
 		RoleAddress:        make(map[RoleKey]string),

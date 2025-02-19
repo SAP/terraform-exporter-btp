@@ -290,6 +290,10 @@ func ReplaceAttribute(body *hclwrite.Body, identifier string, description string
 
 		if len(tokens) == 3 {
 			replacedTokens, attrValue := ReplaceStringTokenVar(tokens, identifier)
+			if attrValue == "" {
+				return
+			}
+
 			(*variables)[identifier] = VariableInfo{
 				Description: description,
 				Value:       attrValue,

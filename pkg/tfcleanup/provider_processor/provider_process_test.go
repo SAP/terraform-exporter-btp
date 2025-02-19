@@ -12,8 +12,9 @@ import (
 func TestProcessProvider(t *testing.T) {
 
 	btpSrcFile, btpTrgtFile := testutils.GetHclFilesById("provider_btp")
-
 	cfSrcFile, cfTrgtFile := testutils.GetHclFilesById("provider_cf")
+
+	emptyTestContent := make(generictools.VariableContent)
 
 	tests := []struct {
 		name          string
@@ -42,6 +43,18 @@ func TestProcessProvider(t *testing.T) {
 					Value:       "https://api.cf.sap.hana.ondemand.com",
 				},
 			},
+		},
+		{
+			name:          "Test BTP Provider Cleanup - No changes",
+			src:           btpTrgtFile,
+			trgt:          btpTrgtFile,
+			trgtVariables: &emptyTestContent,
+		},
+		{
+			name:          "Test CF Provider Cleanup - No changes",
+			src:           cfTrgtFile,
+			trgt:          cfTrgtFile,
+			trgtVariables: &emptyTestContent,
 		},
 	}
 
