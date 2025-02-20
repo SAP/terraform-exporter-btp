@@ -49,7 +49,7 @@ func TestFillRoleDependencyAddresses(t *testing.T) {
 
 			dependencies := generictools.NewDependencyAddresses()
 			blocks := tt.src.Body().Blocks()
-			// we assume one rrsource entry in the blocks file
+			// we assume one resource entry in the blocks file
 			fillRoleDependencyAddresses(blocks[0].Body(), tt.resourceAddress, &dependencies)
 
 			assert.Equal(t, tt.trgtDependencies.RoleAddress, dependencies.RoleAddress)

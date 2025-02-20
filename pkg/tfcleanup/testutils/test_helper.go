@@ -80,6 +80,14 @@ var testFiles = testFileMapping{
 		sourceFilePath: "remove_config_block_source.tf",
 		targetFilePath: "remove_config_block_target.tf",
 	},
+	"cf_space_dependency": {
+		sourceFilePath: "resource_cf_space_dependency_source.tf",
+		targetFilePath: "resource_cf_space_dependency_target.tf",
+	},
+	"cf_space_no_dependency": {
+		sourceFilePath: "resource_cf_space_no_dependency.tf",
+		targetFilePath: "resource_cf_space_no_dependency.tf",
+	},
 }
 
 // Read a hcl files from disc
