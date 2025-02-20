@@ -53,7 +53,7 @@ func TestProcessSATrustConfig(t *testing.T) {
 			dependencies := generictools.NewDependencyAddresses()
 
 			blocks := tt.src.Body().Blocks()
-			// we assume one rrsource entry in the blocks file
+			// we assume one resource entry in the blocks file
 			processTrustConfigurationAttributes(blocks[0].Body(), blocks[0].Labels()[0], blocks[0].Labels()[0]+"."+blocks[0].Labels()[1], &dependencies)
 			assert.Equal(t, tt.trgtDependencies.BlocksToRemove, dependencies.BlocksToRemove)
 		})

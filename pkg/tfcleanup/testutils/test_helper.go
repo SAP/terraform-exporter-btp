@@ -60,6 +60,14 @@ var testFiles = testFileMapping{
 		sourceFilePath: "resource_subaccount_role_incomplete.tf",
 		targetFilePath: "resource_subaccount_role_incomplete.tf",
 	},
+	"sa_subscription_dependency": {
+		sourceFilePath: "resource_subaccount_subscription_dep_source.tf",
+		targetFilePath: "resource_subaccount_subscription_dep_target.tf",
+	},
+	"sa_subscription_no_dependency": {
+		sourceFilePath: "resource_subaccount_subscription_no_dependency.tf",
+		targetFilePath: "resource_subaccount_subscription_no_dependency.tf",
+	},
 	"empty_attributes": {
 		sourceFilePath: "resource_empty_attributes_source.tf",
 		targetFilePath: "resource_empty_attributes_target.tf",
