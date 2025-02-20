@@ -25,7 +25,7 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 		case tfutils.DirectoryLevel:
 			processDirectoryLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient, levelIds)
 		case tfutils.OrganizationLevel:
-			processCfOrgLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient, levelIds)
+			processCfOrgLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, levelIds)
 		}
 	}
 
@@ -90,8 +90,21 @@ func processDirectoryLevel(body *hclwrite.Body, variables *generictools.Variable
 	}
 }
 
-func processCfOrgLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
+func processCfOrgLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, levelIds generictools.LevelIds) {
 	extractOrgIds(body, variables, levelIds.CfOrgId)
+	if blockIdentifier == spaceBlockIdentifier {
+		spaceId := ExtractSpaceId(body)
+		if spaceId == "" {
+			return
+		}
+		dependencyAddresses.SpaceAddress[spaceId] = resourceAddress
+	}
+
+	if blockIdentifier != spaceBlockIdentifier {
+		for spaceId, spaceAddress := range dependencyAddresses.SpaceAddress {
+			generictools.ReplaceSpaceDependency(body, spaceIdentifier, spaceAddress, spaceId)
+		}
+	}
 }
 
 func processDependencies(body *hclwrite.Body, dependencyAddresses *generictools.DepedendcyAddresses) {

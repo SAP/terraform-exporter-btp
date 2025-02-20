@@ -119,3 +119,26 @@ func GetSpaceName(spaceId string) (string, error) {
 	}
 	return space[0].Name, nil
 }
+
+func GetSpaceId(spaceName string) (string, error) {
+	session, err := configureClient()
+	if err != nil {
+		return "", fmt.Errorf("error configure client")
+	}
+
+	spaceListOption := client.NewSpaceListOptions()
+	spaceListOption.Names = client.Filter{
+		Values: []string{
+			spaceName,
+		},
+	}
+
+	space, err := session.CFClient.Spaces.ListAll(context.Background(), spaceListOption)
+	if err != nil {
+		return "", err
+	}
+	if len(space) == 0 {
+		return "", fmt.Errorf("space not found")
+	}
+	return space[0].GUID, nil
+}

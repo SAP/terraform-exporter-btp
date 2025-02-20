@@ -241,6 +241,21 @@ func ReplaceMainDependency(body *hclwrite.Body, mainIdentifier string, mainAddre
 	}
 }
 
+func ReplaceSpaceDependency(body *hclwrite.Body, spaceIdentifier string, spaceAddress string, spaceId string) {
+	if spaceAddress == "" {
+		return
+	}
+
+	for name, attr := range body.Attributes() {
+		tokens := attr.Expr().BuildTokens(nil)
+
+		if name == spaceIdentifier && len(tokens) == 3 && spaceId == GetStringToken(tokens) {
+			replacedTokens := ReplaceDependency(tokens, spaceAddress)
+			body.SetAttributeRaw(name, replacedTokens)
+		}
+	}
+}
+
 func ProcessParentAttribute(body *hclwrite.Body, description string, btpClient *btpcli.ClientFacade, variables *VariableContent) {
 	parentAttr := body.GetAttribute(ParentIdentifier)
 	if parentAttr == nil {

@@ -45,6 +45,7 @@ type VariableContent map[string]VariableInfo
 type DepedendcyAddresses struct {
 	SubaccountAddress  string
 	DirectoryAddress   string
+	SpaceAddress       map[string]string
 	EntitlementAddress map[EntitlementKey]string
 	RoleAddress        map[RoleKey]string
 	DataSourceInfo     []DataSourceInfo
@@ -55,5 +56,6 @@ func NewDepedendcyAddresses() DepedendcyAddresses {
 	return DepedendcyAddresses{
 		EntitlementAddress: make(map[EntitlementKey]string),
 		RoleAddress:        make(map[RoleKey]string),
+		SpaceAddress:       make(map[string]string),
 	}
 }
