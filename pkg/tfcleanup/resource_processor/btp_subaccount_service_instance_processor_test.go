@@ -13,10 +13,10 @@ func TestAddServiceInstanceDependency(t *testing.T) {
 	srcFileServiceInstanceDep, trgtFileServiceInstanceDep := testutils.GetHclFilesById("sa_service_instance_dependency")
 	srcFileServiceInstanceNoDep, trgtFileServiceInstanceNoDep := testutils.GetHclFilesById("sa_service_instance_no_dependency")
 
-	defaultTestDependencies := getNewDependenciesTemplate()
-	defaultTestDependenciesCopy := getNewDependenciesTemplate()
+	defaultTestDependencies := getNewServiceInstanceDepTemplate()
+	defaultTestDependenciesCopy := getNewServiceInstanceDepTemplate()
 
-	targetDependencies := getNewDependenciesTemplate()
+	targetDependencies := getNewServiceInstanceDepTemplate()
 	targetDependencies.DataSourceInfo = append(targetDependencies.DataSourceInfo, generictools.DataSourceInfo{
 		DatasourceAddress:  "alert-notification_standard",
 		SubaccountAddress:  "btp_subaccount.subaccount_0.id",
@@ -61,7 +61,7 @@ func TestAddServiceInstanceDependency(t *testing.T) {
 
 }
 
-func getNewDependenciesTemplate() generictools.DepedendcyAddresses {
+func getNewServiceInstanceDepTemplate() generictools.DepedendcyAddresses {
 	defaultTestDependencies := generictools.NewDependencyAddresses()
 
 	entitlementKey := generictools.EntitlementKey{
