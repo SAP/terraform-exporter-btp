@@ -68,6 +68,14 @@ var testFiles = testFileMapping{
 		sourceFilePath: "resource_subaccount_subscription_no_dependency.tf",
 		targetFilePath: "resource_subaccount_subscription_no_dependency.tf",
 	},
+	"sa_service_instance_dependency": {
+		sourceFilePath: "resource_subaccount_service_instance_dep_source.tf",
+		targetFilePath: "resource_subaccount_service_instance_dep_target.tf",
+	},
+	"sa_service_instance_no_dependency": {
+		sourceFilePath: "resource_subaccount_service_instance_no_dependency.tf",
+		targetFilePath: "resource_subaccount_service_instance_no_dependency.tf",
+	},
 	"empty_attributes": {
 		sourceFilePath: "resource_empty_attributes_source.tf",
 		targetFilePath: "resource_empty_attributes_target.tf",
@@ -151,7 +159,9 @@ func GetHclFilesById(id string) (sourceHclFile *hclwrite.File, targetHclFile *hc
 
 func AreHclFilesEqual(testResultHclFile *hclwrite.File, targetHclFile *hclwrite.File) error {
 
-	if bytes.Equal(testResultHclFile.Bytes(), targetHclFile.Bytes()) {
+	hclwrite.Format(testResultHclFile.Bytes())
+
+	if bytes.Equal(hclwrite.Format(testResultHclFile.Bytes()), hclwrite.Format(targetHclFile.Bytes())) {
 		return nil
 	} else {
 		return fmt.Errorf("HCL files are not equal")
@@ -165,4 +175,11 @@ func getFilePathsbyId(id string) (sourceFilePath string, targetFilePath string) 
 
 func GetGlobalAccountMockParentData(parentId string) bool {
 	return parentId == "GlobalAccountSubdomain"
+}
+
+func GetServiceMockData(planId string) (planName string, serviceName string) {
+	if planId == "0815" {
+		return "standard", "alert-notification"
+	}
+	return "premium", "alert-notification-dash"
 }

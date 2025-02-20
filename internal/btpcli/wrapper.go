@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"testing"
+
+	"github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/testutils"
 )
 
 func GetLoggedInClient() (*ClientFacade, error) {
@@ -68,6 +71,10 @@ func GetGlobalAccountId(client *ClientFacade) (string, error) {
 }
 
 func GetServiceDataByPlanId(client *ClientFacade, subaccountId string, planId string) (planName string, serviceName string, err error) {
+	if testing.Testing() {
+		planName, serviceName = testutils.GetServiceMockData(planId)
+		return planName, serviceName, nil
+	}
 
 	cliRes, _, err := client.Services.Plan.GetById(context.Background(), subaccountId, planId)
 

@@ -7,6 +7,6 @@ import (
 
 const cfOrgIdentifier = "org"
 
-func extractOrgIds(body *hclwrite.Body, variables *generictools.VariableContent, orgId string) {
+func extractOrgIds(body *hclwrite.Body, variables *generictools.VariableContent) {
 	generictools.ReplaceAttribute(body, cfOrgIdentifier, "ID of the Cloud Foundry Organization", variables)
 }

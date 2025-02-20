@@ -23,9 +23,9 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 		case tfutils.SubaccountLevel:
 			processSubaccountLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient, levelIds)
 		case tfutils.DirectoryLevel:
-			processDirectoryLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient, levelIds)
+			processDirectoryLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient)
 		case tfutils.OrganizationLevel:
-			processCfOrgLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, levelIds)
+			processCfOrgLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress)
 		}
 	}
 
@@ -71,7 +71,7 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 	}
 }
 
-func processDirectoryLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
+func processDirectoryLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade) {
 	if blockIdentifier == directoryBlockIdentifier {
 		processDirectoryAttributes(body, variables, btpClient)
 		dependencyAddresses.DirectoryAddress = resourceAddress
@@ -90,8 +90,8 @@ func processDirectoryLevel(body *hclwrite.Body, variables *generictools.Variable
 	}
 }
 
-func processCfOrgLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, levelIds generictools.LevelIds) {
-	extractOrgIds(body, variables, levelIds.CfOrgId)
+func processCfOrgLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string) {
+	extractOrgIds(body, variables)
 	if blockIdentifier == spaceBlockIdentifier {
 		fillSpaceDependencyAddress(body, dependencyAddresses, resourceAddress)
 	}

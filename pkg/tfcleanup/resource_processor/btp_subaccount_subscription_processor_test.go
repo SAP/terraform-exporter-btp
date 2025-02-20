@@ -12,7 +12,7 @@ import (
 func TestAddEntitlementDependency(t *testing.T) {
 
 	srcFileSubscriptionDep, trgtFileSubscriptionDep := testutils.GetHclFilesById("sa_subscription_dependency")
-	srcFileSubscriptionNoep, trgtFileSubscriptionNoDep := testutils.GetHclFilesById("sa_subscription_no_dependency")
+	srcFileSubscriptionNoDep, trgtFileSubscriptionNoDep := testutils.GetHclFilesById("sa_subscription_no_dependency")
 
 	emptyTestDependencies := generictools.NewDependencyAddresses()
 	defaultTestDependencies := generictools.NewDependencyAddresses()
@@ -39,7 +39,7 @@ func TestAddEntitlementDependency(t *testing.T) {
 		},
 		{
 			name:         "Test No Subscription Dependency",
-			src:          srcFileSubscriptionNoep,
+			src:          srcFileSubscriptionNoDep,
 			trgt:         trgtFileSubscriptionNoDep,
 			dependencies: &emptyTestDependencies,
 		},
