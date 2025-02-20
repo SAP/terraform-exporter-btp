@@ -44,6 +44,14 @@ var testFiles = testFileMapping{
 		sourceFilePath: "resource_subaccount_wo_ga_parent_source.tf",
 		targetFilePath: "resource_subaccount_wo_ga_parent_target.tf",
 	},
+	"sa_entitlement": {
+		sourceFilePath: "resource_subaccount_entitlement.tf",
+		targetFilePath: "resource_subaccount_entitlement.tf",
+	},
+	"sa_entitlement_error": {
+		sourceFilePath: "resource_subaccount_entitlement_incomplete.tf",
+		targetFilePath: "resource_subaccount_entitlement_incomplete.tf",
+	},
 	"empty_attributes": {
 		sourceFilePath: "resource_empty_attributes_source.tf",
 		targetFilePath: "resource_empty_attributes_target.tf",
