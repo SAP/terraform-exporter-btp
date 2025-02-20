@@ -11,6 +11,8 @@ import (
 
 func TestAddRoleDependency(t *testing.T) {
 	srcFileRoleCollectionDep, trgtFileRoleCollectionDep := testutils.GetHclFilesById("sa_role_collection_dependency")
+	srcFileRoleCollectionDepSingle, trgtFileRoleCollectionDepSingle := testutils.GetHclFilesById("sa_role_collection_single_dependency")
+	srcFileRoleCollectionNoDep, trgtFileRoleCollectionNoDep := testutils.GetHclFilesById("sa_role_collection_no_dependency")
 
 	defaultTestDependencies := getNewRoleDepTemplate()
 
@@ -21,10 +23,21 @@ func TestAddRoleDependency(t *testing.T) {
 		dependencies generictools.DepedendcyAddresses
 	}{
 		{
-			name:         "Test Role Collection Dependency",
+			name:         "Test Multiple Role Collection Dependencies",
 			src:          srcFileRoleCollectionDep,
 			trgt:         trgtFileRoleCollectionDep,
 			dependencies: defaultTestDependencies,
+		},
+		{
+			name:         "Test Single Role Collection Dependencies",
+			src:          srcFileRoleCollectionDepSingle,
+			trgt:         trgtFileRoleCollectionDepSingle,
+			dependencies: defaultTestDependencies,
+		},
+		{
+			name: "Test No Role Collection Dependency",
+			src:  srcFileRoleCollectionNoDep,
+			trgt: trgtFileRoleCollectionNoDep,
 		},
 	}
 
@@ -32,7 +45,7 @@ func TestAddRoleDependency(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			blocks := tt.src.Body().Blocks()
 			// we assume one resource entry in the blocks file
-			addRoleDependency(blocks[0].Body(), nil)
+			addRoleDependency(blocks[0].Body(), &tt.dependencies)
 			assert.NoError(t, testutils.AreHclFilesEqual(tt.src, tt.trgt))
 		})
 	}
@@ -149,14 +162,20 @@ func TestBuildDependencyString(t *testing.T) {
 func getNewRoleDepTemplate() generictools.DepedendcyAddresses {
 	defaultTestDependencies := generictools.NewDependencyAddresses()
 
-	roleKey := generictools.RoleKey{
-		AppId:            "app1",
-		Name:             "role1",
-		RoleTemplateName: "template1",
+	roleKey1 := generictools.RoleKey{
+		AppId:            "cis-local!b4",
+		Name:             "Subaccount Admin",
+		RoleTemplateName: "Subaccount_Admin",
+	}
+	roleKey2 := generictools.RoleKey{
+		AppId:            "service-manager!b1476",
+		Name:             "Subaccount Service Administrator",
+		RoleTemplateName: "Subaccount_Service_Administrator",
 	}
 
 	defaultTestDependencies.RoleAddress = make(map[generictools.RoleKey]string)
-	defaultTestDependencies.RoleAddress[roleKey] = "dependency1"
+	defaultTestDependencies.RoleAddress[roleKey1] = "btp_subaccount_role.role_1"
+	defaultTestDependencies.RoleAddress[roleKey2] = "btp_subaccount_role.role_2"
 
 	return defaultTestDependencies
 }

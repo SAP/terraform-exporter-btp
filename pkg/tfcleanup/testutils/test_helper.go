@@ -76,9 +76,17 @@ var testFiles = testFileMapping{
 		sourceFilePath: "resource_subaccount_service_instance_no_dependency.tf",
 		targetFilePath: "resource_subaccount_service_instance_no_dependency.tf",
 	},
-	"": {
+	"sa_role_collection_dependency": {
 		sourceFilePath: "resource_subaccount_role_collection_dep_source.tf",
 		targetFilePath: "resource_subaccount_role_collection_dep_target.tf",
+	},
+	"sa_role_collection_single_dependency": {
+		sourceFilePath: "resource_subaccount_role_collection_single_dep_source.tf",
+		targetFilePath: "resource_subaccount_role_collection_single_dep_target.tf",
+	},
+	"sa_role_collection_no_dependency": {
+		sourceFilePath: "resource_subaccount_role_collection_no_dependency.tf",
+		targetFilePath: "resource_subaccount_role_collection_no_dependency.tf",
 	},
 	"empty_attributes": {
 		sourceFilePath: "resource_empty_attributes_source.tf",
