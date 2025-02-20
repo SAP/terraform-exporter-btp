@@ -315,18 +315,19 @@ func ReplaceAttribute(body *hclwrite.Body, identifier string, description string
 	if attribute != nil {
 		tokens := attribute.Expr().BuildTokens(nil)
 
-		if len(tokens) == 3 {
-			replacedTokens, attrValue := ReplaceStringTokenVar(tokens, identifier)
-			if attrValue == "" {
-				return
-			}
-
-			(*variables)[identifier] = VariableInfo{
-				Description: description,
-				Value:       attrValue,
-			}
-			body.SetAttributeRaw(identifier, replacedTokens)
+		if len(tokens) != 3 {
+			return
 		}
+		replacedTokens, attrValue := ReplaceStringTokenVar(tokens, identifier)
+		if attrValue == "" {
+			return
+		}
+
+		(*variables)[identifier] = VariableInfo{
+			Description: description,
+			Value:       attrValue,
+		}
+		body.SetAttributeRaw(identifier, replacedTokens)
 	}
 }
 

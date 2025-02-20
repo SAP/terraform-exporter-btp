@@ -44,6 +44,26 @@ var testFiles = testFileMapping{
 		sourceFilePath: "resource_subaccount_wo_ga_parent_source.tf",
 		targetFilePath: "resource_subaccount_wo_ga_parent_target.tf",
 	},
+	"empty_attributes": {
+		sourceFilePath: "resource_empty_attributes_source.tf",
+		targetFilePath: "resource_empty_attributes_target.tf",
+	},
+	"main_dependency": {
+		sourceFilePath: "resource_main_dependency_source.tf",
+		targetFilePath: "resource_main_dependency_target.tf",
+	},
+	"replace_attribute": {
+		sourceFilePath: "resource_replace_attribute_source.tf",
+		targetFilePath: "resource_replace_attribute_target.tf",
+	},
+	"remove_import_block": {
+		sourceFilePath: "remove_import_block_source.tf",
+		targetFilePath: "remove_import_block_target.tf",
+	},
+	"remove_config_block": {
+		sourceFilePath: "remove_config_block_source.tf",
+		targetFilePath: "remove_config_block_target.tf",
+	},
 }
 
 // Read a hcl files from disc

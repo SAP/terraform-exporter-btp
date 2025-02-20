@@ -61,22 +61,13 @@ func TestProcessParent(t *testing.T) {
 
 			contentToCreate := make(VariableContent)
 			blocks := tt.src.Body().Blocks()
-			// we assume one rrsource entry in the blocks file
+			// we assume one resource entry in the blocks file
 			ProcessParentAttribute(blocks[0].Body(), tt.description, nil, &contentToCreate)
-			assert.NoError(t, testutils.AreHclFilesEqual(tt.trgt, tt.src))
+			assert.NoError(t, testutils.AreHclFilesEqual(tt.src, tt.trgt))
 			assert.Equal(t, tt.trgtVariables, &contentToCreate)
 		})
 	}
 }
-
-/*
-	TODO
-RemoveConfigBlock
-RemoveImportBlock
-RemoveEmptyAttributes
-ReplaceDependency
-ReplaceAttribute
-*/
 
 func TestReplaceStringTokenVar(t *testing.T) {
 	tests := []struct {
@@ -236,6 +227,213 @@ func TestExtractBlockInformation(t *testing.T) {
 			assert.Equal(t, tt.expectedBlockType, blockType)
 			assert.Equal(t, tt.expectedBlockId, blockIdentifier)
 			assert.Equal(t, tt.expectedResAddr, resourceAddress)
+		})
+	}
+}
+
+func TestRemoveEmptyAttributes(t *testing.T) {
+	srcFileEmptyAttributes, trgtFileEmptyAttributes := testutils.GetHclFilesById("empty_attributes")
+	_, trgtFileBackup := testutils.GetHclFilesById("empty_attributes")
+
+	tests := []struct {
+		name string
+		src  *hclwrite.File
+		trgt *hclwrite.File
+	}{
+		{
+			name: "Test removal of empty attributes",
+			src:  srcFileEmptyAttributes,
+			trgt: trgtFileEmptyAttributes,
+		},
+		{
+			name: "Test nothing to remove",
+			src:  trgtFileEmptyAttributes,
+			trgt: trgtFileBackup,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			blocks := tt.src.Body().Blocks()
+			// we assume one resource entry in the blocks file
+			RemoveEmptyAttributes(blocks[0].Body())
+			assert.NoError(t, testutils.AreHclFilesEqual(tt.src, tt.trgt))
+		})
+	}
+}
+
+func TestReplaceMainDependency(t *testing.T) {
+	srcFileMainDependency, trgtFileMainDependency := testutils.GetHclFilesById("main_dependency")
+	_, trgtFileBackup := testutils.GetHclFilesById("main_dependency")
+
+	tests := []struct {
+		name           string
+		src            *hclwrite.File
+		trgt           *hclwrite.File
+		mainIdentifier string
+		mainAddress    string
+	}{
+		{
+			name:           "Test replacement of main dependency",
+			src:            srcFileMainDependency,
+			trgt:           trgtFileMainDependency,
+			mainIdentifier: "subaccount_id",
+			mainAddress:    "btp_subaccount_dummy.subaccount_0",
+		},
+		{
+			name:           "Test nothing to replace",
+			src:            trgtFileMainDependency,
+			trgt:           trgtFileBackup,
+			mainIdentifier: "subaccount_id",
+			mainAddress:    "btp_subaccount_dummy.subaccount_0",
+		},
+		{
+			name:           "Identifier not available",
+			src:            trgtFileMainDependency,
+			trgt:           trgtFileBackup,
+			mainIdentifier: "directory_id",
+			mainAddress:    "btp_subaccount_dummy.directory_0",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			blocks := tt.src.Body().Blocks()
+			// we assume one resource entry in the blocks file
+			ReplaceMainDependency(blocks[0].Body(), tt.mainIdentifier, tt.mainAddress)
+			assert.NoError(t, testutils.AreHclFilesEqual(tt.src, tt.trgt))
+		})
+	}
+}
+
+func TestReplaceAttribute(t *testing.T) {
+	srcFileReplaceAttr, trgtFileReplaceAttr := testutils.GetHclFilesById("replace_attribute")
+	_, trgtFileBackup := testutils.GetHclFilesById("replace_attribute")
+
+	emptyTestContent := make(VariableContent)
+
+	tests := []struct {
+		name          string
+		src           *hclwrite.File
+		trgt          *hclwrite.File
+		identifier    string
+		description   string
+		trgtVariables *VariableContent
+	}{
+		{
+			name:        "Test replace attribute",
+			src:         srcFileReplaceAttr,
+			trgt:        trgtFileReplaceAttr,
+			identifier:  "plan_name",
+			description: "Name of the plan",
+			trgtVariables: &VariableContent{
+				"plan_name": VariableInfo{
+					Description: "Name of the plan",
+					Value:       "dashboard",
+				},
+			},
+		},
+		{
+			name:          "Test nothing to replace",
+			src:           trgtFileReplaceAttr,
+			trgt:          trgtFileBackup,
+			identifier:    "plan_name",
+			description:   "Some Text",
+			trgtVariables: &emptyTestContent,
+		},
+		{
+			name:          "Identifier not available",
+			src:           trgtFileReplaceAttr,
+			trgt:          trgtFileBackup,
+			identifier:    "directory_id",
+			description:   "Some Text",
+			trgtVariables: &emptyTestContent,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			contentToCreate := make(VariableContent)
+			blocks := tt.src.Body().Blocks()
+			// we assume one resource entry in the blocks file
+			ReplaceAttribute(blocks[0].Body(), tt.identifier, tt.description, &contentToCreate)
+			assert.NoError(t, testutils.AreHclFilesEqual(tt.src, tt.trgt))
+			assert.Equal(t, tt.trgtVariables, &contentToCreate)
+		})
+	}
+}
+
+func TestRemoveImportBlock(t *testing.T) {
+	srcFileImport, trgtFileImport := testutils.GetHclFilesById("remove_import_block")
+	_, trgtFileBackup := testutils.GetHclFilesById("remove_import_block")
+
+	tests := []struct {
+		name            string
+		src             *hclwrite.File
+		trgt            *hclwrite.File
+		resourceAddress string
+		srcResultStore  *map[string]int
+		trgtResultStore *map[string]int
+	}{
+		{
+			name:            "Test remove import block",
+			src:             srcFileImport,
+			trgt:            trgtFileImport,
+			resourceAddress: "btp_subaccount_trust_configuration.trust_0",
+			srcResultStore:  &map[string]int{"btp_subaccount_trust_configuration": 2},
+			trgtResultStore: &map[string]int{"btp_subaccount_trust_configuration": 1},
+		},
+		{
+			name:            "Test nothing to remove",
+			src:             trgtFileImport,
+			trgt:            trgtFileBackup,
+			resourceAddress: "btp_subaccount.subaccount_0",
+			srcResultStore:  &map[string]int{"btp_subaccount_trust_configuration": 2},
+			trgtResultStore: &map[string]int{"btp_subaccount_trust_configuration": 2},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			RemoveImportBlock(srcFileImport.Body(), tt.resourceAddress, tt.srcResultStore)
+			assert.NoError(t, testutils.AreHclFilesEqual(tt.trgt, tt.src))
+			assert.Equal(t, tt.trgtResultStore, tt.srcResultStore)
+		})
+	}
+}
+
+func TestRemoveConfigBlock(t *testing.T) {
+	srcFileRemoveConfig, trgtFileRemoveConfig := testutils.GetHclFilesById("remove_config_block")
+	_, trgtFileBackup := testutils.GetHclFilesById("remove_config_block")
+
+	tests := []struct {
+		name            string
+		src             *hclwrite.File
+		trgt            *hclwrite.File
+		resourceAddress string
+	}{
+		{
+			name:            "Test remove config block",
+			src:             srcFileRemoveConfig,
+			trgt:            trgtFileRemoveConfig,
+			resourceAddress: "btp_subaccount_trust_configuration.trust_0",
+		},
+		{
+			name:            "Test nothing to remove",
+			src:             trgtFileRemoveConfig,
+			trgt:            trgtFileBackup,
+			resourceAddress: "btp_subaccount_trust_configuration.trust_0",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			RemoveConfigBlock(srcFileRemoveConfig.Body(), tt.resourceAddress)
+			assert.NoError(t, testutils.AreHclFilesEqual(tt.trgt, tt.src))
 		})
 	}
 }
