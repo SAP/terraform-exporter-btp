@@ -93,17 +93,11 @@ func processDirectoryLevel(body *hclwrite.Body, variables *generictools.Variable
 func processCfOrgLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DepedendcyAddresses, blockIdentifier string, resourceAddress string, levelIds generictools.LevelIds) {
 	extractOrgIds(body, variables, levelIds.CfOrgId)
 	if blockIdentifier == spaceBlockIdentifier {
-		spaceId := ExtractSpaceId(body)
-		if spaceId == "" {
-			return
-		}
-		dependencyAddresses.SpaceAddress[spaceId] = resourceAddress
+		fillSpaceDependencyAddress(body, dependencyAddresses, resourceAddress)
 	}
 
 	if blockIdentifier != spaceBlockIdentifier {
-		for spaceId, spaceAddress := range dependencyAddresses.SpaceAddress {
-			generictools.ReplaceSpaceDependency(body, spaceIdentifier, spaceAddress, spaceId)
-		}
+		replaceSpaceDependency(body, spaceIdentifier, dependencyAddresses.SpaceAddress)
 	}
 }
 
