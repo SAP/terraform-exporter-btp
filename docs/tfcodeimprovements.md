@@ -1,7 +1,7 @@
 # Terraform Configuration Improvements
 
 !!! info
-    As of now this is an experimental feature and needs to be activated by setting the environment variable `BTPTF_EXPERIMENTAL` to a non-empty value.
+    You can switch this feature **off** by setting the environment variable `BTPTF_PLAIN` to a non-empty value.
 
 The Terraform Exporter for SAP BTP creates the Terraform configuration based on the data available on SAP BTP. This means that the resulting configuration needs manual adjustments before being in a decent state.
 

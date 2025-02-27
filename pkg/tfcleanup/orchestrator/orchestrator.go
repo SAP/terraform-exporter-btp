@@ -15,7 +15,7 @@ import (
 )
 
 func CleanUpJson(resources tfutils.BtpResources) (cleanedResources tfutils.BtpResources) {
-	if os.Getenv("BTPTF_EXPERIMENTAL") == "" {
+	if os.Getenv("BTPTF_PLAIN") != "" {
 		return resources
 	}
 	// Remove default trust configuration
@@ -40,12 +40,12 @@ func CleanUpJson(resources tfutils.BtpResources) (cleanedResources tfutils.BtpRe
 }
 
 func CleanUpGeneratedCode(configFolder string, level string, levelIds generictools.LevelIds, resultStore *map[string]int) {
-	if os.Getenv("BTPTF_EXPERIMENTAL") == "" {
+	if os.Getenv("BTPTF_PLAIN") != "" {
 		return
 	}
 
 	output.AddNewLine()
-	spinner := output.StartSpinner("🧪 making the Terraform configuration even better")
+	spinner := output.StartSpinner("📈 making the Terraform configuration even better")
 
 	currentDir, err := os.Getwd()
 	if err != nil {
