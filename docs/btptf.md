@@ -61,7 +61,7 @@ btptf export [flags]
 
 ```azdeveloper
   -e, --backend-config strings   Backend configuration
-  -b, --backend-path string      Path to the Terraform backend file
+  -b, --backend-path string      Path to the Terraform backend sample file
   -t, --backend-type string      Type of the Terraform backend
   -c, --config-dir string        Directory for the Terraform code (default "generated_configurations_<account-id>")
   -d, --directory string         ID of the directory
@@ -93,7 +93,7 @@ btptf export-by-json [flags]
 
 ```azdeveloper
   -e, --backend-config strings   Backend configuration
-  -b, --backend-path string      Path to the Terraform backend file
+  -b, --backend-path string      Path to the Terraform backend sample file
   -t, --backend-type string      Type of the Terraform backend
   -c, --config-dir string        Directory for the Terraform code (default "generated_configurations_<account-id>")
   -d, --directory string         ID of the directory
