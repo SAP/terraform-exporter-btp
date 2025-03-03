@@ -205,8 +205,9 @@ Here are some points to consider and maybe to be adjusted in the generated code:
 3. **Declare variables**
    The generated code already contains some variables in the *variables.tf* file. Depending on your requirements you might want to add further parameters to the variable list like the name of the subaccount.
 
-4. **Define a place for the state**
-   The state of your configuration should be stored in a remote state backend. Make sure to add the corresponding configuration in the *provider.tf* file . You find more details in the [Terraform documentation](https://developer.hashicorp.com/terraform/language/backend).
+4. **Configure backend**
+   The state of your configuration should be stored in a remote state backend. Make sure to add the corresponding configuration in the *provider.tf* file. You find more details in the [Terraform documentation](https://developer.hashicorp.com/terraform/language/backend).
+	 You can also include the backend configuration in the generated code by using the *--backend-path*, *--backend-type* and *--backend-config* flags.
 
 5. **Validate the import**
    Validate that the import is possible by executing '*terraform plan*'. Depending on the number of resources the planing should return a message like this:

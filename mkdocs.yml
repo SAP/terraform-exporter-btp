@@ -27,3 +27,4 @@ nav:
   - Concepts: concepts.md
   - Security Considerations: security.md
   - Terraform Configuration Improvements: tfcodeimprovements.md
+  - Remote Backend Configuration: remotebackend.md
