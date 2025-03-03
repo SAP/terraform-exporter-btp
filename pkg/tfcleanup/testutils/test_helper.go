@@ -28,6 +28,14 @@ var testFiles = testFileMapping{
 		sourceFilePath: "provider_cf_source.tf",
 		targetFilePath: "provider_cf_target.tf",
 	},
+	"provider_withbackend_btp": {
+		sourceFilePath: "provider_btp_backend_source.tf",
+		targetFilePath: "provider_btp_backend_target.tf",
+	},
+	"provider_wobackend_btp": {
+		sourceFilePath: "provider_btp_wo_backend.tf",
+		targetFilePath: "provider_btp_wo_backend.tf",
+	},
 	"sa_trust_config_replace": {
 		sourceFilePath: "resource_subaccount_trust_configuration_replace.tf",
 		targetFilePath: "resource_subaccount_trust_configuration_replace.tf",
