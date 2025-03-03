@@ -16,7 +16,7 @@ import (
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
-func exportByJson(subaccount string, directory string, organization string, jsonfile string, resourceFile string, configDir string) {
+func exportByJson(subaccount string, directory string, organization string, jsonfile string, resourceFile string, configDir string, backendConfig tfutils.BackendConfig) {
 	// Check if file size is valid
 	validFileSize, err := files.IsFileSizeValid(jsonfile)
 
@@ -115,7 +115,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 		CfOrgId:      organization,
 	}
 
-	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore)
+	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig)
 	tfutils.FinalizeTfConfig(configDir)
 	generateNextStepsDocument(configDir, subaccount, directory, organization, "")
 	output.RenderSummaryTable(resultStore)

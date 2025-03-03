@@ -5,6 +5,7 @@ import (
 
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/testutils"
+	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/stretchr/testify/assert"
 )
@@ -62,7 +63,12 @@ func TestProcessProvider(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			contentToCreate := make(generictools.VariableContent)
-			ProcessProvider(tt.src, &contentToCreate)
+			backendConfig := tfutils.BackendConfig{
+				PathToBackendConfig: "",
+				BackendType:         "",
+				BackendConfig:       []string{},
+			}
+			ProcessProvider(tt.src, &contentToCreate, backendConfig)
 
 			assert.NoError(t, testutils.AreHclFilesEqual(tt.trgt, tt.src))
 			assert.Equal(t, tt.trgtVariables, &contentToCreate)

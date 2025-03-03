@@ -24,6 +24,15 @@ var exportByJsonCmd = &cobra.Command{
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		path, _ := cmd.Flags().GetString("path")
 
+		backendPath, _ := cmd.Flags().GetString("backend-path")
+		backendType, _ := cmd.Flags().GetString("backend-type")
+		backendConfigOptions, _ := cmd.Flags().GetStringSlice("backend-config")
+		backendConfig := tfutils.BackendConfig{
+			PathToBackendConfig: backendPath,
+			BackendType:         backendType,
+			BackendConfig:       backendConfigOptions,
+		}
+
 		level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization, "")
 
 		if !isValidUuid(iD) {
@@ -41,7 +50,7 @@ var exportByJsonCmd = &cobra.Command{
 		}
 
 		output.PrintExportStartMessage()
-		exportByJson(subaccount, directory, organization, path, tfConfigFileName, configDir)
+		exportByJson(subaccount, directory, organization, path, tfConfigFileName, configDir, backendConfig)
 		output.PrintExportSuccessMessage()
 	},
 }
@@ -66,6 +75,8 @@ func init() {
 	var subaccount string
 	var directory string
 	var organization string
+	var backendPath string
+	var backendType string
 
 	exportByJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	exportByJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
@@ -75,6 +86,12 @@ func init() {
 
 	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")
+
+	exportByJsonCmd.Flags().StringVarP(&backendPath, "backend-path", "b", "", "Path to the Terraform backend file")
+	exportByJsonCmd.Flags().StringVarP(&backendType, "backend-type", "t", "", "Type of the Terraform backend")
+	exportByJsonCmd.Flags().StringSliceP("backend-config", "e", []string{}, "Backend configuration")
+	exportByJsonCmd.MarkFlagsMutuallyExclusive("backend-path", "backend-type")
+	exportByJsonCmd.MarkFlagsRequiredTogether("backend-type", "backend-config")
 
 	rootCmd.AddCommand(exportByJsonCmd)
 

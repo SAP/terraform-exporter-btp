@@ -39,7 +39,7 @@ func CleanUpJson(resources tfutils.BtpResources) (cleanedResources tfutils.BtpRe
 	return cleanedResources
 }
 
-func CleanUpGeneratedCode(configFolder string, level string, levelIds generictools.LevelIds, resultStore *map[string]int) {
+func CleanUpGeneratedCode(configFolder string, level string, levelIds generictools.LevelIds, resultStore *map[string]int, backendConfig tfutils.BackendConfig) {
 	if os.Getenv("BTPTF_PLAIN") != "" {
 		return
 	}
@@ -56,7 +56,7 @@ func CleanUpGeneratedCode(configFolder string, level string, levelIds generictoo
 
 	terraformConfigPath := filepath.Join(currentDir, configFolder)
 
-	err = orchestrateCodeCleanup(terraformConfigPath, level, levelIds, resultStore)
+	err = orchestrateCodeCleanup(terraformConfigPath, level, levelIds, resultStore, backendConfig)
 
 	if err != nil {
 		fmt.Print("\r\n")
@@ -67,7 +67,7 @@ func CleanUpGeneratedCode(configFolder string, level string, levelIds generictoo
 	output.StopSpinner(spinner)
 }
 
-func orchestrateCodeCleanup(dir string, level string, levelIds generictools.LevelIds, resultStore *map[string]int) error {
+func orchestrateCodeCleanup(dir string, level string, levelIds generictools.LevelIds, resultStore *map[string]int, backendConfig tfutils.BackendConfig) error {
 	dir = filepath.Clean(dir)
 
 	_, err := os.Lstat(dir)
@@ -101,7 +101,7 @@ func orchestrateCodeCleanup(dir string, level string, levelIds generictools.Leve
 			generictools.ProcessChanges(f, path)
 		} else if file.Name() == "provider.tf" {
 			f := generictools.GetHclFile(path)
-			providerprocessor.ProcessProvider(f, &contentToCreate)
+			providerprocessor.ProcessProvider(f, &contentToCreate, backendConfig)
 			generictools.ProcessChanges(f, path)
 		}
 	}
