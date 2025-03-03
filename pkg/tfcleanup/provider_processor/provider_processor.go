@@ -33,13 +33,23 @@ func processProviderAttributes(body *hclwrite.Body, inBlocks []string, variables
 
 func addBackendBlock(body *hclwrite.Body, backendConfig tfutils.BackendConfig) {
 
+	var terraFormBlockBody *hclwrite.Body
+
+	blocks := body.Blocks()
+	for _, block := range blocks {
+		if block.Type() == "terraform" {
+			terraFormBlockBody = block.Body()
+			break
+		}
+	}
+
 	if backendConfig.PathToBackendConfig != "" {
-		appendBackendBlockByFile(backendConfig.PathToBackendConfig, body)
+		appendBackendBlockByFile(backendConfig.PathToBackendConfig, terraFormBlockBody)
 		return
 	}
 
 	if backendConfig.BackendType != "" && backendConfig.BackendConfig != nil {
-		appendBackendBlockByParams(backendConfig.BackendType, backendConfig.BackendConfig, body)
+		appendBackendBlockByParams(backendConfig.BackendType, backendConfig.BackendConfig, terraFormBlockBody)
 		return
 	}
 

@@ -124,7 +124,7 @@ func init() {
 	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
 
-	exportByResourceCmd.Flags().StringVarP(&backendPath, "backend-path", "b", "", "Path to the Terraform backend file")
+	exportByResourceCmd.Flags().StringVarP(&backendPath, "backend-path", "b", "", "Path to the Terraform backend sample file")
 	exportByResourceCmd.Flags().StringVarP(&backendType, "backend-type", "t", "", "Type of the Terraform backend")
 	exportByResourceCmd.Flags().StringSliceP("backend-config", "e", []string{}, "Backend configuration")
 	exportByResourceCmd.MarkFlagsMutuallyExclusive("backend-path", "backend-type")

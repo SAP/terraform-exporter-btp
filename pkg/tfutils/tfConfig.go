@@ -437,7 +437,7 @@ func FinalizeTfConfig(configFolder string) {
 		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
 	}
 
-	if err := runTfCmdGeneric("init"); err != nil {
+	if err := runTfCmdGeneric("init", "-backend=false"); err != nil {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
 		log.Fatalf("error initializing Terraform: %v", err)
