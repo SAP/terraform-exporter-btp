@@ -1,6 +1,7 @@
 package files
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -116,7 +117,6 @@ func copyFile(src, dest string) error {
 }
 
 func WriteExportLog(configDir string, resource string) error {
-
 	currentDir, err := os.Getwd()
 	if err != nil {
 		return fmt.Errorf("error getting current directory: %v", err)
@@ -124,28 +124,107 @@ func WriteExportLog(configDir string, resource string) error {
 
 	logFileName := filepath.Join(currentDir, configDir, "importlog.json")
 
+	// Check if the log file exists
 	_, err = os.Stat(logFileName)
-
-	if err == nil {
-		// Read the file and append the resource
-		file, err := os.OpenFile(logFileName, os.O_RDWR|os.O_APPEND, 0644)
+	if os.IsNotExist(err) {
+		// Create a new log file with the initial resource
+		initialContent := map[string][]string{"resources": {resource}}
+		contentBytes, err := json.MarshalIndent(initialContent, "", "  ")
 		if err != nil {
-			return fmt.Errorf("error opening file %s: %v", logFileName, err)
+			return fmt.Errorf("error marshaling initial content: %v", err)
 		}
-		defer file.Close()
-
-		_, err = file.WriteString(fmt.Sprintf(", \"%s\"]}", resource))
+		err = os.WriteFile(logFileName, contentBytes, 0644)
 		if err != nil {
-			return fmt.Errorf("error writing to file %s: %v", logFileName, err)
-		}
-	} else if os.IsNotExist(err) {
-		err = CreateFileWithContent(logFileName, fmt.Sprintf("{\"resources\": [\"%s\"]}", resource))
-		if err != nil {
-			return fmt.Errorf("create file %s failed: %v", logFileName, err)
+			return fmt.Errorf("error creating file %s: %v", logFileName, err)
 		}
 		return nil
-	} else {
+	} else if err != nil {
+		return fmt.Errorf("error checking file %s: %v", logFileName, err)
+	}
+
+	// Read the existing log file
+	fileContent, err := os.ReadFile(logFileName)
+	if err != nil {
 		return fmt.Errorf("error reading file %s: %v", logFileName, err)
+	}
+
+	// Parse the existing JSON content
+	var logData map[string][]string
+	err = json.Unmarshal(fileContent, &logData)
+	if err != nil {
+		return fmt.Errorf("error unmarshaling JSON content: %v", err)
+	}
+
+	// Append the new resource to the resources array
+	logData["resources"] = append(logData["resources"], resource)
+
+	// Marshal the updated content back to JSON
+	updatedContent, err := json.MarshalIndent(logData, "", "  ")
+	if err != nil {
+		return fmt.Errorf("error marshaling updated content: %v", err)
+	}
+
+	// Write the updated JSON back to the file
+	err = os.WriteFile(logFileName, updatedContent, 0644)
+	if err != nil {
+		return fmt.Errorf("error writing to file %s: %v", logFileName, err)
+	}
+
+	return nil
+}
+
+func GetExistingExportLog(configDir string) ([]string, error) {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("error getting current directory: %v", err)
+	}
+
+	logFileName := filepath.Join(currentDir, configDir, "importlog.json")
+
+	// Check if the log file exists
+	_, err = os.Stat(logFileName)
+	if os.IsNotExist(err) {
+		return nil, nil
+	} else if err != nil {
+		return nil, fmt.Errorf("error checking file %s: %v", logFileName, err)
+	}
+
+	// Read the existing log file
+	fileContent, err := os.ReadFile(logFileName)
+	if err != nil {
+		return nil, fmt.Errorf("error reading file %s: %v", logFileName, err)
+	}
+
+	// Parse the existing JSON content
+	var logData map[string][]string
+	err = json.Unmarshal(fileContent, &logData)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling JSON content: %v", err)
+	}
+
+	return logData["resources"], nil
+
+}
+
+func RemoveExportLog(configDir string) error {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("error getting current directory: %v", err)
+	}
+
+	logFileName := filepath.Join(currentDir, configDir, "importlog.json")
+
+	// Check if the log file exists
+	_, err = os.Stat(logFileName)
+	if os.IsNotExist(err) {
+		return nil
+	} else if err != nil {
+		return fmt.Errorf("error checking file %s: %v", logFileName, err)
+	}
+
+	err = os.Remove(logFileName)
+	if err != nil {
+		return fmt.Errorf("error removing file %s: %v", logFileName, err)
 	}
 
 	return nil

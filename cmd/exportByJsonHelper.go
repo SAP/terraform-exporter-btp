@@ -79,13 +79,22 @@ func exportByJson(subaccount string, directory string, organization string, json
 	tfutils.SetupConfigDir(configDir, true, level)
 	resultStore := make(map[string]int)
 
+	exportLog, _ := files.GetExistingExportLog(configDir)
+
 	for _, resName := range resNames {
+		// Check if the resource is already exported
+		if len(exportLog) > 0 && slices.Contains(exportLog, resName) {
+			// Skip the resource if it is already exported
+			continue
+		}
+
 		var value []string
 		for _, temp := range resources.BtpResources {
 			if temp.Name == resName {
 				value = temp.Values
 			}
 		}
+
 		if len(value) != 0 {
 			if resName == tfutils.CmdCfSpaceRoleParameter {
 				spaceRoles := make(map[string][]string)
@@ -120,6 +129,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig)
 	tfutils.FinalizeTfConfig(configDir)
 	generateNextStepsDocument(configDir, subaccount, directory, organization, "")
+	files.RemoveExportLog(configDir)
 	output.RenderSummaryTable(resultStore)
 	tfutils.CleanupProviderConfig()
 }

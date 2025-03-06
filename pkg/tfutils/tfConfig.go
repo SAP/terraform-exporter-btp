@@ -11,6 +11,7 @@ import (
 
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
+	"github.com/nexidian/gocliselect"
 	"github.com/spf13/viper"
 	"github.com/theckman/yacspin"
 )
@@ -276,22 +277,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 	if !exist {
 		createNewConfigDir(configFilepath, configFolder, curWd)
 	} else {
-		fmt.Printf("the configuration directory '%s' already exists. Do you want to continue? If yes then the directory will be overwritten (y/N): ", configFolder)
-		var choice string
-
-		_, err = fmt.Scanln(&choice)
-		if err != nil {
-			choice = handleReturnWoInput(err)
-		}
-
-		choice = strings.TrimSpace(choice)
-		if choice == "" {
-			choice = "N"
-		}
-
-		// We acccept "Yes" or "No" as entry and take the first letter only
-		// Configuration folder must be re-created, otherwise the Terraform commands will fail
-		handleInputExistingDir(choice, configFilepath, configFolder, curWd)
+		handleExistingDir(isMainCmd, configFilepath, configFolder, curWd)
 	}
 
 	sourceFile, err := os.Open(TmpFolder + "/provider.tf")
@@ -333,6 +319,11 @@ func handleInputExistingDir(choice string, configFilepath string, configFolder s
 			fmt.Print("\r\n")
 			log.Fatalf("error recreating configuration folder %s at %s: %v", configFolder, curWd, err)
 		}
+	} else if choice == "R" {
+		// Can only happen if we are in the main command
+		// Do nothing, the processing will be resumed with the existing directory
+		fmt.Println(output.ColorStringCyan("export will be resumed"))
+		return
 	} else {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
@@ -360,6 +351,40 @@ func createNewConfigDir(configFilepath string, configFolder string, curWd string
 	}
 }
 
+func handleExistingDir(isMainCmd bool, configFilepath string, configFolder string, curWd string) {
+	var choice string
+	var importLog []string
+	if isMainCmd {
+		// check if an import log exists to decide how to proceed
+		importLog, _ = files.GetExistingExportLog(configFolder)
+	}
+
+	if len(importLog) > 0 {
+		menuString := fmt.Sprintf("the configuration directory '%s' with an import log exists. How do you want to continue?", configFolder)
+		menu := gocliselect.NewMenu(menuString)
+		menu.AddItem("Overwrite the existing directory", "Y")
+		menu.AddItem("Resume the existing export", "R")
+		menu.AddItem("Abort the processing", "N")
+
+		choice = menu.Display()
+	} else {
+		fmt.Printf("the configuration directory '%s' already exists. Do you want to continue? If yes then the directory will be overwritten (y/N): ", configFolder)
+
+		_, err := fmt.Scanln(&choice)
+		if err != nil {
+			choice = handleReturnWoInput(err)
+		}
+
+		choice = strings.TrimSpace(choice)
+		if choice == "" {
+			choice = "N"
+		}
+	}
+
+	handleInputExistingDir(choice, configFilepath, configFolder, curWd)
+
+}
+
 func GetResourcesList(resourcesString string, level string) []string {
 
 	var resources []string
@@ -382,6 +407,19 @@ func GetResourcesList(resourcesString string, level string) []string {
 	}
 
 	return resources
+}
+
+func FilterResourcesListByLog(resources []string, exportLog []string) []string {
+
+	var filteredResources []string
+
+	for _, resource := range resources {
+		if !slices.Contains(exportLog, resource) {
+			filteredResources = append(filteredResources, resource)
+		}
+	}
+
+	return filteredResources
 }
 
 func CleanupProviderConfig(directory ...string) {
