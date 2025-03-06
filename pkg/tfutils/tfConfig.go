@@ -276,7 +276,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 	if !exist {
 		createNewConfigDir(configFilepath, configFolder, curWd)
 	} else {
-		fmt.Printf("the configuration directory '%s' already exist. Do you want to continue? If yes then the directory will be overwritten (y/N): ", configFolder)
+		fmt.Printf("the configuration directory '%s' already exists. Do you want to continue? If yes then the directory will be overwritten (y/N): ", configFolder)
 		var choice string
 
 		_, err = fmt.Scanln(&choice)
@@ -290,7 +290,7 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 		}
 
 		// We acccept "Yes" or "No" as entry and take the first letter only
-		// Configuration folder must be re-created, otherwiese the Terraform commands will fail
+		// Configuration folder must be re-created, otherwise the Terraform commands will fail
 		handleInputExistingDir(choice, configFilepath, configFolder, curWd)
 	}
 

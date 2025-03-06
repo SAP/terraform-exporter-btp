@@ -114,3 +114,40 @@ func copyFile(src, dest string) error {
 	_, err = io.Copy(destFile, sourceFile)
 	return err
 }
+
+func WriteExportLog(configDir string, resource string) error {
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("error getting current directory: %v", err)
+	}
+
+	logFileName := filepath.Join(currentDir, configDir, "importlog.json")
+
+	_, err = os.Stat(logFileName)
+
+	if err == nil {
+		// Read the file and append the resource
+		file, err := os.OpenFile(logFileName, os.O_RDWR|os.O_APPEND, 0644)
+		if err != nil {
+			return fmt.Errorf("error opening file %s: %v", logFileName, err)
+		}
+		defer file.Close()
+
+		_, err = file.WriteString(fmt.Sprintf(", \"%s\"]}", resource))
+		if err != nil {
+			return fmt.Errorf("error writing to file %s: %v", logFileName, err)
+		}
+	} else if os.IsNotExist(err) {
+		err = CreateFileWithContent(logFileName, fmt.Sprintf("{\"resources\": [\"%s\"]}", resource))
+		if err != nil {
+			return fmt.Errorf("create file %s failed: %v", logFileName, err)
+		}
+		return nil
+	} else {
+		return fmt.Errorf("error reading file %s: %v", logFileName, err)
+	}
+
+	return nil
+
+}

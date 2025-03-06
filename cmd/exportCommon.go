@@ -126,3 +126,4 @@ func generateNextStepsDocument(configDir string, subaccount string, directory st
 		log.Println("error creating NextSteps.md file: ", err)
 	}
 }
+

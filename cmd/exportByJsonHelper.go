@@ -59,7 +59,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 
 	allowedResources := tfutils.GetValidResourcesByLevel(level)
 
-	for i := 0; i < len(resources.BtpResources); i++ {
+	for i := range resources.BtpResources {
 
 		if !(slices.Contains(allowedResources, resources.BtpResources[i].Name)) {
 
@@ -101,10 +101,12 @@ func exportByJson(subaccount string, directory string, organization string, json
 					finalCount = finalCount + count
 				}
 				resultStore[resourceType] = finalCount
+				files.WriteExportLog(configDir, resName)
 
 			} else {
 				resourceType, count := generateConfigForResource(resName, value, subaccount, directory, organization, "", configDir, resourceFile)
 				resultStore[resourceType] = count
+				files.WriteExportLog(configDir, resName)
 			}
 		}
 	}
