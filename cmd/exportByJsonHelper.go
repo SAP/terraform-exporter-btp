@@ -11,6 +11,7 @@ import (
 
 	"github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
+	"github.com/SAP/terraform-exporter-btp/pkg/resume"
 	tfcleantypes "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	tfcleanorchestrator "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/orchestrator"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
@@ -79,7 +80,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 	tfutils.SetupConfigDir(configDir, true, level)
 	resultStore := make(map[string]int)
 
-	exportLog, _ := files.GetExistingExportLog(configDir)
+	exportLog, _ := resume.GetExistingExportLog(configDir)
 
 	for _, resName := range resNames {
 		// Check if the resource is already exported
@@ -110,12 +111,12 @@ func exportByJson(subaccount string, directory string, organization string, json
 					finalCount = finalCount + count
 				}
 				resultStore[resourceType] = finalCount
-				files.WriteExportLog(configDir, resName)
+				resume.WriteExportLog(configDir, resName)
 
 			} else {
 				resourceType, count := generateConfigForResource(resName, value, subaccount, directory, organization, "", configDir, resourceFile)
 				resultStore[resourceType] = count
-				files.WriteExportLog(configDir, resName)
+				resume.WriteExportLog(configDir, resName)
 			}
 		}
 	}
@@ -129,7 +130,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig)
 	tfutils.FinalizeTfConfig(configDir)
 	generateNextStepsDocument(configDir, subaccount, directory, organization, "")
-	files.RemoveExportLog(configDir)
+	resume.RemoveExportLog(configDir)
 	output.RenderSummaryTable(resultStore)
 	tfutils.CleanupProviderConfig()
 }

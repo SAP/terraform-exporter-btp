@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/SAP/terraform-exporter-btp/internal/cfcli"
-	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
+	"github.com/SAP/terraform-exporter-btp/pkg/resume"
 	tfcleantypes "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	tfcleanorchestrator "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/orchestrator"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
@@ -56,7 +56,7 @@ var exportByResourceCmd = &cobra.Command{
 
 		resourcesList := tfutils.GetResourcesList(resources, level)
 
-		exportLog, _ := files.GetExistingExportLog(configDir)
+		exportLog, _ := resume.GetExistingExportLog(configDir)
 
 		if len(exportLog) > 0 {
 			resourcesList = tfutils.FilterResourcesListByLog(resourcesList, exportLog)
@@ -78,12 +78,12 @@ var exportByResourceCmd = &cobra.Command{
 					finalCount = finalCount + count
 				}
 				resultStore[resourceType] = finalCount
-				files.WriteExportLog(configDir, resourceToImport)
+				resume.WriteExportLog(configDir, resourceToImport)
 
 			} else {
 				resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName)
 				resultStore[resourceType] = count
-				files.WriteExportLog(configDir, resourceToImport)
+				resume.WriteExportLog(configDir, resourceToImport)
 			}
 		}
 
@@ -97,7 +97,7 @@ var exportByResourceCmd = &cobra.Command{
 		tfutils.FinalizeTfConfig(configDir)
 		generateNextStepsDocument(configDir, subaccount, directory, organization, space)
 		tfutils.CleanupProviderConfig()
-		files.RemoveExportLog(configDir)
+		resume.RemoveExportLog(configDir)
 		output.RenderSummaryTable(resultStore)
 		output.PrintExportSuccessMessage()
 	},

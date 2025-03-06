@@ -11,6 +11,7 @@ import (
 
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
+	"github.com/SAP/terraform-exporter-btp/pkg/resume"
 	"github.com/nexidian/gocliselect"
 	"github.com/spf13/viper"
 	"github.com/theckman/yacspin"
@@ -356,7 +357,7 @@ func handleExistingDir(isMainCmd bool, configFilepath string, configFolder strin
 	var importLog []string
 	if isMainCmd {
 		// check if an import log exists to decide how to proceed
-		importLog, _ = files.GetExistingExportLog(configFolder)
+		importLog, _ = resume.GetExistingExportLog(configFolder)
 	}
 
 	if len(importLog) > 0 {

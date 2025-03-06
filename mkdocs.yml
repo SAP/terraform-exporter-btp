@@ -28,3 +28,4 @@ nav:
   - Security Considerations: security.md
   - Terraform Configuration Improvements: tfcodeimprovements.md
   - Remote Backend Configuration: remotebackend.md
+  - Resumption of Execution: resume.md
