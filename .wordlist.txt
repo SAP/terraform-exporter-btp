@@ -32,6 +32,7 @@ https
 HCL
 HashiCorp
 IdP
+importlog
 json
 JSON
 js
@@ -53,6 +54,7 @@ readme
 resourceFileName
 restrictedplan
 runtime
+safepoint
 spf
 SSO
 sso

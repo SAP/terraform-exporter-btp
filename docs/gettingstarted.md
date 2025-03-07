@@ -43,7 +43,7 @@ The below example explains how to use the Terraform Exporter for SAP BTP to expo
    btptf create-json - s 9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1
    ```
    The resources list file with the name btpResources_<subaccount id>.json e.g `btpResources_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.json` gets generated.
-   ![Console output of create json coammnd of Terraform Exporter for SAP BTP](img/create-json.jpg)
+   ![Console output of create json command of Terraform Exporter for SAP BTP](img/create-json.jpg)
 
 4. Edit the json file and remove the resources which need not be exported and managed by Terraform.
 
