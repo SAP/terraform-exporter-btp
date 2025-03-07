@@ -6,9 +6,7 @@ This leads to an incomplete export of your infrastructure configuration. This is
 To avoid manual workarounds like:
 
 - restarting the export from scratch.
-- executing a second separate export with an adjusted configuration to export the missing resources accompanied by some
-
-manual rework to get everything in shape.
+- executing a second separate export with an adjusted configuration to export the missing resources accompanied by some manual rework to get everything in shape.
 
 To avoid this we provide an option to resume the export from the last safepoint.
 
