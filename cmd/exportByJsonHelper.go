@@ -134,6 +134,5 @@ func exportByJson(subaccount string, directory string, organization string, json
 	_ = resume.RemoveExportLog(configDir)
 	resultStoreNew := resume.MergeSummaryTable(resultStore, fullExportLog)
 	output.RenderSummaryTable(resultStoreNew)
-	output.RenderSummaryTable(resultStore)
 	tfutils.CleanupProviderConfig()
 }
