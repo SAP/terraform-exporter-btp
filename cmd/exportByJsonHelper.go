@@ -111,12 +111,12 @@ func exportByJson(subaccount string, directory string, organization string, json
 					finalCount = finalCount + count
 				}
 				resultStore[resourceType] = finalCount
-				resume.WriteExportLog(configDir, resName)
+				_ = resume.WriteExportLog(configDir, resName)
 
 			} else {
 				resourceType, count := generateConfigForResource(resName, value, subaccount, directory, organization, "", configDir, resourceFile)
 				resultStore[resourceType] = count
-				resume.WriteExportLog(configDir, resName)
+				_ = resume.WriteExportLog(configDir, resName)
 			}
 		}
 	}
@@ -130,7 +130,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig)
 	tfutils.FinalizeTfConfig(configDir)
 	generateNextStepsDocument(configDir, subaccount, directory, organization, "")
-	resume.RemoveExportLog(configDir)
+	_ = resume.RemoveExportLog(configDir)
 	output.RenderSummaryTable(resultStore)
 	tfutils.CleanupProviderConfig()
 }

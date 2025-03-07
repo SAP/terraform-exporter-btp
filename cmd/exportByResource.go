@@ -78,12 +78,12 @@ var exportByResourceCmd = &cobra.Command{
 					finalCount = finalCount + count
 				}
 				resultStore[resourceType] = finalCount
-				resume.WriteExportLog(configDir, resourceToImport)
+				_ = resume.WriteExportLog(configDir, resourceToImport)
 
 			} else {
 				resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName)
 				resultStore[resourceType] = count
-				resume.WriteExportLog(configDir, resourceToImport)
+				_ = resume.WriteExportLog(configDir, resourceToImport)
 			}
 		}
 
@@ -97,7 +97,7 @@ var exportByResourceCmd = &cobra.Command{
 		tfutils.FinalizeTfConfig(configDir)
 		generateNextStepsDocument(configDir, subaccount, directory, organization, space)
 		tfutils.CleanupProviderConfig()
-		resume.RemoveExportLog(configDir)
+		_ = resume.RemoveExportLog(configDir)
 		output.RenderSummaryTable(resultStore)
 		output.PrintExportSuccessMessage()
 	},
