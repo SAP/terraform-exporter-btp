@@ -81,6 +81,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 	resultStore := make(map[string]int)
 
 	exportLog, _ := resume.GetExistingExportLog(configDir)
+	fullExportLog, _ := resume.GetExistingExportLogComplete(configDir)
 
 	for _, resName := range resNames {
 		// Check if the resource is already exported
@@ -111,12 +112,12 @@ func exportByJson(subaccount string, directory string, organization string, json
 					finalCount = finalCount + count
 				}
 				resultStore[resourceType] = finalCount
-				_ = resume.WriteExportLog(configDir, resName)
+				_ = resume.WriteExportLog(configDir, resName, resourceType, finalCount)
 
 			} else {
 				resourceType, count := generateConfigForResource(resName, value, subaccount, directory, organization, "", configDir, resourceFile)
 				resultStore[resourceType] = count
-				_ = resume.WriteExportLog(configDir, resName)
+				_ = resume.WriteExportLog(configDir, resName, resourceType, count)
 			}
 		}
 	}
@@ -131,6 +132,8 @@ func exportByJson(subaccount string, directory string, organization string, json
 	tfutils.FinalizeTfConfig(configDir)
 	generateNextStepsDocument(configDir, subaccount, directory, organization, "")
 	_ = resume.RemoveExportLog(configDir)
+	resultStoreNew := resume.MergeSummaryTable(resultStore, fullExportLog)
+	output.RenderSummaryTable(resultStoreNew)
 	output.RenderSummaryTable(resultStore)
 	tfutils.CleanupProviderConfig()
 }

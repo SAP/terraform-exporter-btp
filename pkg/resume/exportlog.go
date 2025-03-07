@@ -7,7 +7,17 @@ import (
 	"path/filepath"
 )
 
-func WriteExportLog(configDir string, resource string) error {
+type Logentry struct {
+	Resource     string `json:"resource"`
+	ResourceType string `json:"resource_type"`
+	Count        int    `json:"count"`
+}
+
+type Log struct {
+	Resources []Logentry `json:"resources"`
+}
+
+func WriteExportLog(configDir string, resource string, resourceType string, count int) error {
 	currentDir, err := os.Getwd()
 	if err != nil {
 		return fmt.Errorf("error getting current directory: %v", err)
@@ -19,7 +29,15 @@ func WriteExportLog(configDir string, resource string) error {
 	_, err = os.Stat(logFileName)
 	if os.IsNotExist(err) {
 		// Create a new log file with the initial resource
-		initialContent := map[string][]string{"resources": {resource}}
+		initialContent := Log{
+			Resources: []Logentry{
+				{
+					Resource:     resource,
+					ResourceType: resourceType,
+					Count:        count,
+				},
+			},
+		}
 		contentBytes, err := json.MarshalIndent(initialContent, "", "  ")
 		if err != nil {
 			return fmt.Errorf("error marshaling initial content: %v", err)
@@ -40,14 +58,18 @@ func WriteExportLog(configDir string, resource string) error {
 	}
 
 	// Parse the existing JSON content
-	var logData map[string][]string
+	var logData Log
 	err = json.Unmarshal(fileContent, &logData)
 	if err != nil {
 		return fmt.Errorf("error unmarshaling JSON content: %v", err)
 	}
 
 	// Append the new resource to the resources array
-	logData["resources"] = append(logData["resources"], resource)
+	logData.Resources = append(logData.Resources, Logentry{
+		Resource:     resource,
+		ResourceType: resourceType,
+		Count:        count,
+	})
 
 	// Marshal the updated content back to JSON
 	updatedContent, err := json.MarshalIndent(logData, "", "  ")
@@ -87,14 +109,52 @@ func GetExistingExportLog(configDir string) ([]string, error) {
 	}
 
 	// Parse the existing JSON content
-	var logData map[string][]string
+	var logData Log
 	err = json.Unmarshal(fileContent, &logData)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling JSON content: %v", err)
 	}
 
-	return logData["resources"], nil
+	// Extract the resource names from the log
+	var resources []string
+	for _, entry := range logData.Resources {
+		resources = append(resources, entry.Resource)
+	}
 
+	return resources, nil
+}
+
+func GetExistingExportLogComplete(configDir string) (Log, error) {
+	var logData Log
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return logData, fmt.Errorf("error getting current directory: %v", err)
+	}
+
+	logFileName := filepath.Join(currentDir, configDir, "importlog.json")
+
+	// Check if the log file exists
+	_, err = os.Stat(logFileName)
+	if os.IsNotExist(err) {
+		return logData, nil
+	} else if err != nil {
+		return logData, fmt.Errorf("error checking file %s: %v", logFileName, err)
+	}
+
+	// Read the existing log file
+	fileContent, err := os.ReadFile(logFileName)
+	if err != nil {
+		return logData, fmt.Errorf("error reading file %s: %v", logFileName, err)
+	}
+
+	// Parse the existing JSON content
+	err = json.Unmarshal(fileContent, &logData)
+	if err != nil {
+		return logData, fmt.Errorf("error unmarshaling JSON content: %v", err)
+	}
+
+	return logData, nil
 }
 
 func RemoveExportLog(configDir string) error {
@@ -119,5 +179,23 @@ func RemoveExportLog(configDir string) error {
 	}
 
 	return nil
+}
 
+func MergeSummaryTable(resultStore map[string]int, logData Log) map[string]int {
+	// if there are no resources in the logData, return the resultStore
+	if len(logData.Resources) == 0 {
+		return resultStore
+	}
+
+	// We have resumed processing, so we must merge the logData with the resultStore
+	resultStoreNew := make(map[string]int)
+	for _, entry := range logData.Resources {
+		resultStoreNew[entry.ResourceType] = entry.Count
+	}
+
+	for key, value := range resultStore {
+		resultStoreNew[key] = value
+	}
+
+	return resultStoreNew
 }
