@@ -312,22 +312,25 @@ func handleInputExistingDir(choice string, configFilepath string, configFolder s
 		CleanupProviderConfig()
 		os.Exit(0)
 	} else if strings.ToUpper(choice[:1]) == "Y" {
+		output.AddNewLine()
 		fmt.Println(output.ColorStringCyan("existing files will be overwritten"))
+		output.AddNewLine()
 
 		err := recreateExistingConfigDir(configFilepath)
 		if err != nil {
 			CleanupProviderConfig()
-			fmt.Print("\r\n")
+			output.AddNewLine()
 			log.Fatalf("error recreating configuration folder %s at %s: %v", configFolder, curWd, err)
 		}
 	} else if choice == "R" {
 		// Can only happen if we are in the main command
 		// Do nothing, the processing will be resumed with the existing directory
+		output.AddNewLine()
 		fmt.Println(output.ColorStringCyan("export will be resumed"))
-		return
+		output.AddNewLine()
 	} else {
 		CleanupProviderConfig()
-		fmt.Print("\r\n")
+		output.AddNewLine()
 		log.Fatalf("invalid input. exiting the process")
 	}
 }
