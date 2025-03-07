@@ -375,16 +375,6 @@ func handleExistingDir(isMainCmd bool, configFilepath string, configFolder strin
 		menu.AddItem("Abort the processing", "N")
 
 		choice = menu.Display()
-
-		_, err := fmt.Scanln(&choice)
-		if err != nil {
-			choice = handleReturnWoInput(err)
-		}
-
-		choice = strings.TrimSpace(choice)
-		if choice == "" {
-			choice = "N"
-		}
 	}
 
 	handleInputExistingDir(choice, configFilepath, configFolder, curWd)

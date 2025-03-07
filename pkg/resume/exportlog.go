@@ -3,6 +3,7 @@ package resume
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 )
@@ -193,9 +194,7 @@ func MergeSummaryTable(resultStore map[string]int, logData Log) map[string]int {
 		resultStoreNew[entry.ResourceType] = entry.Count
 	}
 
-	for key, value := range resultStore {
-		resultStoreNew[key] = value
-	}
+	maps.Copy(resultStoreNew, resultStore)
 
 	return resultStoreNew
 }
