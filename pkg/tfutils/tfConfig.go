@@ -372,7 +372,7 @@ func handleExistingDir(isMainCmd bool, configFilepath string, configFolder strin
 
 		choice = menu.Display()
 	} else {
-		menuString := fmt.Sprintf("the configuration directory '%s' already exists. How do you want to continue? ", configFolder)
+		menuString := fmt.Sprintf("the configuration directory '%s' already exists. How do you want to continue?", configFolder)
 		menu := gocliselect.NewMenu(menuString)
 		menu.AddItem("Overwrite the existing directory and continue", "Y")
 		menu.AddItem("Abort the processing", "N")

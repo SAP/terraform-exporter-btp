@@ -13,7 +13,7 @@ The btptf CLI offers two options for the import:
 
 ## Basic Flow
 
-   ![image](img/exporter-diagram-l0.png)
+   ![Diagram depicting the process flow of the Terraform Exporter for SAP BTP](img/exporter-diagram-l0.png)
 
 1.	Fetching and parsing the markdown documentation for the resource from the provider repository (publicly available) to collect the information on the resource keys needed for the import.
 
