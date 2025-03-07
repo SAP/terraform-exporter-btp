@@ -4,12 +4,16 @@ The export of existing infrastructure via the Terraform Exporter for SAP BTP cou
 This leads to an incomplete export of your infrastructure configuration. This is an issue especially if this is an extensive export with many resources that takes some time.
 
 To avoid manual workarounds like:
--	restarting the export from scratch.
--	executing a second separate export with an adjusted configuration to export the missing resources accompanied by some manual rework to get everything in shape.
+
+- restarting the export from scratch.
+- executing a second separate export with an adjusted configuration to export the missing resources accompanied by some
+
+manual rework to get everything in shape.
 
 To avoid this we provide an option to resume the export from the last safepoint.
 
 Let us assume that are exporting a subaccount based on a JSON configuration called `btpResources.json`. The resources that we want to export are:
+
 - a subaccount
 - an entitlement
 - a subscription
