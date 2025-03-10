@@ -75,8 +75,9 @@ jobs:
           cache: false
       - run: go mod download
       - run: go mod tidy
-      - run: go test -v -cover -coverprofile=cover.out -timeout=900s -parallel=4 ./...
-        timeout-minutes: 10
+      - uses: robherley/go-test-action@v0
+        with:
+          testArguments: -v -cover -coverprofile=cover.out -timeout=900s -parallel=4 ./...
       # Upload coverage report
       - uses: actions/upload-artifact@v4
         with:
