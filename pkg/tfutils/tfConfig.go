@@ -41,7 +41,7 @@ var AllowedResourcesDirectory = []string{
 
 var AllowedResourcesOrganization = []string{
 	CmdCfSpaceParameter,
-	CmdCfUserParameter,
+	//CmdCfUserParameter, See https://github.com/SAP/terraform-exporter-btp/issues/298
 	CmdCfDomainParamater,
 	CmdCfOrgRoleParameter,
 	CmdCfRouteParameter,
