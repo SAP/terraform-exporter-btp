@@ -11,7 +11,8 @@ Terraform Exporter for SAP BTP
 
 ```azdeveloper
   -h, --help      help for btptf
-      --verbose    Enable verbose output for debugging
+      --verbose   Enable verbose output for debugging
+  -v, --version   Print the version number of btptf
 ```
 
 ### See also
@@ -42,7 +43,7 @@ btptf create-json [flags]
 ### Options inherited from parent commands
 
 ```azdeveloper
-      --verbose    Enable verbose output for debugging
+      --verbose   Enable verbose output for debugging
 ```
 
 ### See also
@@ -74,7 +75,7 @@ btptf export [flags]
 ### Options inherited from parent commands
 
 ```azdeveloper
-      --verbose    Enable verbose output for debugging
+      --verbose   Enable verbose output for debugging
 ```
 
 ### See also
@@ -106,7 +107,7 @@ btptf export-by-json [flags]
 ### Options inherited from parent commands
 
 ```azdeveloper
-      --verbose    Enable verbose output for debugging
+      --verbose   Enable verbose output for debugging
 ```
 
 ### See also
