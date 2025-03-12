@@ -12,10 +12,13 @@ import (
 
 var verbose bool
 
+const version = "1.0.0-rc1"
+
 var rootCmd = &cobra.Command{
 	Use:               "btptf",
 	Short:             "Terraform Exporter for SAP BTP",
 	DisableAutoGenTag: true,
+	Version:           version,
 }
 
 func init() {
@@ -27,7 +30,9 @@ func init() {
 		DescriptionNote: getRootCmdDescriptionNote,
 	}
 
-	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, " Enable verbose output for debugging")
+	rootCmd.SetVersionTemplate(fmt.Sprintf("Version: %s", version))
+	rootCmd.Flags().BoolP("version", "v", false, "Print the version number of btptf")
+	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Enable verbose output for debugging")
 	_ = viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 	rootCmd.AddCommand(docCmd)
 	rootCmd.SetHelpTemplate(generateCmdHelp(rootCmd, templateOptions))
@@ -83,5 +88,4 @@ func getRootCmdDescriptionNote(c *cobra.Command) string {
 	content := fmt.Sprintf("%s\n%s", point1, point2)
 
 	return getSectionWithHeader("Prerequisites", content)
-
 }
