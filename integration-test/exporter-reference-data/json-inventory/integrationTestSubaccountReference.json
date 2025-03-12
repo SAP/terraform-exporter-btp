@@ -61,7 +61,6 @@
     {
       "Name": "trust-configurations",
       "Values": [
-        "sap.default",
         "terraformeds-platform"
       ]
     },
@@ -87,7 +86,6 @@
         "destination_subaccount_trust_viewer",
         "destination_viewer",
         "destination_viewer_instance",
-        "end_user",
         "feature_flags_service_dashboard_administrator",
         "feature_flags_service_dashboard_auditor",
         "service_credentials_viewer",
@@ -98,7 +96,6 @@
         "subaccount_service_auditor",
         "subaccount_service_viewer",
         "subaccount_viewer",
-        "tenant_admin",
         "user_and_role_administrator",
         "user_and_role_auditor"
       ]
