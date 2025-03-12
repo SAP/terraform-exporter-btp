@@ -8,12 +8,6 @@
       ]
     },
     {
-      "Name": "users",
-      "Values": [
-        "christian.lechner@sap.com"
-      ]
-    },
-    {
       "Name": "org-roles",
       "Values": [
         "organization_user_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac",
