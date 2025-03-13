@@ -8,17 +8,20 @@
 
 # Terraform Exporter for SAP BTP
 
-> [!CAUTION]
-> The Terraform Exporter for SAP BTP is still under development. It is not intended for productive useage in its current state.
+> [!MPORTANT]
+> The Terraform Exporter for SAP BTP is still under development.
+> All beta versions (v0.x.0-beta1) should not be used in productive scenarios
+> All release candidates (v1.0.0-rcx) can be used in productive sceanrios. However we can not exclude breaking changes on the way to the GA version
+> The GA release is planned for April 2025
 
 ## Overview
-The *Terraform Exporter for SAP BTP* (btptf CLI) is a handy tool that makes it easier to bring your existing SAP Business Technology Platform (BTP) resources into Terraform. With it, you can take things like subaccounts and directories in BTP and turn them into Terraform state and configuration files. It's especially useful for teams who are moving to Terraform but still need to manage older infrastructure or SAP BTP accounts that are already set up.
+The *Terraform Exporter for SAP BTP* (btptf CLI) is a handy tool that makes it easier to bring your existing SAP Business Technology Platform (BTP) resources into Terraform. With it, you can take things like subaccounts and directories in BTP and turn them into configuration files including the import of the state. It's especially useful for teams who are moving to Terraform but still need to manage older infrastructure or SAP BTP accounts that are already set up.
 
 Here's how it works:
 
-- **Resource Identification**: Terraform Exporter for SAP BTP identifies the SAP BTP resources and maps them to corresponding Terraform resources using the BTP CLI Server APIs.
-- **Import Process**: The tool utilizes Terraform's import function to integrate each resource into Terraform's state.
-- **Configuration Generation**: After import, it generates the Terraform code (in HashiCorp Configuration Language - HCL) for each resource, enabling further customizations as needed.
+- **Resource Identification**: Terraform Exporter for SAP BTP identifies the SAP BTP resources and maps them to corresponding Terraform resources.
+- **Import Process**: The tool uses Terraform's import function to create the import blocks required for the state import.
+- **Configuration Generation**: It generates the Terraform code (in HashiCorp Configuration Language - HCL) for each resource, enabling further customizations as needed.
 
 You can install btptf CLI across various operating systems as described below.
 
@@ -32,7 +35,15 @@ If you want to contribute to the code of the Terraform Exporter for SAP BTP, ple
 
 ## Support, Feedback, Contributing
 
-This project is open to feature requests/suggestions, bug reports, and so on, via [GitHub issues](https://github.com/SAP/terraform-exporter-for-sap-btp/issues). Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
+This project is open to feature requests/suggestions, bug reports, and so on, via [GitHub issues](https://github.com/SAP/terraform-exporter-for-sap-btp/issues):
+
+❓ - If you have a *question* you can ask it here in [GitHub Discussions](https://github.com/SAP/terraform-exporter-btp/discussions/).
+
+🐞 - If you find a bug, feel free to create a [bug report](https://github.com/SAP/terraform-exporter-btp/issues/new?assignees=&labels=bug%2Cneeds-triage&projects=&template=bug_report.yml&title=%5BBUG%5D).
+
+💡 - If you have an idea for improvement or a feature request, please open a [feature request](https://github.com/SAP/terraform-exporter-btp/issues/new?assignees=&labels=enhancement%2Cneeds-triage&projects=&template=feature_request.yml&title=%5BFEATURE%5D).
+
+Contribution and feedback are encouraged and always welcome. For more information about how to contribute, the project structure, as well as additional contribution information, see our [Contribution Guidelines](CONTRIBUTING.md).
 
 ## Security / Disclosure
 If you find any bug that may be a security problem, please follow our instructions at [in our security policy](https://github.com/SAP/terraform-exporter-for-sap-btp/security/policy) on how to report it. Please do not create GitHub issues for security-related doubts or problems.
