@@ -8,7 +8,7 @@
 
 # Terraform Exporter for SAP BTP
 
-> [!MPORTANT]
+> [!IMPORTANT]
 > The Terraform Exporter for SAP BTP is still under development.
 > All beta versions (v0.x.0-beta1) should not be used in productive scenarios
 > All release candidates (v1.0.0-rcx) can be used in productive sceanrios. However we can not exclude breaking changes on the way to the GA version
