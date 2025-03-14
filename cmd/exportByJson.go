@@ -88,8 +88,8 @@ func init() {
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")
 
 	exportByJsonCmd.Flags().StringVarP(&backendPath, "backend-path", "b", "", "Path to the Terraform backend sample file")
-	exportByJsonCmd.Flags().StringVarP(&backendType, "backend-type", "t", "", "Type of the Terraform backend")
-	exportByJsonCmd.Flags().StringSliceP("backend-config", "e", []string{}, "Backend configuration")
+	exportByJsonCmd.Flags().StringVar(&backendType, "backend-type", "", "Type of the Terraform backend")
+	exportByJsonCmd.Flags().StringSlice("backend-config", []string{}, "Backend configuration")
 	exportByJsonCmd.MarkFlagsMutuallyExclusive("backend-path", "backend-type")
 	exportByJsonCmd.MarkFlagsRequiredTogether("backend-type", "backend-config")
 

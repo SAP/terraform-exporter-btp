@@ -14,18 +14,18 @@ markdown_extensions:
       alternate_style: true
 repo_url: https://github.com/SAP/terraform-exporter-btp
 extra:
-    generator: false
+  generator: false
 copyright: Copyright © 2025 SAP SE or SAP affiliate company. All rights reserved.
 nav:
   - Home: index.md
   - Installation: install.md
   - Usage:
-    - Prerequisites: prerequisites.md
-    - Getting Started: gettingstarted.md
-    - Limitations: limitations.md
-    - Commands List: btptf.md
+      - Prerequisites: prerequisites.md
+      - Getting Started: gettingstarted.md
+      - Terraform Configuration Improvements: tfcodeimprovements.md
+      - Remote Backend Configuration: remotebackend.md
+      - Resumption of Execution: resume.md
+      - Limitations: limitations.md
+      - Commands List: btptf.md
   - Concepts: concepts.md
   - Security Considerations: security.md
-  - Terraform Configuration Improvements: tfcodeimprovements.md
-  - Remote Backend Configuration: remotebackend.md
-  - Resumption of Execution: resume.md
