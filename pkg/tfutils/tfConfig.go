@@ -9,10 +9,10 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/AlecAivazis/survey/v2"
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	"github.com/SAP/terraform-exporter-btp/pkg/resume"
-	gochoice "github.com/TwiN/go-choice"
 	"github.com/spf13/viper"
 	"github.com/theckman/yacspin"
 )
@@ -361,7 +361,6 @@ func createNewConfigDir(configFilepath string, configFolder string, curWd string
 }
 
 func handleExistingDir(isMainCmd bool, configFilepath string, configFolder string, curWd string) {
-	var choice string
 	var err error
 	var importLog []string
 	if isMainCmd {
@@ -369,47 +368,39 @@ func handleExistingDir(isMainCmd bool, configFilepath string, configFolder strin
 		importLog, _ = resume.GetExistingExportLog(configFolder)
 	}
 
+	surveyName := "existingdir"
+	surveyMessage := ""
+	surveyDefault := selectionOverwrite
+	answer := struct {
+		ExistingDir string `survey:"existingdir"`
+	}{}
+
+	surveyOptions := []string{selectionOverwrite, selectionAbort}
+
 	if len(importLog) > 0 {
-		menuString := fmt.Sprintf("the configuration directory '%s' with an import log exists. How do you want to continue?", configFolder)
-		choice, _, err = gochoice.Pick(
-			menuString,
-			[]string{
-				selectionOverwrite,
-				selectionResume,
-				selectionAbort,
-			},
-			gochoice.OptionSelectedTextColor(gochoice.Cyan),
-			gochoice.OptionSelectedTextBold(),
-		)
-
-		if err != nil {
-			choice = selectionInvalid
-		}
+		surveyMessage = fmt.Sprintf("the configuration directory '%s' with an import log exists. How do you want to continue?", configFolder)
+		surveyOptions = append([]string{selectionResume}, surveyOptions...)
+		surveyDefault = selectionResume
 	} else {
-		menuString := fmt.Sprintf("the configuration directory '%s' already exists. How do you want to continue?", configFolder)
-		choice, _, err = gochoice.Pick(
-			menuString,
-			[]string{
-				selectionOverwrite,
-				selectionAbort,
-			},
-			gochoice.OptionSelectedTextColor(gochoice.Cyan),
-			gochoice.OptionSelectedTextBold(),
-		)
-		if err != nil {
-			choice = selectionInvalid
-		}
-		/*
-			menuString := fmt.Sprintf("the configuration directory '%s' already exists. How do you want to continue?", configFolder)
-			menu := gocliselect.NewMenu(menuString)
-			menu.AddItem("Overwrite the existing directory and continue", "Y")
-			menu.AddItem("Abort the processing", "N")
-
-			choice = menu.Display()
-		*/
+		surveyMessage = fmt.Sprintf("the configuration directory '%s' already exists. How do you want to continue?", configFolder)
 	}
 
-	handleInputExistingDir(choice, configFilepath, configFolder, curWd)
+	qs := []*survey.Question{
+		{
+			Name: surveyName,
+			Prompt: &survey.Select{
+				Message: surveyMessage,
+				Options: surveyOptions,
+				Default: surveyDefault,
+			},
+		},
+	}
+
+	err = survey.Ask(qs, &answer)
+	if err != nil {
+		answer.ExistingDir = selectionInvalid
+	}
+	handleInputExistingDir(answer.ExistingDir, configFilepath, configFolder, curWd)
 
 }
 

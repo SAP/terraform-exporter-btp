@@ -3,7 +3,7 @@ module github.com/SAP/terraform-exporter-btp
 go 1.24
 
 require (
-	github.com/TwiN/go-choice v1.2.0
+	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.11
 	github.com/fatih/color v1.18.0
 	github.com/go-git/go-git/v5 v5.14.0
@@ -25,8 +25,6 @@ require (
 	github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 // indirect
 	github.com/cyphar/filepath-securejoin v0.4.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
-	github.com/gdamore/encoding v1.0.0 // indirect
-	github.com/gdamore/tcell/v2 v2.5.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.6.2 // indirect
 	github.com/go-martini/martini v0.0.0-20170121215854-22fa46961aab // indirect
@@ -34,9 +32,10 @@ require (
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
+	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/martini-contrib/render v0.0.0-20150707142108-ec18f8345a11 // indirect
+	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/pjbgf/sha1cd v0.3.2 // indirect
