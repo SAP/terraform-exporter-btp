@@ -1,5 +1,5 @@
 # Concepts
-The Terraform Exporter for SAP BTP (btptf CLI) provides a convenience functionality to import existing subaccounts on SAP BTP into Terraform/OpenTofu configurations. The configurations delivered by the btptf CLI are:
+The Terraform Exporter for SAP BTP (btptf CLI) provides a convenience functionality to import existing subaccounts on SAP BTP into Terraform configurations. The configurations delivered by the btptf CLI are:
 
   -	Provider configuration (excluding credentials)
   -	[Import](https://developer.hashicorp.com/terraform/language/import) blocks for the resources
@@ -19,7 +19,7 @@ The btptf CLI offers two options for the import:
 
 2.	Creating the files with the import block based on the information from the documentation and reading the data from the platform leveraging the corresponding Terraform [data sources](https://registry.terraform.io/providers/SAP/btp/latest/docs).
 
-3.	Executing the Terraform/OpenTofu commands via Terraform/OpenTofu CLI to generate the resource configuration and store the results in the file system.
+3.	Executing the Terraform commands via the Terraform CLI to generate the resource configuration and store the results in the file system.
 
 The following points should be mentioned:
 

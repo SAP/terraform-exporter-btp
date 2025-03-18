@@ -2,7 +2,7 @@
 
 ## Terraform/OpenTofu CLI
 
-The btptf CLI requires a installation of the Terraform CLI or the OpenTofu CLI. The corresponding CLI will be detected and called by the btptf CLI.
+The btptf CLI requires a installation of the Terraform or the OpenTofu CLI. The corresponding CLI will be detected and called by the btptf CLI.
 
 You find the necessary information in the official documentation:
 
