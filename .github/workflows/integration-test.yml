@@ -139,6 +139,10 @@ jobs:
           terraform -chdir=directory-export-by-json show -json > directory-export-by-json-state.json
           echo '${{ secrets.DIRECTORY_EXPORT_BY_JSON_REF}}' | base64 -d > directory-export-by-json-state-reference.json
           echo "====================================="
+          echo "List imported state"
+          echo "====================================="
+          terraform -chdir=directory-export-by-json state list
+          echo "====================================="
           echo "Execute comparison of state files for Directory"
           echo "====================================="
           node .github/scripts/compareJson.js directory-export-by-json-state-reference.json directory-export-by-json-state.json
@@ -165,6 +169,10 @@ jobs:
           terraform -chdir=subaccount-export-by-json show -json > subaccount-export-by-json-state.json
           echo '${{ secrets.SUBACCOUNT_EXPORT_BY_JSON_REF}}' | base64 -d > subaccount-export-by-json-state-reference.json
           echo "====================================="
+          echo "List imported state"
+          echo "====================================="
+          terraform -chdir=subaccount-export-by-json state list
+          echo "====================================="
           echo "Execute comparison of state files for Subaccount"
           echo "====================================="
           node .github/scripts/compareJson.js subaccount-export-by-json-state-reference.json subaccount-export-by-json-state.json
@@ -190,6 +198,10 @@ jobs:
           echo "Preparing state file for CF Organization in JSON format"
           terraform -chdir=cforg-export-by-json show -json > cforg-export-by-json-state.json
           echo '${{ secrets.CFORG_EXPORT_BY_JSON_REF}}' | base64 -d > cforg-export-by-json-state-reference.json
+          echo "====================================="
+          echo "List imported state"
+          echo "====================================="
+          terraform -chdir=cforg-export-by-json state list
           echo "====================================="
           echo "Execute comparison of state files for CF Organization"
           echo "====================================="
@@ -253,6 +265,10 @@ jobs:
           terraform -chdir=directory-export-by-resource show -json > directory-export-by-resource-state.json
           echo '${{ secrets.DIRECTORY_EXPORT_BY_RESOURCE_REF}}' | base64 -d > directory-export-by-resource-state-reference.json
           echo "====================================="
+          echo "List imported state"
+          echo "====================================="
+          terraform -chdir=directory-export-by-resource state list
+          echo "====================================="
           echo "Execute comparison of state files for Directory"
           echo "====================================="
           node .github/scripts/compareJson.js directory-export-by-resource-state-reference.json directory-export-by-resource-state.json
@@ -280,6 +296,10 @@ jobs:
           terraform -chdir=subaccount-export-by-resource show -json > subaccount-export-by-resource-state.json
           echo '${{ secrets.SUBACCOUNT_EXPORT_BY_RESOURCE_REF}}' | base64 -d > subaccount-export-by-resource-state-reference.json
           echo "====================================="
+          echo "List imported state"
+          echo "====================================="
+          terraform -chdir=subaccount-export-by-resource state list
+          echo "====================================="
           echo "Execute comparison of state files for Subaccount"
           echo "====================================="
           node .github/scripts/compareJson.js subaccount-export-by-resource-state-reference.json subaccount-export-by-resource-state.json
@@ -305,6 +325,10 @@ jobs:
           echo "Preparing state file for CF Organization in JSON format"
           terraform -chdir=cforg-export-by-resource show -json > cforg-export-by-resource-state.json
           echo '${{ secrets.CFORG_EXPORT_BY_RESOURCE_REF}}' | base64 -d > cforg-export-by-resource-state-reference.json
+          echo "====================================="
+          echo "List imported state"
+          echo "====================================="
+          terraform -chdir=cforg-export-by-resource state list
           echo "====================================="
           echo "Execute comparison of state files for CF Organization"
           echo "====================================="
