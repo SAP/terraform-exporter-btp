@@ -219,7 +219,7 @@ func getExportByResourceCmdExamples(c *cobra.Command) string {
 			output.ColorStringYellow("'directory'"),
 		),
 		"Export a directory that manages entitlements and users": fmt.Sprintf("%s %s",
-			output.ColorStringCyan("btptf export-by-json --directory"),
+			output.ColorStringCyan("btptf export --directory"),
 			output.ColorStringYellow("<directory ID>"),
 		),
 		"Export the entitlements of a subaccount": fmt.Sprintf("%s %s %s %s",
