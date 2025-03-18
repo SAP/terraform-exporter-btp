@@ -62,7 +62,7 @@ func getRootCmdDescription(c *cobra.Command) string {
 
 	point1 := formatHelpNote("Directories")
 	point2 := formatHelpNote("Subaccounts")
-	point3 := formatHelpNote("Cloud Foundry environment instances")
+	point3 := formatHelpNote("Cloud Foundry orgs")
 
 	list := fmt.Sprintf("%s\n%s\n%s", point1, point2, point3)
 
