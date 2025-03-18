@@ -20,7 +20,7 @@ var exportByJsonCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		directory, _ := cmd.Flags().GetString("directory")
-		organization, _ := cmd.Flags().GetString("organization")
+		organization, _ := cmd.Flags().GetString("org")
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		path, _ := cmd.Flags().GetString("path")
 
@@ -80,9 +80,9 @@ func init() {
 
 	exportByJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	exportByJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
-	exportByJsonCmd.Flags().StringVarP(&organization, "organization", "o", "", "ID of the Cloud Foundry organization")
-	exportByJsonCmd.MarkFlagsOneRequired("subaccount", "directory", "organization")
-	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "organization")
+	exportByJsonCmd.Flags().StringVarP(&organization, "org", "o", "", "ID of the Cloud Foundry org")
+	exportByJsonCmd.MarkFlagsOneRequired("subaccount", "directory", "org")
+	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "org")
 
 	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")
@@ -101,12 +101,17 @@ func init() {
 
 func getExportByJsonCmdDescription(c *cobra.Command) string {
 
-	mainText := `Use this command to export resources from SAP BTP using a JSON file. The export is always per subaccount, directory, or environment instance. Create the JSON file with 'btptf create-json' and edit it as needed before exporting.`
+	mainText := `Use this command to export resources from SAP BTP using a JSON file. The export is always per subaccount, directory, or Cloud Foundry org. Create the JSON file with 'btptf create-json' and edit it as needed before exporting.`
 	return generateCmdHelpDescription(mainText, nil)
 }
 
 func getExportByJsonCmdDescriptionNote(c *cobra.Command) string {
-	return getSectionWithHeader("Note", "You must specify one of --subaccount, --directory, or --environment-instance.")
+	point1 := formatHelpNote("You must specify one of --subaccount, --directory, or --org.")
+	point2 := formatHelpNote("If you already have a remote state backend for SAP BTP resources which you want to use, specify the remote backend by providing the `--backend-path` or `--backend-type` and `--backend-config`.")
+
+	content := fmt.Sprintf("%s\n%s", point1, point2)
+
+	return getSectionWithHeader("Note", content)
 }
 
 func getExportByJsonCmdExamples(c *cobra.Command) string {
@@ -131,7 +136,7 @@ func getExportByJsonCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("--path"),
 			output.ColorStringYellow("'"+filePathSubaccount+"'"),
 		),
-		"Export the resources of a subaccount with a sample backend configuration file": fmt.Sprintf("%s %s",
+		"Export the resources of a subaccount that are listed in the JSON file from the default directory": fmt.Sprintf("%s %s",
 			output.ColorStringCyan("btptf export-by-json --subaccount"),
 			output.ColorStringYellow("<subaccount ID>"),
 		),
@@ -151,9 +156,9 @@ func getExportByJsonCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("--backend-config"),
 			output.ColorStringYellow("'storage_account_name=terraformstatestorage'"),
 		),
-		"Export the resources of a Cloud Foundry organization that are listed in the JSON file from the default directory": fmt.Sprintf("%s %s",
-			output.ColorStringCyan("btptf export-by-json --organization"),
-			output.ColorStringYellow("<organization ID>"),
+		"Export the resources of a Cloud Foundry org that are listed in the JSON file from the default directory": fmt.Sprintf("%s %s",
+			output.ColorStringCyan("btptf export-by-json --org"),
+			output.ColorStringYellow("<CF org ID>"),
 		),
 	})
 }

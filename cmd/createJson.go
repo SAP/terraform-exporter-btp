@@ -19,7 +19,7 @@ var createJsonCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		directory, _ := cmd.Flags().GetString("directory")
-		organization, _ := cmd.Flags().GetString("organization")
+		organization, _ := cmd.Flags().GetString("org")
 		path, _ := cmd.Flags().GetString("path")
 		resources, _ := cmd.Flags().GetString("resources")
 		space := ""
@@ -65,10 +65,10 @@ func init() {
 
 	createJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
-	createJsonCmd.Flags().StringVarP(&organization, "organization", "o", "", "ID of the Cloud Foundry organization")
+	createJsonCmd.Flags().StringVarP(&organization, "org", "o", "", "ID of the Cloud Foundry org")
 
-	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory", "organization")
-	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "organization")
+	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory", "org")
+	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "org")
 	createJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")
 	createJsonCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
 
@@ -107,7 +107,7 @@ func getCreateJsonCmdDescription(c *cobra.Command) string {
 		}
 	}
 
-	mainText := `Use this command to create a JSON file that lists all the resources for a directory, subaccount, or environment instance. This lets you easily edit the resources in the file before you export them.
+	mainText := `Use this command to create a JSON file that lists all the resources for a directory, subaccount, or Cloud Foundry org. This lets you easily edit the resources in the file before you export them.
 
 Depending on the account level you specify, the JSON file will include the following resources:`
 
@@ -120,13 +120,13 @@ Depending on the account level you specify, the JSON file will include the follo
 				fmt.Sprint("For subaccounts: " + resources),
 			),
 			formatHelpNote(
-				"For environment instances: " + resourcesEnv,
+				"For Cloud Foundry orgs: " + resourcesEnv,
 			),
 		})
 }
 
 func getCreateJsonUsageNote(c *cobra.Command) string {
-	return getSectionWithHeader("Note", "You must specify one of --subaccount, --directory, or --environment-instance.")
+	return getSectionWithHeader("Note", "You must specify one of --subaccount, --directory, or --org.")
 }
 
 func getCreateJsonCmdExamples(c *cobra.Command) string {
@@ -152,17 +152,17 @@ func getCreateJsonCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("--subaccount"),
 			output.ColorStringYellow("<subaccount ID>"),
 		),
-		"Create a JSON file for the spaces of a Cloud Foundry organization": fmt.Sprintf("%s%s %s %s",
+		"Create a JSON file for the spaces of a Cloud Foundry org": fmt.Sprintf("%s%s %s %s",
 			output.ColorStringCyan("btptf create-json --resources="),
 			output.ColorStringYellow("'spaces'"),
-			output.ColorStringCyan("--organization"),
-			output.ColorStringYellow("<organization ID>"),
+			output.ColorStringCyan("--org"),
+			output.ColorStringYellow("<CF org ID>"),
 		),
-		"Create a JSON file for the users of a Cloud Foundry organization": fmt.Sprintf("%s%s %s %s",
+		"Create a JSON file for the users of a Cloud Foundry org": fmt.Sprintf("%s%s %s %s",
 			output.ColorStringCyan("btptf create-json --resources="),
 			output.ColorStringYellow("'users'"),
-			output.ColorStringCyan("--organization"),
-			output.ColorStringYellow("<organization ID>"),
+			output.ColorStringCyan("--org"),
+			output.ColorStringYellow("<CF org ID>"),
 		),
 	})
 }

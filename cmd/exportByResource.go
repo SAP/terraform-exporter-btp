@@ -23,7 +23,7 @@ var exportByResourceCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		directory, _ := cmd.Flags().GetString("directory")
-		organization, _ := cmd.Flags().GetString("organization")
+		organization, _ := cmd.Flags().GetString("org")
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		resources, _ := cmd.Flags().GetString("resources")
 
@@ -131,9 +131,9 @@ func init() {
 
 	exportByResourceCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	exportByResourceCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
-	exportByResourceCmd.Flags().StringVarP(&organization, "organization", "o", "", "ID of the Cloud Foundry organization")
-	exportByResourceCmd.MarkFlagsOneRequired("subaccount", "directory", "organization")
-	exportByResourceCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "organization")
+	exportByResourceCmd.Flags().StringVarP(&organization, "org", "o", "", "ID of the Cloud Foundry org")
+	exportByResourceCmd.MarkFlagsOneRequired("subaccount", "directory", "org")
+	exportByResourceCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "org")
 
 	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
@@ -179,7 +179,7 @@ func getExportByResourceCmdDescription(c *cobra.Command) string {
 		}
 	}
 
-	mainText := `Use this command to export resources from SAP BTP per account level (subaccount, directory, or environment instance). The command will create a directory with the Terraform configuration files and import blocks for the following resources in your specified account level:`
+	mainText := `Use this command to export resources from SAP BTP per account level (subaccount, directory, or Cloud Foundry org). The command will create a directory with the Terraform configuration files and import blocks for the following resources in your specified account level:`
 	return generateCmdHelpDescription(mainText,
 		[]string{
 			formatHelpNote(
@@ -189,16 +189,17 @@ func getExportByResourceCmdDescription(c *cobra.Command) string {
 				fmt.Sprint("For subaccounts: " + resources),
 			),
 			formatHelpNote(
-				"For environment instances: " + resourcesEnv,
+				"For Cloud Foundry orgs: " + resourcesEnv,
 			),
 		})
 }
 
 func getExportCmdDescriptionNote(c *cobra.Command) string {
 	point1 := formatHelpNote("We recommend to run this command only if you’re familiar with the Terraform resources in your SAP BTP accounts. For a safer approach, use 'btptf export-by-json'.")
-	point2 := formatHelpNote("You must specify one of --subaccount, --directory, or --environment-instance.")
+	point2 := formatHelpNote("You must specify one of --subaccount, --directory, or --org.")
+	point3 := formatHelpNote("If you already have a remote state backend for SAP BTP resources which you want to use, specify the remote backend by providing the `--backend-path` or `--backend-type` and `--backend-config`.")
 
-	content := fmt.Sprintf("%s\n%s", point1, point2)
+	content := fmt.Sprintf("%s\n%s\n%s", point1, point2, point3)
 
 	return getSectionWithHeader("Note", content)
 }
@@ -256,15 +257,15 @@ func getExportByResourceCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("--backend-config"),
 			output.ColorStringYellow("'storage_account_name=terraformstatestorage'"),
 		),
-		"Export the spaces of a Cloud Foundry organization": fmt.Sprintf("%s %s %s %s",
-			output.ColorStringCyan("btptf export --organization"),
-			output.ColorStringYellow("<organization ID>"),
+		"Export the spaces of a Cloud Foundry org": fmt.Sprintf("%s %s %s %s",
+			output.ColorStringCyan("btptf export --org"),
+			output.ColorStringYellow("<CF org ID>"),
 			output.ColorStringCyan("--resources"),
 			output.ColorStringYellow("'spaces'"),
 		),
-		"Export the users of a Cloud Foundry organization": fmt.Sprintf("%s %s %s %s",
-			output.ColorStringCyan("btptf export --organization"),
-			output.ColorStringYellow("<organization ID>"),
+		"Export the users of a Cloud Foundry org": fmt.Sprintf("%s %s %s %s",
+			output.ColorStringCyan("btptf export --org"),
+			output.ColorStringYellow("<CF org ID>"),
 			output.ColorStringCyan("--resources"),
 			output.ColorStringYellow("'users'"),
 		),
