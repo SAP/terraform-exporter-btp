@@ -83,9 +83,11 @@ func getRootCmdDescriptionNote(c *cobra.Command) string {
 	linkToRepo := output.AsLink("https://sap.github.io/terraform-exporter-btp/prerequisites/")
 
 	point1 := formatHelpNote("To work with the btptf CLI, you need to configure authentication to access your global account on SAP BTP. For instructions, see " + linkToRepo + ".")
-	point2 := formatHelpNote("To export resources, you need global account administrator permissions.")
+	point2 := formatHelpNote("To export directories, you need the Global Account Administrator and the Directory Administrator role collection.")
+	point3 := formatHelpNote("To export subaccounts, you need the Global Account Administrator and the Subaccount Administrator role collection.")
+	point4 := formatHelpNote("To export Cloud Foundry orgs, you need the Cloud Foundry Org Admin role.")
 
-	content := fmt.Sprintf("%s\n%s", point1, point2)
+	content := fmt.Sprintf("%s\n%s\n%s\n%s", point1, point2, point3, point4)
 
 	return getSectionWithHeader("Prerequisites", content)
 }
