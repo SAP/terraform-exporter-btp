@@ -68,7 +68,7 @@ func getRootCmdDescription(c *cobra.Command) string {
 
 	btptf := output.BoldString("btptf")
 
-	description := `The Terraform Exporter for SAP BTP, or ` + btptf + `, exports existing SAP BTP resources as Terraform code, so you can start adopting Infrastructure-as-Code with Terraform with Terraform or OpenTofu.
+	description := `The Terraform Exporter for SAP BTP, or ` + btptf + `, exports existing SAP BTP resources as Terraform code, so you can start adopting Infrastructure-as-Code with Terraform or OpenTofu.
 
 The following SAP BTP account levels can be exported:
 ` + list + `
