@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -122,11 +123,12 @@ func PrintExportStartMessage() {
 
 func PrintExportSuccessMessage(configDir string) {
 	path2Config := files.GetFullPath(configDir)
+	fileLink := makeFileLink(path2Config)
 
 	fmt.Println("")
 	fmt.Printf("🎉 Terraform configuration successfully created at %s\n", BoldString(configDir))
 	fmt.Println("")
-	fmt.Printf("Click here to navigate to the folder %s\n", AsLink(fmt.Sprintf("file://%s", path2Config)))
+	fmt.Printf("Click here to navigate to the folder %s\n", AsLink(fileLink))
 	fmt.Println("")
 }
 
@@ -140,11 +142,12 @@ func PrintInventoryCreationSuccessMessage(file string) {
 
 	path2File := files.GetFullPath(file)
 	folderPath := filepath.Dir(path2File)
+	fileLink := makeFileLink(folderPath)
 
 	fmt.Println("")
 	fmt.Printf("📋 Resource list successfully created: %s\n", BoldString(file))
 	fmt.Println("")
-	fmt.Printf("Click here to navigate to the folder %s\n", AsLink(fmt.Sprintf("file://%s", folderPath)))
+	fmt.Printf("Click here to navigate to the folder %s\n", AsLink(fileLink))
 	fmt.Println("")
 }
 
@@ -228,4 +231,15 @@ Here are some points to consider and maybe to be adjusted in the generated code:
 Now you're all set to run '*terraform apply*', which will import the state and thus bring your SAP BTP resources under the management of Terraform. Congrats!
 
 `, input.Level, input.Level, input.UUID, input.ConfigDir)
+}
+
+func makeFileLink(path string) (fileLink string) {
+	if runtime.GOOS == "windows" {
+		// Use double backslashes for Windows paths
+		fileLink = fmt.Sprintf("file:///%s", filepath.ToSlash(path))
+	} else {
+		// Use standard file URL for Unix-based systems
+		fileLink = fmt.Sprintf("file://%s", path)
+	}
+	return fileLink
 }
