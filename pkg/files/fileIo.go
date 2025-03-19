@@ -117,9 +117,7 @@ func copyFile(src, dest string) error {
 
 func GetFullPath(inputPath string) string {
 	normalizedInputPath := filepath.FromSlash(inputPath)
-	currentDir, _ := os.Getwd()
-
-	fullPath := filepath.Join(currentDir, normalizedInputPath)
+	fullPath, _ := filepath.Abs(normalizedInputPath)
 	fullPath = filepath.Clean(fullPath)
 
 	return fullPath
