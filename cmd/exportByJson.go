@@ -87,7 +87,7 @@ func init() {
 	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")
 
-	exportByJsonCmd.Flags().StringVarP(&backendPath, "backend-path", "b", "", "Path to the Terraform backend sample file")
+	exportByJsonCmd.Flags().StringVarP(&backendPath, "backend-path", "b", "", "Path to the Terraform backend configuration file")
 	exportByJsonCmd.Flags().StringVar(&backendType, "backend-type", "", "Type of the Terraform backend")
 	exportByJsonCmd.Flags().StringSlice("backend-config", []string{}, "Backend configuration")
 	exportByJsonCmd.MarkFlagsMutuallyExclusive("backend-path", "backend-type")
@@ -140,7 +140,7 @@ func getExportByJsonCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("btptf export-by-json --subaccount"),
 			output.ColorStringYellow("<subaccount ID>"),
 		),
-		"Export a subaccount with a sample backend configuration file": fmt.Sprintf("%s %s %s %s",
+		"Export a subaccount with a backend configuration file": fmt.Sprintf("%s %s %s %s",
 			output.ColorStringCyan("btptf export-by-json --subaccount"),
 			output.ColorStringYellow("<subaccount ID>"),
 			output.ColorStringCyan("--backend-path"),

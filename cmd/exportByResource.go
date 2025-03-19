@@ -138,7 +138,7 @@ func init() {
 	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
 
-	exportByResourceCmd.Flags().StringVarP(&backendPath, "backend-path", "b", "", "Path to the Terraform backend sample file")
+	exportByResourceCmd.Flags().StringVarP(&backendPath, "backend-path", "b", "", "Path to the Terraform backend configuration file")
 	exportByResourceCmd.Flags().StringVar(&backendType, "backend-type", "", "Type of the Terraform backend")
 	exportByResourceCmd.Flags().StringSlice("backend-config", []string{}, "Backend configuration")
 	exportByResourceCmd.MarkFlagsMutuallyExclusive("backend-path", "backend-type")
@@ -241,7 +241,7 @@ func getExportByResourceCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("--resources"),
 			output.ColorStringYellow("'roles,role-collections'"),
 		),
-		"Export a subaccount with a sample backend configuration file": fmt.Sprintf("%s %s %s %s",
+		"Export a subaccount with a backend configuration file": fmt.Sprintf("%s %s %s %s",
 			output.ColorStringCyan("btptf export --subaccount"),
 			output.ColorStringYellow("<subaccount ID>"),
 			output.ColorStringCyan("--backend-path"),
