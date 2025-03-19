@@ -46,9 +46,12 @@ var exportByResourceCmd = &cobra.Command{
 			log.Fatalln(getUuidError(level, iD))
 		}
 
+		var isDefaultConfigDir bool
+
 		if configDir == configDirDefault {
 			configDirParts := strings.Split(configDir, "_")
 			configDir = configDirParts[0] + "_" + configDirParts[1] + "_" + iD
+			isDefaultConfigDir = true
 		}
 
 		output.PrintExportStartMessage()
@@ -102,7 +105,7 @@ var exportByResourceCmd = &cobra.Command{
 		_ = resume.RemoveExportLog(configDir)
 		resultStoreNew := resume.MergeSummaryTable(resultStore, fullExportLog)
 		output.RenderSummaryTable(resultStoreNew)
-		output.PrintExportSuccessMessage(configDir)
+		output.PrintExportSuccessMessage(configDir, isDefaultConfigDir)
 	},
 }
 
@@ -179,7 +182,7 @@ func getExportByResourceCmdDescription(c *cobra.Command) string {
 		}
 	}
 
-	mainText := `Use this command to export resources from SAP BTP per account level (subaccount, directory, or Cloud Foundry org). The command will create a directory with the Terraform configuration files and import blocks for the following resources in your specified account level:`
+	mainText := `Use this command to export resources from SAP BTP per account level (subaccount, directory, or Cloud Foundry org). The command will create a folder with the Terraform configuration files and import blocks for the following resources in your specified account level:`
 	return generateCmdHelpDescription(mainText,
 		[]string{
 			formatHelpNote(

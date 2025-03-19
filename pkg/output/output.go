@@ -5,9 +5,11 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/files"
 	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/viper"
@@ -118,9 +120,18 @@ func PrintExportStartMessage() {
 	fmt.Println("")
 }
 
-func PrintExportSuccessMessage(configdir string) {
+func PrintExportSuccessMessage(configDir string, isDefaultConfigDir bool) {
+
+	var path2Config string
+	if isDefaultConfigDir {
+		path2Config = files.GetFullPath(configDir)
+	} else {
+		path2Config = configDir
+	}
+
 	fmt.Println("")
-	fmt.Printf("🎉 Terraform configuration successfully created at %s", configdir)
+	fmt.Printf("🎉 Terraform configuration successfully created at %s\n", BoldString(configDir))
+	fmt.Printf("Click here to navigate to the folder %s\n", AsLink(fmt.Sprintf("file://%s", path2Config)))
 	fmt.Println("")
 }
 
@@ -130,9 +141,21 @@ func PrintInventoryCreationStartMessage() {
 	fmt.Println("")
 }
 
-func PrintInventoryCreationSuccessMessage(file string) {
+func PrintInventoryCreationSuccessMessage(file string, isDefaultLocation bool) {
+
+	var path2File string
+
+	if isDefaultLocation {
+		path2File = files.GetFullPath(file)
+	} else {
+		path2File = files.GetFullPath(file)
+	}
+
+	folderPath := filepath.Dir(path2File)
+
 	fmt.Println("")
-	fmt.Printf("📋 Resource list successfully created at %s", file)
+	fmt.Printf("📋 Resource list successfully created at %s\n", BoldString(file))
+	fmt.Printf("Click here to navigate to the folder %s\n", AsLink(fmt.Sprintf("file://%s", folderPath)))
 	fmt.Println("")
 }
 

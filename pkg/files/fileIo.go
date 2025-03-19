@@ -114,3 +114,13 @@ func copyFile(src, dest string) error {
 	_, err = io.Copy(destFile, sourceFile)
 	return err
 }
+
+func GetFullPath(inputPath string) string {
+	currentDir, _ := os.Getwd()
+
+	fullPath := filepath.Join(currentDir, inputPath)
+
+	fullPath = filepath.Clean(fullPath)
+
+	return fullPath
+}
