@@ -142,7 +142,7 @@ func PrintInventoryCreationSuccessMessage(file string) {
 	folderPath := filepath.Dir(path2File)
 
 	fmt.Println("")
-	fmt.Printf("📋 Resource list successfully created at %s\n", BoldString(file))
+	fmt.Printf("📋 Resource list successfully created: %s\n", BoldString(file))
 	fmt.Println("")
 	fmt.Printf("Click here to navigate to the folder %s\n", AsLink(fmt.Sprintf("file://%s", folderPath)))
 	fmt.Println("")
