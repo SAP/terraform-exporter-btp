@@ -131,6 +131,7 @@ func PrintExportSuccessMessage(configDir string, isDefaultConfigDir bool) {
 
 	fmt.Println("")
 	fmt.Printf("🎉 Terraform configuration successfully created at %s\n", BoldString(configDir))
+	fmt.Println("")
 	fmt.Printf("Click here to navigate to the folder %s\n", AsLink(fmt.Sprintf("file://%s", path2Config)))
 	fmt.Println("")
 }
@@ -155,6 +156,7 @@ func PrintInventoryCreationSuccessMessage(file string, isDefaultLocation bool) {
 
 	fmt.Println("")
 	fmt.Printf("📋 Resource list successfully created at %s\n", BoldString(file))
+	fmt.Println("")
 	fmt.Printf("Click here to navigate to the folder %s\n", AsLink(fmt.Sprintf("file://%s", folderPath)))
 	fmt.Println("")
 }
