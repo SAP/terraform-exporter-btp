@@ -29,18 +29,16 @@ var createJsonCmd = &cobra.Command{
 		if !isValidUuid(iD) {
 			log.Fatalln(getUuidError(level, iD))
 		}
-		var isDefaultLocation bool
 
 		if path == jsonFileDefault {
 			pathParts := strings.Split(path, "_")
 			path = pathParts[0] + "_" + iD + ".json"
-			isDefaultLocation = true
 		}
 
 		output.PrintInventoryCreationStartMessage()
 		resourcesList := tfutils.GetResourcesList(resources, level)
 		createJson(subaccount, directory, organization, path, resourcesList)
-		output.PrintInventoryCreationSuccessMessage(path, isDefaultLocation)
+		output.PrintInventoryCreationSuccessMessage(path)
 	},
 }
 

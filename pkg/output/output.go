@@ -120,14 +120,8 @@ func PrintExportStartMessage() {
 	fmt.Println("")
 }
 
-func PrintExportSuccessMessage(configDir string, isDefaultConfigDir bool) {
-
-	var path2Config string
-	if isDefaultConfigDir {
-		path2Config = files.GetFullPath(configDir)
-	} else {
-		path2Config = configDir
-	}
+func PrintExportSuccessMessage(configDir string) {
+	path2Config := files.GetFullPath(configDir)
 
 	fmt.Println("")
 	fmt.Printf("🎉 Terraform configuration successfully created at %s\n", BoldString(configDir))
@@ -142,16 +136,9 @@ func PrintInventoryCreationStartMessage() {
 	fmt.Println("")
 }
 
-func PrintInventoryCreationSuccessMessage(file string, isDefaultLocation bool) {
+func PrintInventoryCreationSuccessMessage(file string) {
 
-	var path2File string
-
-	if isDefaultLocation {
-		path2File = files.GetFullPath(file)
-	} else {
-		path2File = files.GetFullPath(file)
-	}
-
+	path2File := files.GetFullPath(file)
 	folderPath := filepath.Dir(path2File)
 
 	fmt.Println("")

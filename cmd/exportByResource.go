@@ -46,12 +46,9 @@ var exportByResourceCmd = &cobra.Command{
 			log.Fatalln(getUuidError(level, iD))
 		}
 
-		var isDefaultConfigDir bool
-
 		if configDir == configDirDefault {
 			configDirParts := strings.Split(configDir, "_")
 			configDir = configDirParts[0] + "_" + configDirParts[1] + "_" + iD
-			isDefaultConfigDir = true
 		}
 
 		output.PrintExportStartMessage()
@@ -105,7 +102,7 @@ var exportByResourceCmd = &cobra.Command{
 		_ = resume.RemoveExportLog(configDir)
 		resultStoreNew := resume.MergeSummaryTable(resultStore, fullExportLog)
 		output.RenderSummaryTable(resultStoreNew)
-		output.PrintExportSuccessMessage(configDir, isDefaultConfigDir)
+		output.PrintExportSuccessMessage(configDir)
 	},
 }
 
