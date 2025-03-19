@@ -38,7 +38,7 @@ var createJsonCmd = &cobra.Command{
 		output.PrintInventoryCreationStartMessage()
 		resourcesList := tfutils.GetResourcesList(resources, level)
 		createJson(subaccount, directory, organization, path, resourcesList)
-		output.PrintInventoryCreationSuccessMessage()
+		output.PrintInventoryCreationSuccessMessage(path)
 	},
 }
 

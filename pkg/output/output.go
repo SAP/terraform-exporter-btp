@@ -118,9 +118,9 @@ func PrintExportStartMessage() {
 	fmt.Println("")
 }
 
-func PrintExportSuccessMessage() {
+func PrintExportSuccessMessage(configdir string) {
 	fmt.Println("")
-	fmt.Println("🎉 Terraform configuration successfully created")
+	fmt.Printf("🎉 Terraform configuration successfully created at %s", configdir)
 	fmt.Println("")
 }
 
@@ -130,9 +130,9 @@ func PrintInventoryCreationStartMessage() {
 	fmt.Println("")
 }
 
-func PrintInventoryCreationSuccessMessage() {
+func PrintInventoryCreationSuccessMessage(file string) {
 	fmt.Println("")
-	fmt.Println("📋 Resource list successfully created")
+	fmt.Printf("📋 Resource list successfully created at %s", file)
 	fmt.Println("")
 }
 

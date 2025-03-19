@@ -51,7 +51,7 @@ var exportByJsonCmd = &cobra.Command{
 
 		output.PrintExportStartMessage()
 		exportByJson(subaccount, directory, organization, path, tfConfigFileName, configDir, backendConfig)
-		output.PrintExportSuccessMessage()
+		output.PrintExportSuccessMessage(configDir)
 	},
 }
 

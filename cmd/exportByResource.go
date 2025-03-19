@@ -102,7 +102,7 @@ var exportByResourceCmd = &cobra.Command{
 		_ = resume.RemoveExportLog(configDir)
 		resultStoreNew := resume.MergeSummaryTable(resultStore, fullExportLog)
 		output.RenderSummaryTable(resultStoreNew)
-		output.PrintExportSuccessMessage()
+		output.PrintExportSuccessMessage(configDir)
 	},
 }
 
