@@ -35,7 +35,7 @@ btptf create-json [flags]
   -d, --directory string    ID of the directory
   -h, --help                help for create-json
   -o, --org string          ID of the Cloud Foundry org
-  -p, --path string         Full path to JSON file with list of resources (default "btpResources_<account-id>.json")
+  -p, --path string         Path to JSON file with list of resources (default "btpResources_<account-id>.json")
   -r, --resources string    Comma-separated list of resources to be included (default "all")
   -s, --subaccount string   ID of the subaccount
 ```
