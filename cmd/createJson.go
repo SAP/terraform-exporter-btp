@@ -158,11 +158,13 @@ func getCreateJsonCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("--org"),
 			output.ColorStringYellow("<CF org ID>"),
 		),
-		"Create a JSON file for the users of a Cloud Foundry org": fmt.Sprintf("%s%s %s %s",
-			output.ColorStringCyan("btptf create-json --resources="),
-			output.ColorStringYellow("'users'"),
-			output.ColorStringCyan("--org"),
-			output.ColorStringYellow("<CF org ID>"),
-		),
+		/*
+			"Create a JSON file for the users of a Cloud Foundry org": fmt.Sprintf("%s%s %s %s",
+				output.ColorStringCyan("btptf create-json --resources="),
+				output.ColorStringYellow("'users'"),
+				output.ColorStringCyan("--org"),
+				output.ColorStringYellow("<CF org ID>"),
+			),
+		*/
 	})
 }
