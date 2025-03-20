@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/defaultfilter"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
@@ -50,6 +51,7 @@ func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId s
 
 		for x, value := range roleCollections {
 			roleCollection := value.(map[string]interface{})
+
 			resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", roleCollection["name"]))
 			subaccountAllRoleCollections = append(subaccountAllRoleCollections, resourceName)
 			if slices.Contains(filterValues, resourceName) {
@@ -65,8 +67,16 @@ func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId s
 		}
 
 	} else {
+		defaultRoleCollections := defaultfilter.FetchDefaultRoleCollectionsBySubaccount(subaccountId)
+
 		for x, value := range roleCollections {
 			roleCollection := value.(map[string]interface{})
+
+			// exclude default role collections from export
+			if defaultfilter.IsRoleCollectionInDefaultList(fmt.Sprintf("%v", roleCollection["name"]), defaultRoleCollections) {
+				continue
+			}
+
 			importBlock += templateRoleCollectionImport(x, roleCollection, subaccountId, resourceDoc)
 			count++
 		}

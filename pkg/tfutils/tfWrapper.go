@@ -8,13 +8,14 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/spf13/viper"
 )
 
 func getIaCTool() (tool string, err error) {
 
 	//For TESTING purposes, we can set the tool to be used
-	tool = os.Getenv("BTPTF_IAC_TOOL")
+	tool = toggles.GetIacTool()
 	if tool != "" {
 		return tool, nil
 	}

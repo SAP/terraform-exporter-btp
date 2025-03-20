@@ -1,8 +1,5 @@
 # Terraform Configuration Improvements
 
-!!! info
-    You can switch this feature **off** by setting the environment variable `BTPTF_PLAIN` to a non-empty value.
-
 The Terraform Exporter for SAP BTP creates the Terraform configuration based on the data available on SAP BTP. This means that the resulting configuration needs manual adjustments before being in a decent state.
 
 We are constantly improving this situation by refining the configuration after it gets generated. The following sections give an overview of the improvements.
@@ -22,6 +19,15 @@ We extract the value of the provider configuration (`provider.tf` file) as a var
 
 - The subdomain of the SAP BTP global account for the Terraform provider for SAP BTP
 - The API URL of Cloud Foundry for the Terraform provider for Cloud Foundry
+
+### Remove automatically provided resources
+
+We remove some resources that get automatically created by SAP BTP when e.g., a subacount or directory get created.
+
+The following resources get removed if they can be identified as automatically created:
+
+- Default trust configuration to the SAP IdP
+- Default role collections that get created during subaccount or directory creation or when a service instance or app subscription gets created
 
 ## Improvements on Subaccount Level
 

@@ -29,3 +29,4 @@ nav:
       - Commands List: btptf.md
   - Concepts: concepts.md
   - Security Considerations: security.md
+  - Troubleshooting: troubleshooting.md

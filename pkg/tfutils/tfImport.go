@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/SAP/terraform-exporter-btp/internal/cfcli"
+	"github.com/SAP/terraform-exporter-btp/pkg/defaultfilter"
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 )
@@ -453,7 +454,12 @@ func generateDataSourcesForList(subaccountId string, directoryId string, organiz
 		error := fmt.Errorf("error unmarshelling JSON: %s", err)
 		return nil, nil, error
 	}
-	// TODO surface the features of the directory stored in data["features"].([]interface{}) analogy to subscription in transform method
+
+	if btpResourceType == SubaccountRoleCollectionType || btpResourceType == DirectoryRoleCollectionType {
+		// For role collections we need to filter the default values out
+		data = defaultfilter.FilterDefaultRoleCollectionsFromJsonData(subaccountId, directoryId, data)
+	}
+
 	return transformDataToStringArray(btpResourceType, data), extractFeatureList(data, btpResourceType), nil
 }
 

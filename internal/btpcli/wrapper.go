@@ -90,3 +90,39 @@ func GetServiceDataByPlanId(client *ClientFacade, subaccountId string, planId st
 
 	return cliRes.Name, cliRes2.Name, nil
 }
+
+func GetDefaultRoleCollectionsBySubaccount(subaccountId string, client *ClientFacade) (defaultRoleCollectionNames []string, err error) {
+	var roleCollections []string
+
+	cliRes, _, err := client.Security.RoleCollection.ListBySubaccount(context.Background(), subaccountId)
+
+	if err != nil {
+		return roleCollections, fmt.Errorf("error listing role collections for subaccount: %w", err)
+	}
+
+	for _, roleCollection := range cliRes {
+		// The role collections that are marked as IsReadOnly as they are predefined and nned not be exported
+		if roleCollection.IsReadOnly {
+			roleCollections = append(roleCollections, roleCollection.Name)
+		}
+	}
+	return roleCollections, nil
+}
+
+func GetDefaultRoleCollectionsByDirectory(directoryId string, client *ClientFacade) (defaultRoleCollectionNames []string, err error) {
+	var roleCollections []string
+
+	cliRes, _, err := client.Security.RoleCollection.ListByDirectory(context.Background(), directoryId)
+
+	if err != nil {
+		return roleCollections, fmt.Errorf("error listing role collections for directory: %w", err)
+	}
+
+	for _, roleCollection := range cliRes {
+		// The role collections that are marked as IsReadOnly as they are predefined and nned not be exported
+		if roleCollection.IsReadOnly {
+			roleCollections = append(roleCollections, roleCollection.Name)
+		}
+	}
+	return roleCollections, nil
+}

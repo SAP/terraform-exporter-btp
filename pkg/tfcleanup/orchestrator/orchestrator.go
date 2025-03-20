@@ -12,10 +12,12 @@ import (
 	providerprocessor "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/provider_processor"
 	resourceprocessor "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/resource_processor"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
+	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 )
 
 func CleanUpJson(resources tfutils.BtpResources) (cleanedResources tfutils.BtpResources) {
-	if os.Getenv("BTPTF_PLAIN") != "" {
+
+	if toggles.IsCodeCleanupDeactivated() {
 		return resources
 	}
 	// Remove default trust configuration
@@ -40,7 +42,7 @@ func CleanUpJson(resources tfutils.BtpResources) (cleanedResources tfutils.BtpRe
 }
 
 func CleanUpGeneratedCode(configFolder string, level string, levelIds generictools.LevelIds, resultStore *map[string]int, backendConfig tfutils.BackendConfig) {
-	if os.Getenv("BTPTF_PLAIN") != "" {
+	if toggles.IsCodeCleanupDeactivated() {
 		return
 	}
 
