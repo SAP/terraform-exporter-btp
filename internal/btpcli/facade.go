@@ -6,6 +6,7 @@ func NewClientFacade(cliClient *v2Client) *ClientFacade {
 		Accounts: newAccountsFacade(cliClient),
 		Services: newServicesFacade(cliClient),
 		Offering: newServicesOfferingFacade(cliClient),
+		Security: newSecurityFacade(cliClient),
 	}
 }
 
@@ -14,4 +15,5 @@ type ClientFacade struct {
 	Accounts accountsFacade
 	Services servicesFacade
 	Offering servicesOfferingFacade
+	Security securityFacade
 }
