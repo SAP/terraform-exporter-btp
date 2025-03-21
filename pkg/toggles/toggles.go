@@ -11,11 +11,11 @@ func IsCodeCleanupDeactivated() bool {
 }
 
 func IsRoleCollectionFilterDeactived() bool {
-	return os.Getenv("BTPTF_SKIP_RCFILTER") == ""
+	return os.Getenv("BTPTF_SKIP_RCFILTER") != ""
 }
 
 /*
 func IsRoleFilterDeactivated() bool {
-	return os.Getenv("BTPTF_SKIP_ROLEFILTER") == ""
+	return os.Getenv("BTPTF_SKIP_ROLEFILTER") != ""
 }
 */
