@@ -20,6 +20,24 @@ resource "btp_directory" "project_directory" {
   ]
   name = "Directory for ${local.subaccount_name}"
 }
+resource "btp_directory_role_collection" "custom" {
+  description  = "A custom Role Collection to validate filtering."
+  directory_id = btp_directory.project_directory.id
+  name         = "Directory Custom Role Collection"
+  roles = [
+    {
+      name                 = "Directory Admin"
+      role_template_app_id = "cis-central!b13"
+      role_template_name   = "Directory_Admin"
+    },
+  ]
+}
+resource "btp_directory_role" "directory_viewer" {
+  app_id             = "cis-central!b14"
+  directory_id       = btp_directory.project_directory.id
+  name               = "Custom Directory Viewer Role"
+  role_template_name = "Directory_Viewer"
+}
 resource "btp_directory_entitlement" "alert_notification_service_standard" {
   directory_id = btp_directory.project_directory.id
   plan_name    = "standard"
@@ -56,6 +74,34 @@ resource "btp_subaccount" "project_subaccount" {
   subdomain = local.subaccount_subdomain
   usage     = "NOT_USED_FOR_PRODUCTION"
 }
+resource "btp_subaccount_role_collection" "custom" {
+  description = "A custom Role Collection to validate filtering."
+  name        = "Directory Custom Role Collection"
+  roles = [
+    {
+      name                 = "Application Subscriptions Viewer"
+      role_template_app_id = "cis-local!b4"
+      role_template_name   = "Application_Subscriptions_Viewer"
+    },
+    {
+      name                 = "Subaccount Viewer"
+      role_template_app_id = "cis-local!b4"
+      role_template_name   = "Subaccount_Viewer"
+    },
+    {
+      name                 = "Subaccount_Service_Viewer"
+      role_template_app_id = "service-manager!b1476"
+      role_template_name   = "Subaccount_Service_Viewer"
+    },
+  ]
+  subaccount_id = btp_subaccount.project_subaccount.id
+}
+resource "btp_subaccount_role" "xsuaa_auditor" {
+  app_id             = "xsuaa!t8"
+  name               = "Custom XSUAA Auditor Role"
+  role_template_name = "xsuaa_auditor"
+  subaccount_id      = btp_subaccount.project_subaccount.id
+}
 resource "btp_subaccount_entitlement" "alert_notification_service_standard" {
   plan_name     = "standard"
   service_name  = "alert-notification"
@@ -83,6 +129,11 @@ resource "btp_subaccount_service_instance" "alert_notification_service_standard"
   name           = "${local.service_name_prefix}-alert-notification"
   serviceplan_id = data.btp_subaccount_service_plan.alert_notification_service_standard.id
   subaccount_id  = btp_subaccount.project_subaccount.id
+}
+resource "btp_subaccount_service_binding" "my_binding" {
+  name                = "${local.service_name_prefix}-sb-af"
+  service_instance_id = btp_subaccount_service_instance.alert_notification_service_standard.id
+  subaccount_id       = btp_subaccount.project_subaccount.id
 }
 resource "btp_subaccount_subscription" "feature_flags_dashboard_app" {
   app_name = "feature-flags-dashboard"

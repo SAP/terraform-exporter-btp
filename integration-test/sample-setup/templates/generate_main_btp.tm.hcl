@@ -17,6 +17,26 @@ generate_hcl "_terramate_generated_main.tf" {
       features    = ["DEFAULT", "ENTITLEMENTS", "AUTHORIZATIONS"]
     }
 
+    resource "btp_directory_role_collection" "custom" {
+      directory_id = btp_directory.project_directory.id
+      name         = "Directory Custom Role Collection"
+      description  = "A custom Role Collection to validate filtering."
+      roles = [
+        {
+          name                 = "Directory Admin"
+          role_template_app_id = "cis-central!b13"
+          role_template_name   = "Directory_Admin"
+        }
+      ]
+    }
+
+    resource "btp_directory_role" "directory_viewer" {
+      directory_id       = btp_directory.project_directory.id
+      name               = "Custom Directory Viewer Role"
+      role_template_name = "Directory_Viewer"
+      app_id             = "cis-central!b14"
+    }
+
     resource "btp_directory_entitlement" "alert_notification_service_standard" {
       directory_id = btp_directory.project_directory.id
       service_name = "alert-notification"
@@ -49,6 +69,36 @@ generate_hcl "_terramate_generated_main.tf" {
       depends_on = [btp_directory_entitlement.alert_notification_service_standard, btp_directory_entitlement.feature_flags_service_lite, btp_directory_entitlement.feature_flags_dashboard_app]
     }
 
+    resource "btp_subaccount_role_collection" "custom" {
+      subaccount_id = btp_subaccount.project_subaccount.id
+      name          = "Directory Custom Role Collection"
+      description   = "A custom Role Collection to validate filtering."
+      roles = [
+        {
+          name                 = "Application Subscriptions Viewer"
+          role_template_app_id = "cis-local!b4"
+          role_template_name   = "Application_Subscriptions_Viewer"
+        },
+        {
+          name                 = "Subaccount Viewer"
+          role_template_app_id = "cis-local!b4"
+          role_template_name   = "Subaccount_Viewer"
+        },
+        {
+          name                 = "Subaccount_Service_Viewer"
+          role_template_app_id = "service-manager!b1476"
+          role_template_name   = "Subaccount_Service_Viewer"
+        }
+      ]
+    }
+
+    resource "btp_subaccount_role" "xsuaa_auditor" {
+      subaccount_id      = btp_subaccount.project_subaccount.id
+      name               = "Custom XSUAA Auditor Role"
+      role_template_name = "xsuaa_auditor"
+      app_id             = "xsuaa!t8"
+    }
+
     resource "btp_subaccount_entitlement" "alert_notification_service_standard" {
       subaccount_id = btp_subaccount.project_subaccount.id
       service_name  = "alert-notification"
@@ -78,6 +128,12 @@ generate_hcl "_terramate_generated_main.tf" {
       subaccount_id  = btp_subaccount.project_subaccount.id
       serviceplan_id = data.btp_subaccount_service_plan.alert_notification_service_standard.id
       name           = "${local.service_name_prefix}-alert-notification"
+    }
+
+    resource "btp_subaccount_service_binding" "my_binding" {
+      subaccount_id       = btp_subaccount.project_subaccount.id
+      service_instance_id = btp_subaccount_service_instance.alert_notification_service_standard.id
+      name                = "${local.service_name_prefix}-sb-af"
     }
 
     resource "btp_subaccount_subscription" "feature_flags_dashboard_app" {
