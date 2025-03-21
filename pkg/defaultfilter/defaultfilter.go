@@ -9,7 +9,7 @@ import (
 )
 
 func FetchDefaultRoleCollectionsBySubaccount(subaccountId string) []string {
-	if toggles.IsRoleCollectionFilterDeactived() {
+	if toggles.IsRoleCollectionFilterDeactivated() {
 		return []string{}
 	}
 
@@ -27,7 +27,7 @@ func FetchDefaultRoleCollectionsBySubaccount(subaccountId string) []string {
 }
 
 func FetchDefaultRoleCollectionsByDirectory(directoryId string) []string {
-	if toggles.IsRoleCollectionFilterDeactived() {
+	if toggles.IsRoleCollectionFilterDeactivated() {
 		return []string{}
 	}
 	// If we run into errors, we will return an empty slice and NOT abort the processing
@@ -80,4 +80,99 @@ func FilterDefaultRoleCollectionsFromJsonData(subaccountId string, directoryID s
 
 	data[dataSourceListKey] = entities
 	return data
+}
+
+func FetchDefaultRolesBySubaccount(subaccountId string) []string {
+	defaulRoles := []string{}
+
+	if toggles.IsRoleFilterDeactivated() {
+		return defaulRoles
+	}
+
+	// If we run into errors, we will return an empty slice and NOT abort the processing
+	btpClient, err := btpcli.GetLoggedInClient()
+
+	if err != nil {
+		return defaulRoles
+	}
+
+	defaulRoles, _ = btpcli.GetDefaultRolesBySubaccount(subaccountId, btpClient)
+	return defaulRoles
+}
+
+func FetchDefaultRolesByDirectory(directoryId string) []string {
+	defaultRoles := []string{}
+
+	if toggles.IsRoleFilterDeactivated() {
+		return defaultRoles
+	}
+
+	// If we run into errors, we will return an empty slice and NOT abort the processing
+	btpClient, err := btpcli.GetLoggedInClient()
+
+	if err != nil {
+		return defaultRoles
+	}
+
+	defaultRoles, _ = btpcli.GetDefaultRolesByDirectory(directoryId, btpClient)
+	return defaultRoles
+}
+
+func IsRoleInDefaultList(roleName string, defaultRoles []string) bool {
+	if len(defaultRoles) == 0 {
+		return false
+	}
+
+	if slices.Contains(defaultRoles, roleName) {
+		return true
+	} else {
+		return false
+	}
+}
+
+func FilterDefaultRolesFromJsonData(subaccountId string, directoryID string, data map[string]any) map[string]any {
+	var defaultRoles []string
+	const dataSourceListKey = "values"
+	const resourceKey = "name"
+
+	if subaccountId != "" {
+		defaultRoles = FetchDefaultRolesBySubaccount(subaccountId)
+	} else if directoryID != "" {
+		defaultRoles = FetchDefaultRolesByDirectory(directoryID)
+	}
+
+	if len(defaultRoles) == 0 {
+		return data
+	}
+
+	// Filter out the default role collections from the data
+	entities := data[dataSourceListKey].([]interface{})
+
+	entities = slices.DeleteFunc(entities, func(value interface{}) bool {
+		entity := value.(map[string]interface{})
+		return IsRoleInDefaultList(fmt.Sprintf("%v", entity[resourceKey]), defaultRoles)
+	})
+
+	data[dataSourceListKey] = entities
+	return data
+}
+
+func FilterDefaultIdpJsonData(data map[string]any) map[string]any {
+	const dataSourceListKey = "values"
+	const resourceKey = "origin"
+
+	// Filter out the default role collections from the data
+	entities := data[dataSourceListKey].([]interface{})
+
+	entities = slices.DeleteFunc(entities, func(value interface{}) bool {
+		entity := value.(map[string]interface{})
+		return fmt.Sprintf("%v", entity[resourceKey]) == "sap.default"
+	})
+
+	data[dataSourceListKey] = entities
+	return data
+}
+
+func IsIdpDefaultIdp(origin string) bool {
+	return origin == "sap.default"
 }

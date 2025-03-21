@@ -54,10 +54,6 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 		addServiceInstanceDependency(body, dependencyAddresses, btpClient, levelIds.SubaccountId)
 	}
 
-	if blockIdentifier == trustConfigBlockIdentifier {
-		processTrustConfigurationAttributes(body, blockIdentifier, resourceAddress, dependencyAddresses)
-	}
-
 	if blockIdentifier == subaccountRoleBlockIdentifier {
 		fillRoleDependencyAddresses(body, resourceAddress, dependencyAddresses)
 	}

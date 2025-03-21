@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/defaultfilter"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
@@ -67,6 +68,12 @@ func createDirectoryRoleImportBlock(data map[string]interface{}, directoryId str
 	} else {
 		for x, value := range roles {
 			role := value.(map[string]interface{})
+
+			// exclude default roles from export
+			if defaultfilter.IsRoleInDefaultList(fmt.Sprintf("%v", role["name"]), defaultfilter.FetchDefaultRolesByDirectory(directoryId)) {
+				continue
+			}
+
 			importBlock += templateDirectoryRoleImport(x, role, directoryId, resourceDoc)
 			count++
 		}

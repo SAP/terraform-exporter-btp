@@ -460,6 +460,16 @@ func generateDataSourcesForList(subaccountId string, directoryId string, organiz
 		data = defaultfilter.FilterDefaultRoleCollectionsFromJsonData(subaccountId, directoryId, data)
 	}
 
+	if btpResourceType == SubaccountRoleType || btpResourceType == DirectoryRoleType {
+		// For roles we need to filter the default values out
+		data = defaultfilter.FilterDefaultRolesFromJsonData(subaccountId, directoryId, data)
+	}
+
+	if btpResourceType == SubaccountTrustConfigurationType {
+		// For trust configurations we need to filter the default SAP IdP out
+		data = defaultfilter.FilterDefaultIdpJsonData(data)
+	}
+
 	return transformDataToStringArray(btpResourceType, data), extractFeatureList(data, btpResourceType), nil
 }
 

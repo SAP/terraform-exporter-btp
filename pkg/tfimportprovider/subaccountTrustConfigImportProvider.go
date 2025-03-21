@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/defaultfilter"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
@@ -64,6 +65,12 @@ func createTrustConfigurationImportBlock(data map[string]interface{}, subaccount
 	} else {
 		for x, value := range trusts {
 			trust := value.(map[string]interface{})
+
+			// Exclude the Default IdP from export
+			if defaultfilter.IsIdpDefaultIdp(fmt.Sprintf("%v", trust["origin"])) {
+				continue
+			}
+
 			importBlock += templateTrustImport(x, trust, subaccountId, resourceDoc)
 			count++
 		}

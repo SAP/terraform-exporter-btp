@@ -10,12 +10,10 @@ func IsCodeCleanupDeactivated() bool {
 	return os.Getenv("BTPTF_SKIP_CODECLEANUP") != ""
 }
 
-func IsRoleCollectionFilterDeactived() bool {
+func IsRoleCollectionFilterDeactivated() bool {
 	return os.Getenv("BTPTF_SKIP_RCFILTER") != ""
 }
 
-/*
 func IsRoleFilterDeactivated() bool {
 	return os.Getenv("BTPTF_SKIP_ROLEFILTER") != ""
 }
-*/

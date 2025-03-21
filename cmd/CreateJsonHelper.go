@@ -9,7 +9,6 @@ import (
 
 	files "github.com/SAP/terraform-exporter-btp/pkg/files"
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
-	tfcleanorchestrator "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/orchestrator"
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
@@ -31,9 +30,6 @@ func createJson(subaccount string, directory string, organization string, fileNa
 		fmt.Print("\r\n")
 		log.Fatalf("error reading data sources: %v", err)
 	}
-
-	// Remove unnecessary entries as they are defaulted by the platform
-	result = tfcleanorchestrator.CleanUpJson(result)
 
 	jsonBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {

@@ -36,14 +36,6 @@ var testFiles = testFileMapping{
 		sourceFilePath: "provider_btp_wo_backend.tf",
 		targetFilePath: "provider_btp_wo_backend.tf",
 	},
-	"sa_trust_config_replace": {
-		sourceFilePath: "resource_subaccount_trust_configuration_replace.tf",
-		targetFilePath: "resource_subaccount_trust_configuration_replace.tf",
-	},
-	"sa_trust_config_no_replace": {
-		sourceFilePath: "resource_subaccount_trust_configuration_no_replace.tf",
-		targetFilePath: "resource_subaccount_trust_configuration_no_replace.tf",
-	},
 	"sa_with_ga_parent": {
 		sourceFilePath: "resource_subaccount_with_ga_parent_source.tf",
 		targetFilePath: "resource_subaccount_with_ga_parent_target.tf",

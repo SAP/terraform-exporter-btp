@@ -126,3 +126,39 @@ func GetDefaultRoleCollectionsByDirectory(directoryId string, client *ClientFaca
 	}
 	return roleCollections, nil
 }
+
+func GetDefaultRolesBySubaccount(subaccountId string, client *ClientFacade) (defaults []string, err error) {
+	var roles []string
+
+	cliRes, _, err := client.Security.Role.ListBySubaccount(context.Background(), subaccountId)
+
+	if err != nil {
+		return roles, fmt.Errorf("error listing role collections for directory: %w", err)
+	}
+
+	for _, role := range cliRes {
+		// The role collections that are marked as IsReadOnly as they are predefined and nned not be exported
+		if role.IsReadOnly && len(role.AttributeList) > 0 {
+			roles = append(roles, role.Name)
+		}
+	}
+	return roles, nil
+}
+
+func GetDefaultRolesByDirectory(directoryId string, client *ClientFacade) (defaultRoles []string, err error) {
+	var roles []string
+
+	cliRes, _, err := client.Security.Role.ListByDirectory(context.Background(), directoryId)
+
+	if err != nil {
+		return roles, fmt.Errorf("error listing role collections for directory: %w", err)
+	}
+
+	for _, role := range cliRes {
+		// The role collections that are marked as IsReadOnly as they are predefined and nned not be exported
+		if role.IsReadOnly && len(role.AttributeList) > 0 {
+			roles = append(roles, role.Name)
+		}
+	}
+	return roles, nil
+}
