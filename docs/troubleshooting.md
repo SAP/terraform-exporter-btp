@@ -45,9 +45,9 @@ If the generated code looks different than expected you can switch off this feat
 
 ## Some role collections are not exported
 
-We are removing role collections that are part of the initial creation process of a subaccount or that get created when you subscribe to a application.
+We are removing role collections that are part of the initial creation process of a subaccount or directory or that get created when you subscribe to an application or create a service instance.
 
-If the generated JSON file (command `btptf create-json`) or the Terraform Code does not contain role collections you would have expected you can switch off this feature by setting the environment variable `BTPTF_SKIP_RCFILTER` to a non-empty value:
+If the generated JSON file (command `btptf create-json`) or the generated Terraform code does not contain role collections you would have expected you can deactivate this feature by setting the environment variable `BTPTF_SKIP_RCFILTER` to a non-empty value:
 
 === "Windows"
 
@@ -59,4 +59,22 @@ If the generated JSON file (command `btptf create-json`) or the Terraform Code d
 
     ``` bash
     export BTPTF_SKIP_RCFILTER=true
+    ```
+
+## Some roles are not exported
+
+We are removing roles that are part of the initial creation process of a subaccount or directory or that get created when you subscribe to an application or create a service instance.
+
+If the generated JSON file (command `btptf create-json`) or the generated Terraform code does not contain role collections you would have expected you can deactivate this feature by setting the environment variable `BTPTF_SKIP_ROLEFILTER` to a non-empty value:
+
+=== "Windows"
+
+    ``` powershell
+    $env:BTPTF_SKIP_ROLEFILTER='true'
+    ```
+
+=== "Linux/Mac"
+
+    ``` bash
+    export BTPTF_SKIP_ROLEFILTER=true
     ```

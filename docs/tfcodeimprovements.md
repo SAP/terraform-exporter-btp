@@ -28,6 +28,7 @@ The following resources get removed if they can be identified as automatically c
 
 - Default trust configuration to the SAP IdP
 - Default role collections that get created during subaccount or directory creation or when a service instance or app subscription gets created
+- Default roles that get created during subaccount or directory creation or when a service instance or app subscription gets created
 
 ## Improvements on Subaccount Level
 
