@@ -22,7 +22,7 @@ We extract the value of the provider configuration (`provider.tf` file) as a var
 
 ### Remove automatically provided resources
 
-We remove some resources that get automatically created by SAP BTP when e.g., a subacount or directory get created.
+We remove some resources that get automatically created by SAP BTP when e.g., a subaccount or directory get created.
 
 The following resources get removed if they can be identified as automatically created:
 
