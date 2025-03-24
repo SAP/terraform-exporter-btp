@@ -334,29 +334,3 @@ jobs:
           echo "====================================="
           node .github/scripts/compareJson.js cforg-export-by-resource-state-reference.json cforg-export-by-resource-state.json
           echo "result=success" >> "$GITHUB_OUTPUT"
-
-  test-result-handling:
-    name: Handle Test Results
-    runs-on: ubuntu-latest
-    needs: [test-json-inventory, test-export-by-json, test-export-by-resource]
-    steps:
-    - name: Build Test Result
-      run: |
-        echo '${{ toJSON(needs.test-json-inventory.outputs) }}' > inventory.json
-        echo '${{ toJSON(needs.test-export-by-json.outputs) }}' > export-by-json.json
-        echo '${{ toJSON(needs.test-export-by-resource.outputs) }}' > export-by-resource.json
-        jq -s '.[0] + .[1] + .[2]' inventory.json export-by-json.json export-by-resource.json > out.json
-        if jq -e 'to_entries[] | select(.value == "failure")' out.json > /dev/null; then
-          echo "failure=true" >> "$GITHUB_ENV"
-          jq -r 'to_entries[] | "## " + .key + "\n" + .value' out.json > out.md
-        else
-          echo "failure=false" >> "$GITHUB_ENV"
-        fi
-
-    - name: Create or update issue for broken links
-      if: env.failure == 'true'
-      uses: peter-evans/create-issue-from-file@v5
-      with:
-          title: Regression Test Report
-          content-filepath: out.md
-          labels: automated issue

@@ -17,16 +17,13 @@
     {
       "Name": "roles",
       "Values": [
-        "directory_admin",
-        "directory_usage_reporting_viewer",
-        "global_account_admin"
+        "custom_directory_viewer_role"
       ]
     },
     {
       "Name": "role-collections",
       "Values": [
-        "directory_administrator",
-        "directory_viewer"
+        "directory_custom_role_collection"
       ]
     }
   ]

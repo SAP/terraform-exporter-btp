@@ -29,25 +29,20 @@
     {
       "Name": "trust-configurations",
       "Values": [
-        "sap.default",
         "terraformeds-platform"
       ]
     },
     {
       "Name": "roles",
       "Values": [
-        "cloud_connector_auditor",
-        "destination_administrator",
-        "destination_administrator_instance",
-        "feature_flags_service_dashboard_administrator",
+        "custom_xsuaa_auditor_role",
         "subaccount_admin"
       ]
     },
     {
       "Name": "role-collections",
       "Values": [
-        "cloud_connector_administrator",
-        "destination_administrator",
+        "subaccount_custom_role_collection",
         "subaccount_administrator"
       ]
     },
