@@ -12,7 +12,7 @@ import (
 
 var verbose bool
 
-const version = "1.0.0-rc1"
+const version = "1.0.0"
 
 var rootCmd = &cobra.Command{
 	Use:               "btptf",

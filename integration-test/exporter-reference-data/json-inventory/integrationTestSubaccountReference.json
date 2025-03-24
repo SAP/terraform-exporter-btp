@@ -67,48 +67,19 @@
     {
       "Name": "roles",
       "Values": [
-        "application_destination_administrator",
-        "application_destination_viewer",
-        "application_subscriptions_viewer",
-        "cloud_connector_administrator",
-        "cloud_connector_auditor",
-        "destination_administrator",
-        "destination_administrator_instance",
-        "destination_certificate_administrator",
-        "destination_certificate_instance_administrator",
-        "destination_certificate_instance_viewer",
-        "destination_certificate_viewer",
-        "destination_configuration_administrator",
-        "destination_configuration_instance_administrator",
-        "destination_configuration_instance_viewer",
-        "destination_configuration_viewer",
-        "destination_subaccount_trust_administrator",
-        "destination_subaccount_trust_viewer",
-        "destination_viewer",
-        "destination_viewer_instance",
-        "feature_flags_service_dashboard_administrator",
-        "feature_flags_service_dashboard_auditor",
-        "service_credentials_viewer",
-        "service_instances_viewer",
-        "subaccount_admin",
-        "subaccount_service_admin",
-        "subaccount_service_administrator",
-        "subaccount_service_auditor",
-        "subaccount_service_viewer",
-        "subaccount_viewer",
-        "user_and_role_administrator",
-        "user_and_role_auditor"
+        "custom_xsuaa_auditor_role"
       ]
     },
     {
       "Name": "role-collections",
       "Values": [
-        "cloud_connector_administrator",
-        "connectivity_and_destination_administrator",
-        "destination_administrator",
-        "subaccount_administrator",
-        "subaccount_service_administrator",
-        "subaccount_viewer"
+        "subaccount_custom_role_collection"
+      ]
+    },
+    {
+      "Name": "service-bindings",
+      "Values": [
+        "dev-inttest-exporter-sb-af"
       ]
     },
     {
