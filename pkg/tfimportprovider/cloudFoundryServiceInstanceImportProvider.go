@@ -75,7 +75,7 @@ func createCfServiceInstanceImportBlock(data map[string]interface{}, orgId strin
 }
 
 func templateCfServiceInstanceImport(x int, serviceInstance map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "cf_serviceinstance_"+fmt.Sprintf("%v", x), -1)
-	template = strings.Replace(template, "<service_instance_guid>", fmt.Sprintf("%v", serviceInstance["id"]), -1)
+	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "cf_serviceinstance_"+fmt.Sprintf("%v", x))
+	template = strings.ReplaceAll(template, "<service_instance_guid>", fmt.Sprintf("%v", serviceInstance["id"]))
 	return template + "\n"
 }

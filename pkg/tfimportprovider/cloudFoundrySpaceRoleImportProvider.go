@@ -65,7 +65,7 @@ func createSpaceRoleImportBlock(data map[string]interface{}, spaceId string, fil
 	return importBlock, count, nil
 }
 func templateSpaceRoleImport(x int, role map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "role_"+fmt.Sprintf("%v", role["id"])+"_"+fmt.Sprintf("%v", role["type"])+"_"+fmt.Sprintf("%v", x), -1)
-	template = strings.Replace(template, "<role_guid>", fmt.Sprintf("%v", role["id"]), -1)
+	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "role_"+fmt.Sprintf("%v", role["id"])+"_"+fmt.Sprintf("%v", role["type"])+"_"+fmt.Sprintf("%v", x))
+	template = strings.ReplaceAll(template, "<role_guid>", fmt.Sprintf("%v", role["id"]))
 	return template + "\n"
 }

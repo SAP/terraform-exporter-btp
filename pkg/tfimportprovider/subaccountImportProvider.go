@@ -46,8 +46,8 @@ func createSubaccountImportBlock(data map[string]interface{}, subaccountId strin
 		}
 	}
 
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "subaccount_0", -1)
-	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
+	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "subaccount_0")
+	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
 	importBlock += template + "\n"
 
 	return importBlock, nil

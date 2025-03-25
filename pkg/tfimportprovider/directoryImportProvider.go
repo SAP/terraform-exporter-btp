@@ -46,8 +46,8 @@ func createDirectoryImportBlock(data map[string]interface{}, directoryId string,
 		}
 	}
 
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "directory_0", -1)
-	template = strings.Replace(template, "<directory_id>", directoryId, -1)
+	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "directory_0")
+	template = strings.ReplaceAll(template, "<directory_id>", directoryId)
 	importBlock += template + "\n"
 
 	return importBlock, nil

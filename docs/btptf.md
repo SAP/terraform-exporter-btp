@@ -9,7 +9,7 @@ Terraform Exporter for SAP BTP
 
 ### Options
 
-```azdeveloper
+```
   -h, --help      help for btptf
       --verbose   Enable verbose output for debugging
   -v, --version   Print the version number of btptf
@@ -31,7 +31,7 @@ btptf create-json [flags]
 
 ### Options
 
-```azdeveloper
+```
   -d, --directory string    ID of the directory
   -h, --help                help for create-json
   -o, --org string          ID of the Cloud Foundry org
@@ -42,7 +42,7 @@ btptf create-json [flags]
 
 ### Options inherited from parent commands
 
-```azdeveloper
+```
       --verbose   Enable verbose output for debugging
 ```
 
@@ -60,7 +60,7 @@ btptf export [flags]
 
 ### Options
 
-```azdeveloper
+```
       --backend-config strings   Backend configuration
   -b, --backend-path string      Path to the Terraform backend configuration file
       --backend-type string      Type of the Terraform backend
@@ -74,7 +74,7 @@ btptf export [flags]
 
 ### Options inherited from parent commands
 
-```azdeveloper
+```
       --verbose   Enable verbose output for debugging
 ```
 
@@ -92,7 +92,7 @@ btptf export-by-json [flags]
 
 ### Options
 
-```azdeveloper
+```
       --backend-config strings   Backend configuration
   -b, --backend-path string      Path to the Terraform backend configuration file
       --backend-type string      Type of the Terraform backend
@@ -106,7 +106,7 @@ btptf export-by-json [flags]
 
 ### Options inherited from parent commands
 
-```azdeveloper
+```
       --verbose   Enable verbose output for debugging
 ```
 

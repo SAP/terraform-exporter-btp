@@ -73,7 +73,7 @@ func createSpaceQuotaImportBlock(data map[string]interface{}, orgId string, filt
 }
 
 func templateSpaceQuotaImport(x int, quota map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "space_quota_"+fmt.Sprintf("%v", x), -1)
-	template = strings.Replace(template, "<space_quota_guid>", fmt.Sprintf("%v", quota["id"]), -1)
+	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "space_quota_"+fmt.Sprintf("%v", x))
+	template = strings.ReplaceAll(template, "<space_quota_guid>", fmt.Sprintf("%v", quota["id"]))
 	return template + "\n"
 }
