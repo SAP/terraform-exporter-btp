@@ -1,25 +1,17 @@
 # Installation
 
-You have two options to install the btptf CLI:
+Download the binary from from the [releases ](https://github.com/SAP/terraform-exporter-btp/releases) section of the GitHub repository.
+   
+Select the version that you want to use and download the binary that fits your operating system from the `assets` of the release. We recommend using the latest version.
+  
 
-1. Download the pre-built binary.
-2. Local build
+## Local Build 
 
-The following sections describe the details for the two options.
+If you contribute to the Terraform Exporter for SAP BTP or you need a fix that has not been added to a released version, you may want to do a local build: 
 
+1. Open the Terraform Exporter for SAP BTP from the [GitHub repository](https://github.com/SAP/terraform-exporter-btp) in the VS Code Editor.
 
-## Pre-Built Binary
-
-The easiest way to get the binary is to download from the [releases section](https://github.com/SAP/terraform-exporter-btp/releases) of this repository. Select the version that you want to use and download the binary that fits your operating system from the `assets` of the release. We recommend using the latest version.
-
-
-## Local Build
-
-If you want to build the binary from scratch, follow these steps:
-
-1. Open [this](https://github.com/SAP/terraform-exporter-btp) repository inside VS Code Editor
-
-2. We have setup a [devcontainer](https://code.visualstudio.com/docs/devcontainers/tutorial), so reopen the repository in the devcontainer.
+2. We have set up a [devcontainer](https://code.visualstudio.com/docs/devcontainers/tutorial), so reopen the repository in the devcontainer.
 
 3. Open a terminal in VS Code and install the binary by running
 

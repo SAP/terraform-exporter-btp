@@ -1,6 +1,6 @@
 # Security Considerations
 
-When using Terraform Exporter for SAP BTP, following security best practices is key to ensuring that your SAP BTP resources and Terraform configurations are managed safely. Here are some recommended security practices:
+When using the Terraform Exporter for SAP BTP, following security best practices is key to ensuring that your SAP BTP resources and Terraform configurations are managed safely. Here are some recommended security practices:
 
 1. **Access Control and Least Privilege**: Ensure that the user running the Terraform exporter has only the necessary permissions, following the principle of least privilege. This helps minimize the risk of accidental or malicious modifications to resources​.
 ​

@@ -136,3 +136,34 @@ In general, we call the `generateCmdHelp` function to generate the output that w
 If the command receives an empty structure, it will call several default functions to create the console help. However, you have the option to override the single section by providing a custom function that crafts the string used in the console help.
 
 You find an example for this setup in the command `exportByResourceCmd`. Be aware that the code leverages several helper functions that are available in the file `cmdDocsHelper.go`.
+
+## Setting Environment Variables in a Dev Container
+
+- Create a file `devcontainer.env` in the `.devcontainer` directory
+- Add the environment variables in the file. Here is an example:
+
+   ```txt
+   BTP_USERNAME='<MY SAP BTP USERNAME>'
+   BTP_PASSWORD='<MY SAP BTP PASSWORD>'
+   BTP_GLOBALACCOUNT='<MY SAP BTP GLOBAL ACCOUNT SUBDOMAIN>' #optional
+   ```
+- Start the devcontainer option `Terraform exporter for SAP BTP - Development (with env file)`. The environment variables defined in the `devcontainer.env` file will be automatically injected.
+
+- Alternative via `.env` file (available on MacOS and Linux only):
+- Create a file `.env` in the root of the project
+- Add the environment variables in the file. Here is an example:
+
+   ```txt
+   BTP_USERNAME='<MY SAP BTP USERNAME>'
+   BTP_PASSWORD='<MY SAP BTP PASSWORD>'
+   BTP_GLOBALACCOUNT='<MY SAP BTP GLOBAL ACCOUNT SUBDOMAIN>'
+   ```
+
+- Execute the following command in a terminal:
+
+   ```bash
+   export $(xargs <.env)
+   ```
+
+!!! info
+    There is no predefined functionality in PowerShell to achieve the same. A custom script is needed.

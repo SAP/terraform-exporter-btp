@@ -18,15 +18,17 @@ extra:
 copyright: Copyright © 2025 SAP SE or SAP affiliate company. All rights reserved.
 nav:
   - Home: index.md
+  - Architecture & Concepts: 
+      - How the btptf CLI Works: concepts.md
+      - How the btptf CLI Refines the Generated Configurations: tfcodeimprovements.md
   - Installation: install.md
-  - Usage:
+  - Commands Reference: btptf.md
+  - Quick Start Guide:
       - Prerequisites: prerequisites.md
-      - Getting Started: gettingstarted.md
-      - Terraform Configuration Improvements: tfcodeimprovements.md
-      - Remote Backend Configuration: remotebackend.md
-      - Resumption of Execution: resume.md
-      - Limitations: limitations.md
-      - Commands List: btptf.md
-  - Concepts: concepts.md
+      - How to Export Resources: gettingstarted.md
+  - Advanced Configuration:
+      - How to Add a Remote Backend: remotebackend.md
+      - How to Resume Failed Exports: resume.md
+  - Limitations: limitations.md
   - Security Considerations: security.md
   - Troubleshooting: troubleshooting.md

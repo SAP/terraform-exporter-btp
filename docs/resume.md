@@ -1,23 +1,19 @@
-# Resuming Failed Exports
+# How to Resume a Failed Export
 
-The export of existing infrastructure via the Terraform Exporter for SAP BTP could run into errors during the export process. This could have various reasons. There could be temporal network issues or there might be a temporary issue on the platform.
-This leads to an incomplete export of your infrastructure configuration. This is an issue especially if this is an extensive export with many resources that takes some time.
+If the export of existing infrastructure via the Terraform Exporter for SAP BTP runs into errors for various reasons. For example, there could be temporal network issues or platform issues.
 
-To avoid manual workarounds like:
+If the export fails, you can resume it from the last safepoint by running the **same command again**, without deleting any temporary files.  
 
-- restarting the export from scratch.
-- executing a second separate export with an adjusted configuration to export the missing resources accompanied by some manual rework to get everything in shape.
+## Example of How the Resumption of a Failed Export Works
 
-To avoid this we provide an option to resume the export from the last safepoint.
-
-Let us assume that are exporting a subaccount based on a JSON configuration called `btpResources.json`. The resources that we want to export are:
+Let's assume you're exporting a subaccount based on a JSON configuration called `btpResources.json`. The resources to export are:
 
 - a subaccount
 - an entitlement
 - a subscription
 - a service instance
 
-In addition, you want to store the generated code into the directory `exported configuration`. Consequently, we execute the command:
+In addition, you want to store the generated code into the directory `exported configuration`. Consequently, you execute the command:
 
 ```bash
 btptf export-by-json -s 12345678-abcd-efgh-ae24-86ff3384cf93 -p btpResources.json -c exported-configuration
@@ -46,23 +42,23 @@ The Terraform Exporter for SAP BTP uses this file to track the successfully expo
 !!! info
     This file will be removed if the export was successful.
 
-To resume the processing, we do not make any changes to the files, but execute the original command:
+To resume the processing, you don't need to make any changes to the files, but execute the original command:
 
 ```bash
 btptf export-by-json -s 12345678-abcd-efgh-ae24-86ff3384cf93 -p btpResources.json -c exported-configuration
 ```
 
-The Terraform Exporter for SAP BTP recognizes the file and prompts how we want to proceed
+The Terraform Exporter for SAP BTP recognizes the file and prompts how you want to proceed
 
 ![Repeat export - prompt for resume based on log](img/resume-step1.png)
 
-We select the option to resume the processing.
+Select the option to resume the processing.
 
-The processing starts, but as we also have the directory `subscriptions-config`, we get prompted if this should be removed:
+The processing starts, and you get prompted if you want to remove the folder `subscriptions-config`:
 
 ![Repeat export - prompt for removing temporary directory](img/resume-step2.png)
 
-It is safe to remove it, so we select the corresponding option, and the export process continues.
+It is safe to remove it, so select the corresponding option, and the export process continues.
 
 The output show that the missing resources get exported:
 
@@ -75,4 +71,4 @@ As a result, the export is executed successfully, and all resources are availabl
 ![Repeat export - created files](img/resume-result-files.png)
 
 !!! warning
-    Exports can fail due to different reason. While we aim to resume such failed scenarios, there might always be situation that we cannot handle automatically. In this case we advise to restart the export from scratch.
+    Exports can fail due to different reason. While the btptf CLI aims to resume such failed scenarios, there might always be situations that cannot be handled automatically. In this case we advise to restart the export from scratch.

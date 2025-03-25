@@ -19,7 +19,7 @@ import (
 const fontMatterFormatString = `
 # Terraform exporter for SAP BTP
 
-This document explains the syntax and parameters for the various Terraform exporter for SAP BTP commands.
+This document lists the syntax and parameters for all three commands.
 
 `
 
