@@ -42,7 +42,11 @@ func generateMarkdown(rootCmd *cobra.Command) {
 		fmt.Printf("Error: %v", err)
 		os.Exit(1)
 	}
-	defer docFile.Close()
+
+	defer func() {
+		// Ignore error on close for markdown generation
+		_ = docFile.Close()
+	}()
 
 	// Write front-matter to the file:
 	if _, err := docFile.WriteString(fontMatterFormatString); err != nil {

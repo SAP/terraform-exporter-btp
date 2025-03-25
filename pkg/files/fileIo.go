@@ -26,7 +26,12 @@ func CreateFileWithContent(fileName string, content string) error {
 		fmt.Println("error:", err)
 		return err
 	}
-	defer file.Close()
+
+	defer func() {
+		if tempErr := file.Close(); tempErr != nil {
+			err = tempErr
+		}
+	}()
 
 	// Write content to the file
 	_, err = file.WriteString(content)
@@ -103,13 +108,23 @@ func copyFile(src, dest string) error {
 	if err != nil {
 		return err
 	}
-	defer sourceFile.Close()
+
+	defer func() {
+		if tempErr := sourceFile.Close(); tempErr != nil {
+			err = tempErr
+		}
+	}()
 
 	destFile, err := os.OpenFile(dest, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
-	defer destFile.Close()
+
+	defer func() {
+		if tempErr := destFile.Close(); tempErr != nil {
+			err = tempErr
+		}
+	}()
 
 	_, err = io.Copy(destFile, sourceFile)
 	return err

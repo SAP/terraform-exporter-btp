@@ -294,7 +294,14 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 		fmt.Print("\r\n")
 		log.Fatalf("failed to open file 'provider.tf' at %s: %v", TmpFolder, err)
 	}
-	defer sourceFile.Close()
+
+	defer func() {
+		if tempErrSrc := sourceFile.Close(); tempErrSrc != nil {
+			CleanupProviderConfig()
+			fmt.Print("\r\n")
+			log.Fatalf("failed to close file 'provider.tf' at %s: %v", TmpFolder, tempErrSrc)
+		}
+	}()
 
 	fullpath := filepath.Join(curWd, configFolder)
 
@@ -304,7 +311,14 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 		fmt.Print("\r\n")
 		log.Fatalf("failed to create file 'provider.tf' at %s: %v", fullpath, err)
 	}
-	defer destinationFile.Close()
+
+	defer func() {
+		if tempErrDest := destinationFile.Close(); tempErrDest != nil {
+			CleanupProviderConfig(fullpath)
+			fmt.Print("\r\n")
+			log.Fatalf("failed to close file 'provider.tf' at %s: %v", fullpath, tempErrDest)
+		}
+	}()
 
 	_, err = io.Copy(destinationFile, sourceFile)
 	if err != nil {
@@ -580,7 +594,11 @@ func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder st
 	if err != nil {
 		return fmt.Errorf("error opening resource config file: %v", err)
 	}
-	defer sourceFile.Close()
+	defer func() {
+		if tempErr := sourceFile.Close(); tempErr != nil {
+			err = tempErr
+		}
+	}()
 
 	targetConfigPath := filepath.Join(currentDir, configFolder, fileName)
 
@@ -601,7 +619,12 @@ func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder st
 	if err != nil {
 		return fmt.Errorf("error opening target configuration file: %v", err)
 	}
-	defer targetFile.Close()
+
+	defer func() {
+		if tempErr := targetFile.Close(); tempErr != nil {
+			err = tempErr
+		}
+	}()
 
 	headerTemplate := `
 ###

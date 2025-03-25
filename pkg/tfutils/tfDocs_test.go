@@ -197,7 +197,11 @@ func readlines(t *testing.T, file string) []string {
 	t.Helper()
 	f, err := os.Open(file)
 	require.NoError(t, err)
-	defer f.Close()
+
+	defer func() {
+		// Ignore error in test function
+		_ = f.Close()
+	}()
 
 	var lines []string
 	scanner := bufio.NewScanner(f)
