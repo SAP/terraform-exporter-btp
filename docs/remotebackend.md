@@ -31,7 +31,7 @@ terraform {
 
 Be aware that the `terraform` block is mandatory when using this file.
 
-The file is stored in the same directory that the CLI will be called from. To instruct the CLI to use this file we must use the  `--backend-path` or short `-b` flag and set the path to the file. The CLI command for the export of a Terraform configuration injecting this backend configuration looks like this:
+The file is stored in the same folder that the CLI will be called from. To instruct the CLI to use this file we must use the  `--backend-path` or short `-b` flag and set the path to the file. The CLI command for the export of a Terraform configuration injecting this backend configuration looks like this:
 
 ```bash
 btptf export -s 23fe9a1b-923d-4ab0-ae24-86ff3384cf93 -b backend.tf

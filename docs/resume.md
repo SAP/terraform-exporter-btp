@@ -13,7 +13,7 @@ Let's assume you're exporting a subaccount based on a JSON configuration called 
 - a subscription
 - a service instance
 
-In addition, you want to store the generated code into the directory `exported configuration`. Consequently, you execute the command:
+In addition, you want to store the generated code into the folder `exported configuration`. Consequently, you execute the command:
 
 ```bash
 btptf export-by-json -s 12345678-abcd-efgh-ae24-86ff3384cf93 -p btpResources.json -c exported-configuration
@@ -27,12 +27,12 @@ The created files show that the export was interrupted, as the configuration is 
 
 ![Created files after failed export run](img/incomplete-export-files.png)
 
-In addition, a temporary directory `subscriptions-config` is stored.
+In addition, a temporary folder `subscriptions-config` is created.
 
 !!! info
-    Directories that follow the naming convention `<resource>-config` are part of the export process as a temporary directory containing the resource specific information. They get removed when the resource was executed successfully or in case of an error that is handled by the Terraform Exporter for SAP BTP. However, in error situations you might see these directories. It is safe to delete them.
+    Directories that follow the naming convention `<resource>-config` are part of the export process as a temporary folder containing the resource specific information. They get removed when the resource was executed successfully or in case of an error that is handled by the Terraform Exporter for SAP BTP. However, in error situations you might see these directories. It is safe to delete them.
 
-You also recognize a file called `importlog.json` in the `exported-configuration` directory:
+You also recognize a file called `importlog.json` in the folder `exported-configuration`:
 
 ![File importlog.json as part of failed export run](img/incomplete-export-log.png)
 
@@ -55,7 +55,7 @@ Select the option to resume the processing.
 
 The processing starts, and you get prompted if you want to remove the folder `subscriptions-config`:
 
-![Repeat export - prompt for removing temporary directory](img/resume-step2.png)
+![Repeat export - prompt for removing temporary folder](img/resume-step2.png)
 
 It is safe to remove it, so select the corresponding option, and the export process continues.
 
