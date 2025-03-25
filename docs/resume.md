@@ -2,7 +2,7 @@
 
 If the export of existing infrastructure via the Terraform Exporter for SAP BTP runs into errors for various reasons. For example, there could be temporal network issues or platform issues.
 
-If the export fails, you can resume it from the last safepoint by running the **same command again**, without deleting any temporary files.  
+If the export fails, you can resume it from the last safepoint by running the **same command again**, without deleting any temporary files.
 
 ## Example of How the Resumption of a Failed Export Works
 
@@ -22,7 +22,6 @@ btptf export-by-json -s 12345678-abcd-efgh-ae24-86ff3384cf93 -p btpResources.jso
 The export process starts, but then runs into an error:
 
 ![Console Output of failed export run](img/export-failed.png)
-
 
 The created files show that the export was interrupted, as the configuration is not complete:
 

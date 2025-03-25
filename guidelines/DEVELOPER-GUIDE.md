@@ -137,7 +137,7 @@ If the command receives an empty structure, it will call several default functio
 
 You find an example for this setup in the command `exportByResourceCmd`. Be aware that the code leverages several helper functions that are available in the file `cmdDocsHelper.go`.
 
-## Setting Environment Variables in a Dev Container
+## Setting Environment Variables in a Development Container
 
 - Create a file `devcontainer.env` in the `.devcontainer` directory
 - Add the environment variables in the file. Here is an example:

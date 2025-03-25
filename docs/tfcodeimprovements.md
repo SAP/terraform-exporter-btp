@@ -1,6 +1,6 @@
 # How the btptf CLI Refines the Generated Configurations
 
-The Terraform Exporter for SAP BTP not only creates the Terraform configuration based on the data available on SAP BTP, but it also cleans up the the resulting configurations by refining the code and adding a `variables.tf` file. 
+The Terraform Exporter for SAP BTP not only creates the Terraform configuration based on the data available on SAP BTP, but it also cleans up the the resulting configurations by refining the code and adding a `variables.tf` file.
 
 The following section outlines the code and, more generally,  configuration refinements carried out by the btptf CLI.
 
@@ -45,7 +45,6 @@ The Terraform configuration on subaccount level gets improved via the following 
 - If the attribute `parent_id` is the global account, it gets removed from the resource `btp_directory`, as the global account is the default. If not it gets extracted as a variable.
 - All resources that reference a `directory_id` get transformed to reference the `btp_directory` resource if available.
 - If a resource `btp_directory_role_collection` as well as `btp_directory_role` a check if there are dependencies is executed. If there are any a corresponding `depends_on` block is added to the resource `btp_directory_role_collection`.
-
 
 ## Improvements on Cloud Foundry Org Level
 

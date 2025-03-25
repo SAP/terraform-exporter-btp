@@ -31,6 +31,7 @@ html
 https
 HCL
 HashiCorp
+howtos
 IdP
 importlog
 json
@@ -44,6 +45,8 @@ NextSteps
 OAuth
 OpenSSF
 OpenTofu
+org
+orgs
 PEM
 Pre
 pre

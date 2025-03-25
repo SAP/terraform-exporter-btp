@@ -1,12 +1,12 @@
 # Prerequisites
 
-- You must have one of the following CLIs installed:  
+- You must have one of the following CLIs installed:
      - [Terraform CLI](https://developer.hashicorp.com/terraform/install).
      - [OpenTofu CLI](https://opentofu.org/docs/intro/install/).
- 
+
     If you have both CLIs installed, you need to enforce the usage of one via the environment variable `BTPTF_IAC_TOOL` by setting its value to `terraform` or `tofu` respectively
 
-- To export directories or subaccounts, you need to set the following environment variables to authenticate against SAP BTP: 
+- To export directories or subaccounts, you need to set the following environment variables to authenticate against SAP BTP:
 
 | Environment Variable Name  | Description |
 | --- | --- |
@@ -20,10 +20,11 @@
 | BTP_CLI_SERVER_URL | The URL of the BTP CLI server (Relevant for SAP internal use-cases only)  |
 
 The parameters are the ones required by the [BTP Terraform Provider](https://registry.terraform.io/providers/SAP/btp/latest/docs).
+
 - To export directories or subaccounts, you need global account administrator permissions.
 
-- To export Cloud Foundry orgs, you need to authenticate against Cloud Foundry by setting the following environment variables: 
- 
+- To export Cloud Foundry orgs, you need to authenticate against Cloud Foundry by setting the following environment variables:
+
 | Environment Variable Name  | Description |
 | --- | --- |
 | CF_API_URL | Specific URL representing the entry point for communication between the client and a Cloud Foundry instance. |
@@ -39,7 +40,7 @@ These environment variables are the ones required by the [Terraform provider for
 
 - To export Cloud Foundry orgs, you need the Org Manager role.
 
-## How to set the parameters 
+## How to set the parameters
 Depending on your operating systems, you set the environment variables as follows:
 
 === "Windows"
@@ -53,5 +54,3 @@ Depending on your operating systems, you set the environment variables as follow
     ``` bash
     export BTP_USERNAME=<MY SAP BTP USERNAME>
     ```
-
-

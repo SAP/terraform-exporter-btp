@@ -1,13 +1,12 @@
 # Installation
 
 Download the binary from from the [releases ](https://github.com/SAP/terraform-exporter-btp/releases) section of the GitHub repository.
-   
+
 Select the version that you want to use and download the binary that fits your operating system from the `assets` of the release. We recommend using the latest version.
-  
 
-## Local Build 
+## Local Build
 
-If you contribute to the Terraform Exporter for SAP BTP or you need a fix that has not been added to a released version, you may want to do a local build: 
+If you contribute to the Terraform Exporter for SAP BTP or you need a fix that has not been added to a released version, you may want to do a local build:
 
 1. Open the Terraform Exporter for SAP BTP from the [GitHub repository](https://github.com/SAP/terraform-exporter-btp) in the VS Code Editor.
 

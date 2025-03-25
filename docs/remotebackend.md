@@ -1,10 +1,10 @@
 # How to Add a Remote Backend Configuration
 
-The Terraform Exporter for SAP BTP generates the configuration with a [local state backend](https://developer.hashicorp.com/terraform/language/backend/local). For a productive setup, you'll probably want to use a a [remote backend](https://developer.hashicorp.com/terraform/language/backend) for storing the state. 
+The Terraform Exporter for SAP BTP generates the configuration with a [local state backend](https://developer.hashicorp.com/terraform/language/backend/local). For a productive setup, you'll probably want to use a a [remote backend](https://developer.hashicorp.com/terraform/language/backend) for storing the state.
 
 You have two options to introduce such a remote backend to your configuration:
 
-1. After the configuration code is generated, you can add the corresponding block in the `provider.tf` file to your eremote backend. 
+1. After the configuration code is generated, you can add the corresponding block in the `provider.tf` file to your remote backend.
 2. You can inject the backend configuration during the export by adding the flag `--backend-path` to specify the path to your existing backend configuration,  or by adding the flags `--backend-type` and `--backend-config` to explicitly specify their parameters.
 
 !!! info
