@@ -86,9 +86,10 @@ func isValidUuid(u string) bool {
 }
 
 func getUuidError(level string, iD string) string {
-	if level == tfutils.SubaccountLevel {
+	switch level {
+	case tfutils.SubaccountLevel:
 		return fmt.Sprintf("Invalid subaccount ID: %s. Please provide a valid UUID.", iD)
-	} else if level == tfutils.DirectoryLevel {
+	case tfutils.DirectoryLevel:
 		return fmt.Sprintf("Invalid directory ID: %s Please provide a valid UUID.", iD)
 	}
 	return ""

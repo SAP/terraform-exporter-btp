@@ -207,31 +207,34 @@ func TranslateResourceParamToTechnicalName(resource string, level string) string
 }
 
 func getEntitlementTechnicalNameByLevel(level string) string {
-	if level == SubaccountLevel {
+	switch level {
+	case SubaccountLevel:
 		return SubaccountEntitlementType
-	} else if level == DirectoryLevel {
+	case DirectoryLevel:
 		return DirectoryEntitlementType
-	} else {
+	default:
 		return ""
 	}
 }
 
 func getRoleTechnicalNameByLevel(level string) string {
-	if level == SubaccountLevel {
+	switch level {
+	case SubaccountLevel:
 		return SubaccountRoleType
-	} else if level == DirectoryLevel {
+	case DirectoryLevel:
 		return DirectoryRoleType
-	} else {
+	default:
 		return ""
 	}
 }
 
 func getRoleCollectionTechnicalNameByLevel(level string) string {
-	if level == SubaccountLevel {
+	switch level {
+	case SubaccountLevel:
 		return SubaccountRoleCollectionType
-	} else if level == DirectoryLevel {
+	case DirectoryLevel:
 		return DirectoryRoleCollectionType
-	} else {
+	default:
 		return ""
 	}
 }
@@ -299,25 +302,25 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 	switch level {
 	case SubaccountLevel:
 		if resourceName == SubaccountType {
-			dataBlock = strings.Replace(doc.Import, "The ID of the subaccount", subaccountId, -1)
+			dataBlock = strings.ReplaceAll(doc.Import, "The ID of the subaccount", subaccountId)
 		} else {
-			dataBlock = strings.Replace(doc.Import, doc.Attributes["subaccount_id"], subaccountId, -1)
+			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["subaccount_id"], subaccountId)
 		}
 	case DirectoryLevel:
 		if resourceName == DirectoryType {
-			dataBlock = strings.Replace(doc.Import, "The ID of the directory.", directoryId, -1)
+			dataBlock = strings.ReplaceAll(doc.Import, "The ID of the directory.", directoryId)
 		} else {
-			dataBlock = strings.Replace(doc.Import, doc.Attributes["directory_id"], directoryId, -1)
+			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["directory_id"], directoryId)
 		}
 	case OrganizationLevel:
 		if resourceName == CfUserType || resourceName == CfDomainType || resourceName == CfRouteType || resourceName == CfServiceInstanceType {
-			dataBlock = strings.Replace(doc.Import, "The ID of the organization", organizationId, -1)
+			dataBlock = strings.ReplaceAll(doc.Import, "The ID of the organization", organizationId)
 		} else {
-			dataBlock = strings.Replace(doc.Import, doc.Attributes["org"], organizationId, -1)
+			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["org"], organizationId)
 		}
 	case SpaceLevel:
 		if resourceName == CfSpaceRoleType {
-			dataBlock = strings.Replace(doc.Import, doc.Attributes["space"], spaceId, -1)
+			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["space"], spaceId)
 		}
 	}
 
@@ -490,10 +493,10 @@ func GetExecutionLevelAndId(subaccountID string, directoryID string, organizatio
 func handleNotFoundError(err error, resourceName string, iD string) error {
 	if strings.Contains(err.Error(), "404") {
 		// if it is a 404 error it is probably thw wrong ID, so we return a more readible error message
-		if resourceName == DirectoryType {
+		switch resourceName {
+		case DirectoryType:
 			return fmt.Errorf("the directory with ID %s was not found. Check that the values for directory ID and globalaccount subdomain are valid", iD)
-
-		} else if resourceName == SubaccountType {
+		case SubaccountType:
 			return fmt.Errorf("the subaccount with ID %s was not found. Check that the values for subaccount ID and globalaccount subdomain are valid", iD)
 		}
 	}
@@ -546,7 +549,7 @@ func transformDataToStringArrayGeneric(data map[string]interface{}, stringArr *[
 
 func transformEntitlementStringArray(data map[string]interface{}, stringArr *[]string) {
 	for key := range data {
-		key := strings.Replace(key, ":", "_", -1)
+		key := strings.ReplaceAll(key, ":", "_")
 		*stringArr = append(*stringArr, key)
 	}
 }
@@ -594,9 +597,9 @@ func transformCfSpaceRolesStringArray(data map[string]interface{}, stringArr *[]
 }
 
 func addUserAgent() {
-	os.Setenv("BTP_APPEND_USER_AGENT", "terraform_exporter_btp")
+	_ = os.Setenv("BTP_APPEND_USER_AGENT", "terraform_exporter_btp")
 }
 
 func removeUserAgent() {
-	os.Unsetenv("BTP_APPEND_USER_AGENT")
+	_ = os.Unsetenv("BTP_APPEND_USER_AGENT")
 }

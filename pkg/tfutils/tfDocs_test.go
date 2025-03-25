@@ -190,7 +190,7 @@ func readTestFile(t *testing.T, name string) string {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return strings.Replace(string(bytes), "\r\n", "\n", -1)
+	return strings.ReplaceAll(string(bytes), "\r\n", "\n")
 }
 
 func readlines(t *testing.T, file string) []string {

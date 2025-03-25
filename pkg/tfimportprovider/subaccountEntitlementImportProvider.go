@@ -42,8 +42,8 @@ func CreateEntitlementImportBlock(data map[string]interface{}, subaccountId stri
 	if len(filterValues) != 0 {
 		var subaccountAllEntitlements []string
 		for key, value := range data {
-			subaccountAllEntitlements = append(subaccountAllEntitlements, strings.Replace(key, ":", "_", -1))
-			if slices.Contains(filterValues, strings.Replace(key, ":", "_", -1)) {
+			subaccountAllEntitlements = append(subaccountAllEntitlements, strings.ReplaceAll(key, ":", "_"))
+			if slices.Contains(filterValues, strings.ReplaceAll(key, ":", "_")) {
 				importBlock += templateEntitlementImport(count, value, subaccountId, resourceDoc)
 				count++
 			}
@@ -65,11 +65,11 @@ func CreateEntitlementImportBlock(data map[string]interface{}, subaccountId stri
 }
 
 func templateEntitlementImport(x int, value interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "entitlement_"+fmt.Sprint(x), -1)
-	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
+	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "entitlement_"+fmt.Sprint(x))
+	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
 	if subMap, ok := value.(map[string]interface{}); ok {
 		for subKey, subValue := range subMap {
-			template = strings.Replace(template, "<"+subKey+">", fmt.Sprintf("%v", subValue), -1)
+			template = strings.ReplaceAll(template, "<"+subKey+">", fmt.Sprintf("%v", subValue))
 		}
 	}
 	return template + "\n"

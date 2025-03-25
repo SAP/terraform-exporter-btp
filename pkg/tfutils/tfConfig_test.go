@@ -26,7 +26,7 @@ func TestSetupConfigDir(t *testing.T) {
 		t.Errorf("File should have been copied to existing directory")
 	}
 
-	os.RemoveAll(filepath.Join(curWd, "configFolder"))
+	_ = os.RemoveAll(filepath.Join(curWd, "configFolder"))
 	cleanup()
 }
 
@@ -37,7 +37,7 @@ func setupTestEnvironment() (string, func()) {
 	}
 
 	return tempDir, func() {
-		os.RemoveAll(tempDir)
+		_ = os.RemoveAll(tempDir)
 	}
 }
 
@@ -72,7 +72,7 @@ globalaccount = "testaccount"
 cli_server_url="https://test.com"
 }`
 
-	expectedContent = strings.Replace(expectedContent, "[VERSION]", BtpProviderVersion[1:], -1)
+	expectedContent = strings.ReplaceAll(expectedContent, "[VERSION]", BtpProviderVersion[1:])
 	content, err := os.ReadFile(expectedFilePath)
 	if err != nil {
 		t.Fatalf("Failed to read file %s: %v", expectedFilePath, err)
@@ -112,7 +112,7 @@ provider "cloudfoundry" {
 api_url = "https://test.com"
 }`
 
-	expectedContent = strings.Replace(expectedContent, "[VERSION]", CfProviderVersion[1:], -1)
+	expectedContent = strings.ReplaceAll(expectedContent, "[VERSION]", CfProviderVersion[1:])
 	content, err := os.ReadFile(expectedFilePath)
 	if err != nil {
 		t.Fatalf("Failed to read file %s: %v", expectedFilePath, err)

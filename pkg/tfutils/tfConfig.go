@@ -122,7 +122,9 @@ func ConfigureProvider(level string) {
 
 	var providerContent string
 
-	if level == SubaccountLevel || level == DirectoryLevel {
+	switch level {
+	case SubaccountLevel, DirectoryLevel:
+
 		username := os.Getenv("BTP_USERNAME")
 		password := os.Getenv("BTP_PASSWORD")
 		cliServerUrl := os.Getenv("BTP_CLI_SERVER_URL")
@@ -160,7 +162,7 @@ func ConfigureProvider(level string) {
 
 		providerContent = providerContent + "}"
 
-	} else if level == OrganizationLevel || level == SpaceLevel {
+	case OrganizationLevel, SpaceLevel:
 
 		username := os.Getenv("CF_USER")
 		password := os.Getenv("CF_PASSWORD")
@@ -313,10 +315,11 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 }
 
 func handleInputExistingDir(choice string, configFilepath string, configFolder string, curWd string) {
-	if choice == selectionAbort {
+	switch choice {
+	case selectionAbort:
 		CleanupProviderConfig()
 		os.Exit(0)
-	} else if choice == selectionOverwrite {
+	case selectionOverwrite:
 		output.AddNewLine()
 		fmt.Println(output.ColorStringCyan("existing files will be overwritten"))
 		output.AddNewLine()
@@ -327,13 +330,13 @@ func handleInputExistingDir(choice string, configFilepath string, configFolder s
 			output.AddNewLine()
 			log.Fatalf("error recreating configuration folder %s at %s: %v", configFolder, curWd, err)
 		}
-	} else if choice == selectionResume {
+	case selectionResume:
 		// Can only happen if we are in the main command
 		// Do nothing, the processing will be resumed with the existing directory
 		output.AddNewLine()
 		fmt.Println(output.ColorStringCyan("export will be resumed"))
 		output.AddNewLine()
-	} else {
+	default:
 		CleanupProviderConfig()
 		output.AddNewLine()
 		log.Fatalf("invalid input. exiting the process")
@@ -450,15 +453,16 @@ func CleanupProviderConfig(directory ...string) {
 }
 
 func GetValidResourcesByLevel(level string) []string {
-	if level == SubaccountLevel {
+	switch level {
+	case SubaccountLevel:
 		return AllowedResourcesSubaccount
-	} else if level == DirectoryLevel {
+	case DirectoryLevel:
 		return AllowedResourcesDirectory
-	} else if level == OrganizationLevel {
+	case OrganizationLevel:
 		return AllowedResourcesOrganization
+	default:
+		return []string{}
 	}
-
-	return []string{}
 }
 
 func cleanup() {

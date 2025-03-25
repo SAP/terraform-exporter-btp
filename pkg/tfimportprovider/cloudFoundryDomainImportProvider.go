@@ -62,7 +62,7 @@ func createDomainImportBlock(data map[string]interface{}, orgId string, filterVa
 	return importBlock, count, nil
 }
 func templateDomainImport(x int, domain map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "domain_"+fmt.Sprintf("%v", x), -1)
-	template = strings.Replace(template, "<domain_guid>", fmt.Sprintf("%v", domain["id"]), -1)
+	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "domain_"+fmt.Sprintf("%v", x))
+	template = strings.ReplaceAll(template, "<domain_guid>", fmt.Sprintf("%v", domain["id"]))
 	return template + "\n"
 }

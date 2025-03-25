@@ -72,8 +72,8 @@ func createEnvironmentInstanceImportBlock(data map[string]interface{}, subaccoun
 }
 
 func templateEnvironmentInstanceImport(environmentInstance map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", fmt.Sprintf("%v", environmentInstance["environment_type"]), -1)
-	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
-	template = strings.Replace(template, "<environment_instance_id>", fmt.Sprintf("%v", environmentInstance["id"]), -1)
+	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", fmt.Sprintf("%v", environmentInstance["environment_type"]))
+	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
+	template = strings.ReplaceAll(template, "<environment_instance_id>", fmt.Sprintf("%v", environmentInstance["id"]))
 	return template + "\n"
 }
