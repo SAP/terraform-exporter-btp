@@ -27,9 +27,9 @@ Review and adjust the JSON file according to your needs.
 
 Export resources from SAP BTP directly, by specifying their IDs.
 
-    ```bash
-    btptf export -s <subaccount id>
-    ```
+```bash
+btptf export -s <subaccount id>
+```
 
 You find a comprehensive overview of the commands and their options and flags in the [documentation](btptf.md).
 

@@ -8,14 +8,5 @@ Here are the steps the btptf CLI takes over for you
 4. **Configuration Refinements**
 It not only creates the Terraform configuration based on the data available on SAP BTP, but also refines the code according to good practice for good readability and sustainable code management. See [How the btptf CLI Refines the Generated Configurations](tfcodeimprovements.md).
 
-
-STUFF TO BE MOVED:
-
-No state file is created by the btptf CLI. The reason is that we want to enable best practices and allow the user to add a remote state storage configuration (always customer specific) to the configuration before triggering the state import.
-
-
-The configurations delivered by the btptf CLI are:
-
-  -	Provider configuration (excluding credentials)
-  -	[Import](https://developer.hashicorp.com/terraform/language/import) blocks for the resources
-  -	Resource configuration retrieved from the platform
+!!! info
+    No state file is created by the btptf CLI. The reason is that we want to enable best practices and allow the user to add a remote state storage configuration (always customer specific) to the configuration before triggering the state import.

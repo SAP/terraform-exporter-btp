@@ -12,12 +12,7 @@ If you contribute to the btptf CLI or you need a fix that has not been added to 
 
 2. We have set up a [devcontainer](https://code.visualstudio.com/docs/devcontainers/tutorial), so reopen the repository in the devcontainer.
 
-3. Open a terminal in VS Code and install the binary by running
-
-   ```bash
-    make install
-    ```
-   This will implicitly trigger a build of the source. If you want to build *without* install, execute `make build`.
+3. Open a terminal in VS Code and install the binary by running `make install`. This will implicitly trigger a build of the source. If you want to build *without* install, execute `make build`.
 
 4. The system will store the binary as `btptf` (`btptf.exe` in case of Windows) in the default binary path of your Go installation `$GOPATH/bin`.
 
