@@ -1,15 +1,15 @@
 # Troubleshooting
 
-This page should help you when you run into a situation where the Terraform Exporter for SAP BTP might not produce the expected results.
-To narrow down the issue we provide some environment variables that allow you to influence or switch off certain features of the exporter.
+This page should help you when you run into a situation where the btptf CLI might not produce the expected results.
+To narrow down the issue we provide some environment variables that allow you to influence or switch off certain features of the btptf CLI.
 
-The following sections describe the environment variables that you can set to influence the behavior of the exporter depending on the situation you are in.
+The following sections describe the environment variables that you can set to influence the behavior of the btptf CLI depending on the situation you are in.
 
 ## The Terraform CLI is used instead of OpenTofu (or vice versa)
 
 You are expecting the the generated code uses the providers from the OpenTofu registry but it downloaded the ones from the HashiCorp Terraform registry or vice versa.
 
-This can happen if you have both CLIs namely the Terraform *and* the OpenTofu CLI installed on your machine. To guide the exporter to use the correct CLI you can set the environment variable `BTPTF_IAC_TOOL` to `terraform` or `tofu` depending on the CLI you want to use.
+This can happen if you have both CLIs namely the Terraform *and* the OpenTofu CLI installed on your machine. To guide the btptf CLI to use the correct CLI you can set the environment variable `BTPTF_IAC_TOOL` to `terraform` or `tofu` depending on the CLI you want to use.
 
 As an example if you want to use the OpenTofu CLI you can set the environment variable as follows:
 

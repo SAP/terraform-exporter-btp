@@ -1,6 +1,6 @@
 # How the btptf CLI Refines the Generated Configurations
 
-The Terraform Exporter for SAP BTP not only creates the Terraform configuration based on the data available on SAP BTP, but it also cleans up the the resulting configurations by refining the code and adding a `variables.tf` file.
+The btptf CLI not only creates the Terraform configuration based on the data available on SAP BTP, but it also cleans up the the resulting configurations by refining the code and adding a `variables.tf` file.
 
 The following section outlines the code and, more generally,  configuration refinements carried out by the btptf CLI.
 

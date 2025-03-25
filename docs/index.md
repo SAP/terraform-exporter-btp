@@ -1,6 +1,7 @@
 # Terraform Exporter for SAP BTP
 
 ## Introduction
+
 Welcome to the documentation for the Terraform exporter for SAP BTP (**btptf CLI**). It's a tool that helps you integrate existing SAP BTP resources into Terraform, facilitating a seamless adoption of Infrastructure-as-Code practices.
 
 This guide will walk you through the concepts, features, and benefits of using the btptf CLI, and it provides comprehensive howtos.
@@ -12,7 +13,7 @@ The following SAP BTP account levels are available for export either as complete
 - Cloud Foundry orgs
 
 !!! info
-    The Terraform Exporter for SAP BTP is fully compatible with [OpenTofu](https://opentofu.org/). All steps outlined in this guide can be executed using either the Terraform CLI or the OpenTofu CLI. For simplicity, this documentation will only reference [Terraform](https://www.terraform.io/).
+    The btptf CLI is fully compatible with [OpenTofu](https://opentofu.org/). All steps outlined in this guide can be executed using either the Terraform CLI or the OpenTofu CLI. For simplicity, this documentation will only reference [Terraform](https://www.terraform.io/).
 
 ## Benefits
 

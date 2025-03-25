@@ -1,6 +1,6 @@
 # How to Resume a Failed Export
 
-If the export of existing infrastructure via the Terraform Exporter for SAP BTP runs into errors for various reasons. For example, there could be temporal network issues or platform issues.
+If the export of existing infrastructure via the btptf CLI runs into errors for various reasons. For example, there could be temporal network issues or platform issues.
 
 If the export fails, you can resume it from the last safepoint by running the **same command again**, without deleting any temporary files.
 
@@ -30,13 +30,13 @@ The created files show that the export was interrupted, as the configuration is 
 In addition, a temporary folder `subscriptions-config` is created.
 
 !!! info
-    Directories that follow the naming convention `<resource>-config` are part of the export process as a temporary folder containing the resource specific information. They get removed when the resource was executed successfully or in case of an error that is handled by the Terraform Exporter for SAP BTP. However, in error situations you might see these directories. It is safe to delete them.
+    Directories that follow the naming convention `<resource>-config` are part of the export process as a temporary folder containing the resource specific information. They get removed when the resource was executed successfully or in case of an error that is handled by the btptf CLI. However, in error situations you might see these directories. It is safe to delete them.
 
 You also recognize a file called `importlog.json` in the folder `exported-configuration`:
 
 ![File importlog.json as part of failed export run](img/incomplete-export-log.png)
 
-The Terraform Exporter for SAP BTP uses this file to track the successfully exported resources.
+The btptf CLI uses this file to track the successfully exported resources.
 
 !!! info
     This file will be removed if the export was successful.
@@ -47,7 +47,7 @@ To resume the processing, you don't need to make any changes to the files, but e
 btptf export-by-json -s 12345678-abcd-efgh-ae24-86ff3384cf93 -p btpResources.json -c exported-configuration
 ```
 
-The Terraform Exporter for SAP BTP recognizes the file and prompts how you want to proceed
+The btptf CLI recognizes the file and prompts how you want to proceed
 
 ![Repeat export - prompt for resume based on log](img/resume-step1.png)
 

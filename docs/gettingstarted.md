@@ -50,7 +50,7 @@ The below example looks in more detail at how to use the btptf CLI to export an 
     ```
 The resources list file with the name btpResources_<subaccount id>.json e.g, `btpResources_9d3471e7-a6b3-48e2-ae4b-b9426bb24cd1.json` gets generated.
 
-![Console output of create json command of Terraform Exporter for SAP BTP](img/create-json.jpg)
+![Console output of create json command of btptf CLI](img/create-json.jpg)
 
 5. Edit the json file and remove the resources which need not be exported and managed by Terraform.
 

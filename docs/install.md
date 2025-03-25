@@ -6,9 +6,9 @@ Select the version that you want to use and download the binary that fits your o
 
 ## Local Build
 
-If you contribute to the Terraform Exporter for SAP BTP or you need a fix that has not been added to a released version, you may want to do a local build:
+If you contribute to the btptf CLI or you need a fix that has not been added to a released version, you may want to do a local build:
 
-1. Open the Terraform Exporter for SAP BTP from the [GitHub repository](https://github.com/SAP/terraform-exporter-btp) in the VS Code Editor.
+1. Open the code of the btptf CLI cloned from the [GitHub repository](https://github.com/SAP/terraform-exporter-btp) in the VS Code Editor.
 
 2. We have set up a [devcontainer](https://code.visualstudio.com/docs/devcontainers/tutorial), so reopen the repository in the devcontainer.
 
