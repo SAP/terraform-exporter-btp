@@ -75,8 +75,8 @@ func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId 
 }
 
 func templateServiceInstanceImport(x int, instance map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "serviceinstance_"+fmt.Sprint(x), -1)
-	template = strings.Replace(template, "<subaccount_id>", subaccountId, -1)
-	template = strings.Replace(template, "<service_instance_id>", fmt.Sprintf("%v", instance["id"]), -1)
+	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "serviceinstance_"+fmt.Sprint(x))
+	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
+	template = strings.ReplaceAll(template, "<service_instance_id>", fmt.Sprintf("%v", instance["id"]))
 	return template + "\n"
 }

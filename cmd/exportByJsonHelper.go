@@ -37,7 +37,12 @@ func exportByJson(subaccount string, directory string, organization string, json
 		log.Fatalf("error opening JSON file with resources: %v", err)
 	}
 
-	defer jsonFile.Close()
+	defer func() {
+		if tempErr := jsonFile.Close(); tempErr != nil {
+			fmt.Print("\r\n")
+			log.Fatalf("error closing JSON file with resources: %v", tempErr)
+		}
+	}()
 
 	byteValue, err := io.ReadAll(jsonFile)
 	if err != nil {

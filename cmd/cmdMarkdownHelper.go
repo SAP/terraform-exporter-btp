@@ -29,7 +29,7 @@ func generateMarkdown(rootCmd *cobra.Command) {
 	color.NoColor = true
 	fmt.Println("Generating markdown documentation")
 
-	basename := strings.Replace(rootCmd.CommandPath(), " ", "_", -1) + ".md"
+	basename := strings.ReplaceAll(rootCmd.CommandPath(), " ", "_") + ".md"
 	filename := filepath.Join("./docs", basename)
 
 	if err := os.MkdirAll(filepath.Dir(filename), directoryMode); err != nil {
@@ -42,7 +42,11 @@ func generateMarkdown(rootCmd *cobra.Command) {
 		fmt.Printf("Error: %v", err)
 		os.Exit(1)
 	}
-	defer docFile.Close()
+
+	defer func() {
+		// Ignore error on close for markdown generation
+		_ = docFile.Close()
+	}()
 
 	// Write front-matter to the file:
 	if _, err := docFile.WriteString(fontMatterFormatString); err != nil {
@@ -170,7 +174,7 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 	}
 
 	if cmd.Runnable() {
-		buf.WriteString(fmt.Sprintf("```bash\n%s\n```\n\n", cmd.UseLine()))
+		fmt.Fprintf(buf, "```bash\n%s\n```\n\n", cmd.UseLine())
 	}
 
 	if len(cmd.Example) > 0 {
@@ -195,8 +199,8 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 			if parent != cmd.Root() {
 				pname := parent.CommandPath()
 				link := pname + ".md"
-				link = strings.Replace(link, " ", "_", -1)
-				buf.WriteString(fmt.Sprintf("* [%s](%s): %s\n", pname, linkHandler(link), parent.Short))
+				link = strings.ReplaceAll(link, " ", "_")
+				fmt.Fprintf(buf, "* [%s](%s): %s\n", pname, linkHandler(link), parent.Short)
 			}
 			cmd.VisitParents(func(c *cobra.Command) {
 				if c.DisableAutoGenTag {
@@ -214,8 +218,8 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 			}
 			cname := name + " " + child.Name()
 			link := cname + ".md"
-			link = strings.Replace(link, " ", "_", -1)
-			buf.WriteString(fmt.Sprintf("* [%s](%s): %s\n", cname, linkHandler(link), child.Short))
+			link = strings.ReplaceAll(link, " ", "_")
+			fmt.Fprintf(buf, "* [%s](%s): %s\n", cname, linkHandler(link), child.Short)
 		}
 
 		// for child commands, write a link back to the root command with the text "Back to top".
@@ -223,8 +227,8 @@ func genMarkdownCustom(cmd *cobra.Command, w io.Writer, linkHandler func(string)
 			root := cmd.Root()
 			cname := root.Name()
 			link := cname + ".md"
-			link = strings.Replace(link, " ", "_", -1)
-			buf.WriteString(fmt.Sprintf("* [Back to top](%s)\n", linkHandler(link)))
+			link = strings.ReplaceAll(link, " ", "_")
+			fmt.Fprintf(buf, "* [Back to top](%s)\n", linkHandler(link))
 		}
 
 		buf.WriteString("\n")

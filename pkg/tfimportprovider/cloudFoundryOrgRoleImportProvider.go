@@ -64,7 +64,7 @@ func createOrgRoleImportBlock(data map[string]interface{}, orgId string, filterV
 	return importBlock, count, nil
 }
 func templateOrgRoleImport(x int, role map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
-	template := strings.Replace(resourceDoc.Import, "<resource_name>", "role_"+fmt.Sprintf("%v", role["type"])+"_"+fmt.Sprintf("%v", x), -1)
-	template = strings.Replace(template, "<role_guid>", fmt.Sprintf("%v", role["id"]), -1)
+	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "role_"+fmt.Sprintf("%v", role["type"])+"_"+fmt.Sprintf("%v", x))
+	template = strings.ReplaceAll(template, "<role_guid>", fmt.Sprintf("%v", role["id"]))
 	return template + "\n"
 }

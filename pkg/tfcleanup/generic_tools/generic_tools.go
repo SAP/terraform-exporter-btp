@@ -337,7 +337,7 @@ func RemoveEmptyFiles(dir string) error {
 		path := filepath.Join(dir, file.Name())
 		info, _ := os.Lstat(path)
 		if info.Size() == 0 {
-			os.Remove(path)
+			_ = os.Remove(path)
 		}
 	}
 	return nil

@@ -54,31 +54,34 @@ func GetImportBlockProvider(cmdResourceName string, level string) (ITfImportProv
 }
 
 func getEntitlementImportProviderByLevel(level string) (ITfImportProvider, error) {
-	if level == tfutils.SubaccountLevel {
+	switch level {
+	case tfutils.SubaccountLevel:
 		return newSubaccountEntitlementImportProvider(), nil
-	} else if level == tfutils.DirectoryLevel {
+	case tfutils.DirectoryLevel:
 		return newDirectoryEntitlementImportProvider(), nil
-	} else {
+	default:
 		return nil, fmt.Errorf("unsupported level provided")
 	}
 }
 
 func getRoleImportProviderByLevel(level string) (ITfImportProvider, error) {
-	if level == tfutils.SubaccountLevel {
+	switch level {
+	case tfutils.SubaccountLevel:
 		return newSubaccountRoleImportProvider(), nil
-	} else if level == tfutils.DirectoryLevel {
+	case tfutils.DirectoryLevel:
 		return newDirectoryRoleImportProvider(), nil
-	} else {
+	default:
 		return nil, fmt.Errorf("unsupported level provided")
 	}
 }
 
 func getRoleCollectionImportProviderByLevel(level string) (ITfImportProvider, error) {
-	if level == tfutils.SubaccountLevel {
+	switch level {
+	case tfutils.SubaccountLevel:
 		return newSubaccountRoleCollectionImportProvider(), nil
-	} else if level == tfutils.DirectoryLevel {
+	case tfutils.DirectoryLevel:
 		return newDirectoryRoleCollectionImportProvider(), nil
-	} else {
+	default:
 		return nil, fmt.Errorf("unsupported level provided")
 	}
 }
