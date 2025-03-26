@@ -34,3 +34,8 @@ The btptf CLI ensures clean, maintainable Terraform code generation, adhering to
 
 - **Flexible JSON Workflow or Direct Export**
 The btptf CLI offers a JSON workflow where a JSON-based resource inventory is created that users can edit before export, allowing pre-export customization. Users can also directly export resources.
+
+## Support
+
+The Terraform exporter for SAP BTP was built by SAP as an open-source project under the [Apache 2.0 license](https://github.com/SAP/terraform-exporter-btp?tab=Apache-2.0-1-ov-file#readme). Note that this means that there is no official SAP support for the provider.
+Feedback, issues, pull requests, and feature requests are handled through this repository on GitHub.com.
