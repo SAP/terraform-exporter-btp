@@ -1,0 +1,15 @@
+name: Update Brew Formula
+on:
+  workflow_dispatch:
+jobs:
+  update-btptf-formula:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # pin@v4.2.2
+      - uses: robinraju/release-downloader@v1
+        with:
+          latest: true
+          fileName: '*'
+          out-file-path: 'downloaded-assets'
+      - name: List Contents
+        run: ls -l
