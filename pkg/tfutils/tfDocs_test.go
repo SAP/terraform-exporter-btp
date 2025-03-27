@@ -360,7 +360,7 @@ func TestParseTextSeq(t *testing.T) {
 
 func TestGetDocsForResource(t *testing.T) {
 
-	doc, err := GetDocsForResource("SAP", "btp", "btp", "resources", "btp_subaccount_environment_instance", "v1.3.0", "github.com")
+	doc, err := GetDocsForResource("SAP", "btp", "btp", "resources", "btp_subaccount_environment_instance", "v1.4.0", "github.com")
 
 	if err != nil {
 		t.Errorf("error is not expected")

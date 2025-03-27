@@ -4,5 +4,5 @@ globals "terraform" "providers" "btp" {
 }
 
 globals "terraform" "providers" "cloudfoundry" {
-  version_dev = "~> 1.3.0"
+  version_dev = "~> 1.4.0"
 }
