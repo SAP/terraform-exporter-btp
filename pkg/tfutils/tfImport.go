@@ -39,7 +39,7 @@ const (
 	CmdServiceBindingParameter      string = "service-bindings"
 	CmdSecuritySettingParameter     string = "security-settings"
 	CmdCfSpaceParameter             string = "spaces"
-	CmdCfUserParameter              string = "users"
+	CmdCfUserParameter              string = "users_cf"
 	CmdCfDomainParamater            string = "domains"
 	CmdCfOrgRoleParameter           string = "org-roles"
 	CmdCfRouteParameter             string = "routes"
@@ -70,7 +70,7 @@ const (
 
 const (
 	CfSpaceType           string = "cloudfoundry_space"
-	CfUserType            string = "cloudfoundry_user"
+	CfUserType            string = "cloudfoundry_user_cf"
 	CfOrgRoleType         string = "cloudfoundry_org_role"
 	CfDomainType          string = "cloudfoundry_domain"
 	CfRouteType           string = "cloudfoundry_route"
