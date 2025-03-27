@@ -71,6 +71,7 @@ const (
 const (
 	CfSpaceType           string = "cloudfoundry_space"
 	CfUserType            string = "cloudfoundry_user_cf"
+	CfUserTypeRead        string = "cloudfoundry_user"
 	CfOrgRoleType         string = "cloudfoundry_org_role"
 	CfDomainType          string = "cloudfoundry_domain"
 	CfRouteType           string = "cloudfoundry_route"
@@ -126,6 +127,11 @@ func FetchImportConfiguration(subaccountId string, directoryId string, organizat
 
 func GetDocByResourceName(kind DocKind, resourceName string, level string) (EntityDocs, error) {
 	var choice string
+
+	// Special handling for resource cloudfoundry_user_cf as the corresponding data source is cloudfoundry_user
+	if resourceName == CfUserType && kind == DataSourcesKind {
+		resourceName = CfUserTypeRead
+	}
 
 	if (kind == ResourcesKind && resourceName != SubaccountSecuritySettingType) || (kind == DataSourcesKind && resourceName == SubaccountType) || (kind == DataSourcesKind && resourceName == DirectoryType) {
 		// We need the singular form of the resource name for all resoucres and the subaccount data source
@@ -313,7 +319,7 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["directory_id"], directoryId)
 		}
 	case OrganizationLevel:
-		if resourceName == CfUserType || resourceName == CfDomainType || resourceName == CfRouteType || resourceName == CfServiceInstanceType {
+		if resourceName == CfUserType || resourceName == CfUserTypeRead || resourceName == CfDomainType || resourceName == CfRouteType || resourceName == CfServiceInstanceType {
 			dataBlock = strings.ReplaceAll(doc.Import, "The ID of the organization", organizationId)
 		} else {
 			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["org"], organizationId)
@@ -406,7 +412,7 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 		stringArr = []string{fmt.Sprintf("%v", data["subaccount_id"])}
 	case CfSpaceType:
 		transformDataToStringArrayGeneric(data, &stringArr, "spaces", "name")
-	case CfUserType:
+	case CfUserType, CfUserTypeRead:
 		transformDataToStringArrayGeneric(data, &stringArr, "users", "username")
 	case CfDomainType:
 		transformDataToStringArrayGeneric(data, &stringArr, "domains", "name")
@@ -431,6 +437,11 @@ func generateDataSourcesForList(subaccountId string, directoryId string, organiz
 	level, iD := GetExecutionLevelAndId(subaccountId, directoryId, organizationId, spaceID)
 
 	btpResourceType := TranslateResourceParamToTechnicalName(resourceName, level)
+
+	if btpResourceType == CfUserType {
+		// For CF Users we must use the data source cloudfoundry_user, but the resource name is cloudfoundry_user_cf
+		btpResourceType = CfUserTypeRead
+	}
 
 	dataBlock, err := readDataSource(subaccountId, directoryId, organizationId, spaceID, btpResourceType)
 	if err != nil {
