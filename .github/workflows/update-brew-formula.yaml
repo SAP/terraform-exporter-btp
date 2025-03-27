@@ -1,6 +1,9 @@
 name: Update Brew Formula
 on:
   workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   update-btptf-formula:
     runs-on: ubuntu-latest
@@ -48,7 +51,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7 
         with:
           add-paths: btptf.rb
-          branch: update_${{ github.event.repository.updated_at }}_${{ steps.latest-release.outputs.LATEST_TAG }}
+          #branch: update_${{ github.event.repository.updated_at }}_${{ steps.latest-release.outputs.LATEST_TAG }}
           delete-branch: true
           title: "chore: Update to ${{ steps.latest-release.outputs.LATEST_TAG }}"
           body: This PR updates btptf.rb to ${{ steps.latest-release.outputs.LATEST_TAG }}
