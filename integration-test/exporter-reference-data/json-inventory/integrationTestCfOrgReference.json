@@ -8,9 +8,17 @@
       ]
     },
     {
+      "Name": "users_cf",
+      "Values": [
+        "christian.lechner@sap.com",
+        "john.doe@sap.com"
+      ]
+    },
+    {
       "Name": "org-roles",
       "Values": [
         "organization_manager_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac",
+        "organization_manager_ac6fdb62-db37-4658-966d-fb55909b45aa",
         "organization_user_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac"
       ]
     },
