@@ -469,20 +469,7 @@ func generateDataSourcesForList(subaccountId string, directoryId string, organiz
 		return nil, nil, error
 	}
 
-	if btpResourceType == SubaccountRoleCollectionType || btpResourceType == DirectoryRoleCollectionType {
-		// For role collections we need to filter the default values out
-		data = defaultfilter.FilterDefaultRoleCollectionsFromJsonData(subaccountId, directoryId, data)
-	}
-
-	if btpResourceType == SubaccountRoleType || btpResourceType == DirectoryRoleType {
-		// For roles we need to filter the default values out
-		data = defaultfilter.FilterDefaultRolesFromJsonData(subaccountId, directoryId, data)
-	}
-
-	if btpResourceType == SubaccountTrustConfigurationType {
-		// For trust configurations we need to filter the default SAP IdP out
-		data = defaultfilter.FilterDefaultIdpJsonData(data)
-	}
+	data = filterDefaultValues(subaccountId, directoryId, btpResourceType, data)
 
 	return transformDataToStringArray(btpResourceType, data), extractFeatureList(data, btpResourceType), nil
 }
@@ -613,4 +600,19 @@ func addUserAgent() {
 
 func removeUserAgent() {
 	_ = os.Unsetenv("BTP_APPEND_USER_AGENT")
+}
+
+func filterDefaultValues(subaccountId string, directoryId string, btpResourceType string, data map[string]interface{}) map[string]any {
+
+	switch btpResourceType {
+	case SubaccountRoleCollectionType, DirectoryRoleCollectionType:
+		return defaultfilter.FilterDefaultRoleCollectionsFromJsonData(subaccountId, directoryId, data)
+	case SubaccountRoleType, DirectoryRoleType:
+		return defaultfilter.FilterDefaultRolesFromJsonData(subaccountId, directoryId, data)
+	case SubaccountTrustConfigurationType:
+		return defaultfilter.FilterDefaultIdpJsonData(data)
+	default:
+		return data
+	}
+
 }
