@@ -83,10 +83,6 @@ func templateEntitlementImport(x int, value interface{}, subaccountId string, re
 }
 
 func getServicePlanNameFromData(value interface{}) (serviceName string, planName string) {
-	if subMap, ok := value.(map[string]interface{}); ok {
-		for subKey, subValue := range subMap {
-			return subKey, fmt.Sprintf("%v", subValue)
-		}
-	}
-	return "", ""
+	entitlement := value.(map[string]any)
+	return fmt.Sprintf("%v", entitlement["service_name"]), fmt.Sprintf("%v", entitlement["plan_name"])
 }

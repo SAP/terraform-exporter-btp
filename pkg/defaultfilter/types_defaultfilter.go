@@ -64,7 +64,7 @@ var DefaultEntitlements EntitlementFilterData = EntitlementFilterData{
 	},
 	{
 		ServiceName: "html5-apps-repo",
-		PlanName:    "apphost",
+		PlanName:    "app-host",
 	},
 	{
 		ServiceName: "html5-apps-repo",
