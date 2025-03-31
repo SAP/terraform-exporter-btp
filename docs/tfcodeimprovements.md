@@ -27,6 +27,7 @@ Some superfluous resources that get automatically created by SAP BTP at, e.g. su
 - Default trust configuration to the SAP IdP
 - Default role collections that get created during subaccount or directory creation or when a service instance or app subscription gets created
 - Default roles that get created during subaccount or directory creation or when a service instance or app subscription gets created
+- Default entitlements that get created during the initial subaccount creation
 
 ## Refinements on Subaccount Level
 

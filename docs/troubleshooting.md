@@ -65,7 +65,7 @@ If the generated JSON file (command `btptf create-json`) or the generated Terraf
 
 We are removing roles that are part of the initial creation process of a subaccount or directory or that get created when you subscribe to an application or create a service instance.
 
-If the generated JSON file (command `btptf create-json`) or the generated Terraform code does not contain role collections you would have expected you can deactivate this feature by setting the environment variable `BTPTF_SKIP_ROLEFILTER` to a non-empty value:
+If the generated JSON file (command `btptf create-json`) or the generated Terraform code does not contain roles you would have expected you can deactivate this feature by setting the environment variable `BTPTF_SKIP_ROLEFILTER` to a non-empty value:
 
 === "Windows"
 
@@ -77,4 +77,22 @@ If the generated JSON file (command `btptf create-json`) or the generated Terraf
 
     ``` bash
     export BTPTF_SKIP_ROLEFILTER=true
+    ```
+
+## Some entitlements are not exported
+
+We are removing entitlements that are part of the initial creation process of a subaccount.
+
+If the generated JSON file (command `btptf create-json`) or the generated Terraform code does not contain entitlements you would have expected you can deactivate this feature by setting the environment variable `BTPTF_SKIP_ENTITLEMENTFILTER` to a non-empty value:
+
+=== "Windows"
+
+    ``` powershell
+    $env:BTPTF_SKIP_ENTITLEMENTFILTER='true'
+    ```
+
+=== "Linux/Mac"
+
+    ``` bash
+    export BTPTF_SKIP_ENTITLEMENTFILTER=true
     ```
