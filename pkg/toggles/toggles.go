@@ -17,3 +17,7 @@ func IsRoleCollectionFilterDeactivated() bool {
 func IsRoleFilterDeactivated() bool {
 	return os.Getenv("BTPTF_SKIP_ROLEFILTER") != ""
 }
+
+func IsEntitlementFilterDeactivated() bool {
+	return os.Getenv("BTPTF_SKIP_ENTITLEMENTFILTER") != ""
+}
