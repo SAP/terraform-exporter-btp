@@ -9,9 +9,9 @@
     {
       "Name": "entitlements",
       "Values": [
-        "feature-flags_lite",
-        "feature-flags-dashboard_dashboard",
-        "alert-notification_standard"
+        "alert-notification_standard",
+        "auditlog-management_default",
+        "content-agent-ui_free"
       ]
     },
     {
