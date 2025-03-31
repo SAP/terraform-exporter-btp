@@ -611,6 +611,8 @@ func filterDefaultValues(subaccountId string, directoryId string, btpResourceTyp
 		return defaultfilter.FilterDefaultRolesFromJsonData(subaccountId, directoryId, data)
 	case SubaccountTrustConfigurationType:
 		return defaultfilter.FilterDefaultIdpJsonData(data)
+	case SubaccountEntitlementType:
+		return defaultfilter.FilterDefaultEntitlementsFromJsonData(data)
 	default:
 		return data
 	}
