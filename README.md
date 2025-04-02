@@ -8,11 +8,6 @@
 
 # Terraform Exporter for SAP BTP
 
-> [!IMPORTANT]
-> All **beta** versions (v0.x.0-beta1) should not be used in productive scenarios
-> All **release candidates** (v1.0.0-rcx) can be used in productive scenarios. However we cannot exclude **breaking changes** on the way to the GA version
-> The **GA** release is planned for **April 2025**
-
 ## Overview
 The *Terraform Exporter for SAP BTP* (btptf CLI) is a handy tool that makes it easier to bring your existing SAP Business Technology Platform (BTP) resources into Terraform. With it, you can take things like subaccounts and directories in BTP and turn them into configuration files including the import of the state. It's especially useful for teams who are moving to Terraform but still need to manage older infrastructure or SAP BTP accounts that are already set up.
 
