@@ -93,7 +93,7 @@ func GetUser(userId string) (string, error) {
 	if len(user) == 0 {
 		return "", fmt.Errorf("user not found")
 	}
-	return user[0].Username, nil
+	return *user[0].Username, nil
 }
 
 // get space name from space id
