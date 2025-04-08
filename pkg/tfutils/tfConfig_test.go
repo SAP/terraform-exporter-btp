@@ -200,6 +200,14 @@ func TestValidateBtpAuthenticationData(t *testing.T) {
 	})
 
 }
+
+func TestIsSSOLoginActivated(t *testing.T) {
+	// Test case where SSO login is activated
+	t.Run("SSO login activated", func(t *testing.T) {
+		t.Setenv("BTP_SSO_LOGIN", "true")
+		isSSOLoginActivated()
+	})
+}
 func TestAllStringsEmpty(t *testing.T) {
 	// Test case where all strings are empty
 	t.Run("All strings empty", func(t *testing.T) {

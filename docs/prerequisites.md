@@ -21,6 +21,9 @@
 
 The parameters are the ones required by the [BTP Terraform Provider](https://registry.terraform.io/providers/SAP/btp/latest/docs).
 
+!!! warning
+    The environment variable `BTP_ENABLE_SSO` is NOT supported. Please usethe e login methods that are supported using the environment variables mentioned above.
+
 - To export directories or subaccounts, you need global account administrator permissions.
 
 - To export Cloud Foundry orgs, you need to authenticate against Cloud Foundry by setting the following environment variables:

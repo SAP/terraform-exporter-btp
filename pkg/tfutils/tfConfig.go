@@ -121,7 +121,6 @@ func ConfigureProvider(level string) {
 	}
 
 	var providerContent string
-
 	switch level {
 	case SubaccountLevel, DirectoryLevel:
 
@@ -134,6 +133,7 @@ func ConfigureProvider(level string) {
 		tlsClientKey := os.Getenv("BTP_TLS_CLIENT_KEY")
 		tlsIdpURL := os.Getenv("BTP_TLS_IDP_URL")
 
+		isSSOLoginActivated()
 		validateBtpAuthenticationData(username, password, tlsClientCertificate, tlsClientKey, tlsIdpURL)
 		validateGlobalAccount(globalAccount)
 
@@ -242,6 +242,14 @@ func validateBtpAuthenticationData(username string, password string, tlsClientCe
 		cleanup()
 		fmt.Print("\r\n")
 		log.Fatalf("set valid authentication data for login e.g. BTP_USERNAME and BTP_PASSWORD environment variables.")
+	}
+}
+
+func isSSOLoginActivated() {
+	// Check if BTP_ENABLE_SSO is set and throw an error if it is
+	if os.Getenv("BTP_ENABLE_SSO") != "" {
+		fmt.Print("\r\n")
+		log.Fatalf("BTP_ENABLE_SSO is not supported. Set valid authentication data for login e.g. BTP_USERNAME and BTP_PASSWORD environment variables.")
 	}
 }
 
