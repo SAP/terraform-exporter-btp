@@ -19,6 +19,11 @@
 | BTP_IDP | The identity provider to be used for authentication (only required for custom IDP) |
 | BTP_CLI_SERVER_URL | The URL of the BTP CLI server (Relevant for SAP internal use-cases only)  |
 
+!!! Warning
+
+    Do not set the `BTP_ENABLE_SSO` parameter when using the btptf CLI. Processing will abort as this parameter is not supported
+
+
 The parameters are the ones required by the [BTP Terraform Provider](https://registry.terraform.io/providers/SAP/btp/latest/docs).
 
 - To export directories or subaccounts, you need global account administrator permissions.

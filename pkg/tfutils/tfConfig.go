@@ -125,6 +125,11 @@ func ConfigureProvider(level string) {
 	switch level {
 	case SubaccountLevel, DirectoryLevel:
 
+		if os.Getenv("BTP_ENABLE_SSO") != "" {
+			fmt.Print("\r\n")
+			log.Fatalf("SSO is not supported for this command. Please remove the BTP_ENABLE_SSO environment variable")
+		}
+
 		username := os.Getenv("BTP_USERNAME")
 		password := os.Getenv("BTP_PASSWORD")
 		cliServerUrl := os.Getenv("BTP_CLI_SERVER_URL")
