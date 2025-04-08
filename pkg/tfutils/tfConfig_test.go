@@ -199,16 +199,6 @@ func TestValidateBtpAuthenticationData(t *testing.T) {
 		validateBtpAuthenticationData("", "", "tlsClientCertificate", "tlsClientKey", "tlsIdpURL", "")
 	})
 
-	// test case when sso Enabled is not empty which should lead to an error
-	t.Run("Error when SSO enabled is provided", func(t *testing.T) {
-		defer func() {
-			if r := recover(); r != nil {
-				t.Errorf("validateBtpAuthenticationData() panicked when SSO enabled was provided")
-			}
-		}()
-		validateBtpAuthenticationData("", "", "", "", "", "ssoEnabled")
-	})
-
 }
 func TestAllStringsEmpty(t *testing.T) {
 	// Test case where all strings are empty

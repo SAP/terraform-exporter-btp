@@ -241,7 +241,7 @@ func validateBtpAuthenticationData(username string, password string, tlsClientCe
 
 	if ssoEnabled != "" {
 		fmt.Print("\r\n")
-		log.Fatalf("SSO is not supported for this command. Please remove the BTP_ENABLE_SSO environment variable")
+		log.Fatalf("SSO is not supported for this command. Please remove the BTP_ENABLE_SSO environment variable and re-run the command.")
 	}
 
 	// Check if any of the authentication data is set (username and password or TLS client certificate and key)
