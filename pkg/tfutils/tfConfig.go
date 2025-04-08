@@ -125,11 +125,6 @@ func ConfigureProvider(level string) {
 	switch level {
 	case SubaccountLevel, DirectoryLevel:
 
-		if os.Getenv("BTP_ENABLE_SSO") != "" {
-			fmt.Print("\r\n")
-			log.Fatalf("SSO is not supported for this command. Please remove the BTP_ENABLE_SSO environment variable")
-		}
-
 		username := os.Getenv("BTP_USERNAME")
 		password := os.Getenv("BTP_PASSWORD")
 		cliServerUrl := os.Getenv("BTP_CLI_SERVER_URL")
@@ -138,8 +133,9 @@ func ConfigureProvider(level string) {
 		tlsClientCertificate := os.Getenv("BTP_TLS_CLIENT_CERTIFICATE")
 		tlsClientKey := os.Getenv("BTP_TLS_CLIENT_KEY")
 		tlsIdpURL := os.Getenv("BTP_TLS_IDP_URL")
+		ssoEnabled := os.Getenv("BTP_ENABLE_SSO")
 
-		validateBtpAuthenticationData(username, password, tlsClientCertificate, tlsClientKey, tlsIdpURL)
+		validateBtpAuthenticationData(username, password, tlsClientCertificate, tlsClientKey, tlsIdpURL, ssoEnabled)
 		validateGlobalAccount(globalAccount)
 
 		providerContent = "terraform {\nrequired_providers {\nbtp = {\nsource  = \"SAP/btp\"\nversion = \"" + BtpProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"btp\" {\n"
@@ -241,7 +237,13 @@ func validateGlobalAccount(globalAccount string) {
 	}
 }
 
-func validateBtpAuthenticationData(username string, password string, tlsClientCertificate string, tlsClientKey string, tlsIdpURL string) {
+func validateBtpAuthenticationData(username string, password string, tlsClientCertificate string, tlsClientKey string, tlsIdpURL string, ssoEnabled string) {
+
+	if ssoEnabled != "" {
+		fmt.Print("\r\n")
+		log.Fatalf("SSO is not supported for this command. Please remove the BTP_ENABLE_SSO environment variable")
+	}
+
 	// Check if any of the authentication data is set (username and password or TLS client certificate and key)
 	if allStringsEmpty(username, password) && allStringsEmpty(tlsClientCertificate, tlsClientKey, tlsIdpURL) {
 		cleanup()

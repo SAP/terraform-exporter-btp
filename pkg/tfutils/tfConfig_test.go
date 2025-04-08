@@ -186,7 +186,7 @@ func TestValidateBtpAuthenticationData(t *testing.T) {
 				t.Errorf("validateBtpAuthenticationData() panicked when username and password were provided")
 			}
 		}()
-		validateBtpAuthenticationData("username", "password", "", "", "")
+		validateBtpAuthenticationData("username", "password", "", "", "", "")
 	})
 
 	// Test case where TLS client certificate, key, and IDP URL are provided
@@ -196,7 +196,17 @@ func TestValidateBtpAuthenticationData(t *testing.T) {
 				t.Errorf("validateBtpAuthenticationData() panicked when TLS client certificate, key, and IDP URL were provided")
 			}
 		}()
-		validateBtpAuthenticationData("", "", "tlsClientCertificate", "tlsClientKey", "tlsIdpURL")
+		validateBtpAuthenticationData("", "", "tlsClientCertificate", "tlsClientKey", "tlsIdpURL", "")
+	})
+
+	// test case when sso Enabled is not empty which should lead to an error
+	t.Run("Error when SSO enabled is provided", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r != nil {
+				t.Errorf("validateBtpAuthenticationData() panicked when SSO enabled was provided")
+			}
+		}()
+		validateBtpAuthenticationData("", "", "", "", "", "ssoEnabled")
 	})
 
 }
