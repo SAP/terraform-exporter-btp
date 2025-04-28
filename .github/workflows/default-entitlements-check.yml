@@ -1,0 +1,87 @@
+name: Default Entitlements Check
+
+on:
+  # schedule:
+  #   - cron: "30 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-entitlements:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout source code"
+        uses: actions/checkout@v4
+
+      - name: "Install btpcli"
+        run: |
+          curl https://cli.btp.cloud.sap/btpcli-install.sh | bash
+          btp --version
+
+      - name: "Login to BTP Account"
+        env:
+          BTP_SUBDOMAIN: ${{ secrets.BTP_SUBDOMAIN }}
+          BTP_USERNAME: ${{ secrets.BTP_USERNAME }}
+          BTP_PASSWORD: ${{ secrets.BTP_PASSWORD }}
+        shell: bash
+        run: |
+          btp login --subdomain "$BTP_SUBDOMAIN" --username "$BTP_USERNAME" --password "$BTP_PASSWORD"
+
+      - name: Create subaccount
+        id: create_subaccount
+        env:
+          BTP_SUBDOMAIN: ${{ secrets.BTP_SUBDOMAIN }}
+        shell: bash
+        run: |
+          EMPTY_SA="empty-subaccount-$(date +%s)"
+          echo "Generated subaccount name: $EMPTY_SA"
+
+          SUBACCOUNT_GUID=$(btp --format json create accounts/subaccount \
+            --global-account "$BTP_SUBDOMAIN" \
+            --display-name "$EMPTY_SA" \
+            --subdomain "$EMPTY_SA" \
+            --labels '{"TEMPLATE_SUBACCOUNT":["DO_NOT_MODIFY"]}' \
+            --region eu10 | jq -r '.guid')
+
+          echo "Subaccount ID: $SUBACCOUNT_GUID"
+
+          # Export outputs for use in later steps
+          echo "sa_guid=$SUBACCOUNT_GUID" >> $GITHUB_OUTPUT
+          echo "sa_name=$EMPTY_SA" >> $GITHUB_OUTPUT
+
+      - name: List Default Entitlements
+        shell: bash
+        id: extract_entitlements
+        run: |
+          echo "Fetching default entitlements for subaccount: ${{ steps.create_subaccount.outputs.guid }}"
+
+          ENTITLEMENTS=$(btp --format json list accounts/entitlement \
+            --subaccount "${{ steps.create_subaccount.outputs.guid }}" | \
+            jq '.quotas | map({service, plan})')
+
+          echo "$ENTITLEMENTS" > pkg/defaultfilter/default-entitlements.json
+          cat pkg/defaultfilter/default-entitlements.json
+
+      - name: Create Pull Request
+        if: success()
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref_name }}
+          commit-message: |
+            chore: Update default entitlements
+            This PR updates the `default-entitlements.json` file.
+          title: "chore: Update default entitlements"
+          body: "This PR updates the `default-entitlements.json` file."
+          base: main
+
+      - name: Delete subaccount
+        if: always()
+        run: |
+          echo "Deleting subaccount: ${{ steps.create_subaccount.outputs.guid }}"
+          btp delete accounts/subaccount \
+            --subaccount "${{ steps.create_subaccount.outputs.guid }}" \
+            --confirm
