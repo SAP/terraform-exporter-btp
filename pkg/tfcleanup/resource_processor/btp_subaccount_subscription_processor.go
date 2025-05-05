@@ -46,8 +46,9 @@ func addEntitlementDependency(body *hclwrite.Body, dependencyAddresses *generict
 			techncialAppName, commercialAppName, _ := btpcli.GetAppNamesBySubaccountAndApp(subaccountId, appName, btpClient)
 
 			if techncialAppName != commercialAppName {
+				// Try to fetch an entry using the commercial app name
 				key := generictools.EntitlementKey{
-					ServiceName: techncialAppName,
+					ServiceName: commercialAppName,
 					PlanName:    planName,
 				}
 				dependencyAddress = (*dependencyAddresses).EntitlementAddress[key]
