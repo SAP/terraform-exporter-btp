@@ -11,7 +11,7 @@ const subscriptionBlockIdentifier = "btp_subaccount_subscription"
 const subscriptionAppNameIdentifier = "app_name"
 const subscriptionPlanNameIdentifier = "plan_name"
 
-func addEntitlementDependency(body *hclwrite.Body, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade, subaccountId string) {
+func addEntitlementDependency(body *hclwrite.Body, dependencyAddresses *generictools.DependencyAddresses, btpClient *btpcli.ClientFacade, subaccountId string) {
 	var appName string
 	var planName string
 

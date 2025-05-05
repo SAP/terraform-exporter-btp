@@ -20,7 +20,7 @@ func TestAddRoleDependency(t *testing.T) {
 		name         string
 		src          *hclwrite.File
 		trgt         *hclwrite.File
-		dependencies generictools.DepedendcyAddresses
+		dependencies generictools.DependencyAddresses
 	}{
 		{
 			name:         "Test Multiple Role Collection Dependencies",
@@ -55,7 +55,7 @@ func TestBuildDependencyString(t *testing.T) {
 	tests := []struct {
 		name                string
 		roles               []Role
-		dependencyAddresses *generictools.DepedendcyAddresses
+		dependencyAddresses *generictools.DependencyAddresses
 		expected            string
 	}{
 		{
@@ -67,7 +67,7 @@ func TestBuildDependencyString(t *testing.T) {
 					RoleTemplateName:  "template1",
 				},
 			},
-			dependencyAddresses: &generictools.DepedendcyAddresses{
+			dependencyAddresses: &generictools.DependencyAddresses{
 				RoleAddress: map[generictools.RoleKey]string{
 					{
 						AppId:            "app1",
@@ -92,7 +92,7 @@ func TestBuildDependencyString(t *testing.T) {
 					RoleTemplateName:  "template2",
 				},
 			},
-			dependencyAddresses: &generictools.DepedendcyAddresses{
+			dependencyAddresses: &generictools.DependencyAddresses{
 				RoleAddress: map[generictools.RoleKey]string{
 					{
 						AppId:            "app1",
@@ -117,7 +117,7 @@ func TestBuildDependencyString(t *testing.T) {
 					RoleTemplateName:  "template1",
 				},
 			},
-			dependencyAddresses: &generictools.DepedendcyAddresses{
+			dependencyAddresses: &generictools.DependencyAddresses{
 				RoleAddress: map[generictools.RoleKey]string{},
 			},
 			expected: "",
@@ -136,7 +136,7 @@ func TestBuildDependencyString(t *testing.T) {
 					RoleTemplateName:  "template2",
 				},
 			},
-			dependencyAddresses: &generictools.DepedendcyAddresses{
+			dependencyAddresses: &generictools.DependencyAddresses{
 				RoleAddress: map[generictools.RoleKey]string{
 					{
 						AppId:            "app1",
@@ -159,7 +159,7 @@ func TestBuildDependencyString(t *testing.T) {
 	}
 }
 
-func getNewRoleDepTemplate() generictools.DepedendcyAddresses {
+func getNewRoleDepTemplate() generictools.DependencyAddresses {
 	defaultTestDependencies := generictools.NewDependencyAddresses()
 
 	roleKey1 := generictools.RoleKey{

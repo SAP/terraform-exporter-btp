@@ -10,7 +10,7 @@ import (
 const serviceInstanceBlockIdentifier = "btp_subaccount_service_instance"
 const serviceInstancePlanIdentifier = "serviceplan_id"
 
-func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *generictools.DepedendcyAddresses, btpClient *btpcli.ClientFacade, subaccountId string) {
+func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *generictools.DependencyAddresses, btpClient *btpcli.ClientFacade, subaccountId string) {
 
 	// 1: Iterate over attributes to find the value for the service name and the plan ID
 	// 2: Fetch the plan name via ID using the BTP CLI client

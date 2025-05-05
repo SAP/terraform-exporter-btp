@@ -28,7 +28,7 @@ func TestFillRoleDependencyAddresses(t *testing.T) {
 		name             string
 		src              *hclwrite.File
 		resourceAddress  string
-		trgtDependencies *generictools.DepedendcyAddresses
+		trgtDependencies *generictools.DependencyAddresses
 	}{
 		{
 			name:             "Test Role Dependency Address",

@@ -21,7 +21,7 @@ type Role struct {
 	RoleTemplateName  string `json:"role_template_name"`
 }
 
-func addRoleDependency(body *hclwrite.Body, dependencyAddresses *generictools.DepedendcyAddresses) {
+func addRoleDependency(body *hclwrite.Body, dependencyAddresses *generictools.DependencyAddresses) {
 	roleAttr := body.GetAttribute(roleBlockIdentifier)
 
 	if roleAttr == nil {
@@ -102,7 +102,7 @@ func preprocessString(input string) string {
 	return input
 }
 
-func buildDependencyString(roles []Role, dependencyAddresses *generictools.DepedendcyAddresses) string {
+func buildDependencyString(roles []Role, dependencyAddresses *generictools.DependencyAddresses) string {
 	var builder strings.Builder
 	first := true
 

@@ -29,7 +29,7 @@ func TestAddEntitlementDependency(t *testing.T) {
 		name         string
 		src          *hclwrite.File
 		trgt         *hclwrite.File
-		dependencies *generictools.DepedendcyAddresses
+		dependencies *generictools.DependencyAddresses
 	}{
 		{
 			name:         "Test Subscription Dependency",

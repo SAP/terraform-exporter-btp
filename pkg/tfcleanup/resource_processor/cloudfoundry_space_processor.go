@@ -10,7 +10,7 @@ const spaceBlockIdentifier = "cloudfoundry_space"
 const spaceIdentifier = "space"
 const spaceNameIdentifier = "name"
 
-func fillSpaceDependencyAddress(body *hclwrite.Body, dependencyAddresses *generictools.DepedendcyAddresses, resourceAddress string) {
+func fillSpaceDependencyAddress(body *hclwrite.Body, dependencyAddresses *generictools.DependencyAddresses, resourceAddress string) {
 	spaceId := extractSpaceId(body)
 	if spaceId == "" {
 		return

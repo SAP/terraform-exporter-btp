@@ -29,8 +29,8 @@ func TestAddServiceInstanceDependency(t *testing.T) {
 		name             string
 		src              *hclwrite.File
 		trgt             *hclwrite.File
-		dependencies     generictools.DepedendcyAddresses
-		trgtDependencies generictools.DepedendcyAddresses
+		dependencies     generictools.DependencyAddresses
+		trgtDependencies generictools.DependencyAddresses
 	}{
 		{
 			name:             "Test Service Instance Dependency",
@@ -61,7 +61,7 @@ func TestAddServiceInstanceDependency(t *testing.T) {
 
 }
 
-func getNewServiceInstanceDepTemplate() generictools.DepedendcyAddresses {
+func getNewServiceInstanceDepTemplate() generictools.DependencyAddresses {
 	defaultTestDependencies := generictools.NewDependencyAddresses()
 
 	entitlementKey := generictools.EntitlementKey{
