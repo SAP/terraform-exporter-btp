@@ -47,7 +47,7 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 	}
 
 	if blockIdentifier == subscriptionBlockIdentifier {
-		addEntitlementDependency(body, dependencyAddresses)
+		addEntitlementDependency(body, dependencyAddresses, btpClient, levelIds.SubaccountId)
 	}
 
 	if blockIdentifier == serviceInstanceBlockIdentifier {

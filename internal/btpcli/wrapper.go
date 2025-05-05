@@ -162,3 +162,21 @@ func GetDefaultRolesByDirectory(directoryId string, client *ClientFacade) (defau
 	}
 	return roles, nil
 }
+
+func GetAppNamesBySubaccountAndApp(subaccountId string, appName string, client *ClientFacade) (technicalAppName string, commercialAppName string, err error) {
+	appList, _, err := client.Accounts.Subscription.List(context.Background(), subaccountId)
+
+	if err != nil {
+		return "", "", fmt.Errorf("error getting app names: %w", err)
+	}
+
+	for _, app := range appList {
+		if app.AppName == appName || app.CommercialAppName == appName {
+			technicalAppName = app.AppName
+			commercialAppName = app.CommercialAppName
+			return technicalAppName, commercialAppName, nil
+		}
+	}
+
+	return appName, appName, nil
+}
