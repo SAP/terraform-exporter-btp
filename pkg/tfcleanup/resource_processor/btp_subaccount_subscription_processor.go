@@ -43,9 +43,9 @@ func addEntitlementDependency(body *hclwrite.Body, dependencyAddresses *generict
 
 		if dependencyAddress == "" {
 			// Check if technical app name is different to service name/commercial app name
-			techncialAppName, commercialAppName, _ := btpcli.GetAppNamesBySubaccountAndApp(subaccountId, appName, btpClient)
+			technicalAppName, commercialAppName, _ := btpcli.GetAppNamesBySubaccountAndApp(subaccountId, appName, btpClient)
 
-			if techncialAppName != commercialAppName {
+			if technicalAppName != commercialAppName {
 				// Try to fetch an entry using the commercial app name
 				key := generictools.EntitlementKey{
 					ServiceName: commercialAppName,
