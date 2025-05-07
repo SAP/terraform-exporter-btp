@@ -103,7 +103,14 @@ func processDependencies(body *hclwrite.Body, dependencyAddresses *generictools.
 		generictools.RemoveConfigBlock(body, blockToRemove.ResourceAddress)
 	}
 	// Add datasource for service instances is necessary - Outer loop to have the main body object available
+	processedDataSources := make(map[string]bool)
+
 	for _, datasourceInfo := range dependencyAddresses.DataSourceInfo {
-		addServicePlanDataSources(body, datasourceInfo)
+
+		if !processedDataSources[datasourceInfo.DatasourceAddress] {
+			addServicePlanDataSources(body, datasourceInfo)
+			// Avoid duplicate data sources 
+			processedDataSources[datasourceInfo.DatasourceAddress] = true
+		}
 	}
 }
