@@ -208,14 +208,18 @@ func FilterDefaultEntitlementsFromJsonData(data map[string]any) map[string]any {
 
 func FilterOriginSapCpServiceInstance(data map[string]any, dataSourceListKey string, resourceKey string) map[string]any {
 
+	if dataSourceListKey == "" || resourceKey == "" {
+		return data
+	}
+
 	instances := data[dataSourceListKey].([]interface{})
 
 	instances = slices.DeleteFunc(instances, func(value interface{}) bool {
 		instance := value.(map[string]interface{})
-		context := fmt.Sprintf("%v", instance["context"])
+		context := instance["context"].(string)
 		var contextData map[string]interface{}
 		if err := json.Unmarshal([]byte(context), &contextData); err != nil {
-			return false
+			return true
 		}
 		return fmt.Sprintf("%v", contextData[resourceKey]) != "sapcp"
 	})
