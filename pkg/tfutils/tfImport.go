@@ -470,6 +470,7 @@ func generateDataSourcesForList(subaccountId string, directoryId string, organiz
 	}
 
 	data = filterDefaultValues(subaccountId, directoryId, btpResourceType, data)
+	data = discardSpecificResource(btpResourceType, data)
 
 	return transformDataToStringArray(btpResourceType, data), extractFeatureList(data, btpResourceType), nil
 }
@@ -617,4 +618,15 @@ func filterDefaultValues(subaccountId string, directoryId string, btpResourceTyp
 		return data
 	}
 
+}
+
+func discardSpecificResource(btpResourceType string, data map[string]interface{}) map[string]any {
+	switch btpResourceType {
+	case SubaccountServiceInstanceType:
+		const dataSourceListKey = "values"
+		const resourceKey = "origin"
+		return defaultfilter.FilterOriginSapCpServiceInstance(data, dataSourceListKey, resourceKey)
+	default:
+		return data
+	}
 }
