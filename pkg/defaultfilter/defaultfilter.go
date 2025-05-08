@@ -1,6 +1,7 @@
 package defaultfilter
 
 import (
+	"encoding/json"
 	"fmt"
 	"slices"
 	"strings"
@@ -202,5 +203,23 @@ func FilterDefaultEntitlementsFromJsonData(data map[string]any) map[string]any {
 			delete(data, key)
 		}
 	}
+	return data
+}
+
+func FilterOriginSapCpServiceInstance(data map[string]any, dataSourceListKey string, resourceKey string) map[string]any {
+
+	instances := data[dataSourceListKey].([]interface{})
+
+	instances = slices.DeleteFunc(instances, func(value interface{}) bool {
+		instance := value.(map[string]interface{})
+		context := fmt.Sprintf("%v", instance["context"])
+		var contextData map[string]interface{}
+		if err := json.Unmarshal([]byte(context), &contextData); err != nil {
+			return false
+		}
+		return fmt.Sprintf("%v", contextData[resourceKey]) != "sapcp"
+	})
+
+	data[dataSourceListKey] = instances
 	return data
 }
