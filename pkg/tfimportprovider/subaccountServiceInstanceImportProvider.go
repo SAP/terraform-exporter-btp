@@ -71,6 +71,7 @@ func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId 
 			context := instance["context"].(string)
 			var contextData map[string]interface{}
 			if err := json.Unmarshal([]byte(context), &contextData); err != nil {
+				fmt.Print("\r\n")
 				log.Printf("error unmarshalling context data: %v", err)
 				continue
 			}

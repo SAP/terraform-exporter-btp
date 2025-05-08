@@ -212,12 +212,12 @@ func FilterOriginSapCpServiceInstance(data map[string]any, dataSourceListKey str
 		return data
 	}
 
-	instances := data[dataSourceListKey].([]interface{})
+	instances := data[dataSourceListKey].([]any)
 
-	instances = slices.DeleteFunc(instances, func(value interface{}) bool {
-		instance := value.(map[string]interface{})
+	instances = slices.DeleteFunc(instances, func(value any) bool {
+		instance := value.(map[string]any)
 		context := instance["context"].(string)
-		var contextData map[string]interface{}
+		var contextData map[string]any
 		if err := json.Unmarshal([]byte(context), &contextData); err != nil {
 			return true
 		}
