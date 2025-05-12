@@ -14,7 +14,7 @@ This is a two-step process where a JSON is created as a resource inventory and u
 1. Create a JSON file with a list of BTP resources to be exported.
 
     ```bash
-    btptf create-json - s <subaccount id>
+    btptf create-json -s <subaccount id>
     ```
 Review and adjust the JSON file according to your needs.
 
