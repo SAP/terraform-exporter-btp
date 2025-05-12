@@ -14,14 +14,14 @@ body:
     attributes:
       label: What version of the Terraform exporter are you using?
       description: What version of the Terraform exporter for SAP BTP are you using?
-      placeholder: 1.0.0-rc1
+      placeholder: 1.1.0
     validations:
       required: true
   - type: input
     attributes:
       label: What version of the Terraform CLI/OpenTofu CLI are you using?
       description: What version of the Terraform CLI are you using?
-      placeholder: 1.11.2
+      placeholder: 1.11.4
     validations:
       required: true
   - type: dropdown
