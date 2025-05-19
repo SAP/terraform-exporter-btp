@@ -5,6 +5,10 @@ To narrow down the issue we provide some environment variables that allow you to
 
 The following sections describe the environment variables that you can set to influence the behavior of the btptf CLI depending on the situation you are in.
 
+## Neither the Terraform nor OpenTofu CLI is detected although the binary is available
+
+The btptf CLI tries to autodetect the Terraform CLI and the OpenTofu CLI by checking if the binary is availbale in the `PATH` environment variable. If this error occurs please check if the binary is available in the `PATH` environment variable.
+
 ## The Terraform CLI is used instead of OpenTofu (or vice versa)
 
 You are expecting the the generated code uses the providers from the OpenTofu registry but it downloaded the ones from the HashiCorp Terraform registry or vice versa.
