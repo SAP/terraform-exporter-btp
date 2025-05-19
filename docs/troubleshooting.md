@@ -7,7 +7,7 @@ The following sections describe the environment variables that you can set to in
 
 ## Neither the Terraform nor OpenTofu CLI is detected although the binary is available
 
-The btptf CLI tries to autodetect the Terraform CLI and the OpenTofu CLI by checking if the binary is availbale in the `PATH` environment variable. If this error occurs please check if the binary is available in the `PATH` environment variable.
+The btptf CLI tries to autodetect the Terraform CLI and the OpenTofu CLI by checking if the binary is available in the `PATH` environment variable. If this error occurs please check if the binary is available in the `PATH` environment variable.
 
 ## The Terraform CLI is used instead of OpenTofu (or vice versa)
 
