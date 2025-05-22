@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <PackageGroup Id="ProductPackage">
+    <MsiPackage Id="MyMSI"
+                DisplayName="{{ .ProjectName }}"
+                Manufacturer="SAP SE"
+                UpgradeCode="473CB861-B110-457F-B85F-050D8580AEB6"
+                Compressed="yes"
+                InstallScope="perUser"
+                Platform="x64" />
+  </PackageGroup>
+
+  <Product Id="*" 
+           Name="{{ .ProjectName }}" 
+           Version="{{ .Version }}" 
+           Manufacturer="SAP SE"
+           UpgradeCode="473CB861-B110-457F-B85F-050D8580AEB6"
+           Language="1033">
+
+    <Package InstallerVersion="500" Compressed="yes" InstallScope="perUser" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
+
+    <MediaTemplate />
+
+    <Directory Id="ProgramFilesFolder">
+      <Directory Id="InstallFolder" Name="{{ .ProjectName }}" />
+    </Directory>
+
+    <DirectoryRef Id="InstallFolder">
+      <Component Id="MainExecutable" Guid="{{ .Env.PRODUCT_CODE }}">
+        <File Id="MainExe" 
+              Source="{{ .Binary }}.exe" 
+              Name="{{ .Binary }}.exe"
+              KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <Feature Id="DefaultFeature" Title="{{ .ProjectName }} Feature" Level="1">
+      <ComponentRef Id="MainExecutable" />
+    </Feature>
+
+  </Product>
+
+</Wix>

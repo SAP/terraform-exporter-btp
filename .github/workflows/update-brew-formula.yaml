@@ -1,57 +1,55 @@
 name: Update Brew Formula
+
 on:
   workflow_dispatch:
+
 permissions:
   contents: write
-  pull-requests: write
+  id-token: write
+
 jobs:
-  update-btptf-formula:
-    runs-on: ubuntu-latest
+  build-msi:
+    runs-on: windows-latest
+
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # fetch full history
-          filter: tree:0
-      - uses: robinraju/release-downloader@v1
-        with:
-          latest: true
-          fileName: '*'
-          out-file-path: ${{ runner.temp }}/downloaded-assets
-      - id: latest-release
-        name: latest-release
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+      - name: Install WiX
+        run: dotnet tool install --global wix
+      - name: Get latest release tag
+        id: latest_release
+        shell: pwsh
         run: |
-          LATEST_TAG=$(git describe --tags --abbrev=0 --match "v*")
-          echo "LATEST_TAG=$LATEST_TAG" >> "$GITHUB_OUTPUT"
-      - name: Extract SHA from release
-        id: extract-sha
-        run: |
-          echo "Event '${{ github.event.action }}'"
-          echo "BTP Terraform binary hash:"
-          tag=$(echo ${{ steps.latest-release.outputs.LATEST_TAG }} | cut -c 2-) 
-          darwin_amd64_sha="btptf_${tag}_darwin_amd64.sha256"
-          echo $darwin_amd64_sha $(cat ${{ runner.temp }}/downloaded-assets/$darwin_amd64_sha)
-          echo "DARWIN_AMD64_SHA=$(cat ${{ runner.temp }}/downloaded-assets/$darwin_amd64_sha)" >> "$GITHUB_OUTPUT"
+          $tag = (gh release list --limit 1 --repo "${{ github.repository }}" | Select-String -Pattern '^\S+' -AllMatches).Matches.Value
+          echo "tag=$tag" >> $env:GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          darwin_arm_sha="btptf_${tag}_darwin_arm64.sha256"
-          echo $darwin_arm_sha $(cat ${{ runner.temp }}/downloaded-assets/$darwin_arm_sha)
-          echo "DARWIN_ARM_SHA=$(cat ${{ runner.temp }}/downloaded-assets/$darwin_arm_sha)" >> "$GITHUB_OUTPUT"
-
-          linux_amd64_sha="btptf_${tag}_linux_amd64.sha256"
-          echo $linux_amd64_sha $(cat ${{ runner.temp }}/downloaded-assets/$linux_amd64_sha)
-          echo "LINUX_AMD64_SHA=$(cat ${{ runner.temp }}/downloaded-assets/$linux_amd64_sha)" >> "$GITHUB_OUTPUT"
-
-          linux_arm_sha="btptf_${tag}_linux_arm64.sha256"
-          echo $linux_arm_sha $(cat ${{ runner.temp }}/downloaded-assets/$linux_arm_sha)
-          echo "LINUX_ARM_SHA=$(cat ${{ runner.temp }}/downloaded-assets/$linux_arm_sha)" >> "$GITHUB_OUTPUT"
-      - name: Run update script
-        run:  ./.github/scripts/update-btptf-brew-formula.sh ${{ steps.latest-release.outputs.LATEST_TAG }} ${{ steps.extract-sha.outputs.DARWIN_AMD64_SHA }} ${{ steps.extract-sha.outputs.DARWIN_ARM_SHA }} ${{ steps.extract-sha.outputs.LINUX_AMD64_SHA }} ${{ steps.extract-sha.outputs.LINUX_ARM_SHA }}
-      - name: btptf.rb Contents
-        run: cat btptf.rb
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7 
+      - name: Checkout code at latest tag
+        uses: actions/checkout@v4
         with:
-          add-paths: btptf.rb
-          #branch: update_${{ github.event.repository.updated_at }}_${{ steps.latest-release.outputs.LATEST_TAG }}
-          delete-branch: true
-          title: "chore: Update to ${{ steps.latest-release.outputs.LATEST_TAG }}"
-          body: This PR updates btptf.rb to ${{ steps.latest-release.outputs.LATEST_TAG }}
+          # ref: ${{ steps.latest_release.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: false
+
+      - name: Generate product_code GUID
+        id: guid
+        shell: pwsh
+        run: |
+          $guid = [guid]::NewGuid().ToString().ToUpper()
+          echo "PRODUCT_CODE={$guid}" >> $env:GITHUB_ENV
+
+      - name: Build MSI only
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: "v2.7.0"
+          distribution: goreleaser-pro
+          args: release --clean --snapshot --config=goreleaser-msi.yaml --timeout=60m
+        env:
+          GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+          PRODUCT_CODE: ${{ env.PRODUCT_CODE }}
