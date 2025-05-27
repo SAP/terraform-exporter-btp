@@ -1,0 +1,1 @@
+Remove-Item "$env:ChocolateyToolsLocation\btptf.exe" -Force -ErrorAction SilentlyContinue
