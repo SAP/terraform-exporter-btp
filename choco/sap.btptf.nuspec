@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>sap.btptf</id>
+    <version>VERSION</version>
+    <title>Terraform Exporter for SAP BTP</title>
+    <authors>SAP SE</authors>
+    <owners>SAP BTP Terraform Team</owners>
+    <description>Terraform exporter for SAP BTP (btptf CLI) is a tool that helps you integrate existing SAP BTP resources into Terraform/OpenTofu, facilitating a seamless adoption of Infrastructure-as-Code practices.</description>
+    <projectUrl>https://github.com/SAP/terraform-exporter-btp</projectUrl>
+    <licenseUrl>https://github.com/SAP/terraform-exporter-btp/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>sap terraform btp iac opentofu tf cloudfoundry cf</tags>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

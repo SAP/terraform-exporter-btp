@@ -1,0 +1,82 @@
+name: Update Chocolatey Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to use (optional, defaults to latest release)'
+        required: false
+  release:
+    types: [published]
+
+jobs:
+  update-choco:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Determine tag to use
+        id: determine-tag
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.tag }}" != "" ]]; then
+            echo "TAG=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "release" ]]; then
+            echo "TAG=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          else
+            latest_tag=$(git describe --tags --abbrev=0 --match "v*")
+            echo "TAG=$latest_tag" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout code at specified tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.determine-tag.outputs.TAG }}
+          fetch-depth: 0
+
+      - name: Install Mono & dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y mono-complete
+
+      - name: Install Chocolatey
+        run: |
+          mkdir -p /opt/chocolatey
+          wget -q -O - "https://github.com/chocolatey/choco/releases/download/${CHOCOLATEY_VERSION}/chocolatey.v${CHOCOLATEY_VERSION}.tar.gz" | tar -xz -C "/opt/chocolatey"
+          echo '#!/bin/bash' >> /usr/local/bin/choco
+          echo 'mono /opt/chocolatey/choco.exe $@' >> /usr/local/bin/choco
+          chmod +x /usr/local/bin/choco
+        env:
+          CHOCOLATEY_VERSION: 2.4.3
+
+      - name: Set release version
+        id: release-version
+        run: |
+          version=${{ steps.determine-tag.outputs.TAG }}
+          version=${version#v}
+          echo "LATEST_TAG=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Modify choco properties
+        run: |
+          RELEASE_VERSION="${{ steps.release-version.outputs.LATEST_TAG }}"
+          sed -i "s/VERSION/${RELEASE_VERSION}/g" choco/sap.btptf.nuspec
+          sed -i "s/VERSION/${RELEASE_VERSION}/g" choco/tools/install.ps1
+
+      - name: Print config
+        run: |
+          echo NUSPEC
+          echo -----
+          cat choco/sap.btptf.nuspec
+          echo
+          echo install.ps1
+          echo -----
+          cat choco/tools/install.ps1
+
+      - name: Choco package
+        run: |
+          choco pack choco/sap.btptf.nuspec
+
+      - name: Push to Chocolatey
+        env:
+          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+        run: |
+          choco apikey --key "$CHOCOLATEY_API_KEY" --source https://push.chocolatey.org/
+          choco push sap.btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg --source https://push.chocolatey.org/
