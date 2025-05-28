@@ -1,6 +1,7 @@
 package tfimportprovider
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"slices"
@@ -67,8 +68,19 @@ func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId 
 	} else {
 		for x, value := range serviceInstances {
 			instance := value.(map[string]interface{})
+			context := instance["context"].(string)
+			var contextData map[string]interface{}
+			if err := json.Unmarshal([]byte(context), &contextData); err != nil {
+				fmt.Print("\r\n")
+				log.Printf("error unmarshalling context data: %v", err)
+				continue
+			}
+			if contextData["origin"] != "sapcp" {
+				continue
+			}
 			importBlock += templateServiceInstanceImport(x, instance, subaccountId, resourceDoc)
 			count++
+
 		}
 	}
 	return importBlock, count, nil

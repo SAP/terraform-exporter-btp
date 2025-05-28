@@ -29,7 +29,7 @@ func TestAddEntitlementDependency(t *testing.T) {
 		name         string
 		src          *hclwrite.File
 		trgt         *hclwrite.File
-		dependencies *generictools.DepedendcyAddresses
+		dependencies *generictools.DependencyAddresses
 	}{
 		{
 			name:         "Test Subscription Dependency",
@@ -50,7 +50,7 @@ func TestAddEntitlementDependency(t *testing.T) {
 
 			blocks := tt.src.Body().Blocks()
 			// we assume one resource entry in the blocks file
-			addEntitlementDependency(blocks[0].Body(), tt.dependencies)
+			addEntitlementDependency(blocks[0].Body(), tt.dependencies, nil, "")
 			assert.NoError(t, testutils.AreHclFilesEqual(tt.src, tt.trgt))
 		})
 	}

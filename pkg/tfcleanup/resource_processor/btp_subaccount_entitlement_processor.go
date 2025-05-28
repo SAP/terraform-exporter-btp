@@ -9,7 +9,7 @@ const subaccountEntitlementBlockIdentifier = "btp_subaccount_entitlement"
 const entitlementPlanNameIdentifier = "plan_name"
 const entitlementServiceNameIdentifier = "service_name"
 
-func fillSubaccountEntitlementDependencyAddresses(body *hclwrite.Body, resourceAddress string, dependencyAddresses *generictools.DepedendcyAddresses) {
+func fillSubaccountEntitlementDependencyAddresses(body *hclwrite.Body, resourceAddress string, dependencyAddresses *generictools.DependencyAddresses) {
 	planNameAttr := body.GetAttribute(entitlementPlanNameIdentifier)
 	serviceNameAttr := body.GetAttribute(entitlementServiceNameIdentifier)
 

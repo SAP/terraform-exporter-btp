@@ -42,7 +42,7 @@ type LevelIds struct {
 
 type VariableContent map[string]VariableInfo
 
-type DepedendcyAddresses struct {
+type DependencyAddresses struct {
 	SubaccountAddress  string
 	DirectoryAddress   string
 	SpaceAddress       map[string]string
@@ -52,8 +52,8 @@ type DepedendcyAddresses struct {
 	BlocksToRemove     []BlockSpecifier
 }
 
-func NewDependencyAddresses() DepedendcyAddresses {
-	return DepedendcyAddresses{
+func NewDependencyAddresses() DependencyAddresses {
+	return DependencyAddresses{
 		EntitlementAddress: make(map[EntitlementKey]string),
 		RoleAddress:        make(map[RoleKey]string),
 		SpaceAddress:       make(map[string]string),

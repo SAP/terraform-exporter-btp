@@ -11,7 +11,7 @@ const roleAppIdIdentifier = "app_id"
 const roleNameIdentifier = "name"
 const roleTemplateNameIdentifier = "role_template_name"
 
-func fillRoleDependencyAddresses(body *hclwrite.Body, resourceAddress string, dependencyAddresses *generictools.DepedendcyAddresses) {
+func fillRoleDependencyAddresses(body *hclwrite.Body, resourceAddress string, dependencyAddresses *generictools.DependencyAddresses) {
 	appIdAttr := body.GetAttribute(roleAppIdIdentifier)
 	roleNameAttr := body.GetAttribute(roleNameIdentifier)
 	roleTemplateNameAttr := body.GetAttribute(roleTemplateNameIdentifier)

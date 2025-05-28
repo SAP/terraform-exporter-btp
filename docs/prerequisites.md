@@ -4,7 +4,8 @@
      - [Terraform CLI](https://developer.hashicorp.com/terraform/install).
      - [OpenTofu CLI](https://opentofu.org/docs/intro/install/).
 
-    If you have both CLIs installed, you need to enforce the usage of one via the environment variable `BTPTF_IAC_TOOL` by setting its value to `terraform` or `tofu` respectively
+    If you download the CLI binaries make sure that they are in your `PATH` environment variable.
+    If you have both CLIs installed, you can enforce the usage of one via the environment variable `BTPTF_IAC_TOOL` by setting its value to `terraform` or `tofu` respectively. Otherwise the btptf CLI will check for Terraform first and use it i available.
 
 - To export directories or subaccounts, you need to set the following environment variables to authenticate against SAP BTP:
 
