@@ -6,14 +6,25 @@ on:
       tag:
         description: 'Tag to use (optional, defaults to latest release)'
         required: false
+      push-to-chocolatey:
+        description: 'Trigger to update Chocolatey package'
+        required: true
+        default: false
   release:
     types: [published]
+permissions:
+  contents: write
+  id-token: write
+  packages: write
 
 jobs:
   update-choco:
     runs-on: ubuntu-latest
-
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Determine tag to use
         id: determine-tag
         run: |
@@ -24,6 +35,17 @@ jobs:
           else
             latest_tag=$(git describe --tags --abbrev=0 --match "v*")
             echo "TAG=$latest_tag" >> "$GITHUB_OUTPUT"
+          fi
+      
+      - name: Determine Chocolatey push
+        id: determine-choco-push
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.push-to-chocolatey }}" == "true" ]]; then
+            echo "Choco push enabled"
+            echo "PUSH_TO_CHOCOLATEY=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Choco push not enabled"
+            echo "PUSH_TO_CHOCOLATEY=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout code at specified tag
@@ -53,30 +75,43 @@ jobs:
           version=${{ steps.determine-tag.outputs.TAG }}
           version=${version#v}
           echo "LATEST_TAG=$version" >> "$GITHUB_OUTPUT"
-
+      - uses: robinraju/release-downloader@v1
+        id: release-downloader
+        with:
+          tag: "${{ steps.determine-tag.outputs.TAG }}"
+          fileName: "btptf_${{ steps.release-version.outputs.LATEST_TAG }}_windows_amd64.exe.sha256"
       - name: Modify choco properties
         run: |
           RELEASE_VERSION="${{ steps.release-version.outputs.LATEST_TAG }}"
-          sed -i "s/VERSION/${RELEASE_VERSION}/g" choco/sap.btptf.nuspec
-          sed -i "s/VERSION/${RELEASE_VERSION}/g" choco/tools/install.ps1
-
+          # awk just to make sure we take only the hash part and no white spaces or filenames
+          SHA256=$(cat btptf_${{ steps.release-version.outputs.LATEST_TAG }}_windows_amd64.exe.sha256 | awk '{print $1}')
+          sed -i "s/VERSION/${RELEASE_VERSION}/g" choco/sap-btptf.nuspec
+          sed -i "s/VERSION/${RELEASE_VERSION}/g" choco/tools/chocolateyInstall.ps1
+          sed -i "s/CHECKSUM/${SHA256}/g" choco/tools/chocolateyInstall.ps1
+          
       - name: Print config
         run: |
           echo NUSPEC
           echo -----
-          cat choco/sap.btptf.nuspec
+          cat choco/sap-btptf.nuspec
           echo
-          echo install.ps1
+          echo chocolateyInstall.ps1
           echo -----
-          cat choco/tools/install.ps1
+          cat choco/tools/chocolateyInstall.ps1
 
       - name: Choco package
         run: |
-          choco pack choco/sap.btptf.nuspec
+          choco pack choco/sap-btptf.nuspec
+      
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg
 
       - name: Push to Chocolatey
+        if: ${{ steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
         env:
           CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
         run: |
           choco apikey --key "$CHOCOLATEY_API_KEY" --source https://push.chocolatey.org/
-          choco push sap.btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg --source https://push.chocolatey.org/
+          choco push sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg --source https://push.chocolatey.org/
