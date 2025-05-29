@@ -13,9 +13,6 @@ on:
   #     tag:
   #       required: false
   #       type: string
-  #     additional_parameters:
-  #       required: false
-  #       type: string
 
 jobs:
   publish-winget:
@@ -24,81 +21,123 @@ jobs:
       WINGET_FORK_ORG: saptfautomation
       WINGET_UPSTREAM_REPO: microsoft/winget-pkgs
       PACKAGE_ID: SAP.btptf
-      BTPTF_BASE_URL: "${{github.repository}}/releases"
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }} 
 
     steps:
-      - name: Set tag
-        id: get-tag
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 n
+      - name: Set tag and versions
+        id: get-tag 
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "TAG=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+          TAG="" 
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.tag }}" != "" ]]; then
+            TAG="${{ github.event.inputs.tag }}"
           elif [[ "${{ github.event_name }}" == "release" ]]; then
-            echo "TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
-          elif [[ "${{ github.event_name }}" == "workflow_call" ]]; then
-            echo "TAG=${{ inputs.tag }}" >> $GITHUB_ENV
+            TAG="${{ github.event.release.tag_name }}"
+          # elif [[ "${{ github.event_name }}" == "workflow_call" ]]; then
+          #   TAG="${{ inputs.tag }}" 
           else
-            latest_tag=$(git describe --tags --abbrev=0 --match "v*")
-            echo "TAG=$latest_tag" >> $GITHUB_ENV
+            TAG=$(git describe --tags --abbrev=0 --match "v*") # Added fallback
           fi
-          echo "RELEASE_VERSION=${TAG#v}" >> $GITHUB_ENV
+
+          if [ -z "$TAG" ]; then
+            echo "Error: TAG could not be determined. Exiting."
+            exit 1
+          fi
+
+          RELEASE_VERSION="${TAG#v}" 
+
+          echo "Detected TAG: $TAG"
+          echo "Calculated RELEASE_VERSION: $RELEASE_VERSION"
+
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+          echo "btptf_base_url=https://github.com/${{ github.repository }}/releases" >> $GITHUB_OUTPUT
 
       - name: Clone upstream and set up fork
         run: |
           gh auth login --with-token <<< "$PAT_TOKEN"
-          # Check if fork exists
-          if ! gh repo view "$FORK_OWNER/winget-pkgs" >/dev/null 2>&1; then
+          
+          if ! gh repo view "$WINGET_FORK_ORG/winget-pkgs" >/dev/null 2>&1; then
             echo "Fork does not exist. Creating..."
-            gh repo fork "$UPSTREAM_REPO" --org "$FORK_OWNER" --remote=false --clone=false
+            gh repo fork "$WINGET_UPSTREAM_REPO" --org "$WINGET_FORK_ORG" --remote=false --clone=false
           else
-            echo "Fork already exists. Syncing with upstream..."
-            gh repo sync "$FORK_OWNER/winget-pkgs" --remote=fork --force
+            echo "Fork exists. Syncing..."
+            gh repo sync "$WINGET_FORK_ORG/winget-pkgs" --force
           fi
+          
+          git clone https://$PAT_TOKEN@github.com/$WINGET_FORK_ORG/winget-pkgs.git
           cd winget-pkgs
-          git remote add upstream https://github.com/$UPSTREAM_REPO.git || true
+          git remote add upstream https://github.com/$WINGET_UPSTREAM_REPO.git || true
           git fetch upstream
           git checkout master
           git reset --hard upstream/master
           git pull
-          git push fork master --force
+          git push --force
+          git config --global user.email "terraform.team@sap.com"
+          git config --global user.name "SAP Terraform Team"
 
       - name: Create new branch
         run: |
           cd winget-pkgs
-          BRANCH_NAME="update-$TAG"
-          git checkout -b $BRANCH_NAME
+          git checkout -b update-${{ steps.get-tag.outputs.tag }}
 
-      - name: Download binary SAH256 file
-        id: download-sha256
+      - name: Download SHA256 file
+        id: download-sha256 
         run: |
-          curl -L  "$BTPTF_BASE_URL/download/v$TAG/btptf_$RELEASE_VERSION_windows_amd64.exe.sha256" -o btptf_${TAG}_windows_amd64.exe.sha256
-          SHA256=$(cat btptf_${TAG}_windows_amd64.exe.sha256 )
-          echo "SHA256=$SHA256" >> $GITHUB_OUTPUT
+          BTPTF_BASE_URL="${{ steps.get-tag.outputs.btptf_base_url }}"
+          TAG="${{ steps.get-tag.outputs.tag }}"
+          RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
+
+          curl -L "$BTPTF_BASE_URL/download/$TAG/btptf_${RELEASE_VERSION}_windows_amd64.exe.sha256" -o btptf_${RELEASE_VERSION}_windows_amd64.exe.sha256
+          SHA256=$(cat btptf_${RELEASE_VERSION}_windows_amd64.exe.sha256)
+          echo "sha256=$SHA256" >> $GITHUB_OUTPUT 
 
       - name: Create winget manifest folder and files
         run: |
+          RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
+          BTPTF_BASE_URL="${{ steps.get-tag.outputs.btptf_base_url }}"
+          TAG="${{ steps.get-tag.outputs.tag }}"
+          
           cd winget-pkgs/manifests/s/SAP/btptf
           mkdir -p "$RELEASE_VERSION"
-          cp 1.1.0/*.yaml "$RELEASE_VERSION/"
+          cp 1.1.0/*.yaml "$RELEASE_VERSION/" 
 
-          # Update YAMLs using yq
-          yq e -i ".PackageVersion = \"$TAG\"" "$RELEASE_VERSION/SAP.btptf.yaml"
-          yq e -i ".PackageVersion = \"$TAG\"" "$RELEASE_VERSION/SAP.btptf.locale.en-US.yaml"
-          yq e -i ".PackageVersion = \"$TAG\"" "$RELEASE_VERSION/SAP.btptf.installer.yaml"
-          # https://github.com/SAP/terraform-exporter-btp/releases/download/v1.1.0/btptf_1.1.0_windows_amd64.exe
-          yq e -i ".ReleaseNotesUrl = \"$BTPTF_BASE_URL/tag/$TAG\"" "$RELEASE_VERSION/SAP.btptf.locale.en-US.yaml"
           
-          yq e -i ".Installers[0].InstallerUrl = \"${INSTALLER_BASE_URL}/$TAG/btptf_$RELEASE_VERSION_windows_amd64.exe\"" "$RELEASE_VERSION/SAP.btptf.installer.yaml"
-          yq e -i ".Installers[0].InstallerSha256 = \"${{ steps.download-sha256.SHA256 }}\"" "$VERSION_DIR/SAP.btptf.installer.yaml"
-
+          yq e -i ".PackageVersion = \"$RELEASE_VERSION\"" "$RELEASE_VERSION/SAP.btptf.yaml"
+          yq e -i ".PackageVersion = \"$RELEASE_VERSION\"" "$RELEASE_VERSION/SAP.btptf.locale.en-US.yaml"
+          yq e -i ".PackageVersion = \"$RELEASE_VERSION\"" "$RELEASE_VERSION/SAP.btptf.installer.yaml"
+          yq e -i ".ReleaseNotesUrl = \"$BTPTF_BASE_URL/tag/$TAG\"" "$RELEASE_VERSION/SAP.btptf.locale.en-US.yaml"
+          yq e -i ".Installers[0].InstallerUrl = \"$BTPTF_BASE_URL/download/$TAG/btptf_${RELEASE_VERSION}_windows_amd64.exe\"" "$RELEASE_VERSION/SAP.btptf.installer.yaml"
+          
+          yq e -i ".Installers[0].InstallerSha256 = \"${{ steps.download-sha256.outputs.sha256 }}\"" "$RELEASE_VERSION/SAP.btptf.installer.yaml"
+      - name: Print files
+        run: |
+          RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
+          echo "-------winget-pkgs/manifests/s/SAP/btptf/$RELEASE_VERSION/SAP.btptf.yaml:-----"
+          cat winget-pkgs/manifests/s/SAP/btptf/"$RELEASE_VERSION"/SAP.btptf.yaml
+          echo "-----winget-pkgs/manifests/s/SAP/btptf/$RELEASE_VERSION/SAP.btptf.locale.en-US.yaml:-----"
+          cat winget-pkgs/manifests/s/SAP/btptf/"$RELEASE_VERSION"/SAP.btptf.locale.en-US.yaml
+          echo "-----winget-pkgs/manifests/s/SAP/btptf/$RELEASE_VERSION/SAP.btptf.installer.yaml:-----"
+          cat winget-pkgs/manifests/s/SAP/btptf/"$RELEASE_VERSION"/SAP.btptf.installer.yaml
       - name: Commit and push
         run: |
+          RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
           cd winget-pkgs
-          git add winget-pkgs/manifests/s/SAP/btptf/$RELEASE_VERSION
-          git commit -m "New Version: SAP.btptf version $TAG"
-          git push fork HEAD
+          git add manifests/s/SAP/btptf/"$RELEASE_VERSION"
+          git commit -m "New Version: SAP.btptf version $RELEASE_VERSION"
+          git push origin HEAD
 
       - name: Create Pull Request
         run: |
+          TAG="${{ steps.get-tag.outputs.tag }}"
+          RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
+          
           cd winget-pkgs
-          gh pr create --base master --head $WINGET_FORK_ORG:update-$TAG --title "Add SAP.btptf $TAG" --body "Automated PR to publish SAP.btptf version $TAG"
+          gh pr create \
+            --base master \
+            --head $WINGET_FORK_ORG:update-"$TAG" \
+            --title "Add SAP.btptf $RELEASE_VERSION" \
+            --body "Automated PR to publish SAP.btptf version $RELEASE_VERSION"
