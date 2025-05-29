@@ -5,11 +5,12 @@ $url = "https://github.com/SAP/terraform-exporter-btp/releases/download/vVERSION
 
 $targetPath = Join-Path $toolsDir 'btptf.exe'
 
+
 # Download the binary at install time
 Get-ChocolateyWebFile `
   -PackageName 'btptf' `
   -FileFullPath $targetPath `
   -Url64bit $url `
-
-# Copy binary to Chocolatey tools location for execution
-Copy-Item $targetPath -Destination "$env:ChocolateyToolsLocation\btptf.exe" -Force
+  -Checksum64 'CHECKSUM'
+  -ChecksumType64 'sha256'
+$validExitCodes = @(0)
