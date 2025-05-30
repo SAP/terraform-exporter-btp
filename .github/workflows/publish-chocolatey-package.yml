@@ -107,6 +107,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg
+          path: sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg
 
       - name: Push to Chocolatey
         if: ${{ steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
