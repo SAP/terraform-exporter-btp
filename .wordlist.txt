@@ -80,6 +80,7 @@ toolchain
 UIs
 UI
 VS
+winget
 workspace
 workspaces
 YAML

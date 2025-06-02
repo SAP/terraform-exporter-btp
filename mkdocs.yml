@@ -6,6 +6,8 @@ theme:
   logo: img/logo.svg
   palette:
     primary: black
+plugins:
+  - tags
 markdown_extensions:
   - admonition
   - pymdownx.details
