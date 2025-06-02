@@ -1,6 +1,35 @@
 # Installation
 
-Download the binary from from the [releases ](https://github.com/SAP/terraform-exporter-btp/releases) section of the GitHub repository.
+## Package Manager
+You can easily install the `Terraform Exporter for SAP BTP` using popular installation methods based on your operating system. We’ve made it simple with ready-to-use installers and package managers across platforms. 
+
+!!! Commands
+    === "Windows"
+        Please refer to the [Winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) website for details
+        ```cmd
+        winget install SAP.btptf
+        ```
+
+    === "Mac OS"
+        Please refer to the [Homebrew](https://brew.sh/) website for details.
+        ```bash
+        brew tap SAP/terraform-exporter-btp https://github.com/SAP/terraform-exporter-btp
+        brew install sap/terraform-exporter-btp/btptf
+        ```
+    === "Linux"
+        We’ve released `deb` and `rpm` packages to support installation on the most common Linux distributions. You can download the packages from the `assets` section of the [releases](https://github.com/SAP/terraform-exporter-btp/releases) page.
+
+        **For Debian-based distributions (like Ubuntu, Linux Mint, etc.):**
+        ```bash
+        sudo dpkg -i <path-to-download>/terraform-exporter-btp_<latest-version>_linux_amd64.deb
+        ```
+        **For RPM-based distributions (like Fedora, RHEL, CentOS, openSUSE):**
+        ```bash
+        sudo rpm -i <path-to-download>/terraform-exporter-btp_<latest-version>_linux_amd64.rpm
+        ```
+
+## Download Binaries
+You can also download the binaries directly from the [releases](https://github.com/SAP/terraform-exporter-btp/releases) section of the GitHub repository.
 
 Select the version that you want to use and download the binary that fits your operating system from the `assets` of the release. We recommend using the latest version.
 
