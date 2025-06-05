@@ -1,4 +1,5 @@
 const fs = require('fs');
+const _ = require('lodash');
 
 // Function to read and parse JSON file
 function readJsonFile(filePath) {
@@ -8,7 +9,7 @@ function readJsonFile(filePath) {
 
 // Function to compare resources
 function compareResources(resource1, resource2) {
-    return resource1.type === resource2.type && JSON.stringify(resource1.values) === JSON.stringify(resource2.values) && JSON.stringify(resource1.sensitive_values) === JSON.stringify(resource2.sensitive_values);
+    return resource1.type === resource2.type && _.isEqual(JSON.stringify(resource1.values),JSON.stringify(resource2.values)) && _.isEqual(JSON.stringify(resource1.sensitive_values), JSON.stringify(resource2.sensitive_values));
 }
 
 // Function to compare JSON files
