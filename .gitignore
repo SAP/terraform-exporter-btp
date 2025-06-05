@@ -84,3 +84,5 @@ devcontainer.env
 ###
 # enf of gitignore devcontainer
 ###
+
+node_modules/

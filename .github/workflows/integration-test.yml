@@ -1,4 +1,6 @@
 name: Integration Test
+# Execution sequence of the integration tests is SEQUENTIAL
+# to avoid platform issues to too parallel calls exceeding a rate limit.
 
 on:
   workflow_dispatch:
@@ -15,11 +17,17 @@ jobs:
   test-json-inventory:
     name: Integration Test JSON Inventory
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
     outputs:
       output_dir_json_inventory: ${{ steps.json-inventory-directory.outputs.result }}
       output_subacount_json_inventory: ${{ steps.json-inventory-subaccount.outputs.result }}
       output_cforg_json_inventory: ${{ steps.json-inventory-cforg.outputs.result }}
+      output_dir_export_by_json: ${{ steps.export-by-json-directory.outputs.result }}
+      output_subacount_export_by_json: ${{ steps.export-by-json-subaccount.outputs.result }}
+      output_cforg_export_by_json: ${{ steps.export-by-json-cforg.outputs.result }}
+      output_dir_export_by_res: ${{ steps.export-by-resource-directory.outputs.result }}
+      output_subacount_export_by_res: ${{ steps.export-by-resource-subaccount.outputs.result }}
+      output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,6 +52,18 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
+
+      ###
+      # Integration Test JSON Inventory
+      ###
       - name: JSON inventory for Directory
         id: json-inventory-directory
         run: |
@@ -55,19 +75,7 @@ jobs:
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestDirectory.json > temp.json && mv temp.json integrationTestDirectory.json
           diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json)
           echo "result=success" >> "$GITHUB_OUTPUT"
-
-      - name: JSON inventory for Subaccount
-        id: json-inventory-subaccount
-        if: ${{ success() }} || ${{ failure() }}
-        run: |
-          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
-          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
-          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
-          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
-          btptf create-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubaccount.json
-          jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccount.json > temp.json && mv temp.json integrationTestSubaccount.json
-          diff <(jq -S . integrationTestSubaccount.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestSubaccountReference.json) || echo "JSON inventory for subaccount is not as expected"
-          echo "result=success" >> "$GITHUB_OUTPUT"
+          rm -rf integrationTestDirectory.json
 
       - name: JSON inventory for Cloud Foundry Org
         id: json-inventory-cforg
@@ -81,44 +89,25 @@ jobs:
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestCfOrg.json > temp.json && mv temp.json integrationTestCfOrg.json
           diff <(jq -S . integrationTestCfOrg.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestCfOrgReference.json) || echo "JSON inventory for Cloud Foundry Org is not as expected"
           echo "result=success" >> "$GITHUB_OUTPUT"
+          rm -rf integrationTestCfOrg.json
 
-  test-export-by-json:
-    name: Integration Test Export by JSON
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    outputs:
-      output_dir_export_by_json: ${{ steps.export-by-json-directory.outputs.result }}
-      output_subacount_export_by_json: ${{ steps.export-by-json-subaccount.outputs.result }}
-      output_cforg_export_by_json: ${{ steps.export-by-json-cforg.outputs.result }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-          cache: false
-
-      - name: Download dependencies
+      - name: JSON inventory for Subaccount
+        id: json-inventory-subaccount
+        if: ${{ success() }} || ${{ failure() }}
         run: |
-          go mod download
-          go mod tidy
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
+          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
+          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          btptf create-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubaccount.json
+          jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccount.json > temp.json && mv temp.json integrationTestSubaccount.json
+          diff <(jq -S . integrationTestSubaccount.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestSubaccountReference.json) || echo "JSON inventory for subaccount is not as expected"
+          echo "result=success" >> "$GITHUB_OUTPUT"
+          rm -rf integrationTestSubaccount.json
 
-      - name: Install Terraform exporter CLI
-        run: make install
-
-      - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1.2
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
-          terraform_wrapper: false
-
-      - name: "Setup Node.js"
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
+      ###
+      # Integration Test Export by JSON
+      ###
       - name: Export by JSON for Directory
         id: export-by-json-directory
         run: |
@@ -146,36 +135,6 @@ jobs:
           echo "Execute comparison of state files for Directory"
           echo "====================================="
           node .github/scripts/compareJson.js directory-export-by-json-state-reference.json directory-export-by-json-state.json
-          echo "result=success" >> "$GITHUB_OUTPUT"
-
-      - name: Export by JSON for Subaccount
-        id: export-by-json-subaccount
-        if: ${{ success() }} || ${{ failure() }}
-        run: |
-          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
-          echo "====================================="
-          echo "Export by JSON for Subaccount"
-          echo "====================================="
-          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
-          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
-          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
-          btptf export-by-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integration-test/exporter-reference-data/import-by-json/integrationTestSubaccountCurated.json -c subaccount-export-by-json
-          echo "====================================="
-          echo "Executing state import for Subaccount"
-          echo "====================================="
-          terraform -chdir=subaccount-export-by-json init
-          terraform -chdir=subaccount-export-by-json apply -auto-approve
-          echo "Preparing state file for Subaccount in JSON format"
-          terraform -chdir=subaccount-export-by-json show -json > subaccount-export-by-json-state.json
-          echo '${{ secrets.SUBACCOUNT_EXPORT_BY_JSON_REF}}' | base64 -d > subaccount-export-by-json-state-reference.json
-          echo "====================================="
-          echo "List imported state"
-          echo "====================================="
-          terraform -chdir=subaccount-export-by-json state list
-          echo "====================================="
-          echo "Execute comparison of state files for Subaccount"
-          echo "====================================="
-          node .github/scripts/compareJson.js subaccount-export-by-json-state-reference.json subaccount-export-by-json-state.json
           echo "result=success" >> "$GITHUB_OUTPUT"
 
       - name: Export by JSON for Cloud Foundry Organization
@@ -208,43 +167,40 @@ jobs:
           node .github/scripts/compareJson.js cforg-export-by-json-state-reference.json cforg-export-by-json-state.json
           echo "result=success" >> "$GITHUB_OUTPUT"
 
-  test-export-by-resource:
-    name: Integration Test Export by Ressource
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    outputs:
-      output_dir_export_by_res: ${{ steps.export-by-resource-directory.outputs.result }}
-      output_subacount_export_by_res: ${{ steps.export-by-resource-subaccount.outputs.result }}
-      output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-          cache: false
-
-      - name: Download dependencies
+      - name: Export by JSON for Subaccount
+        id: export-by-json-subaccount
+        if: ${{ success() }} || ${{ failure() }}
         run: |
-          go mod download
-          go mod tidy
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
+          echo "====================================="
+          echo "Export by JSON for Subaccount"
+          echo "====================================="
+          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
+          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          btptf export-by-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integration-test/exporter-reference-data/import-by-json/integrationTestSubaccountCurated.json -c subaccount-export-by-json
+          echo "====================================="
+          echo "Executing state import for Subaccount"
+          echo "====================================="
+          terraform -chdir=subaccount-export-by-json init
+          terraform -chdir=subaccount-export-by-json apply -auto-approve
+          echo "Preparing state file for Subaccount in JSON format"
+          terraform -chdir=subaccount-export-by-json show -json > subaccount-export-by-json-state.json
+          echo '${{ secrets.SUBACCOUNT_EXPORT_BY_JSON_REF}}' | base64 -d > subaccount-export-by-json-state-reference.json
+          echo "====================================="
+          echo "List imported state"
+          echo "====================================="
+          terraform -chdir=subaccount-export-by-json state list
+          echo "====================================="
+          echo "Execute comparison of state files for Subaccount"
+          echo "====================================="
+          node .github/scripts/compareJson.js subaccount-export-by-json-state-reference.json subaccount-export-by-json-state.json
+          echo "result=success" >> "$GITHUB_OUTPUT"
 
-      - name: Install Terraform exporter CLI
-        run: make install
-
-      - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1.2
-        with:
-          terraform_version: ${{ env.TF_VERSION }}
-          terraform_wrapper: false
-
-      - name: "Setup Node.js"
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
+      ###
+      # Integration Test Export by JSON
+      ###
       - name: Export by Resource for Directory
         id: export-by-resource-directory
         run: |
@@ -273,37 +229,11 @@ jobs:
           echo "====================================="
           node .github/scripts/compareJson.js directory-export-by-resource-state-reference.json directory-export-by-resource-state.json
           echo "result=success" >> "$GITHUB_OUTPUT"
-
-
-      - name: Export by Resource for Subaccount
-        id: export-by-resource-subaccount
-        if: ${{ success() }} || ${{ failure() }}
-        run: |
-          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
-          echo "Export by Resource for Subaccount"
+          echo "Cleanup after Export by Resource for Directory"
           echo "====================================="
-          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
-          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
-          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
-          btptf export -s ${{ secrets.BTP_SUBACCOUNT }} -c subaccount-export-by-resource -r='subaccount,subscriptions'
-          echo "====================================="
-          echo "Executing state import for Subaccount"
-          echo "====================================="
-          terraform -chdir=subaccount-export-by-resource init
-          terraform -chdir=subaccount-export-by-resource apply -auto-approve
-          echo "Preparing state file for Subaccount in JSON format"
-          terraform -chdir=subaccount-export-by-resource show -json > subaccount-export-by-resource-state.json
-          echo '${{ secrets.SUBACCOUNT_EXPORT_BY_RESOURCE_REF}}' | base64 -d > subaccount-export-by-resource-state-reference.json
-          echo "====================================="
-          echo "List imported state"
-          echo "====================================="
-          terraform -chdir=subaccount-export-by-resource state list
-          echo "====================================="
-          echo "Execute comparison of state files for Subaccount"
-          echo "====================================="
-          node .github/scripts/compareJson.js subaccount-export-by-resource-state-reference.json subaccount-export-by-resource-state.json
-          echo "result=success" >> "$GITHUB_OUTPUT"
+          rm -rf directory-export-by-resource
+          rm directory-export-by-resource-state.json
 
       - name: Export by Resource for Cloud Foundry Organization
         id: export-by-resource-cforg
@@ -334,3 +264,43 @@ jobs:
           echo "====================================="
           node .github/scripts/compareJson.js cforg-export-by-resource-state-reference.json cforg-export-by-resource-state.json
           echo "result=success" >> "$GITHUB_OUTPUT"
+          echo "====================================="
+          echo "Cleanup after Export by Resource for CF Organization"
+          echo "====================================="
+          rm -rf cforg-export-by-resource
+          rm -rf cforg-export-by-resource-state-reference.json
+
+      - name: Export by Resource for Subaccount
+        id: export-by-resource-subaccount
+        if: ${{ success() }} || ${{ failure() }}
+        run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
+          echo "====================================="
+          echo "Export by Resource for Subaccount"
+          echo "====================================="
+          export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
+          export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          btptf export -s ${{ secrets.BTP_SUBACCOUNT }} -c subaccount-export-by-resource -r='subaccount,subscriptions'
+          echo "====================================="
+          echo "Executing state import for Subaccount"
+          echo "====================================="
+          terraform -chdir=subaccount-export-by-resource init
+          terraform -chdir=subaccount-export-by-resource apply -auto-approve
+          echo "Preparing state file for Subaccount in JSON format"
+          terraform -chdir=subaccount-export-by-resource show -json > subaccount-export-by-resource-state.json
+          echo '${{ secrets.SUBACCOUNT_EXPORT_BY_RESOURCE_REF}}' | base64 -d > subaccount-export-by-resource-state-reference.json
+          echo "====================================="
+          echo "List imported state"
+          echo "====================================="
+          terraform -chdir=subaccount-export-by-resource state list
+          echo "====================================="
+          echo "Execute comparison of state files for Subaccount"
+          echo "====================================="
+          node .github/scripts/compareJson.js subaccount-export-by-resource-state-reference.json subaccount-export-by-resource-state.json
+          echo "result=success" >> "$GITHUB_OUTPUT"
+          echo "====================================="
+          echo "Cleanup after Export by Resource for Subaccount"
+          echo "====================================="
+          rm -rf subaccount-export-by-resource
+          rm subaccount-export-by-resource-state.json
