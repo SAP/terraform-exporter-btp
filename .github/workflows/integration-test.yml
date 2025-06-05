@@ -110,6 +110,7 @@ jobs:
       ###
       - name: Export by JSON for Directory
         id: export-by-json-directory
+        if: ${{ success() }} || ${{ failure() }}
         run: |
           trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
@@ -203,6 +204,7 @@ jobs:
       ###
       - name: Export by Resource for Directory
         id: export-by-resource-directory
+        if: ${{ success() }} || ${{ failure() }}
         run: |
           trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
