@@ -210,6 +210,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: .github/scripts/package-lock.json
 
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
+
       - name: Export by JSON for Directory
         id: export-by-json-directory
         run: |
@@ -286,6 +290,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: .github/scripts/package-lock.json
 
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
+
       - name: Export by JSON for Subaccount
         id: export-by-json-subaccount
         if: ${{ success() }} || ${{ failure() }}
@@ -361,6 +369,10 @@ jobs:
           node-version: 22
           cache: 'npm'
           cache-dependency-path: .github/scripts/package-lock.json
+
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
 
       - name: Export by JSON for Cloud Foundry Organization
         id: export-by-json-cforg
@@ -441,6 +453,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: .github/scripts/package-lock.json
 
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
+
       - name: Export by Resource for Directory
         id: export-by-resource-directory
         run: |
@@ -518,6 +534,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: .github/scripts/package-lock.json
 
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
+
       - name: Export by Resource for Subaccount
         id: export-by-resource-subaccount
         if: ${{ success() }} || ${{ failure() }}
@@ -593,6 +613,10 @@ jobs:
           node-version: 22
           cache: 'npm'
           cache-dependency-path: .github/scripts/package-lock.json
+
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
 
       - name: Export by Resource for Cloud Foundry Organization
         id: export-by-resource-cforg
