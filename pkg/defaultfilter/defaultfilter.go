@@ -184,10 +184,7 @@ func IsDefaultEntitlement(serviceName string, planName string) bool {
 		return false
 	}
 
-	return slices.Contains(DefaultEntitlements, struct {
-		ServiceName string
-		PlanName    string
-	}{ServiceName: serviceName, PlanName: planName})
+	return slices.Contains(DefaultEntitlements, ServiceEntry{ServiceName: serviceName, PlanName: planName})
 }
 
 func FilterDefaultEntitlementsFromJsonData(data map[string]any) map[string]any {
