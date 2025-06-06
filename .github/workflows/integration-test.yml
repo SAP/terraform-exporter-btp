@@ -690,9 +690,10 @@ jobs:
       - name: Require manual approval if any job failed
         if: steps.aggregate.outputs.failed == '1'
         uses: trstringer/manual-approval@v1
+        timeout-minutes: 30
         with:
           secret: ${{ secrets.GITHUB_TOKEN }}
-          approvers: terraform-exporter-for-sap-btp-admin
+          approvers: lechnerc77,CHERIANS,vipinvkmenon
           minimum-approvals: 1
           issue-title: "Manual approval required for integration test failures"
           issue-body: "One or more integration test jobs failed. Please review and approve or deny."
