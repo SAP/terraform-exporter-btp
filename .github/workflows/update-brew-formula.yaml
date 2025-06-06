@@ -27,7 +27,7 @@ jobs:
         run: |
           echo "Event '${{ github.event.action }}'"
           echo "BTP Terraform binary hash:"
-          tag=$(echo ${{ steps.latest-release.outputs.LATEST_TAG }} | cut -c 2-) 
+          tag=$(echo ${{ steps.latest-release.outputs.LATEST_TAG }} | cut -c 2-)
           darwin_amd64_sha="btptf_${tag}_darwin_amd64.sha256"
           echo $darwin_amd64_sha $(cat ${{ runner.temp }}/downloaded-assets/$darwin_amd64_sha)
           echo "DARWIN_AMD64_SHA=$(cat ${{ runner.temp }}/downloaded-assets/$darwin_amd64_sha)" >> "$GITHUB_OUTPUT"
@@ -48,10 +48,10 @@ jobs:
       - name: btptf.rb Contents
         run: cat btptf.rb
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7 
+        uses: peter-evans/create-pull-request@v7
         with:
           add-paths: btptf.rb
           #branch: update_${{ github.event.repository.updated_at }}_${{ steps.latest-release.outputs.LATEST_TAG }}
           delete-branch: true
-          title: "chore: Update to ${{ steps.latest-release.outputs.LATEST_TAG }}"
+          title: "chore: Update brew formula to ${{ steps.latest-release.outputs.LATEST_TAG }}"
           body: This PR updates btptf.rb to ${{ steps.latest-release.outputs.LATEST_TAG }}
