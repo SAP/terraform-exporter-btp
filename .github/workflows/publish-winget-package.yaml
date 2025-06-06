@@ -67,22 +67,27 @@ jobs:
             echo "Fork exists. Syncing..."
             gh repo sync "$WINGET_FORK_ORG/winget-pkgs" --force
           fi
-          
           git clone https://$PAT_TOKEN@github.com/$WINGET_FORK_ORG/winget-pkgs.git
           cd winget-pkgs
-          git remote add upstream https://github.com/$WINGET_UPSTREAM_REPO.git || true
-          git fetch upstream
-          git checkout master
-          git reset --hard upstream/master
-          git pull
-          git push --force
           git config --global user.email "terraform.team@sap.com"
           git config --global user.name "SAP Terraform Team"
+          git remote add upstream https://github.com/$WINGET_UPSTREAM_REPO.git || true
+          git pull upstream master --rebase
+          git push origin master --force
+
+      # - name: Clone winget-pkgs repository
+      #   run: |
+      #     git clone https://github.com/$WINGET_UPSTREAM_REPO.git winget-pkgs
+      #     cd winget-pkgs
+      #     git config --global user.email "terraform.team@sap.com"
+      #     git config --global user.name "SAP Terraform Team"
+      #     git remote add fork https://$PAT_TOKEN@github.com/$WINGET_FORK_ORG/winget-pkgs.git || true
 
       - name: Create new branch
         run: |
           cd winget-pkgs
           git checkout -b update-${{ steps.get-tag.outputs.tag }}
+          #git push --set-upstream fork HEAD:update-${{ steps.get-tag.outputs.tag }} --force
 
       - name: Download SHA256 file
         id: download-sha256 
@@ -128,16 +133,33 @@ jobs:
           cd winget-pkgs
           git add manifests/s/SAP/btptf/"$RELEASE_VERSION"
           git commit -m "New Version: SAP.btptf version $RELEASE_VERSION"
-          git push origin HEAD
+          git push --set-upstream origin HEAD:update-${{ steps.get-tag.outputs.tag }} --force
+          #git log upstream/master..update-${{ steps.get-tag.outputs.tag }}
+          #git diff upstream/master..update-${{ steps.get-tag.outputs.tag }}
 
       - name: Create Pull Request
         run: |
           TAG="${{ steps.get-tag.outputs.tag }}"
           RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
+          #gh auth login --with-token <<< "$PAT_TOKEN"
           
           cd winget-pkgs
+ 
+
           gh pr create \
-            --base master \
-            --head $WINGET_FORK_ORG:update-"$TAG" \
             --title "Add SAP.btptf $RELEASE_VERSION" \
             --body "Automated PR to publish SAP.btptf version $RELEASE_VERSION"
+            --head saptfautomation:update-$TAG
+            --repo microsoft/winget-pkgs \
+            --base master
+      # - name: Create Pull Request
+      #   uses: peter-evans/create-pull-request@v4
+      #   with:
+      #     path: winget-pkgs
+      #     token: ${{ secrets.PAT_TOKEN }}
+      #     push-to-fork: "saptfautomation/winget-pkgs"
+      #     commit-message: "New Version: SAP.btptf version ${{ steps.get-tag.outputs.release_version }}"
+      #     branch: update-${{ steps.get-tag.outputs.tag }}
+      #     title: "Add SAP.btptf ${{ steps.get-tag.outputs.release_version }}"
+      #     body: "Automated PR to publish SAP.btptf version ${{ steps.get-tag.outputs.release_version }}"
+      #     base: master
