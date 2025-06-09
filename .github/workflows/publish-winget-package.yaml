@@ -18,7 +18,7 @@ jobs:
   publish-winget:
     runs-on: ubuntu-latest
     env:
-      WINGET_FORK_ORG: saptfautomation
+      WINGET_FORK_ORG: ${{ vars.FORK_OWNER }}  
       WINGET_UPSTREAM_REPO: microsoft/winget-pkgs
       PACKAGE_ID: SAP.btptf
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }} 
@@ -46,9 +46,7 @@ jobs:
             echo "Error: TAG could not be determined. Exiting."
             exit 1
           fi
-
           RELEASE_VERSION="${TAG#v}" 
-
           echo "Detected TAG: $TAG"
           echo "Calculated RELEASE_VERSION: $RELEASE_VERSION"
 
@@ -67,17 +65,17 @@ jobs:
             echo "Fork exists. Syncing..."
             gh repo sync "$WINGET_FORK_ORG/winget-pkgs" --force
           fi
+
+          git config --global user.email "terraform.team@sap.com"
+          git config --global user.name "SAP Terraform Team"
           
           git clone https://$PAT_TOKEN@github.com/$WINGET_FORK_ORG/winget-pkgs.git
           cd winget-pkgs
           git remote add upstream https://github.com/$WINGET_UPSTREAM_REPO.git || true
-          git fetch upstream
           git checkout master
-          git reset --hard upstream/master
-          git pull
-          git push --force
-          git config --global user.email "terraform.team@sap.com"
-          git config --global user.name "SAP Terraform Team"
+          git pull upstream master
+          git push origin --force
+
 
       - name: Create new branch
         run: |
@@ -136,8 +134,12 @@ jobs:
           RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
           
           cd winget-pkgs
+
+          gh repo set-default microsoft/winget-pkgs
+
           gh pr create \
             --base master \
+            --repo microsoft/winget-pkgs \
             --head $WINGET_FORK_ORG:update-"$TAG" \
             --title "Add SAP.btptf $RELEASE_VERSION" \
             --body "Automated PR to publish SAP.btptf version $RELEASE_VERSION"
