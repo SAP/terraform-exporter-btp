@@ -1,6 +1,8 @@
 name: Integration Test
-# Execution sequence of the integration tests is SEQUENTIAL
-# to avoid platform issues to too parallel calls exceeding a rate limit.
+# The integration tests are split into a job per sceanrio to allow for better error handling and reporting.
+# The jobs are executed sequentially to avoid rate limiting or other overload issues of the platform.
+# In addtion, artificial sleep times are added to the jobs to allow the platform to recover from potential rate limiting issues.
+# Caching is activated for all setup actions to improve the execution time and avoid unnecessary downloads.
 
 on:
   workflow_dispatch:
@@ -14,20 +16,12 @@ env:
   TF_VERSION: 1.10.5
 
 jobs:
-  test-json-inventory:
-    name: Integration Test JSON Inventory
+  test-json-inventory-directory:
+    name: Integration Test JSON Inventory for a Directory
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 10
     outputs:
       output_dir_json_inventory: ${{ steps.json-inventory-directory.outputs.result }}
-      output_subacount_json_inventory: ${{ steps.json-inventory-subaccount.outputs.result }}
-      output_cforg_json_inventory: ${{ steps.json-inventory-cforg.outputs.result }}
-      output_dir_export_by_json: ${{ steps.export-by-json-directory.outputs.result }}
-      output_subacount_export_by_json: ${{ steps.export-by-json-subaccount.outputs.result }}
-      output_cforg_export_by_json: ${{ steps.export-by-json-cforg.outputs.result }}
-      output_dir_export_by_res: ${{ steps.export-by-resource-directory.outputs.result }}
-      output_subacount_export_by_res: ${{ steps.export-by-resource-subaccount.outputs.result }}
-      output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,7 +30,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-          cache: false
+          cache: true
 
       - name: Download dependencies
         run: |
@@ -52,18 +46,6 @@ jobs:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
-      - name: "Setup Node.js"
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: "Install Node.js dependencies"
-        working-directory: ./.github/scripts
-        run: npm ci --omit=dev
-
-      ###
-      # Integration Test JSON Inventory
-      ###
       - name: JSON inventory for Directory
         id: json-inventory-directory
         run: |
@@ -75,21 +57,45 @@ jobs:
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestDirectory.json > temp.json && mv temp.json integrationTestDirectory.json
           diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json)
           echo "result=success" >> "$GITHUB_OUTPUT"
-          rm -rf integrationTestDirectory.json
 
-      - name: JSON inventory for Cloud Foundry Org
-        id: json-inventory-cforg
-        if: ${{ success() }} || ${{ failure() }}
+      - name: Sleep for 10 seconds
+        # Add artificial delays to avoid rate limiting issues
         run: |
-          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
-          export CF_USER=${{ secrets.BTP_USERNAME }}
-          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
-          export CF_API_URL=${{ secrets.CF_API_URL }}
-          btptf create-json -o ${{ secrets.CF_ORGANIZATION }} -p integrationTestCfOrg.json
-          jq '.BtpResources[] |= (.Values |= sort)' integrationTestCfOrg.json > temp.json && mv temp.json integrationTestCfOrg.json
-          diff <(jq -S . integrationTestCfOrg.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestCfOrgReference.json) || echo "JSON inventory for Cloud Foundry Org is not as expected"
-          echo "result=success" >> "$GITHUB_OUTPUT"
-          rm -rf integrationTestCfOrg.json
+          echo "Sleeping for 10 seconds to avoid rate limiting issues..."
+          sleep 10s
+        shell: bash
+
+  test-json-inventory-subaccount:
+    name: Integration Test JSON Inventory for a Subaccount
+    if: ${{ always() }}
+    needs: test-json-inventory-directory
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      output_subacount_json_inventory: ${{ steps.json-inventory-subaccount.outputs.result }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: |
+          go mod download
+          go mod tidy
+
+      - name: Install Terraform Exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
 
       - name: JSON inventory for Subaccount
         id: json-inventory-subaccount
@@ -103,14 +109,113 @@ jobs:
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccount.json > temp.json && mv temp.json integrationTestSubaccount.json
           diff <(jq -S . integrationTestSubaccount.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestSubaccountReference.json) || echo "JSON inventory for subaccount is not as expected"
           echo "result=success" >> "$GITHUB_OUTPUT"
-          rm -rf integrationTestSubaccount.json
 
-      ###
-      # Integration Test Export by JSON
-      ###
+      - name: Sleep for 10 seconds
+        # Add artificial delays to avoid rate limiting issues
+        run: |
+          echo "Sleeping for 10 seconds to avoid rate limiting issues..."
+          sleep 10s
+        shell: bash
+
+
+  test-json-inventory-cforg:
+    name: Integration Test JSON Inventory for CF org
+    if: ${{ always() }}
+    needs: test-json-inventory-subaccount
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      output_cforg_json_inventory: ${{ steps.json-inventory-cforg.outputs.result }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: |
+          go mod download
+          go mod tidy
+
+      - name: Install Terraform Exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: JSON inventory for Cloud Foundry Org
+        id: json-inventory-cforg
+        if: ${{ success() }} || ${{ failure() }}
+        run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
+          export CF_USER=${{ secrets.BTP_USERNAME }}
+          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export CF_API_URL=${{ secrets.CF_API_URL }}
+          btptf create-json -o ${{ secrets.CF_ORGANIZATION }} -p integrationTestCfOrg.json
+          jq '.BtpResources[] |= (.Values |= sort)' integrationTestCfOrg.json > temp.json && mv temp.json integrationTestCfOrg.json
+          diff <(jq -S . integrationTestCfOrg.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestCfOrgReference.json) || echo "JSON inventory for Cloud Foundry Org is not as expected"
+          echo "result=success" >> "$GITHUB_OUTPUT"
+
+      - name: Sleep for 10 seconds
+        # Add artificial delays to avoid rate limiting issues
+        run: |
+          echo "Sleeping for 10 seconds to avoid rate limiting issues..."
+          sleep 10s
+        shell: bash
+
+
+  test-export-by-json-directory:
+    name: Integration Test Export by JSON for Directory
+    if: ${{ always() }}
+    needs: test-json-inventory-cforg
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      output_dir_export_by_json: ${{ steps.export-by-json-directory.outputs.result }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: |
+          go mod download
+          go mod tidy
+
+      - name: Install Terraform exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: .github/scripts/package-lock.json
+
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
+
       - name: Export by JSON for Directory
         id: export-by-json-directory
-        if: ${{ success() }} || ${{ failure() }}
         run: |
           trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
@@ -138,36 +243,56 @@ jobs:
           node .github/scripts/compareJson.js directory-export-by-json-state-reference.json directory-export-by-json-state.json
           echo "result=success" >> "$GITHUB_OUTPUT"
 
-      - name: Export by JSON for Cloud Foundry Organization
-        id: export-by-json-cforg
-        if: ${{ success() }} || ${{ failure() }}
+      - name: Sleep for 10 seconds
+        # Add artificial delays to avoid rate limiting issues
         run: |
-          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
-          echo "====================================="
-          echo "Export by JSON for CF Organization"
-          echo "====================================="
-          export CF_USER=${{ secrets.BTP_USERNAME }}
-          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
-          export CF_API_URL=${{ secrets.CF_API_URL }}
-          btptf export-by-json -o ${{ secrets.CF_ORGANIZATION }} -p integration-test/exporter-reference-data/import-by-json/integrationTestCfOrgCurated.json -c cforg-export-by-json
-          echo "====================================="
-          echo "Executing state import for CF Organization"
-          echo "====================================="
-          terraform -chdir=cforg-export-by-json init
-          terraform -chdir=cforg-export-by-json apply -auto-approve
-          echo "Preparing state file for CF Organization in JSON format"
-          terraform -chdir=cforg-export-by-json show -json > cforg-export-by-json-state.json
-          echo '${{ secrets.CFORG_EXPORT_BY_JSON_REF}}' | base64 -d > cforg-export-by-json-state-reference.json
-          echo "====================================="
-          echo "List imported state"
-          echo "====================================="
-          terraform -chdir=cforg-export-by-json state list
-          echo "====================================="
-          echo "Execute comparison of state files for CF Organization"
-          echo "====================================="
-          node .github/scripts/compareJson.js cforg-export-by-json-state-reference.json cforg-export-by-json-state.json
-          echo "result=success" >> "$GITHUB_OUTPUT"
+          echo "Sleeping for 10 seconds to avoid rate limiting issues..."
+          sleep 10s
+        shell: bash
 
+
+  test-export-by-json-subaccount:
+    name: Integration Test Export by JSON for Subaccount
+    if: ${{ always() }}
+    needs: test-export-by-json-directory
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      output_subacount_export_by_json: ${{ steps.export-by-json-subaccount.outputs.result }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: |
+          go mod download
+          go mod tidy
+
+      - name: Install Terraform exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: .github/scripts/package-lock.json
+
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
 
       - name: Export by JSON for Subaccount
         id: export-by-json-subaccount
@@ -199,12 +324,141 @@ jobs:
           node .github/scripts/compareJson.js subaccount-export-by-json-state-reference.json subaccount-export-by-json-state.json
           echo "result=success" >> "$GITHUB_OUTPUT"
 
-      ###
-      # Integration Test Export by JSON
-      ###
+      - name: Sleep for 10 seconds
+        # Add artificial delays to avoid rate limiting issues
+        run: |
+          echo "Sleeping for 10 seconds to avoid rate limiting issues..."
+          sleep 10s
+        shell: bash
+
+  test-export-by-json-cforg:
+    name: Integration Test Export by JSON for CF Org
+    if: ${{ always() }}
+    needs: test-export-by-json-subaccount
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      output_cforg_export_by_json: ${{ steps.export-by-json-cforg.outputs.result }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: |
+          go mod download
+          go mod tidy
+
+      - name: Install Terraform exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: .github/scripts/package-lock.json
+
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
+
+      - name: Export by JSON for Cloud Foundry Organization
+        id: export-by-json-cforg
+        if: ${{ success() }} || ${{ failure() }}
+        run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
+          echo "====================================="
+          echo "Export by JSON for CF Organization"
+          echo "====================================="
+          export CF_USER=${{ secrets.BTP_USERNAME }}
+          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export CF_API_URL=${{ secrets.CF_API_URL }}
+          btptf export-by-json -o ${{ secrets.CF_ORGANIZATION }} -p integration-test/exporter-reference-data/import-by-json/integrationTestCfOrgCurated.json -c cforg-export-by-json
+          echo "====================================="
+          echo "Executing state import for CF Organization"
+          echo "====================================="
+          terraform -chdir=cforg-export-by-json init
+          terraform -chdir=cforg-export-by-json apply -auto-approve
+          echo "Preparing state file for CF Organization in JSON format"
+          terraform -chdir=cforg-export-by-json show -json > cforg-export-by-json-state.json
+          echo '${{ secrets.CFORG_EXPORT_BY_JSON_REF}}' | base64 -d > cforg-export-by-json-state-reference.json
+          echo "====================================="
+          echo "List imported state"
+          echo "====================================="
+          terraform -chdir=cforg-export-by-json state list
+          echo "====================================="
+          echo "Execute comparison of state files for CF Organization"
+          echo "====================================="
+          node .github/scripts/compareJson.js cforg-export-by-json-state-reference.json cforg-export-by-json-state.json
+          echo "result=success" >> "$GITHUB_OUTPUT"
+
+      - name: Sleep for 10 seconds
+        # Add artificial delays to avoid rate limiting issues
+        run: |
+          echo "Sleeping for 10 seconds to avoid rate limiting issues..."
+          sleep 10s
+        shell: bash
+
+
+  test-export-by-resource-directory:
+    name: Integration Test Export Directory by Ressource
+    if: ${{ always() }}
+    needs: test-export-by-json-cforg
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      output_dir_export_by_res: ${{ steps.export-by-resource-directory.outputs.result }}
+      output_subacount_export_by_res: ${{ steps.export-by-resource-subaccount.outputs.result }}
+      output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: |
+          go mod download
+          go mod tidy
+
+      - name: Install Terraform exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: .github/scripts/package-lock.json
+
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
+
       - name: Export by Resource for Directory
         id: export-by-resource-directory
-        if: ${{ success() }} || ${{ failure() }}
         run: |
           trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
@@ -231,46 +485,58 @@ jobs:
           echo "====================================="
           node .github/scripts/compareJson.js directory-export-by-resource-state-reference.json directory-export-by-resource-state.json
           echo "result=success" >> "$GITHUB_OUTPUT"
-          echo "====================================="
-          echo "Cleanup after Export by Resource for Directory"
-          echo "====================================="
-          rm -rf directory-export-by-resource
-          rm directory-export-by-resource-state.json
 
-      - name: Export by Resource for Cloud Foundry Organization
-        id: export-by-resource-cforg
-        if: ${{ success() }} || ${{ failure() }}
+      - name: Sleep for 10 seconds
+        # Add artificial delays to avoid rate limiting issues
         run: |
-          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
-          echo "====================================="
-          echo "Export by Resource for CF Organization"
-          echo "====================================="
-          export CF_USER=${{ secrets.BTP_USERNAME }}
-          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
-          export CF_API_URL=${{ secrets.CF_API_URL }}
-          btptf export -o ${{ secrets.CF_ORGANIZATION }} -c cforg-export-by-resource -r='spaces'
-          echo "====================================="
-          echo "Executing state import for CF Organization"
-          echo "====================================="
-          terraform -chdir=cforg-export-by-resource init
-          terraform -chdir=cforg-export-by-resource apply -auto-approve
-          echo "Preparing state file for CF Organization in JSON format"
-          terraform -chdir=cforg-export-by-resource show -json > cforg-export-by-resource-state.json
-          echo '${{ secrets.CFORG_EXPORT_BY_RESOURCE_REF}}' | base64 -d > cforg-export-by-resource-state-reference.json
-          echo "====================================="
-          echo "List imported state"
-          echo "====================================="
-          terraform -chdir=cforg-export-by-resource state list
-          echo "====================================="
-          echo "Execute comparison of state files for CF Organization"
-          echo "====================================="
-          node .github/scripts/compareJson.js cforg-export-by-resource-state-reference.json cforg-export-by-resource-state.json
-          echo "result=success" >> "$GITHUB_OUTPUT"
-          echo "====================================="
-          echo "Cleanup after Export by Resource for CF Organization"
-          echo "====================================="
-          rm -rf cforg-export-by-resource
-          rm -rf cforg-export-by-resource-state-reference.json
+          echo "Sleeping for 10 seconds to avoid rate limiting issues..."
+          sleep 10s
+        shell: bash
+
+  test-export-by-resource-subaccount:
+    name: Integration Test Export Subaccount by Ressource
+    if: ${{ always() }}
+    needs: test-export-by-resource-directory
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      output_dir_export_by_res: ${{ steps.export-by-resource-directory.outputs.result }}
+      output_subacount_export_by_res: ${{ steps.export-by-resource-subaccount.outputs.result }}
+      output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: |
+          go mod download
+          go mod tidy
+
+      - name: Install Terraform exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: .github/scripts/package-lock.json
+
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
 
       - name: Export by Resource for Subaccount
         id: export-by-resource-subaccount
@@ -301,8 +567,142 @@ jobs:
           echo "====================================="
           node .github/scripts/compareJson.js subaccount-export-by-resource-state-reference.json subaccount-export-by-resource-state.json
           echo "result=success" >> "$GITHUB_OUTPUT"
+
+      - name: Sleep for 10 seconds
+        # Add artificial delays to avoid rate limiting issues
+        run: |
+          echo "Sleeping for 10 seconds to avoid rate limiting issues..."
+          sleep 10s
+        shell: bash
+
+  test-export-by-resource-cforg:
+    name: Integration Test Export a CF org by Ressource
+    if: ${{ always() }}
+    needs: test-export-by-resource-subaccount
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Download dependencies
+        run: |
+          go mod download
+          go mod tidy
+
+      - name: Install Terraform exporter CLI
+        run: make install
+
+      - name: Setup Terraform CLI
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: .github/scripts/package-lock.json
+
+      - name: "Install Node.js dependencies"
+        working-directory: ./.github/scripts
+        run: npm ci --omit=dev
+
+      - name: Export by Resource for Cloud Foundry Organization
+        id: export-by-resource-cforg
+        if: ${{ success() }} || ${{ failure() }}
+        run: |
+          trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
-          echo "Cleanup after Export by Resource for Subaccount"
+          echo "Export by Resource for CF Organization"
           echo "====================================="
-          rm -rf subaccount-export-by-resource
-          rm subaccount-export-by-resource-state.json
+          export CF_USER=${{ secrets.BTP_USERNAME }}
+          export CF_PASSWORD=${{ secrets.BTP_PASSWORD }}
+          export CF_API_URL=${{ secrets.CF_API_URL }}
+          btptf export -o ${{ secrets.CF_ORGANIZATION }} -c cforg-export-by-resource -r='spaces'
+          echo "====================================="
+          echo "Executing state import for CF Organization"
+          echo "====================================="
+          terraform -chdir=cforg-export-by-resource init
+          terraform -chdir=cforg-export-by-resource apply -auto-approve
+          echo "Preparing state file for CF Organization in JSON format"
+          terraform -chdir=cforg-export-by-resource show -json > cforg-export-by-resource-state.json
+          echo '${{ secrets.CFORG_EXPORT_BY_RESOURCE_REF}}' | base64 -d > cforg-export-by-resource-state-reference.json
+          echo "====================================="
+          echo "List imported state"
+          echo "====================================="
+          terraform -chdir=cforg-export-by-resource state list
+          echo "====================================="
+          echo "Execute comparison of state files for CF Organization"
+          echo "====================================="
+          node .github/scripts/compareJson.js cforg-export-by-resource-state-reference.json cforg-export-by-resource-state.json
+          echo "result=success" >> "$GITHUB_OUTPUT"
+
+  aggregate-results:
+    name: Aggregate Integration Test Results
+    # This job needs to run after all integration test jobs to aggregate their results.
+    if: ${{ always() }}
+    needs:
+      - test-json-inventory-directory
+      - test-json-inventory-subaccount
+      - test-json-inventory-cforg
+      - test-export-by-json-directory
+      - test-export-by-json-subaccount
+      - test-export-by-json-cforg
+      - test-export-by-resource-directory
+      - test-export-by-resource-subaccount
+      - test-export-by-resource-cforg
+    runs-on: ubuntu-latest
+    steps:
+      - name: Aggregate job results
+        id: aggregate
+        run: |
+          set -e
+          results=(
+            "${{ needs.test-json-inventory-directory.outputs.output_dir_json_inventory }}"
+            "${{ needs.test-json-inventory-subaccount.outputs.output_subacount_json_inventory }}"
+            "${{ needs.test-json-inventory-cforg.outputs.output_cforg_json_inventory }}"
+            "${{ needs.test-export-by-json-directory.outputs.output_dir_export_by_json }}"
+            "${{ needs.test-export-by-json-subaccount.outputs.output_subacount_export_by_json }}"
+            "${{ needs.test-export-by-json-cforg.outputs.output_cforg_export_by_json }}"
+            "${{ needs.test-export-by-resource-directory.outputs.output_dir_export_by_res }}"
+            "${{ needs.test-export-by-resource-subaccount.outputs.output_subacount_export_by_res }}"
+            "${{ needs.test-export-by-resource-cforg.outputs.output_cforg_export_by_res }}"
+          )
+          failed=0
+          for result in "${results[@]}"; do
+            if [[ "$result" != "success" ]]; then
+              failed=1
+              break
+            fi
+          done
+          echo "failed=$failed" >> "$GITHUB_OUTPUT"
+      - name: Require manual approval if any job failed
+        if: steps.aggregate.outputs.failed == '1'
+        uses: trstringer/manual-approval@v1
+        timeout-minutes: 30
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          # Using explicit approvers due to missing GitHub App permissions for the action
+          approvers: lechnerc77,CHERIANS,vipinvkmenon
+          minimum-approvals: 1
+          issue-title: "Manual approval required for integration test failures"
+          issue-body: "One or more integration test jobs failed. Please review and approve or deny."
+      - name: Fail if not approved
+        if: steps.aggregate.outputs.failed == '1' && (cancelled() || failure())
+        run: |
+          echo "Workflow failed due to test failures and no approval."
+          exit 1
+      - name: Success if all jobs passed or approved
+        if: steps.aggregate.outputs.failed == '0' || success()
+        run: echo "All integration tests passed or were manually approved."
