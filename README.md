@@ -23,6 +23,15 @@ You can install btptf CLI across various operating systems as described below.
 
 You find the documentation of the Terraform Exporter for SAP BTP on the [GitHub page of this repository](https://sap.github.io/terraform-exporter-btp/).
 
+Here are some quick links to the most important documentation sections:
+
+- [Installation](https://sap.github.io/terraform-exporter-btp/install/)
+- Quickstart
+   - [Prerequisites](https://sap.github.io/terraform-exporter-btp/prerequisites/)
+   - [Getting started](https://sap.github.io/terraform-exporter-btp/gettingstarted/)
+- [Limitations](https://sap.github.io/terraform-exporter-btp/limitations/)
+- [Troubleshooting](https://sap.github.io/terraform-exporter-btp/troubleshooting/)
+
 ## Developer Guide
 
 If you want to contribute to the code of the Terraform Exporter for SAP BTP, please check our [Contribution Guidelines](CONTRIBUTING.md). The technical setup and how to get started are described in the [Developer Guide](./guidelines/DEVELOPER-GUIDE.md)

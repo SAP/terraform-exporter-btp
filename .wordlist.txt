@@ -55,6 +55,8 @@ Pre
 pre
 PowerShell
 powershell
+Quickstart
+quickstart
 README
 readme
 resourceFileName
