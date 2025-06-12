@@ -7,7 +7,7 @@ $targetPath = Join-Path $toolsDir 'btptf.exe'
 
 
 $webFileArgs = @{
-    PackageName    = 'btptf'
+    PackageName    = $env:ChocolateyPackageName
     FileFullPath   = $targetPath
     Url64bit       = $url
     Checksum64     = 'CHECKSUM'

@@ -34,5 +34,7 @@ test:
 
 docs:
 	go run main.go gendoc
-
+spellchecker:
+	#prerequisite: Install pyspelling and aspell
+	pyspelling -c .spellcheck.yml
 .PHONY: build install lint fmt test docs
