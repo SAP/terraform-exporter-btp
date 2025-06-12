@@ -21,7 +21,7 @@ Review and adjust the JSON file according to your needs.
 2. Export resources from SAP BTP via a JSON file.
 
     ```bash
-    btptf export-by-json -p <path to json file>
+    btptf export-by-json -s <subaccount id>
     ```
 
 ## Option 2: Basic Flow to Export a Subaccount Directly
