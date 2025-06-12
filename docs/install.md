@@ -5,9 +5,14 @@ You can easily install the `Terraform Exporter for SAP BTP` using popular instal
 
 !!! Commands
     === "Windows"
-        Please refer to the [Winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) website for details
+        We have released `winget` and `Chocolatey` packages. Please refer to the official [Winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) and [Chocolatey](https://chocolatey.org/about) documentation websites for details.
+        **For Winget based installation**
         ```cmd
         winget install SAP.btptf
+        ```
+        **For Chocolatey based installation**
+        ```cmd
+        choco install sap-btptf
         ```
 
     === "Mac OS"
