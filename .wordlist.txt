@@ -9,6 +9,8 @@ BTP
 btp
 btptf
 btpResources
+choco
+Chocolatey
 CLA
 CLI
 CLIs
