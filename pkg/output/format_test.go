@@ -13,6 +13,17 @@ func TestFormatResourceNameGeneric(t *testing.T) {
 		t.Errorf("got %q, wanted %q", result, expected)
 	}
 }
+func TestFormatResourceNameGenericNoCapConversion(t *testing.T) {
+
+	input := "Application Destination Administrator"
+	expected := "Application_Destination_Administrator"
+
+	result := FormatResourceNameGenericNoCapConversion(input)
+
+	if result != expected {
+		t.Errorf("got %q, wanted %q", result, expected)
+	}
+}
 
 func TestFormatSubscriptionResourceName(t *testing.T) {
 

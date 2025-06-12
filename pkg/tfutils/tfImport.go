@@ -399,7 +399,7 @@ func transformDataToStringArray(btpResource string, data map[string]interface{})
 	case SubaccountEnvironmentInstanceType:
 		transformDataToStringArrayGeneric(data, &stringArr, "values", "environment_type")
 	case SubaccountTrustConfigurationType:
-		transformDataToStringArrayGeneric(data, &stringArr, "values", "origin")
+		transformTrustConfigurationStringArray(data, &stringArr)
 	case SubaccountRoleType, DirectoryRoleType:
 		transformDataToStringArrayGeneric(data, &stringArr, "values", "name")
 	case SubaccountRoleCollectionType, DirectoryRoleCollectionType:
@@ -538,11 +538,19 @@ func resourceIsProcessable(level string, resource string, featureList []string) 
 	return true
 }
 
-func transformDataToStringArrayGeneric(data map[string]interface{}, stringArr *[]string, dataSourceListKey string, resourceKey string) {
-	entities := data[dataSourceListKey].([]interface{})
+func transformDataToStringArrayGeneric(data map[string]any, stringArr *[]string, dataSourceListKey string, resourceKey string) {
+	entities := data[dataSourceListKey].([]any)
 	for _, value := range entities {
-		entity := value.(map[string]interface{})
+		entity := value.(map[string]any)
 		*stringArr = append(*stringArr, output.FormatResourceNameGeneric(fmt.Sprintf("%v", entity[resourceKey])))
+	}
+}
+
+func transformTrustConfigurationStringArray(data map[string]any, stringArr *[]string) {
+	entities := data["values"].([]any)
+	for _, value := range entities {
+		entity := value.(map[string]any)
+		*stringArr = append(*stringArr, output.FormatResourceNameGenericNoCapConversion(fmt.Sprintf("%v", entity["origin"])))
 	}
 }
 
