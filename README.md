@@ -27,7 +27,7 @@ Here are some quick links to the most important documentation sections:
 
 - [Installation](https://sap.github.io/terraform-exporter-btp/install/)
 - Quickstart
-   - [Prerequistes](https://sap.github.io/terraform-exporter-btp/prerequisites/)
+   - [Prerequisites](https://sap.github.io/terraform-exporter-btp/prerequisites/)
    - [Getting started](https://sap.github.io/terraform-exporter-btp/gettingstarted/)
 - [Limitations](https://sap.github.io/terraform-exporter-btp/limitations/)
 - [Troubleshooting](https://sap.github.io/terraform-exporter-btp/troubleshooting/)
