@@ -7,7 +7,11 @@ import (
 )
 
 func FormatResourceNameGeneric(name string) string {
-	return strings.ToLower(strings.ReplaceAll(name, " ", "_"))
+	return strings.ToLower(FormatResourceNameGenericNoCapConversion(name))
+}
+
+func FormatResourceNameGenericNoCapConversion(name string) string {
+	return strings.ReplaceAll(name, " ", "_")
 }
 
 func FormatDirEntitlementResourceName(appName string, planName string) string {
