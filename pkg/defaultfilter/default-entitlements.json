@@ -1,0 +1,174 @@
+[
+  {
+    "service": "lps-service",
+    "plan": "resources"
+  },
+  {
+    "service": "lps-service",
+    "plan": "service"
+  },
+  {
+    "service": "metering-service",
+    "plan": "default"
+  },
+  {
+    "service": "metering-service",
+    "plan": "development"
+  },
+  {
+    "service": "metering-service",
+    "plan": "operations"
+  },
+  {
+    "service": "metering-service",
+    "plan": "registrar"
+  },
+  {
+    "service": "metering-service",
+    "plan": "unified-metering"
+  },
+  {
+    "service": "saas-registry",
+    "plan": "service"
+  },
+  {
+    "service": "saas-registry",
+    "plan": "reference-instance"
+  },
+  {
+    "service": "application-logs",
+    "plan": "lite"
+  },
+  {
+    "service": "cias",
+    "plan": "oauth2"
+  },
+  {
+    "service": "xsuaa",
+    "plan": "application"
+  },
+  {
+    "service": "html5-apps-repo",
+    "plan": "app-host"
+  },
+  {
+    "service": "service-manager",
+    "plan": "service-operator-access"
+  },
+  {
+    "service": "xsuaa",
+    "plan": "broker"
+  },
+  {
+    "service": "connectivity",
+    "plan": "lite"
+  },
+  {
+    "service": "print",
+    "plan": "receiver"
+  },
+  {
+    "service": "content-agent",
+    "plan": "application"
+  },
+  {
+    "service": "service-manager",
+    "plan": "global-offerings-audit"
+  },
+  {
+    "service": "saas-registry",
+    "plan": "application"
+  },
+  {
+    "service": "auditlog-management",
+    "plan": "default"
+  },
+  {
+    "service": "destination",
+    "plan": "lite"
+  },
+  {
+    "service": "html5-apps-repo",
+    "plan": "app-runtime"
+  },
+  {
+    "service": "credstore",
+    "plan": "proxy"
+  },
+  {
+    "service": "identity",
+    "plan": "application"
+  },
+  {
+    "service": "autoscaler",
+    "plan": "standard"
+  },
+  {
+    "service": "one-mds",
+    "plan": "sap-integration"
+  },
+  {
+    "service": "auditlog-api",
+    "plan": "default"
+  },
+  {
+    "service": "feature-flags",
+    "plan": "standard"
+  },
+  {
+    "service": "xsuaa",
+    "plan": "space"
+  },
+  {
+    "service": "service-manager",
+    "plan": "subaccount-audit"
+  },
+  {
+    "service": "xsuaa",
+    "plan": "apiaccess"
+  },
+  {
+    "service": "service-manager",
+    "plan": "subaccount-admin"
+  },
+  {
+    "service": "connectivity",
+    "plan": "connectivity_proxy"
+  },
+  {
+    "service": "service-manager",
+    "plan": "container"
+  },
+  {
+    "service": "content-agent",
+    "plan": "standard"
+  },
+  {
+    "service": "feature-flags",
+    "plan": "lite"
+  },
+  {
+    "service": "sap-identity-services-onboarding",
+    "plan": "default"
+  },
+  {
+    "service": "one-mds-master",
+    "plan": "standard"
+  },
+  {
+    "service": "mdo-one-mds-master",
+    "plan": "standard"
+  },
+  {
+    "service": "cias",
+    "plan": "standard"
+  },
+  {
+    "service": "content-agent-ui",
+    "plan": "free"
+  },
+  {
+    "service": "feature-flags-dashboard",
+    "plan": "dashboard"
+  }
+]
