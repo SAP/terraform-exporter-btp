@@ -9,13 +9,13 @@ import (
 
 func TestCreateEntitlementImportBlock(t *testing.T) {
 	resourceDoc := tfutils.EntityDocs{
-		Import: "import {\n\t\t\t\tto = btp_subaccount_entitlement.<resource_name>\n\t\t\t\tid = \"<subaccount_id>,<service_name>,<plan_name>\"\n\t\t\t  }\n",
+		Import: "import {\n\t\t\t\tto = btp_subaccount_entitlement.<resource_name>\n\t\t\t\tid = \"<subaccount_id>,<service>,<plan_name>\"\n\t\t\t  }\n",
 	}
 
-	jsonString := "{\"auditlog-management:default\": {\"category\":\"ELASTIC_SERVICE\",\"plan_description\":\"Free offering for development purposes\",\"plan_display_name\":\"lite\",\"plan_name\":\"default\",\"quota_assigned\": 1,\"quota_remaining\": 1,\"service_display_name\":\"auditlog-management\",\"service_name\":\"auditlog-management\"}}"
+	jsonString := "{\"auditlog-management:default\": {\"category\":\"ELASTIC_SERVICE\",\"plan_description\":\"Free offering for development purposes\",\"plan_display_name\":\"lite\",\"plan_name\":\"default\",\"quota_assigned\": 1,\"quota_remaining\": 1,\"service_display_name\":\"auditlog-management\",\"service\":\"auditlog-management\"}}"
 	dataEntitlement, _ := GetDataFromJsonString(jsonString)
 
-	jsonStrinMultipleEntitlements := "{\"auditlog-management:default\": {\"category\":\"ELASTIC_SERVICE\",\"plan_description\":\"Free offering for development purposes\",\"plan_display_name\":\"default\",\"plan_name\":\"default\",\"quota_assigned\": 1,\"quota_remaining\": 1,\"service_display_name\":\"auditlog-management\",\"service_name\":\"auditlog-management\"},\"auditlog-api:default\": {\"category\":\"ELASTIC_SERVICE\",\"plan_description\":\"Default plan for Auditlog API\",\"plan_display_name\":\"Default\",\"plan_name\":\"default\",\"quota_assigned\": 1,\"quota_remaining\": 1,\"service_display_name\":\"[DEPRECATED] Audit Log Retrieval\",\"service_name\":\"auditlog-api\"}}"
+	jsonStrinMultipleEntitlements := "{\"auditlog-management:default\": {\"category\":\"ELASTIC_SERVICE\",\"plan_description\":\"Free offering for development purposes\",\"plan_display_name\":\"default\",\"plan_name\":\"default\",\"quota_assigned\": 1,\"quota_remaining\": 1,\"service_display_name\":\"auditlog-management\",\"service\":\"auditlog-management\"},\"auditlog-api:default\": {\"category\":\"ELASTIC_SERVICE\",\"plan_description\":\"Default plan for Auditlog API\",\"plan_display_name\":\"Default\",\"plan_name\":\"default\",\"quota_assigned\": 1,\"quota_remaining\": 1,\"service_display_name\":\"[DEPRECATED] Audit Log Retrieval\",\"service\":\"auditlog-api\"}}"
 	dataMultipleEntitlements, _ := GetDataFromJsonString(jsonStrinMultipleEntitlements)
 
 	tests := []struct {
