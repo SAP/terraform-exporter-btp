@@ -10,7 +10,7 @@ import (
 
 func ProcessResources(hclFile *hclwrite.File, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DependencyAddresses, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
 	processResourceAttributes(hclFile.Body(), nil, level, variables, dependencyAddresses, btpClient, levelIds)
-	processDependencies(hclFile.Body(), dependencyAddresses, variables)
+	processDependencies(hclFile.Body(), dependencyAddresses, variables, levelIds)
 }
 
 func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DependencyAddresses, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
@@ -98,7 +98,7 @@ func processCfOrgLevel(body *hclwrite.Body, variables *generictools.VariableCont
 	}
 }
 
-func processDependencies(body *hclwrite.Body, dependencyAddresses *generictools.DependencyAddresses, variables *generictools.VariableContent) {
+func processDependencies(body *hclwrite.Body, dependencyAddresses *generictools.DependencyAddresses, variables *generictools.VariableContent, levelIds generictools.LevelIds) {
 	// Remove blocks that point to defaulted resources that get created by the platform automagically
 	for _, blockToRemove := range dependencyAddresses.BlocksToRemove {
 		generictools.RemoveConfigBlock(body, blockToRemove.ResourceAddress)
@@ -108,7 +108,7 @@ func processDependencies(body *hclwrite.Body, dependencyAddresses *generictools.
 	if !toggles.IsEntitlementModuleGenerationDeactivated() {
 
 		// Add module for entitlements
-		addEntitlementModule(body, dependencyAddresses.SubaccountAddress)
+		addEntitlementModule(body, dependencyAddresses.SubaccountAddress, levelIds.SubaccountId)
 
 		// Add variables to variables to be generated
 		addEntitlementVariables(variables, dependencyAddresses)

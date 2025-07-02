@@ -2,6 +2,7 @@ package resourceprocessor
 
 import (
 	"strconv"
+	"strings"
 
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -61,7 +62,7 @@ func fillSubaccountEntitlementDependencyAddresses(body *hclwrite.Body, resourceA
 	}
 }
 
-func addEntitlementModule(body *hclwrite.Body, subaccountAddress string) {
+func addEntitlementModule(body *hclwrite.Body, subaccountAddress string, subaccountId string) {
 	body.AppendNewline()
 
 	moduleBlock := body.AppendNewBlock("module", []string{moduleName})
@@ -96,12 +97,30 @@ func addEntitlementModule(body *hclwrite.Body, subaccountAddress string) {
 		},
 	})
 
-	moduleBlock.Body().SetAttributeRaw("subaccount_id", hclwrite.Tokens{
-		{
-			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte(subaccountAddress),
-		},
-	})
+	if subaccountAddress == "" {
+		moduleBlock.Body().SetAttributeRaw("subaccount", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenOQuote,
+				Bytes: []byte(`"`),
+			},
+			{
+				Type:  hclsyntax.TokenStringLit,
+				Bytes: []byte(subaccountId),
+			},
+			{
+				Type:  hclsyntax.TokenOQuote,
+				Bytes: []byte(`"`),
+			},
+		})
+	} else {
+		moduleBlock.Body().SetAttributeRaw("subaccount", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenIdent,
+				Bytes: []byte(subaccountAddress),
+			},
+		})
+
+	}
 
 	moduleBlock.Body().SetAttributeRaw("entitlements", hclwrite.Tokens{
 		{
@@ -127,9 +146,10 @@ func addEntitlementVariables(variablesToCreate *generictools.VariableContent, de
 		amount := key.Amount
 
 		if amount > 0 {
-			defaultValue += " \"" + serviceName + "\" = [\"" + planName + "=" + strconv.Itoa(amount) + "\"]\n"
+			stringForValue := serviceName + "=[\"" + planName + "=" + strconv.Itoa(amount) + "\"]\n"
+			defaultValue += strings.ReplaceAll(stringForValue, " ", "")
 		} else {
-			defaultValue += " \"" + serviceName + "\" = [\"" + planName + "\"]\n"
+			defaultValue += "\"" + serviceName + "\" = [\"" + planName + "\"]\n"
 		}
 	}
 	defaultValue += "}"

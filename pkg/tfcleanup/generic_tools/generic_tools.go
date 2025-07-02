@@ -62,7 +62,7 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 		varBody.SetAttributeRaw("type", hclwrite.Tokens{
 			{
 				Type:  hclsyntax.TokenStringLit,
-				Bytes: []byte("string"),
+				Bytes: []byte(value.Type),
 			},
 		})
 
@@ -73,12 +73,22 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 			},
 		})
 
-		varBody.SetAttributeRaw("default", hclwrite.Tokens{
-			{
-				Type:  hclsyntax.TokenStringLit,
-				Bytes: []byte("\"" + value.DefaultValue + "\""),
-			},
-		})
+		if value.Type == "string" {
+			varBody.SetAttributeRaw("default", hclwrite.Tokens{
+				{
+					Type:  hclsyntax.TokenStringLit,
+					Bytes: []byte("\"" + value.DefaultValue + "\""),
+				},
+			})
+		} else {
+			varBody.SetAttributeRaw("default", hclwrite.Tokens{
+				{
+					Type:  hclsyntax.TokenStringLit,
+					Bytes: []byte(value.DefaultValue),
+				},
+			})
+		}
+
 		rootBody.AppendNewline()
 	}
 
@@ -197,6 +207,10 @@ func IsGlobalAccountParent(btpClient *btpcli.ClientFacade, parentId string) (isP
 
 func RemoveConfigBlock(body *hclwrite.Body, resourceAddress string) {
 	for _, block := range body.Blocks() {
+		labels := block.Labels()
+		if len(labels) != 2 {
+			continue
+		}
 		address := block.Labels()[0] + "." + block.Labels()[1]
 		if address == resourceAddress {
 			body.RemoveBlock(block)
