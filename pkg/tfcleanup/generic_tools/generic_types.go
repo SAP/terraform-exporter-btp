@@ -6,13 +6,15 @@ const EmptyMap = "{}"
 const ParentIdentifier = "parent_id"
 
 type VariableInfo struct {
-	Description string
-	Value       string
+	Description  string
+	DefaultValue string
+	Type         string
 }
 
 type EntitlementKey struct {
 	ServiceName string
 	PlanName    string
+	Amount      int
 }
 
 type RoleKey struct {

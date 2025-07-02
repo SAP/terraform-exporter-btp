@@ -76,7 +76,7 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 		varBody.SetAttributeRaw("default", hclwrite.Tokens{
 			{
 				Type:  hclsyntax.TokenStringLit,
-				Bytes: []byte("\"" + value.Value + "\""),
+				Bytes: []byte("\"" + value.DefaultValue + "\""),
 			},
 		})
 		rootBody.AppendNewline()
@@ -285,8 +285,9 @@ func ProcessParentAttribute(body *hclwrite.Body, description string, btpClient *
 			replacedTokens, parentValue := ReplaceStringTokenVar(tokens, ParentIdentifier)
 			if parentValue != "" {
 				(*variables)[ParentIdentifier] = VariableInfo{
-					Description: description,
-					Value:       parentValue,
+					Description:  description,
+					DefaultValue: parentValue,
+					Type:         "string",
 				}
 			}
 			body.SetAttributeRaw(ParentIdentifier, replacedTokens)
@@ -309,8 +310,9 @@ func ReplaceAttribute(body *hclwrite.Body, identifier string, description string
 		}
 
 		(*variables)[identifier] = VariableInfo{
-			Description: description,
-			Value:       attrValue,
+			Description:  description,
+			DefaultValue: attrValue,
+			Type:         "string",
 		}
 		body.SetAttributeRaw(identifier, replacedTokens)
 	}

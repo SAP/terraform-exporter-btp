@@ -21,3 +21,7 @@ func IsRoleFilterDeactivated() bool {
 func IsEntitlementFilterDeactivated() bool {
 	return os.Getenv("BTPTF_SKIP_ENTITLEMENTFILTER") != ""
 }
+
+func IsEntitlementModuleGenerationDeactivated() bool {
+	return os.Getenv("BTPTF_SKIP_ENTITLEMENTMODULE") != ""
+}

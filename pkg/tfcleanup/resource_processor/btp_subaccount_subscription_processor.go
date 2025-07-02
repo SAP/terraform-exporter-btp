@@ -5,6 +5,7 @@ import (
 
 	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
+	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
@@ -48,7 +49,22 @@ func addEntitlementDependency(body *hclwrite.Body, dependencyAddresses *generict
 			dependencyAddress = handleCommercialAppName(appName, planName, dependencyAddresses, btpClient, subaccountId)
 		}
 
-		if dependencyAddress != "" {
+		if dependencyAddress != "" && !toggles.IsEntitlementModuleGenerationDeactivated() {
+			// Add generic module dependency
+			body.SetAttributeRaw("depends_on", hclwrite.Tokens{
+				{
+					Type:  hclsyntax.TokenOBrack,
+					Bytes: []byte("["),
+				},
+				{Type: hclsyntax.TokenStringLit,
+					Bytes: []byte(genericEntitlementModuleAddress),
+				},
+				{
+					Type:  hclsyntax.TokenCBrack,
+					Bytes: []byte("]"),
+				},
+			})
+		} else if dependencyAddress != "" && toggles.IsEntitlementModuleGenerationDeactivated() {
 			body.SetAttributeRaw("depends_on", hclwrite.Tokens{
 				{
 					Type:  hclsyntax.TokenOBrack,

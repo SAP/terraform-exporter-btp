@@ -3,6 +3,7 @@ package resourceprocessor
 import (
 	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
+	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
@@ -115,17 +116,34 @@ func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.
 		},
 	})
 
-	dsBlock.Body().SetAttributeRaw("depends_on", hclwrite.Tokens{
-		{
-			Type:  hclsyntax.TokenOBrack,
-			Bytes: []byte("["),
-		},
-		{Type: hclsyntax.TokenStringLit,
-			Bytes: []byte(datasourceInfo.EntitlementAddress),
-		},
-		{
-			Type:  hclsyntax.TokenCBrack,
-			Bytes: []byte("]"),
-		},
-	})
+	if !toggles.IsEntitlementModuleGenerationDeactivated() {
+		dsBlock.Body().SetAttributeRaw("depends_on", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenOBrack,
+				Bytes: []byte("["),
+			},
+			{Type: hclsyntax.TokenStringLit,
+				Bytes: []byte(genericEntitlementModuleAddress),
+			},
+			{
+				Type:  hclsyntax.TokenCBrack,
+				Bytes: []byte("]"),
+			},
+		})
+
+	} else {
+		dsBlock.Body().SetAttributeRaw("depends_on", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenOBrack,
+				Bytes: []byte("["),
+			},
+			{Type: hclsyntax.TokenStringLit,
+				Bytes: []byte(datasourceInfo.EntitlementAddress),
+			},
+			{
+				Type:  hclsyntax.TokenCBrack,
+				Bytes: []byte("]"),
+			},
+		})
+	}
 }

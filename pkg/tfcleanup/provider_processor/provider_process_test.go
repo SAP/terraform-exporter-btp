@@ -36,8 +36,9 @@ func TestProcessProvider(t *testing.T) {
 			trgt: btpTrgtFile,
 			trgtVariables: &generictools.VariableContent{
 				"globalaccount": generictools.VariableInfo{
-					Description: "Global account subdomain",
-					Value:       "my-global-account",
+					Description:  "Global account subdomain",
+					Type:         "string",
+					DefaultValue: "my-global-account",
 				},
 			},
 		},
@@ -47,8 +48,9 @@ func TestProcessProvider(t *testing.T) {
 			trgt: cfTrgtFile,
 			trgtVariables: &generictools.VariableContent{
 				"api_url": generictools.VariableInfo{
-					Description: "Cloud Foundry API endpoint",
-					Value:       "https://api.cf.sap.hana.ondemand.com",
+					Description:  "Cloud Foundry API endpoint",
+					Type:         "string",
+					DefaultValue: "https://api.cf.sap.hana.ondemand.com",
 				},
 			},
 			backendConfig: emptyBackendConfig,
