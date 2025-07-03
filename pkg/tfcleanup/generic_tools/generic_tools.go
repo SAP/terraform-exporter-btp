@@ -240,6 +240,11 @@ func RemoveImportBlock(body *hclwrite.Body, resourceAddress string, resultStore 
 
 	for _, block := range taintedBlocks {
 		body.RemoveBlock(block)
+		// If the rsource address contains the string "btp_subaccount_entitlement", we do notremove the entry from the resultStore
+		// Otherwise the Export summary displays the wrong number of entitlements
+		if strings.Contains(resourceAddress, "btp_subaccount_entitlement") {
+			continue
+		}
 		(*resultStore)[strings.Split(resourceAddress, ".")[0]] -= 1
 	}
 }
