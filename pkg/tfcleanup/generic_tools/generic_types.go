@@ -14,7 +14,11 @@ type VariableInfo struct {
 type EntitlementKey struct {
 	ServiceName string
 	PlanName    string
-	Amount      int
+}
+
+type EntitlementInfo struct {
+	Amount  int
+	Address string
 }
 
 type RoleKey struct {
@@ -48,7 +52,7 @@ type DependencyAddresses struct {
 	SubaccountAddress  string
 	DirectoryAddress   string
 	SpaceAddress       map[string]string
-	EntitlementAddress map[EntitlementKey]string
+	EntitlementAddress map[EntitlementKey]EntitlementInfo
 	RoleAddress        map[RoleKey]string
 	DataSourceInfo     []DataSourceInfo
 	BlocksToRemove     []BlockSpecifier
@@ -56,7 +60,7 @@ type DependencyAddresses struct {
 
 func NewDependencyAddresses() DependencyAddresses {
 	return DependencyAddresses{
-		EntitlementAddress: make(map[EntitlementKey]string),
+		EntitlementAddress: make(map[EntitlementKey]EntitlementInfo),
 		RoleAddress:        make(map[RoleKey]string),
 		SpaceAddress:       make(map[string]string),
 	}

@@ -9,20 +9,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFillRoleDependencyAddresses(t *testing.T) {
+func TestFillSubaccountEntitlementDependencyAddresses(t *testing.T) {
 
-	srcFileRole, _ := testutils.GetHclFilesById("sa_role")
-	srcFileRoleIncomplete, _ := testutils.GetHclFilesById("sa_role_error")
+	srcFileEntitlement, _ := testutils.GetHclFilesById("sa_entitlement")
+	srcFileEntitlementIncomplete, _ := testutils.GetHclFilesById("sa_entitlement_error")
 
 	emptyTestDependencies := generictools.NewDependencyAddresses()
 	defaultTestDependencies := generictools.NewDependencyAddresses()
 
-	defaultTestDependencies.RoleAddress = make(map[generictools.RoleKey]string)
-	defaultTestDependencies.RoleAddress[generictools.RoleKey{
-		AppId:            "destination-xsappname!b62",
-		Name:             "Destination Administrator Instance",
-		RoleTemplateName: "Destination_Administrator_Instance",
-	}] = "btp_subaccount_role.role_6"
+	defaultTestDependencies.EntitlementAddress = make(map[generictools.EntitlementKey]generictools.EntitlementInfo)
+
+	defaultTestDependencies.EntitlementAddress[generictools.EntitlementKey{
+		ServiceName: "feature-flags-dashboard",
+		PlanName:    "dashboard",
+	}] = generictools.EntitlementInfo{Address: "btp_subaccount_entitlement.entitlement_2", Amount: 1}
 
 	tests := []struct {
 		name             string
@@ -31,15 +31,15 @@ func TestFillRoleDependencyAddresses(t *testing.T) {
 		trgtDependencies *generictools.DependencyAddresses
 	}{
 		{
-			name:             "Test Role Dependency Address",
-			src:              srcFileRole,
-			resourceAddress:  "btp_subaccount_role.role_6",
+			name:             "Test Entitlement Dependency Address",
+			src:              srcFileEntitlement,
+			resourceAddress:  "btp_subaccount_entitlement.entitlement_2",
 			trgtDependencies: &defaultTestDependencies,
 		},
 		{
-			name:             "Test Role Incomplete",
-			src:              srcFileRoleIncomplete,
-			resourceAddress:  "btp_subaccount_role.role_6",
+			name:             "Test Entitlement Incomplete",
+			src:              srcFileEntitlementIncomplete,
+			resourceAddress:  "btp_subaccount_entitlement.entitlement_2",
 			trgtDependencies: &emptyTestDependencies,
 		},
 	}
@@ -50,9 +50,9 @@ func TestFillRoleDependencyAddresses(t *testing.T) {
 			dependencies := generictools.NewDependencyAddresses()
 			blocks := tt.src.Body().Blocks()
 			// we assume one resource entry in the blocks file
-			fillRoleDependencyAddresses(blocks[0].Body(), tt.resourceAddress, &dependencies)
+			fillSubaccountEntitlementDependencyAddresses(blocks[0].Body(), tt.resourceAddress, &dependencies)
 
-			assert.Equal(t, tt.trgtDependencies.RoleAddress, dependencies.RoleAddress)
+			assert.Equal(t, tt.trgtDependencies.EntitlementAddress, dependencies.EntitlementAddress)
 		})
 	}
 }

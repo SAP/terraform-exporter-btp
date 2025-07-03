@@ -48,8 +48,8 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 		PlanName:    planName,
 	}
 
-	dependencyAddress := (*dependencyAddresses).EntitlementAddress[key]
-	if dependencyAddress == "" {
+	dependencyInfo := (*dependencyAddresses).EntitlementAddress[key]
+	if dependencyInfo.Address == "" {
 		//No entitlement exported that fits the service instance
 		return
 	}
@@ -69,7 +69,7 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 		SubaccountAddress:  (*dependencyAddresses).SubaccountAddress + ".id",
 		OfferingName:       serviceName,
 		Name:               planName,
-		EntitlementAddress: dependencyAddress,
+		EntitlementAddress: dependencyInfo.Address,
 	},
 	)
 }

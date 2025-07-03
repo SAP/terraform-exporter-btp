@@ -22,8 +22,8 @@ func TestAddEntitlementDependency(t *testing.T) {
 		PlanName:    "dashboard",
 	}
 
-	defaultTestDependencies.EntitlementAddress = make(map[generictools.EntitlementKey]string)
-	defaultTestDependencies.EntitlementAddress[entitlementKey] = "btp_subaccount_entitlement.entitlement_2"
+	defaultTestDependencies.EntitlementAddress = make(map[generictools.EntitlementKey]generictools.EntitlementInfo)
+	defaultTestDependencies.EntitlementAddress[entitlementKey] = generictools.EntitlementInfo{Address: "btp_subaccount_entitlement.entitlement_2"}
 
 	tests := []struct {
 		name         string

@@ -57,14 +57,13 @@ func fillSubaccountEntitlementDependencyAddresses(body *hclwrite.Body, resourceA
 		key := generictools.EntitlementKey{
 			ServiceName: serviceName,
 			PlanName:    planName,
-			Amount:      amount,
 		}
 
-		(*dependencyAddresses).EntitlementAddress[key] = resourceAddress
+		(*dependencyAddresses).EntitlementAddress[key] = generictools.EntitlementInfo{Amount: amount, Address: resourceAddress}
 	}
 }
 
-func addEntitlementModule(body *hclwrite.Body, subaccountAddress string, subaccountId string, entitlementAddress map[generictools.EntitlementKey]string) {
+func addEntitlementModule(body *hclwrite.Body, subaccountAddress string, subaccountId string, entitlementAddress map[generictools.EntitlementKey]generictools.EntitlementInfo) {
 	if toggles.IsEntitlementModuleGenerationDeactivated() {
 		return
 	}
@@ -140,7 +139,7 @@ func addEntitlementModule(body *hclwrite.Body, subaccountAddress string, subacco
 	})
 }
 
-func addEntitlementVariables(variablesToCreate *generictools.VariableContent, entitlementAddress map[generictools.EntitlementKey]string) {
+func addEntitlementVariables(variablesToCreate *generictools.VariableContent, entitlementAddress map[generictools.EntitlementKey]generictools.EntitlementInfo) {
 	if toggles.IsEntitlementModuleGenerationDeactivated() {
 		return
 	}
@@ -154,10 +153,10 @@ func addEntitlementVariables(variablesToCreate *generictools.VariableContent, en
 	variableType := "map(list(string))"
 
 	defaultValue := "{\n"
-	for key := range entitlementAddress {
+	for key, info := range entitlementAddress {
 		serviceName := key.ServiceName
 		planName := key.PlanName
-		amount := key.Amount
+		amount := info.Amount
 
 		if amount > 0 {
 			stringForValue := serviceName + "=[\"" + planName + "=" + strconv.Itoa(amount) + "\"]\n"
@@ -186,16 +185,16 @@ func appendEntitlementBlocksToRemove(dependencyAddresses *generictools.Dependenc
 	}
 
 	const blockIdentifier = "btp_subaccount_entitlement"
-	for _, entitlementdependencyAddresses := range dependencyAddresses.EntitlementAddress {
+	for _, entitlementDependencyInfo := range dependencyAddresses.EntitlementAddress {
 		entitlementImportToRemove := generictools.BlockSpecifier{
 			BlockIdentifier: blockIdentifier,
-			ResourceAddress: entitlementdependencyAddresses,
+			ResourceAddress: entitlementDependencyInfo.Address,
 		}
 		dependencyAddresses.BlocksToRemove = append(dependencyAddresses.BlocksToRemove, entitlementImportToRemove)
 	}
 }
 
-func ApppendImportBlocksForEntitlementModule(directory string, entitlementsToAdd map[generictools.EntitlementKey]string, levelIds generictools.LevelIds) {
+func ApppendImportBlocksForEntitlementModule(directory string, entitlementsToAdd map[generictools.EntitlementKey]generictools.EntitlementInfo, levelIds generictools.LevelIds) {
 	if toggles.IsEntitlementModuleGenerationDeactivated() {
 		return
 	}
@@ -240,7 +239,7 @@ func ApppendImportBlocksForEntitlementModule(directory string, entitlementsToAdd
 	generictools.ProcessChanges(f, filePath)
 }
 
-func removeEntitlementConfigBlock(body *hclwrite.Body, entitlementAddress map[generictools.EntitlementKey]string) {
+func removeEntitlementConfigBlock(body *hclwrite.Body, entitlementAddress map[generictools.EntitlementKey]generictools.EntitlementInfo) {
 	if toggles.IsEntitlementModuleGenerationDeactivated() {
 		return
 	}
@@ -249,8 +248,8 @@ func removeEntitlementConfigBlock(body *hclwrite.Body, entitlementAddress map[ge
 		return
 	}
 
-	for _, entitlementToRemove := range entitlementAddress {
-		generictools.RemoveConfigBlock(body, entitlementToRemove)
+	for _, entitlementInfo := range entitlementAddress {
+		generictools.RemoveConfigBlock(body, entitlementInfo.Address)
 	}
 }
 

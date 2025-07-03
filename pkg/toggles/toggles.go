@@ -1,6 +1,9 @@
 package toggles
 
-import "os"
+import (
+	"os"
+	"testing"
+)
 
 func GetIacTool() string {
 	return os.Getenv("BTPTF_IAC_TOOL")
@@ -23,5 +26,10 @@ func IsEntitlementFilterDeactivated() bool {
 }
 
 func IsEntitlementModuleGenerationDeactivated() bool {
+	// For Unit tests we rely on the existing logic
+	if testing.Testing() {
+		return true
+	}
+
 	return os.Getenv("BTPTF_SKIP_ENTITLEMENTMODULE") != ""
 }

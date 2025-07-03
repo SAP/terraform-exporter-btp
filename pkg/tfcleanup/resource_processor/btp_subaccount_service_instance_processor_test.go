@@ -69,8 +69,8 @@ func getNewServiceInstanceDepTemplate() generictools.DependencyAddresses {
 		PlanName:    "standard",
 	}
 
-	defaultTestDependencies.EntitlementAddress = make(map[generictools.EntitlementKey]string)
-	defaultTestDependencies.EntitlementAddress[entitlementKey] = "btp_subaccount_entitlement.entitlement_0"
+	defaultTestDependencies.EntitlementAddress = make(map[generictools.EntitlementKey]generictools.EntitlementInfo)
+	defaultTestDependencies.EntitlementAddress[entitlementKey] = generictools.EntitlementInfo{Address: "btp_subaccount_entitlement.entitlement_0"}
 	defaultTestDependencies.SubaccountAddress = "btp_subaccount.subaccount_0"
 
 	return defaultTestDependencies

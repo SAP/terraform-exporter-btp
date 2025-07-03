@@ -42,15 +42,16 @@ func addEntitlementDependency(body *hclwrite.Body, dependencyAddresses *generict
 			PlanName:    planName,
 		}
 
-		dependencyAddress := (*dependencyAddresses).EntitlementAddress[key]
+		dependencyInfo := (*dependencyAddresses).EntitlementAddress[key]
 
-		if dependencyAddress == "" {
+		if dependencyInfo.Address == "" {
 			//Check if the app name used is the technical app name and switch to the commercial app name
-			dependencyAddress = handleCommercialAppName(appName, planName, dependencyAddresses, btpClient, subaccountId)
+			dependencyInfo = handleCommercialAppName(appName, planName, dependencyAddresses, btpClient, subaccountId)
 		}
 
-		if dependencyAddress != "" && !toggles.IsEntitlementModuleGenerationDeactivated() {
-			// Add generic module dependency
+		// Add generic module dependency is requested
+		if dependencyInfo.Address != "" && !toggles.IsEntitlementModuleGenerationDeactivated() {
+
 			body.SetAttributeRaw("depends_on", hclwrite.Tokens{
 				{
 					Type:  hclsyntax.TokenOBrack,
@@ -64,14 +65,17 @@ func addEntitlementDependency(body *hclwrite.Body, dependencyAddresses *generict
 					Bytes: []byte("]"),
 				},
 			})
-		} else if dependencyAddress != "" && toggles.IsEntitlementModuleGenerationDeactivated() {
+		}
+
+		// Add explicit dependency to the resource
+		if dependencyInfo.Address != "" && toggles.IsEntitlementModuleGenerationDeactivated() {
 			body.SetAttributeRaw("depends_on", hclwrite.Tokens{
 				{
 					Type:  hclsyntax.TokenOBrack,
 					Bytes: []byte("["),
 				},
 				{Type: hclsyntax.TokenStringLit,
-					Bytes: []byte(dependencyAddress),
+					Bytes: []byte(dependencyInfo.Address),
 				},
 				{
 					Type:  hclsyntax.TokenCBrack,
@@ -82,13 +86,13 @@ func addEntitlementDependency(body *hclwrite.Body, dependencyAddresses *generict
 	}
 }
 
-func handleCommercialAppName(appName string, planName string, dependencyAddresses *generictools.DependencyAddresses, btpClient *btpcli.ClientFacade, subaccountId string) (dependencyAddress string) {
+func handleCommercialAppName(appName string, planName string, dependencyAddresses *generictools.DependencyAddresses, btpClient *btpcli.ClientFacade, subaccountId string) (dependencyInfo generictools.EntitlementInfo) {
 	// Check if technical app name is different to service name/commercial app name
 	technicalAppName, commercialAppName, err := btpcli.GetAppNamesBySubaccountAndApp(subaccountId, appName, btpClient)
 	if err != nil {
 		// Error is not critical, so we log it and continue with the flow
 		log.Printf("Error fetching app names from platform for %s: %s", appName, err)
-		return ""
+		return
 	}
 
 	if technicalAppName != commercialAppName {
@@ -97,7 +101,7 @@ func handleCommercialAppName(appName string, planName string, dependencyAddresse
 			ServiceName: commercialAppName,
 			PlanName:    planName,
 		}
-		dependencyAddress = (*dependencyAddresses).EntitlementAddress[key]
+		dependencyInfo = (*dependencyAddresses).EntitlementAddress[key]
 	}
-	return dependencyAddress
+	return dependencyInfo
 }

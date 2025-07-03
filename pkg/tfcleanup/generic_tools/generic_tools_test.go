@@ -31,6 +31,7 @@ func TestProcessParent(t *testing.T) {
 	targetVariables[ParentIdentifier] = VariableInfo{
 		Description:  "Some Text",
 		DefaultValue: "directory",
+		Type:         "string",
 	}
 
 	tests := []struct {
