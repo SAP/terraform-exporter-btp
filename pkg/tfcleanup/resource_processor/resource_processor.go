@@ -4,7 +4,6 @@ import (
 	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
-	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
@@ -104,20 +103,7 @@ func processDependencies(body *hclwrite.Body, dependencyAddresses *generictools.
 		generictools.RemoveConfigBlock(body, blockToRemove.ResourceAddress)
 	}
 
-	// Add generic module for entitlements
-	if !toggles.IsEntitlementModuleGenerationDeactivated() {
-
-		// Add module for entitlements
-		addEntitlementModule(body, dependencyAddresses.SubaccountAddress, levelIds.SubaccountId)
-
-		// Add variables to variables to be generated
-		addEntitlementVariables(variables, dependencyAddresses)
-
-		// Remove the entitlement configurations
-		for _, entitlementToRemove := range dependencyAddresses.EntitlementAddress {
-			generictools.RemoveConfigBlock(body, entitlementToRemove)
-		}
-	}
+	handleGenericEntitlementModule(body, levelIds.SubaccountId, dependencyAddresses, variables)
 
 	// Add datasource for service instances is necessary - Outer loop to have the main body object available
 	processedDataSources := make(map[string]bool)

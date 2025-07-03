@@ -85,6 +85,9 @@ func orchestrateCodeCleanup(dir string, level string, levelIds generictools.Leve
 	// Remove unused imports
 	generictools.RemoveUnusedImports(dir, &dependencyAddresses.BlocksToRemove, resultStore)
 
+	//Manipulate the import block to comprise the module addresses
+	resourceprocessor.ApppendImportBlocksForEntitlementModule(dir, dependencyAddresses.EntitlementAddress, levelIds)
+
 	err = generictools.RemoveEmptyFiles(dir)
 	if err != nil {
 		return err

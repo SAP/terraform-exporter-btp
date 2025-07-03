@@ -1,10 +1,12 @@
 package resourceprocessor
 
 import (
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
+	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
@@ -62,7 +64,15 @@ func fillSubaccountEntitlementDependencyAddresses(body *hclwrite.Body, resourceA
 	}
 }
 
-func addEntitlementModule(body *hclwrite.Body, subaccountAddress string, subaccountId string) {
+func addEntitlementModule(body *hclwrite.Body, subaccountAddress string, subaccountId string, entitlementAddress map[generictools.EntitlementKey]string) {
+	if toggles.IsEntitlementModuleGenerationDeactivated() {
+		return
+	}
+
+	if len(entitlementAddress) == 0 {
+		return
+	}
+
 	body.AppendNewline()
 
 	moduleBlock := body.AppendNewBlock("module", []string{moduleName})
@@ -130,8 +140,12 @@ func addEntitlementModule(body *hclwrite.Body, subaccountAddress string, subacco
 	})
 }
 
-func addEntitlementVariables(variablesToCreate *generictools.VariableContent, dependencyAddresses *generictools.DependencyAddresses) {
-	if len(dependencyAddresses.EntitlementAddress) == 0 {
+func addEntitlementVariables(variablesToCreate *generictools.VariableContent, entitlementAddress map[generictools.EntitlementKey]string) {
+	if toggles.IsEntitlementModuleGenerationDeactivated() {
+		return
+	}
+
+	if len(entitlementAddress) == 0 {
 		return
 	}
 
@@ -140,7 +154,7 @@ func addEntitlementVariables(variablesToCreate *generictools.VariableContent, de
 	variableType := "map(list(string))"
 
 	defaultValue := "{\n"
-	for key := range dependencyAddresses.EntitlementAddress {
+	for key := range entitlementAddress {
 		serviceName := key.ServiceName
 		planName := key.PlanName
 		amount := key.Amount
@@ -159,4 +173,98 @@ func addEntitlementVariables(variablesToCreate *generictools.VariableContent, de
 		Type:         variableType,
 		DefaultValue: defaultValue,
 	}
+}
+
+func appendEntitlementBlocksToRemove(dependencyAddresses *generictools.DependencyAddresses) {
+
+	if toggles.IsEntitlementModuleGenerationDeactivated() {
+		return
+	}
+
+	if len(dependencyAddresses.EntitlementAddress) == 0 {
+		return
+	}
+
+	const blockIdentifier = "btp_subaccount_entitlement"
+	for _, entitlementdependencyAddresses := range dependencyAddresses.EntitlementAddress {
+		entitlementImportToRemove := generictools.BlockSpecifier{
+			BlockIdentifier: blockIdentifier,
+			ResourceAddress: entitlementdependencyAddresses,
+		}
+		dependencyAddresses.BlocksToRemove = append(dependencyAddresses.BlocksToRemove, entitlementImportToRemove)
+	}
+}
+
+func ApppendImportBlocksForEntitlementModule(directory string, entitlementsToAdd map[generictools.EntitlementKey]string, levelIds generictools.LevelIds) {
+	if toggles.IsEntitlementModuleGenerationDeactivated() {
+		return
+	}
+
+	if len(entitlementsToAdd) == 0 {
+		return
+	}
+
+	filePath := filepath.Join(directory, "btp_subaccount_entitlement_import.tf")
+	f := generictools.GetHclFile(filePath)
+	body := f.Body()
+
+	for key := range entitlementsToAdd {
+
+		importToKey := key.ServiceName + "-" + key.PlanName
+		importIdKey := levelIds.SubaccountId + "," + key.ServiceName + "," + key.PlanName
+
+		body.AppendNewline()
+		importBlock := body.AppendNewBlock("import", []string{})
+		importBlock.Body().SetAttributeRaw("to", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenStringLit,
+				Bytes: []byte(genericEntitlementModuleAddress + "." + subaccountEntitlementBlockIdentifier + ".entitlement[\"" + importToKey + "\"]"),
+			},
+		})
+
+		importBlock.Body().SetAttributeRaw("id", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenOQuote,
+				Bytes: []byte(`"`),
+			},
+			{
+				Type:  hclsyntax.TokenStringLit,
+				Bytes: []byte(importIdKey),
+			},
+			{
+				Type:  hclsyntax.TokenOQuote,
+				Bytes: []byte(`"`),
+			},
+		})
+	}
+	generictools.ProcessChanges(f, filePath)
+}
+
+func removeEntitlementConfigBlock(body *hclwrite.Body, entitlementAddress map[generictools.EntitlementKey]string) {
+	if toggles.IsEntitlementModuleGenerationDeactivated() {
+		return
+	}
+
+	if len(entitlementAddress) == 0 {
+		return
+	}
+
+	for _, entitlementToRemove := range entitlementAddress {
+		generictools.RemoveConfigBlock(body, entitlementToRemove)
+	}
+}
+
+func handleGenericEntitlementModule(body *hclwrite.Body, subaccountId string, dependencyAddresses *generictools.DependencyAddresses, variables *generictools.VariableContent) {
+
+	// Add module to main configuration
+	addEntitlementModule(body, dependencyAddresses.SubaccountAddress, subaccountId, dependencyAddresses.EntitlementAddress)
+
+	// Add variables to variables to be generated
+	addEntitlementVariables(variables, dependencyAddresses.EntitlementAddress)
+
+	// Remove the entitlement configurations
+	removeEntitlementConfigBlock(body, dependencyAddresses.EntitlementAddress)
+
+	// Add import blocks for entitlements to be removed
+	appendEntitlementBlocksToRemove(dependencyAddresses)
 }
