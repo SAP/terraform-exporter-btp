@@ -79,7 +79,8 @@ func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.
 
 	dsBlock := body.AppendNewBlock("data", []string{"btp_subaccount_service_plan", datasourceInfo.DatasourceAddress})
 
-	if datasourceInfo.SubaccountAddress == "" {
+	if datasourceInfo.SubaccountAddress == ".id" {
+		// Address of subaccount dependency is missing
 		dsBlock.Body().SetAttributeRaw("subaccount_id", hclwrite.Tokens{
 			{
 				Type:  hclsyntax.TokenOQuote,

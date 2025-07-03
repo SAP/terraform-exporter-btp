@@ -31,5 +31,5 @@ func IsEntitlementModuleGenerationDeactivated() bool {
 		return true
 	}
 
-	return os.Getenv("BTPTF_SKIP_ENTITLEMENTMODULE") != ""
+	return os.Getenv("BTPTF_ADD_ENTITLEMENTMODULE") == ""
 }

@@ -47,6 +47,35 @@ The Terraform configuration on subaccount level gets improved via the following 
 - All resources that reference a `directory_id` get transformed to reference the `btp_directory` resource if available.
 - If a resource `btp_directory_role_collection` as well as `btp_directory_role` a check if there are dependencies is executed. If there are any a corresponding `depends_on` block is added to the resource `btp_directory_role_collection`.
 
-## Improvements on Cloud Foundry Org Level
+## Refinements on Cloud Foundry Org Level
 
 - The ID of the org is extracted as a variable
+
+## Refinements in Beta
+
+We continuously improve the generated Terraform configurations. The following refinements are currently in beta and must be explicitly activated via environment variables.
+
+### Entitlement Module Generation on Subaccount Level
+
+By default, the generated code for entitlements contains one resource `btp_subaccount_entitlement` per entitlement. Depending on the number of entitlements the Terraform configuration can become quite extensive. Therefore, some users rely on the **community** module [sap-btp-entitlements](https://registry.terraform.io/modules/aydin-ozcan/sap-btp-entitlements/btp/latest) to make the setup more comprehensive.
+
+Based on a feature request by these users, we introduced the beta feature to adjust the generated code namely to use the community module instead of the individual resources. The following adjustments are made to the generated code:
+
+- All resources `btp_subaccount_entitlement` are replaced by the module `sap-btp-entitlements`
+- A variable is generated for the module `sap-btp-entitlements` to hold the entitlements
+- Dependencies to the entitlements from subscriptions or service instances are pointing to the module `sap-btp-entitlements` instead of the individual resources
+- The import blocks namely the target address of the import are adjusted to point to the module `sap-btp-entitlements`
+
+To activate this feature you must set the environment variable `BTPTF_ADD_ENTITLEMENTMODULE` to any value as follows:
+
+=== "Windows"
+
+    ``` powershell
+    $env:BBTPTF_ADD_ENTITLEMENTMODULE='true'
+    ```
+
+=== "Linux/Mac"
+
+    ``` bash
+    export BTPTF_ADD_ENTITLEMENTMODULE=true
+    ```
