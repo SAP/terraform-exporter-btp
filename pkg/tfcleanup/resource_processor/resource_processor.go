@@ -111,7 +111,7 @@ func processDependencies(body *hclwrite.Body, dependencyAddresses *generictools.
 	for _, datasourceInfo := range dependencyAddresses.DataSourceInfo {
 
 		if !processedDataSources[datasourceInfo.DatasourceAddress] {
-			addServicePlanDataSources(body, datasourceInfo)
+			addServicePlanDataSources(body, datasourceInfo, levelIds)
 			// Avoid duplicate data sources
 			processedDataSources[datasourceInfo.DatasourceAddress] = true
 		}

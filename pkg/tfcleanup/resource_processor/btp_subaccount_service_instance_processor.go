@@ -74,17 +74,34 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 	)
 }
 
-func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.DataSourceInfo) {
+func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.DataSourceInfo, levelIds generictools.LevelIds) {
 	body.AppendNewline()
 
 	dsBlock := body.AppendNewBlock("data", []string{"btp_subaccount_service_plan", datasourceInfo.DatasourceAddress})
 
-	dsBlock.Body().SetAttributeRaw("subaccount_id", hclwrite.Tokens{
-		{
-			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte(datasourceInfo.SubaccountAddress),
-		},
-	})
+	if datasourceInfo.SubaccountAddress == "" {
+		dsBlock.Body().SetAttributeRaw("subaccount_id", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenOQuote,
+				Bytes: []byte((`"`)),
+			},
+			{
+				Type:  hclsyntax.TokenStringLit,
+				Bytes: []byte(levelIds.SubaccountId),
+			},
+			{
+				Type:  hclsyntax.TokenOQuote,
+				Bytes: []byte((`"`)),
+			},
+		})
+	} else {
+		dsBlock.Body().SetAttributeRaw("subaccount_id", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenIdent,
+				Bytes: []byte(datasourceInfo.SubaccountAddress),
+			},
+		})
+	}
 
 	dsBlock.Body().SetAttributeRaw("offering_name", hclwrite.Tokens{
 		{
