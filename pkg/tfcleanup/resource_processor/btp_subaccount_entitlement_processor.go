@@ -194,7 +194,7 @@ func appendEntitlementBlocksToRemove(dependencyAddresses *generictools.Dependenc
 	}
 }
 
-func ApppendImportBlocksForEntitlementModule(directory string, entitlementsToAdd map[generictools.EntitlementKey]generictools.EntitlementInfo, levelIds generictools.LevelIds) {
+func AppendImportBlocksForEntitlementModule(directory string, entitlementsToAdd map[generictools.EntitlementKey]generictools.EntitlementInfo, levelIds generictools.LevelIds) {
 	if toggles.IsEntitlementModuleGenerationDeactivated() {
 		return
 	}
