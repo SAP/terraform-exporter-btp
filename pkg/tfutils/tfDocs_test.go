@@ -27,8 +27,15 @@ func TestParseImport(t *testing.T) {
 		},
 	}
 
+	mockIsResourceIdentitySupported := func() (bool, error) {
+		return true, nil // Simulate that resource identity is supported
+	}
+
 	for _, tt := range tests {
 		parser := tfMarkdownParser{}
+
+		isResourceIdentitySupported = mockIsResourceIdentitySupported
+
 		parser.parseImport(tt.input)
 		actual := parser.ret.Import
 		assert.Equal(t, tt.expected, actual)

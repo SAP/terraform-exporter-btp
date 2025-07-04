@@ -88,7 +88,7 @@ func runTfShowJson(directory string) (*State, error) {
 }
 
 // function return true if resource identity is supported in the installed terraform version, false otherwise
-func isResourceIdentitySupported() (bool, error) {
+var isResourceIdentitySupported = func() (bool, error) {
 	tool, err := getIaCTool()
 	if err != nil {
 		return false, err
