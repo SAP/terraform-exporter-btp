@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
+	"strings"
 
 	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/spf13/viper"
@@ -83,4 +85,53 @@ func runTfShowJson(directory string) (*State, error) {
 	}
 
 	return &state, nil
+}
+
+// function return true if resource identity is supported in the installed terraform version, false otherwise
+func isResourceIdentitySupported() (bool, error) {
+	tool, err := getIaCTool()
+	if err != nil {
+		return false, err
+	}
+
+	if tool == "terraform" {
+		version, err := getTerraformVersion()
+		if err != nil {
+			return false, fmt.Errorf("failed to get Terraform version: %w", err)
+		}
+
+		terraformVersion := strings.Split(version, ".")
+		majorVersion := terraformVersion[0]
+		minorVersion := terraformVersion[1]
+		version = majorVersion + "." + minorVersion
+
+		floatVersion, err := strconv.ParseFloat(version, 64)
+		if err != nil {
+			return false, fmt.Errorf("failed to parse Terraform version %s: %w", version, err)
+		}
+
+		if floatVersion >= 1.12 {
+			return true, nil
+		}
+
+		return false, nil
+	} else {
+		return false, nil
+	}
+}
+
+// This function returns terraform version.
+func getTerraformVersion() (string, error) {
+
+	cmd := exec.Command("terraform", "version")
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("failed to execute %s version command: %w", "terraform", err)
+	}
+
+	versionOutput := strings.Split(string(output), "\n")[0]
+	versionParts := strings.Fields(versionOutput)
+	version := strings.TrimPrefix(versionParts[1], "v")
+
+	return version, nil
 }
