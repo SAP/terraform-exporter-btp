@@ -29,8 +29,9 @@ func TestProcessParent(t *testing.T) {
 	emptyTestContent := make(VariableContent)
 	targetVariables := make(VariableContent)
 	targetVariables[ParentIdentifier] = VariableInfo{
-		Description: "Some Text",
-		Value:       "directory",
+		Description:  "Some Text",
+		DefaultValue: "directory",
+		Type:         "string",
 	}
 
 	tests := []struct {
@@ -330,8 +331,9 @@ func TestReplaceAttribute(t *testing.T) {
 			description: "Name of the plan",
 			trgtVariables: &VariableContent{
 				"plan_name": VariableInfo{
-					Description: "Name of the plan",
-					Value:       "dashboard",
+					Description:  "Name of the plan",
+					DefaultValue: "dashboard",
+					Type:         "string",
 				},
 			},
 		},
