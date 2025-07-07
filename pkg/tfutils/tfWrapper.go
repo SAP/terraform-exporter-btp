@@ -14,7 +14,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func getIaCTool() (tool string, err error) {
+var getIaCTool = func() (tool string, err error) {
 
 	//For TESTING purposes, we can set the tool to be used
 	tool = toggles.GetIacTool()

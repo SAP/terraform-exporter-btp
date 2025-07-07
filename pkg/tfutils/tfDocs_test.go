@@ -23,7 +23,17 @@ func TestParseImport(t *testing.T) {
 		},
 	}
 
+	mockIsResourceIdentitySupported := func() (bool, error) {
+		return true, nil // Simulate that resource identity is supported
+	}
+
+	mockGetIaCTool := func() (string, error) {
+		return "terraform", nil // mocking getIaCTool() to return Terraform
+	}
+
 	for _, tt := range tests {
+		isResourceIdentitySupported = mockIsResourceIdentitySupported
+		getIaCTool = mockGetIaCTool
 		parser := tfMarkdownParser{}
 		parser.parseImport(tt.input)
 		actual := parser.ret.Import
