@@ -3,6 +3,7 @@ package resourceprocessor
 import (
 	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
+	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
@@ -47,8 +48,8 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 		PlanName:    planName,
 	}
 
-	dependencyAddress := (*dependencyAddresses).EntitlementAddress[key]
-	if dependencyAddress == "" {
+	dependencyInfo := (*dependencyAddresses).EntitlementAddress[key]
+	if dependencyInfo.Address == "" {
 		//No entitlement exported that fits the service instance
 		return
 	}
@@ -68,22 +69,40 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 		SubaccountAddress:  (*dependencyAddresses).SubaccountAddress + ".id",
 		OfferingName:       serviceName,
 		Name:               planName,
-		EntitlementAddress: dependencyAddress,
+		EntitlementAddress: dependencyInfo.Address,
 	},
 	)
 }
 
-func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.DataSourceInfo) {
+func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.DataSourceInfo, levelIds generictools.LevelIds) {
 	body.AppendNewline()
 
 	dsBlock := body.AppendNewBlock("data", []string{"btp_subaccount_service_plan", datasourceInfo.DatasourceAddress})
 
-	dsBlock.Body().SetAttributeRaw("subaccount_id", hclwrite.Tokens{
-		{
-			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte(datasourceInfo.SubaccountAddress),
-		},
-	})
+	if datasourceInfo.SubaccountAddress == ".id" {
+		// Address of subaccount dependency is missing
+		dsBlock.Body().SetAttributeRaw("subaccount_id", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenOQuote,
+				Bytes: []byte((`"`)),
+			},
+			{
+				Type:  hclsyntax.TokenStringLit,
+				Bytes: []byte(levelIds.SubaccountId),
+			},
+			{
+				Type:  hclsyntax.TokenOQuote,
+				Bytes: []byte((`"`)),
+			},
+		})
+	} else {
+		dsBlock.Body().SetAttributeRaw("subaccount_id", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenIdent,
+				Bytes: []byte(datasourceInfo.SubaccountAddress),
+			},
+		})
+	}
 
 	dsBlock.Body().SetAttributeRaw("offering_name", hclwrite.Tokens{
 		{
@@ -115,17 +134,34 @@ func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.
 		},
 	})
 
-	dsBlock.Body().SetAttributeRaw("depends_on", hclwrite.Tokens{
-		{
-			Type:  hclsyntax.TokenOBrack,
-			Bytes: []byte("["),
-		},
-		{Type: hclsyntax.TokenStringLit,
-			Bytes: []byte(datasourceInfo.EntitlementAddress),
-		},
-		{
-			Type:  hclsyntax.TokenCBrack,
-			Bytes: []byte("]"),
-		},
-	})
+	if !toggles.IsEntitlementModuleGenerationDeactivated() {
+		dsBlock.Body().SetAttributeRaw("depends_on", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenOBrack,
+				Bytes: []byte("["),
+			},
+			{Type: hclsyntax.TokenStringLit,
+				Bytes: []byte(genericEntitlementModuleAddress),
+			},
+			{
+				Type:  hclsyntax.TokenCBrack,
+				Bytes: []byte("]"),
+			},
+		})
+
+	} else {
+		dsBlock.Body().SetAttributeRaw("depends_on", hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenOBrack,
+				Bytes: []byte("["),
+			},
+			{Type: hclsyntax.TokenStringLit,
+				Bytes: []byte(datasourceInfo.EntitlementAddress),
+			},
+			{
+				Type:  hclsyntax.TokenCBrack,
+				Bytes: []byte("]"),
+			},
+		})
+	}
 }

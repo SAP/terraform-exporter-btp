@@ -62,7 +62,7 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 		varBody.SetAttributeRaw("type", hclwrite.Tokens{
 			{
 				Type:  hclsyntax.TokenStringLit,
-				Bytes: []byte("string"),
+				Bytes: []byte(value.Type),
 			},
 		})
 
@@ -73,12 +73,22 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 			},
 		})
 
-		varBody.SetAttributeRaw("default", hclwrite.Tokens{
-			{
-				Type:  hclsyntax.TokenStringLit,
-				Bytes: []byte("\"" + value.Value + "\""),
-			},
-		})
+		if value.Type == "string" {
+			varBody.SetAttributeRaw("default", hclwrite.Tokens{
+				{
+					Type:  hclsyntax.TokenStringLit,
+					Bytes: []byte("\"" + value.DefaultValue + "\""),
+				},
+			})
+		} else {
+			varBody.SetAttributeRaw("default", hclwrite.Tokens{
+				{
+					Type:  hclsyntax.TokenStringLit,
+					Bytes: []byte(value.DefaultValue),
+				},
+			})
+		}
+
 		rootBody.AppendNewline()
 	}
 
@@ -197,6 +207,10 @@ func IsGlobalAccountParent(btpClient *btpcli.ClientFacade, parentId string) (isP
 
 func RemoveConfigBlock(body *hclwrite.Body, resourceAddress string) {
 	for _, block := range body.Blocks() {
+		labels := block.Labels()
+		if len(labels) != 2 {
+			continue
+		}
 		address := block.Labels()[0] + "." + block.Labels()[1]
 		if address == resourceAddress {
 			body.RemoveBlock(block)
@@ -226,6 +240,11 @@ func RemoveImportBlock(body *hclwrite.Body, resourceAddress string, resultStore 
 
 	for _, block := range taintedBlocks {
 		body.RemoveBlock(block)
+		// If the rsource address contains the string "btp_subaccount_entitlement", we do notremove the entry from the resultStore
+		// Otherwise the Export summary displays the wrong number of entitlements
+		if strings.Contains(resourceAddress, "btp_subaccount_entitlement") {
+			continue
+		}
 		(*resultStore)[strings.Split(resourceAddress, ".")[0]] -= 1
 	}
 }
@@ -285,8 +304,9 @@ func ProcessParentAttribute(body *hclwrite.Body, description string, btpClient *
 			replacedTokens, parentValue := ReplaceStringTokenVar(tokens, ParentIdentifier)
 			if parentValue != "" {
 				(*variables)[ParentIdentifier] = VariableInfo{
-					Description: description,
-					Value:       parentValue,
+					Description:  description,
+					DefaultValue: parentValue,
+					Type:         "string",
 				}
 			}
 			body.SetAttributeRaw(ParentIdentifier, replacedTokens)
@@ -309,8 +329,9 @@ func ReplaceAttribute(body *hclwrite.Body, identifier string, description string
 		}
 
 		(*variables)[identifier] = VariableInfo{
-			Description: description,
-			Value:       attrValue,
+			Description:  description,
+			DefaultValue: attrValue,
+			Type:         "string",
 		}
 		body.SetAttributeRaw(identifier, replacedTokens)
 	}
