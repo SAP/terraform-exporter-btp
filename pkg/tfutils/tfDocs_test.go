@@ -21,6 +21,10 @@ func TestParseImport(t *testing.T) {
 			input:    readlines(t, "testdata/testImport.md"),
 			expected: "import {\n\t\t\t\tto = btp_subaccount.<resource_name>\n\t\t\t\tid = \"<subaccount_id>\"\n\t\t\t  }",
 		},
+		{
+			input:    readlines(t, "testdata/testImportUsingIdentity.md"),
+			expected: "import {\n\t\t\t\t\tto = btp_subaccount_subscription.<resource_name>\n\t\t\t\t\tidentity = {\n\t\t\t\t\tsubaccount_id = \"<subaccount_id>\"\napp_name = \"<app_name>\"\nplan_name = \"<plan_name>\"\n\n\t\t\t\t\t}\n\t\t\t\t  }",
+		},
 	}
 
 	mockIsResourceIdentitySupported := func() (bool, error) {
