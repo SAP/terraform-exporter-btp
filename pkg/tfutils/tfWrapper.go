@@ -101,19 +101,19 @@ var isResourceIdentitySupported = func() (bool, error) {
 		}
 
 		terraformVersion := strings.Split(version, ".")
-		majorVersion := terraformVersion[0]
-		minorVersion := terraformVersion[1]
-		version = majorVersion + "." + minorVersion
-
-		floatVersion, err := strconv.ParseFloat(version, 64)
+		majorVersion, err := strconv.Atoi(terraformVersion[0])
 		if err != nil {
-			return false, fmt.Errorf("failed to parse Terraform version %s: %w", version, err)
+			return false, fmt.Errorf("failed to parse Terraform version %s: %w", strconv.Itoa(majorVersion), err)
+		}
+		minorVersion, err := strconv.Atoi(terraformVersion[1])
+		if err != nil {
+			return false, fmt.Errorf("failed to parse Terraform version %s: %w", strconv.Itoa(minorVersion), err)
 		}
 
-		if floatVersion >= 1.12 {
+		if majorVersion > 1 || (majorVersion == 1 && minorVersion >= 12) {
+			// Terraform version 1.12 or higher supports resource identity
 			return true, nil
 		}
-
 		return false, nil
 	} else {
 		return false, nil
