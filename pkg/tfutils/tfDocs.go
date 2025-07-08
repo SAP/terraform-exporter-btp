@@ -933,6 +933,9 @@ func (p *tfMarkdownParser) parseImport(importLines []string) {
 	}()
 
 	var importString []string
+	tool, _ := getIaCTool()
+	resourceIdentitySupport, _ := isResourceIdentitySupported()
+	var parts []string
 	for _, line := range importLines {
 		if strings.Contains(line, "**NOTE:") || strings.Contains(line, "**Please Note:") ||
 			strings.Contains(line, "**Note:**") {
@@ -946,16 +949,38 @@ func (p *tfMarkdownParser) parseImport(importLines []string) {
 		line = strings.ReplaceAll(line, "```sh", "")
 		line = strings.ReplaceAll(line, "```", "")
 
+		importTemplateUsingId := `import {
+				to = %s
+				id = "%s"
+			  }`
+
 		if strings.Contains(line, "# terraform import") {
 			line = strings.ReplaceAll(line, "$ ", "")
 			line = strings.ReplaceAll(line, "# terraform import ", "")
 
-			parts := strings.Split(line, " ")
-			importTemplate := `import {
-				to = %s
-				id = "%s"
-			  }`
-			importString = append(importString, fmt.Sprintf(importTemplate, parts[0], parts[1]))
+			parts = strings.Split(line, " ")
+			importString = append(importString, fmt.Sprintf(importTemplateUsingId, parts[0], parts[1]))
+		}
+
+		if tool == "terraform" && resourceIdentitySupport {
+			if strings.Contains(line, "this resource supports import using identity") {
+				identityAttribute := strings.Split(parts[1], ",")
+				var identityObject string
+				for _, identity := range identityAttribute {
+					key := strings.ReplaceAll(identity, "<", "")
+					key = strings.ReplaceAll(key, ">", "")
+					identityObject += fmt.Sprintf("%s = \"%s\"\n", key, identity)
+
+				}
+				importTemplateUsingResourceIdentity := `import {
+					to = %s
+					identity = {
+					%s
+					}
+				  }`
+				importString = []string{}
+				importString = append(importString, fmt.Sprintf(importTemplateUsingResourceIdentity, parts[0], identityObject))
+			}
 
 		}
 	}

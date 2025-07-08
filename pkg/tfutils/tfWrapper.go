@@ -7,12 +7,14 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
+	"strings"
 
 	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/spf13/viper"
 )
 
-func getIaCTool() (tool string, err error) {
+var getIaCTool = func() (tool string, err error) {
 
 	//For TESTING purposes, we can set the tool to be used
 	tool = toggles.GetIacTool()
@@ -83,4 +85,53 @@ func runTfShowJson(directory string) (*State, error) {
 	}
 
 	return &state, nil
+}
+
+// function return true if resource identity is supported in the installed terraform version, false otherwise
+var isResourceIdentitySupported = func() (bool, error) {
+	tool, err := getIaCTool()
+	if err != nil {
+		return false, err
+	}
+
+	if tool == "terraform" {
+		version, err := getTerraformVersion()
+		if err != nil {
+			return false, fmt.Errorf("failed to get Terraform version: %w", err)
+		}
+
+		terraformVersion := strings.Split(version, ".")
+		majorVersion, err := strconv.Atoi(terraformVersion[0])
+		if err != nil {
+			return false, fmt.Errorf("failed to parse Terraform version %s: %w", strconv.Itoa(majorVersion), err)
+		}
+		minorVersion, err := strconv.Atoi(terraformVersion[1])
+		if err != nil {
+			return false, fmt.Errorf("failed to parse Terraform version %s: %w", strconv.Itoa(minorVersion), err)
+		}
+
+		if majorVersion > 1 || (majorVersion == 1 && minorVersion >= 12) {
+			// Terraform version 1.12 or higher supports resource identity
+			return true, nil
+		}
+		return false, nil
+	} else {
+		return false, nil
+	}
+}
+
+// This function returns terraform version.
+func getTerraformVersion() (string, error) {
+
+	cmd := exec.Command("terraform", "version")
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("failed to execute %s version command: %w", "terraform", err)
+	}
+
+	versionOutput := strings.Split(string(output), "\n")[0]
+	versionParts := strings.Fields(versionOutput)
+	version := strings.TrimPrefix(versionParts[1], "v")
+
+	return version, nil
 }
