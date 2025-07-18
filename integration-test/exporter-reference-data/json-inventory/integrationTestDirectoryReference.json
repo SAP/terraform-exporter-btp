@@ -16,6 +16,7 @@
         "autoscaler_standard",
         "cias_oauth2",
         "cias_standard",
+        "cloudfoundry_standard",
         "connectivity_connectivity_proxy",
         "connectivity_lite",
         "content-agent-ui_free",
