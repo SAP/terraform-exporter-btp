@@ -103,7 +103,7 @@ func TestConfigureProviderCF(t *testing.T) {
 required_providers {
 cloudfoundry = {
 source  = "cloudfoundry/cloudfoundry"
-version = "1.7.0"
+version = "1.8.0"
 }
 }
 }
