@@ -7,7 +7,7 @@ require (
 	github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.12
 	github.com/fatih/color v1.18.0
 	github.com/go-git/go-git/v5 v5.16.2
-	github.com/jedib0t/go-pretty/v6 v6.6.7
+	github.com/jedib0t/go-pretty/v6 v6.6.8
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.7
