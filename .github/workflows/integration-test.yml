@@ -24,7 +24,7 @@ jobs:
       output_dir_json_inventory: ${{ steps.json-inventory-directory.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -75,7 +75,7 @@ jobs:
       output_subacount_json_inventory: ${{ steps.json-inventory-subaccount.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -128,7 +128,7 @@ jobs:
       output_cforg_json_inventory: ${{ steps.json-inventory-cforg.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -181,7 +181,7 @@ jobs:
       output_dir_export_by_json: ${{ steps.export-by-json-directory.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -261,7 +261,7 @@ jobs:
       output_subacount_export_by_json: ${{ steps.export-by-json-subaccount.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -341,7 +341,7 @@ jobs:
       output_cforg_export_by_json: ${{ steps.export-by-json-cforg.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -424,7 +424,7 @@ jobs:
       output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -505,7 +505,7 @@ jobs:
       output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -585,7 +585,7 @@ jobs:
       output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Go
         uses: actions/setup-go@v5
