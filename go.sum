@@ -19,8 +19,8 @@ github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5 h1:0CwZNZbxp69SHPd
 github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5/go.mod h1:wHh0iHkYZB8zMSxRWpUBQtwG5a7fFgvEO+odwuTv2gs=
 github.com/cloudflare/circl v1.6.1 h1:zqIqSPIndyBh1bjLVVDHMPpVKqp8Su/V+6MeDzzQBQ0=
 github.com/cloudflare/circl v1.6.1/go.mod h1:uddAzsPgqdMAYatqJ0lsjX1oECcQLIlRpzZh3pJrofs=
-github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.13 h1:R4BAPGwtcFuferrVQ6ub7uL/ik+rI8jc68NE/8ne97E=
-github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.13/go.mod h1:+sY77PKx6xxDyApQ07webuPs80UMefAOTMPFuwXUerM=
+github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.14 h1:/djvHTmRW3Tixys/KB3ivv8SPUhcixdeESI54UTx864=
+github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.14/go.mod h1:dJA5Y5hjlv1rwBN8dXZqY4GP/xfDsXLwuhYGOgW7s2s=
 github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 h1:sDMmm+q/3+BukdIpxwO365v/Rbspp2Nt5XntgQRXq8Q=
 github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0/go.mod h1:4Zcjuz89kmFXt9morQgcfYZAYZ5n8WHjt81YYWIwtTM=
 github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=
