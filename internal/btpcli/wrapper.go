@@ -137,8 +137,8 @@ func GetDefaultRolesBySubaccount(subaccountId string, client *ClientFacade) (def
 	}
 
 	for _, role := range cliRes {
-		// The roles that are marked as IsReadOnly and contain an empty attribute list are predefined and need not be exported
-		if role.IsReadOnly && len(role.AttributeList) == 0 {
+		// The roles that are marked as IsReadOnly or are not read only but contain a non-empty attribute list are predefined and need not be exported
+		if role.IsReadOnly || (!role.IsReadOnly && len(role.AttributeList) > 0) {
 			roles = append(roles, role.Name)
 		}
 	}
@@ -155,8 +155,8 @@ func GetDefaultRolesByDirectory(directoryId string, client *ClientFacade) (defau
 	}
 
 	for _, role := range cliRes {
-		// The roles that are marked as IsReadOnly and contain an empty attribute list are predefined and need not be exported
-		if role.IsReadOnly && len(role.AttributeList) == 0 {
+		// The roles that are marked as IsReadOnly or are not read only but contain a non-empty attribute list are predefined and need not be exported
+		if role.IsReadOnly || (!role.IsReadOnly && len(role.AttributeList) > 0) {
 			roles = append(roles, role.Name)
 		}
 	}
