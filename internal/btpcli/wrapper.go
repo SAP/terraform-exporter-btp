@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"slices"
 	"testing"
 
 	"github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/testutils"
@@ -128,6 +129,11 @@ func GetDefaultRoleCollectionsByDirectory(directoryId string, client *ClientFaca
 }
 
 func GetDefaultRolesBySubaccount(subaccountId string, client *ClientFacade) (defaults []string, err error) {
+	// Role names that are provisioned by default but cannot be identified via standard configuration
+	var defaultRoleNameSubaccount = []string{
+		"Application_Frontend_Developer",
+	}
+
 	var roles []string
 
 	cliRes, _, err := client.Security.Role.ListBySubaccount(context.Background(), subaccountId)
@@ -138,7 +144,7 @@ func GetDefaultRolesBySubaccount(subaccountId string, client *ClientFacade) (def
 
 	for _, role := range cliRes {
 		// The roles that are marked as IsReadOnly and contain an empty attribute list are predefined and need not be exported
-		if role.IsReadOnly && len(role.AttributeList) == 0 {
+		if role.IsReadOnly && len(role.AttributeList) == 0 || role.IsReadOnly && slices.Contains(defaultRoleNameSubaccount, role.Name) {
 			roles = append(roles, role.Name)
 		}
 	}
