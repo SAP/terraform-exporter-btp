@@ -14,3 +14,6 @@ The btptf CLI focuses on the resources that are available in the Cloud Foundry e
 
 You find the details about supported and unsupported Cloud Foundry features on SAP BTP on [help.sap.com](https://help.sap.com/docs/btp/sap-business-technology-platform/cloud-foundry-environment#supported-and-unsupported-cloud-foundry-features).
 
+## Subaccounts created with `skip_auto_entitlement`
+
+The Terraform provider for SAP BTP is not able to fetch the the information if the subaccount was created with the parameter `skip_auto_entitlement` set to `true`. This flag must be set manually after generating the configuration of the subaccount.
