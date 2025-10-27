@@ -103,9 +103,9 @@ If the generated JSON file (command `btptf create-json`) or the generated Terraf
 
 ## The generated code for the subaccount does not contain the right value of the `skip_auto_entitlement` flag
 
-The Terraform provider for SAP BTP is not able to fetch the the information if the subaccount was created with the parameter `skip_auto_entitlement` set to `true`. This impacts the import of teh subaccount resource and the import of the assigned entitlements.
+The Terraform provider for SAP BTP is not able to fetch the the information if the subaccount was created with the parameter `skip_auto_entitlement` set to `true`. This impacts the import of the subaccount resource and the import of the assigned entitlements.
 
-The follwoing workaround must be applied if the subacount was created with this flag set to `true`:
+The following workaround must be applied if the subaccount was created with this flag set to `true`:
 
 1. Set the flag `BTPTF_SKIP_ENTITLEMENTFILTER` to `false` to make sure that the all entitlements are exported.
 2. Execute the export via the btptf CLI.
