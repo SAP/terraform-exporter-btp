@@ -13,7 +13,7 @@ permissions:
   issues: write
 
 env:
-  TF_VERSION: 1.10.5
+  TF_VERSION: 1.14.0
 
 jobs:
   test-json-inventory-directory:
