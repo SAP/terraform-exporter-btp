@@ -16,7 +16,7 @@ import (
 )
 
 // Constants for TF version for Terraform providers
-const BtpProviderVersion = "v1.17.0"
+const BtpProviderVersion = "v1.18.1"
 const CfProviderVersion = "v1.11.0"
 
 const (
