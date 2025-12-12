@@ -104,7 +104,7 @@ jobs:
           choco pack choco/sap-btptf.nuspec
       
       - name: Upload package artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg
           path: sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg
