@@ -9,6 +9,6 @@
   "license": "Apache-2.0",
   "description": "Tool to compare Terraform state in JSON representation after Export",
   "dependencies": {
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.23"
   }
 }
