@@ -694,7 +694,7 @@ jobs:
         with:
           secret: ${{ secrets.GITHUB_TOKEN }}
           # Using explicit approvers due to missing GitHub App permissions for the action
-          approvers: lechnerc77,CHERIANS,vipinvkmenon
+          approvers: lechnerc77,vipinvkmenon
           minimum-approvals: 1
           issue-title: "Manual approval required for integration test failures"
           issue-body: "One or more integration test jobs failed. Please review and approve or deny."
