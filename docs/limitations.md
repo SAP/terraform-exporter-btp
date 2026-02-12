@@ -17,3 +17,11 @@ You find the details about supported and unsupported Cloud Foundry features on S
 ## Subaccounts created with `skip_auto_entitlement`
 
 The Terraform provider for SAP BTP is not able to fetch the the information if the subaccount was created with the parameter `skip_auto_entitlement` set to `true`. This flag must be set manually after generating the configuration of the subaccount.
+
+## Import of Destinations
+
+In general the resource `btp_subaccount_destination_generic` (available since release 1.19.0 of the Terraform provider for SAP BTP) supports the import operation. Due to the design of the resource, we cannot use the mechanism of resource configuration generation (see ) that is used as central part of this tool. Hence, the import of destinations via this tool cannot be supported and must be done manually. The flow of the manual import is:
+
+1. Create the [import block](https://developer.hashicorp.com/terraform/language/block/import) for the [destination resource](https://registry.terraform.io/providers/SAP/btp/latest/docs/resources/subaccount_destination_generic#import) in the Terraform configuration.
+2. Create the resource configuration for the destination resource in the Terraform configuration. Please make sure to use the same name for the resource as used in the import block. The parameters needed for the configuration can be fetched from the SAP BTP Cockpit. Go to the destination details and click on the "Export" button. Choose as format `JSON` and use the content of the export for the configuration.
+3 Execute the import via the `terraform apply` command.
