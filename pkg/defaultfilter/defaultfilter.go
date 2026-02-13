@@ -73,10 +73,10 @@ func FilterDefaultRoleCollectionsFromJsonData(subaccountId string, directoryID s
 	}
 
 	// Filter out the default role collections from the data
-	entities := data[dataSourceListKey].([]interface{})
+	entities := data[dataSourceListKey].([]any)
 
-	entities = slices.DeleteFunc(entities, func(value interface{}) bool {
-		entity := value.(map[string]interface{})
+	entities = slices.DeleteFunc(entities, func(value any) bool {
+		entity := value.(map[string]any)
 		return IsRoleCollectionInDefaultList(fmt.Sprintf("%v", entity[resourceKey]), defaultRoleCollectionNames)
 	})
 
@@ -148,10 +148,10 @@ func FilterDefaultRolesFromJsonData(subaccountId string, directoryID string, dat
 	}
 
 	// Filter out the default role collections from the data
-	entities := data[dataSourceListKey].([]interface{})
+	entities := data[dataSourceListKey].([]any)
 
-	entities = slices.DeleteFunc(entities, func(value interface{}) bool {
-		entity := value.(map[string]interface{})
+	entities = slices.DeleteFunc(entities, func(value any) bool {
+		entity := value.(map[string]any)
 		return IsRoleInDefaultList(fmt.Sprintf("%v", entity[resourceKey]), defaultRoles)
 	})
 
@@ -164,10 +164,10 @@ func FilterDefaultIdpJsonData(data map[string]any) map[string]any {
 	const resourceKey = "origin"
 
 	// Filter out the default role collections from the data
-	entities := data[dataSourceListKey].([]interface{})
+	entities := data[dataSourceListKey].([]any)
 
-	entities = slices.DeleteFunc(entities, func(value interface{}) bool {
-		entity := value.(map[string]interface{})
+	entities = slices.DeleteFunc(entities, func(value any) bool {
+		entity := value.(map[string]any)
 		return fmt.Sprintf("%v", entity[resourceKey]) == "sap.default"
 	})
 

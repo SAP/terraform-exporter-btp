@@ -23,7 +23,7 @@ func newSubaccountRoleImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountRoleImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *subaccountRoleImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	subaccountId := levelId
 
@@ -42,15 +42,15 @@ func (tf *subaccountRoleImportProvider) GetImportBlock(data map[string]interface
 	return importBlock, count, nil
 }
 
-func createRoleImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createRoleImportBlock(data map[string]any, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	roles := data["values"].([]interface{})
+	roles := data["values"].([]any)
 
 	if len(filterValues) != 0 {
 		var subaccountAllRoles []string
 
 		for x, value := range roles {
-			role := value.(map[string]interface{})
+			role := value.(map[string]any)
 			resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", role["name"]))
 			subaccountAllRoles = append(subaccountAllRoles, resourceName)
 			if slices.Contains(filterValues, resourceName) {
@@ -67,7 +67,7 @@ func createRoleImportBlock(data map[string]interface{}, subaccountId string, fil
 
 	} else {
 		for x, value := range roles {
-			role := value.(map[string]interface{})
+			role := value.(map[string]any)
 
 			// Exclude default roles from export
 			if defaultfilter.IsRoleInDefaultList(fmt.Sprintf("%v", role["name"]), defaultfilter.FetchDefaultRolesBySubaccount(subaccountId)) {
@@ -81,7 +81,7 @@ func createRoleImportBlock(data map[string]interface{}, subaccountId string, fil
 	return importBlock, count, nil
 }
 
-func templateRoleImport(x int, role map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+func templateRoleImport(x int, role map[string]any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 
 	resourceDoc.Import = strings.ReplaceAll(resourceDoc.Import, "'", "")
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "role_"+fmt.Sprint(x))

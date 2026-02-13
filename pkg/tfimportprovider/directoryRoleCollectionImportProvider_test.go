@@ -20,7 +20,7 @@ func TestCreateDirectoryRoleCollectionImportBlock(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		data          map[string]interface{}
+		data          map[string]any
 		directoryId   string
 		filterValues  []string
 		expectedBlock string

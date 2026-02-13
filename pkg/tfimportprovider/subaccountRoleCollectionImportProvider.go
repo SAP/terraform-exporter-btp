@@ -23,7 +23,7 @@ func newSubaccountRoleCollectionImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountRoleCollectionImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *subaccountRoleCollectionImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	subaccountId := levelId
 
@@ -42,15 +42,15 @@ func (tf *subaccountRoleCollectionImportProvider) GetImportBlock(data map[string
 	return importBlock, count, nil
 }
 
-func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createRoleCollectionImportBlock(data map[string]any, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	roleCollections := data["values"].([]interface{})
+	roleCollections := data["values"].([]any)
 
 	if len(filterValues) != 0 {
 		var subaccountAllRoleCollections []string
 
 		for x, value := range roleCollections {
-			roleCollection := value.(map[string]interface{})
+			roleCollection := value.(map[string]any)
 
 			resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", roleCollection["name"]))
 			subaccountAllRoleCollections = append(subaccountAllRoleCollections, resourceName)
@@ -70,7 +70,7 @@ func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId s
 		defaultRoleCollections := defaultfilter.FetchDefaultRoleCollectionsBySubaccount(subaccountId)
 
 		for x, value := range roleCollections {
-			roleCollection := value.(map[string]interface{})
+			roleCollection := value.(map[string]any)
 
 			// exclude default role collections from export
 			if defaultfilter.IsRoleCollectionInDefaultList(fmt.Sprintf("%v", roleCollection["name"]), defaultRoleCollections) {
@@ -86,7 +86,7 @@ func createRoleCollectionImportBlock(data map[string]interface{}, subaccountId s
 
 }
 
-func templateRoleCollectionImport(x int, roleCollection map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+func templateRoleCollectionImport(x int, roleCollection map[string]any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	resourceDoc.Import = strings.ReplaceAll(resourceDoc.Import, "'", "")
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "rolecollection_"+fmt.Sprint(x))
 	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)

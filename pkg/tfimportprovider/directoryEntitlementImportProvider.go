@@ -20,7 +20,7 @@ func newDirectoryEntitlementImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *directoryEntitlementImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *directoryEntitlementImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	directoryId := levelId
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.DirectoryEntitlementType, tfutils.DirectoryLevel)
@@ -37,7 +37,7 @@ func (tf *directoryEntitlementImportProvider) GetImportBlock(data map[string]int
 	return importBlock, count, nil
 }
 
-func CreateDirEntitlementImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func CreateDirEntitlementImportBlock(data map[string]any, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
 
 	if len(filterValues) != 0 {
@@ -65,10 +65,10 @@ func CreateDirEntitlementImportBlock(data map[string]interface{}, directoryId st
 	return importBlock, count, nil
 }
 
-func templateDirEntitlementImport(x int, value interface{}, directoryId string, resourceDoc tfutils.EntityDocs) string {
+func templateDirEntitlementImport(x int, value any, directoryId string, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "entitlement_"+fmt.Sprint(x))
 	template = strings.ReplaceAll(template, "<directory_id>", directoryId)
-	if subMap, ok := value.(map[string]interface{}); ok {
+	if subMap, ok := value.(map[string]any); ok {
 		for subKey, subValue := range subMap {
 			template = strings.ReplaceAll(template, "<"+subKey+">", fmt.Sprintf("%v", subValue))
 		}

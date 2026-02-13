@@ -110,7 +110,6 @@ func TestParseTFMarkdownResource(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			require.NotZero(t, tt.name)
@@ -165,7 +164,6 @@ func TestParseTFMarkdownDataSource(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			require.NotZero(t, tt.name)
@@ -194,7 +192,7 @@ func TestParseTFMarkdownDataSource(t *testing.T) {
 
 func compareTestFile(
 	t *testing.T, path, actual string,
-	comp func(t assert.TestingT, expected string, actual string, msgAndArgs ...interface{}) bool,
+	comp func(t assert.TestingT, expected string, actual string, msgAndArgs ...any) bool,
 ) {
 	comp(t, readTestFile(t, path), actual)
 }
@@ -316,7 +314,6 @@ func TestArgumentRegularExp(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			ret := EntityDocs{
 				Arguments: make(map[string]*argumentDocs),

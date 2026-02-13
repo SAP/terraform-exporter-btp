@@ -51,7 +51,7 @@ type StateResource struct {
 	// empty.
 	//
 	// This value can be either an integer (int) or a string.
-	Index interface{} `json:"index,omitempty"`
+	Index any `json:"index,omitempty"`
 
 	// The name of the provider this resource belongs to. This allows
 	// the provider to be interpreted unambiguously in the unusual
@@ -68,7 +68,7 @@ type StateResource struct {
 	// whose structure depends on the resource type schema. Any unknown
 	// values are omitted or set to null, making them indistinguishable
 	// from absent values.
-	AttributeValues map[string]interface{} `json:"values,omitempty"`
+	AttributeValues map[string]any `json:"values,omitempty"`
 
 	// The JSON representation of the sensitivity of the resource's
 	// attribute values. Only attributes which are sensitive

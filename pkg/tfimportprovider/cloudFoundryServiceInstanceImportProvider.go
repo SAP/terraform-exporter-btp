@@ -22,7 +22,7 @@ func newCloudfoundryServiceInstanceImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *cloudfoundryServiceInstanceImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *cloudfoundryServiceInstanceImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	orgId := levelId
 
@@ -41,15 +41,15 @@ func (tf *cloudfoundryServiceInstanceImportProvider) GetImportBlock(data map[str
 	return importBlock, count, nil
 }
 
-func createCfServiceInstanceImportBlock(data map[string]interface{}, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createCfServiceInstanceImportBlock(data map[string]any, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	serviceInstances := data["service_instances"].([]interface{})
+	serviceInstances := data["service_instances"].([]any)
 
 	if len(filterValues) != 0 {
 		var cfAllServiceInstances []string
 
 		for x, value := range serviceInstances {
-			serviceInstance := value.(map[string]interface{})
+			serviceInstance := value.(map[string]any)
 			resourceName := output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", serviceInstance["name"]), fmt.Sprintf("%v", serviceInstance["service_plan"]))
 			cfAllServiceInstances = append(cfAllServiceInstances, resourceName)
 			if slices.Contains(filterValues, resourceName) {
@@ -65,7 +65,7 @@ func createCfServiceInstanceImportBlock(data map[string]interface{}, orgId strin
 		}
 	} else {
 		for x, value := range serviceInstances {
-			serviceInstance := value.(map[string]interface{})
+			serviceInstance := value.(map[string]any)
 			importBlock += templateCfServiceInstanceImport(x, serviceInstance, resourceDoc)
 			count++
 		}
@@ -74,7 +74,7 @@ func createCfServiceInstanceImportBlock(data map[string]interface{}, orgId strin
 	return importBlock, count, nil
 }
 
-func templateCfServiceInstanceImport(x int, serviceInstance map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
+func templateCfServiceInstanceImport(x int, serviceInstance map[string]any, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "cf_serviceinstance_"+fmt.Sprintf("%v", x))
 	template = strings.ReplaceAll(template, "<service_instance_guid>", fmt.Sprintf("%v", serviceInstance["id"]))
 	return template + "\n"

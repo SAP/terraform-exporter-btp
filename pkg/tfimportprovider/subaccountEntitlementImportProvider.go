@@ -21,7 +21,7 @@ func newSubaccountEntitlementImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountEntitlementImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *subaccountEntitlementImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	subaccountId := levelId
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.SubaccountEntitlementType, tfutils.SubaccountLevel)
@@ -37,7 +37,7 @@ func (tf *subaccountEntitlementImportProvider) GetImportBlock(data map[string]in
 	return importBlock, count, nil
 }
 
-func CreateEntitlementImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func CreateEntitlementImportBlock(data map[string]any, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
 
 	if len(filterValues) != 0 {
@@ -71,10 +71,10 @@ func CreateEntitlementImportBlock(data map[string]interface{}, subaccountId stri
 	return importBlock, count, nil
 }
 
-func templateEntitlementImport(x int, value interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+func templateEntitlementImport(x int, value any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "entitlement_"+fmt.Sprint(x))
 	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
-	if subMap, ok := value.(map[string]interface{}); ok {
+	if subMap, ok := value.(map[string]any); ok {
 		for subKey, subValue := range subMap {
 			template = strings.ReplaceAll(template, "<"+subKey+">", fmt.Sprintf("%v", subValue))
 		}
@@ -82,7 +82,7 @@ func templateEntitlementImport(x int, value interface{}, subaccountId string, re
 	return template + "\n"
 }
 
-func getServicePlanNameFromData(value interface{}) (serviceName string, planName string) {
+func getServicePlanNameFromData(value any) (serviceName string, planName string) {
 	entitlement := value.(map[string]any)
 	return fmt.Sprintf("%v", entitlement["service_name"]), fmt.Sprintf("%v", entitlement["plan_name"])
 }

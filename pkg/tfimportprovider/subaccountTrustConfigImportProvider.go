@@ -22,7 +22,7 @@ func newSubaccountTrustConfigImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountTrustConfigImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *subaccountTrustConfigImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	subaccountId := levelId
 
@@ -41,15 +41,15 @@ func (tf *subaccountTrustConfigImportProvider) GetImportBlock(data map[string]in
 	return importBlock, count, nil
 }
 
-func createTrustConfigurationImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createTrustConfigurationImportBlock(data map[string]any, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	trusts := data["values"].([]interface{})
+	trusts := data["values"].([]any)
 
 	if len(filterValues) != 0 {
 		var subaccountAllTrusts []string
 
 		for x, value := range trusts {
-			trust := value.(map[string]interface{})
+			trust := value.(map[string]any)
 			subaccountAllTrusts = append(subaccountAllTrusts, fmt.Sprintf("%v", trust["origin"]))
 			if slices.Contains(filterValues, fmt.Sprintf("%v", trust["origin"])) {
 				importBlock += templateTrustImport(x, trust, subaccountId, resourceDoc)
@@ -64,7 +64,7 @@ func createTrustConfigurationImportBlock(data map[string]interface{}, subaccount
 		}
 	} else {
 		for x, value := range trusts {
-			trust := value.(map[string]interface{})
+			trust := value.(map[string]any)
 
 			// Exclude the Default IdP from export
 			if defaultfilter.IsIdpDefaultIdp(fmt.Sprintf("%v", trust["origin"])) {
@@ -79,7 +79,7 @@ func createTrustConfigurationImportBlock(data map[string]interface{}, subaccount
 	return importBlock, count, nil
 }
 
-func templateTrustImport(x int, trust map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+func templateTrustImport(x int, trust map[string]any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "trust_"+fmt.Sprint(x))
 	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
 	template = strings.ReplaceAll(template, "<origin>", fmt.Sprintf("%v", trust["origin"]))

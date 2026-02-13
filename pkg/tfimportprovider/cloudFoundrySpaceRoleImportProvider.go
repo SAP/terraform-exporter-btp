@@ -22,7 +22,7 @@ func newCloudfoundrySpaceRolesImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *cloudfoundrySpaceRolesImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *cloudfoundrySpaceRolesImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	spaceId := levelId
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.CfSpaceRoleType, tfutils.OrganizationLevel)
@@ -37,13 +37,13 @@ func (tf *cloudfoundrySpaceRolesImportProvider) GetImportBlock(data map[string]i
 	}
 	return importBlock, count, nil
 }
-func createSpaceRoleImportBlock(data map[string]interface{}, spaceId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createSpaceRoleImportBlock(data map[string]any, spaceId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	roles := data["roles"].([]interface{})
+	roles := data["roles"].([]any)
 	if len(filterValues) != 0 {
 		var cfAllSpaceRoles []string
 		for x, value := range roles {
-			role := value.(map[string]interface{})
+			role := value.(map[string]any)
 			var formattedRoleName = output.FormatRoles
 			cfAllSpaceRoles = append(cfAllSpaceRoles, formattedRoleName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["space"]), fmt.Sprintf("%v", role["user"])))
 			if slices.Contains(filterValues, formattedRoleName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["space"]), fmt.Sprintf("%v", role["user"]))) {
@@ -57,14 +57,14 @@ func createSpaceRoleImportBlock(data map[string]interface{}, spaceId string, fil
 		}
 	} else {
 		for x, value := range roles {
-			role := value.(map[string]interface{})
+			role := value.(map[string]any)
 			importBlock += templateSpaceRoleImport(x, role, resourceDoc)
 			count++
 		}
 	}
 	return importBlock, count, nil
 }
-func templateSpaceRoleImport(x int, role map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
+func templateSpaceRoleImport(x int, role map[string]any, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "role_"+fmt.Sprintf("%v", role["id"])+"_"+fmt.Sprintf("%v", role["type"])+"_"+fmt.Sprintf("%v", x))
 	template = strings.ReplaceAll(template, "<role_guid>", fmt.Sprintf("%v", role["id"]))
 	return template + "\n"

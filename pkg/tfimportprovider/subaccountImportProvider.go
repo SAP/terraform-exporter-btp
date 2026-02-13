@@ -20,7 +20,7 @@ func newSubaccountImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *subaccountImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 
 	subaccountId := levelId
 
@@ -37,7 +37,7 @@ func (tf *subaccountImportProvider) GetImportBlock(data map[string]interface{}, 
 	return importBlock, 1, nil
 }
 
-func createSubaccountImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
+func createSubaccountImportBlock(data map[string]any, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
 	if len(filterValues) != 0 {
 		if filterValues[0] != fmt.Sprintf("%v", data["name"]) {
 			err := fmt.Errorf("subaccount %s not found. Please adjust it in the provided file", filterValues[0])

@@ -21,7 +21,7 @@ func newcloudfoundryUserImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *cloudfoundryUserImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *cloudfoundryUserImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	orgId := levelId
 
@@ -40,15 +40,15 @@ func (tf *cloudfoundryUserImportProvider) GetImportBlock(data map[string]interfa
 	return importBlock, count, nil
 }
 
-func createUserImportBlock(data map[string]interface{}, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createUserImportBlock(data map[string]any, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	users := data["users"].([]interface{})
+	users := data["users"].([]any)
 
 	if len(filterValues) != 0 {
 		var cfAllUsers []string
 
 		for x, value := range users {
-			user := value.(map[string]interface{})
+			user := value.(map[string]any)
 			cfAllUsers = append(cfAllUsers, fmt.Sprintf("%v", user["username"]))
 			if slices.Contains(filterValues, fmt.Sprintf("%v", user["username"])) {
 				importBlock += templateUserImport(x, user, resourceDoc)
@@ -63,7 +63,7 @@ func createUserImportBlock(data map[string]interface{}, orgId string, filterValu
 		}
 	} else {
 		for x, value := range users {
-			user := value.(map[string]interface{})
+			user := value.(map[string]any)
 			importBlock += templateUserImport(x, user, resourceDoc)
 			count++
 		}
@@ -72,7 +72,7 @@ func createUserImportBlock(data map[string]interface{}, orgId string, filterValu
 	return importBlock, count, nil
 }
 
-func templateUserImport(x int, user map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
+func templateUserImport(x int, user map[string]any, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "user_"+fmt.Sprintf("%v", x))
 	template = strings.ReplaceAll(template, "<user_guid>", fmt.Sprintf("%v", user["id"]))
 	return template + "\n"

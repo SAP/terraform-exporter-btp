@@ -21,7 +21,7 @@ func newcloudfoundrySpaceQuotaImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *cloudfoundrySpaceQuotaImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *cloudfoundrySpaceQuotaImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	orgId := levelId
 
@@ -40,15 +40,15 @@ func (tf *cloudfoundrySpaceQuotaImportProvider) GetImportBlock(data map[string]i
 	return importBlock, count, nil
 }
 
-func createSpaceQuotaImportBlock(data map[string]interface{}, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createSpaceQuotaImportBlock(data map[string]any, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	quotas := data["space_quotas"].([]interface{})
+	quotas := data["space_quotas"].([]any)
 
 	if len(filterValues) != 0 {
 		var cfAllSpaceQuotas []string
 
 		for x, value := range quotas {
-			quota := value.(map[string]interface{})
+			quota := value.(map[string]any)
 			cfAllSpaceQuotas = append(cfAllSpaceQuotas, fmt.Sprintf("%v", quota["name"]))
 			if slices.Contains(filterValues, fmt.Sprintf("%v", quota["name"])) {
 				importBlock += templateSpaceQuotaImport(x, quota, resourceDoc)
@@ -63,7 +63,7 @@ func createSpaceQuotaImportBlock(data map[string]interface{}, orgId string, filt
 		}
 	} else {
 		for x, value := range quotas {
-			quota := value.(map[string]interface{})
+			quota := value.(map[string]any)
 			importBlock += templateSpaceQuotaImport(x, quota, resourceDoc)
 			count++
 		}
@@ -72,7 +72,7 @@ func createSpaceQuotaImportBlock(data map[string]interface{}, orgId string, filt
 	return importBlock, count, nil
 }
 
-func templateSpaceQuotaImport(x int, quota map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
+func templateSpaceQuotaImport(x int, quota map[string]any, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "space_quota_"+fmt.Sprintf("%v", x))
 	template = strings.ReplaceAll(template, "<space_quota_guid>", fmt.Sprintf("%v", quota["id"]))
 	return template + "\n"

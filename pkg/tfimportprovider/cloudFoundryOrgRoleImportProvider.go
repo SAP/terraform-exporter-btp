@@ -22,7 +22,7 @@ func newCloudfoundryOrgRolesImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *cloudfoundryOrgRolesImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *cloudfoundryOrgRolesImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	orgId := levelId
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.CfOrgRoleType, tfutils.OrganizationLevel)
@@ -37,13 +37,13 @@ func (tf *cloudfoundryOrgRolesImportProvider) GetImportBlock(data map[string]int
 	}
 	return importBlock, count, nil
 }
-func createOrgRoleImportBlock(data map[string]interface{}, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createOrgRoleImportBlock(data map[string]any, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	roles := data["roles"].([]interface{})
+	roles := data["roles"].([]any)
 	if len(filterValues) != 0 {
 		var cfAllOrgRoles []string
 		for x, value := range roles {
-			role := value.(map[string]interface{})
+			role := value.(map[string]any)
 			cfAllOrgRoles = append(cfAllOrgRoles, output.FormatOrgRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["user"])))
 			if slices.Contains(filterValues, output.FormatOrgRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["user"]))) {
 				importBlock += templateOrgRoleImport(x, role, resourceDoc)
@@ -56,14 +56,14 @@ func createOrgRoleImportBlock(data map[string]interface{}, orgId string, filterV
 		}
 	} else {
 		for x, value := range roles {
-			role := value.(map[string]interface{})
+			role := value.(map[string]any)
 			importBlock += templateOrgRoleImport(x, role, resourceDoc)
 			count++
 		}
 	}
 	return importBlock, count, nil
 }
-func templateOrgRoleImport(x int, role map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
+func templateOrgRoleImport(x int, role map[string]any, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "role_"+fmt.Sprintf("%v", role["type"])+"_"+fmt.Sprintf("%v", x))
 	template = strings.ReplaceAll(template, "<role_guid>", fmt.Sprintf("%v", role["id"]))
 	return template + "\n"

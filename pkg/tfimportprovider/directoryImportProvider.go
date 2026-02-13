@@ -20,7 +20,7 @@ func newDirectoryImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *directoryImportProvider) GetImportBlock(data map[string]interface{}, LevelId string, filterValues []string) (string, int, error) {
+func (tf *directoryImportProvider) GetImportBlock(data map[string]any, LevelId string, filterValues []string) (string, int, error) {
 
 	directoryId := LevelId
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.DirectoryType, tfutils.DirectoryLevel)
@@ -37,7 +37,7 @@ func (tf *directoryImportProvider) GetImportBlock(data map[string]interface{}, L
 	return importBlock, 1, nil
 }
 
-func createDirectoryImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
+func createDirectoryImportBlock(data map[string]any, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
 	if len(filterValues) != 0 {
 		if filterValues[0] != fmt.Sprintf("%v", data["name"]) {
 			err := fmt.Errorf("directory %s not found. Please adjust it in the provided file", filterValues[0])

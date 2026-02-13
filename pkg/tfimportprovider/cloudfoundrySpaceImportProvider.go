@@ -21,7 +21,7 @@ func newcloudfoundrySpaceImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *cloudfoundrySpaceImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *cloudfoundrySpaceImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	orgId := levelId
 
@@ -40,15 +40,15 @@ func (tf *cloudfoundrySpaceImportProvider) GetImportBlock(data map[string]interf
 	return importBlock, count, nil
 }
 
-func createSpaceImportBlock(data map[string]interface{}, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createSpaceImportBlock(data map[string]any, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	spaces := data["spaces"].([]interface{})
+	spaces := data["spaces"].([]any)
 
 	if len(filterValues) != 0 {
 		var cfAllSpaces []string
 
 		for x, value := range spaces {
-			space := value.(map[string]interface{})
+			space := value.(map[string]any)
 			cfAllSpaces = append(cfAllSpaces, fmt.Sprintf("%v", space["name"]))
 			if slices.Contains(filterValues, fmt.Sprintf("%v", space["name"])) {
 				importBlock += templateSpaceImport(x, space, resourceDoc)
@@ -63,7 +63,7 @@ func createSpaceImportBlock(data map[string]interface{}, orgId string, filterVal
 		}
 	} else {
 		for x, value := range spaces {
-			space := value.(map[string]interface{})
+			space := value.(map[string]any)
 			importBlock += templateSpaceImport(x, space, resourceDoc)
 			count++
 		}
@@ -72,7 +72,7 @@ func createSpaceImportBlock(data map[string]interface{}, orgId string, filterVal
 	return importBlock, count, nil
 }
 
-func templateSpaceImport(x int, space map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
+func templateSpaceImport(x int, space map[string]any, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "space_"+fmt.Sprintf("%v", x))
 	template = strings.ReplaceAll(template, "<space_guid>", fmt.Sprintf("%v", space["id"]))
 	return template + "\n"
