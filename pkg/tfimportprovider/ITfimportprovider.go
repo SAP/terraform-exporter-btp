@@ -2,5 +2,5 @@ package tfimportprovider
 
 type ITfImportProvider interface {
 	GetResourceType() string
-	GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error)
+	GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error)
 }

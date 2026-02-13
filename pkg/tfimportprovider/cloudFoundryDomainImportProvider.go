@@ -20,7 +20,7 @@ func newCloudfoundryDomainImportProvider() ITfImportProvider {
 		},
 	}
 }
-func (tf *cloudfoundryDomainImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *cloudfoundryDomainImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	orgId := levelId
 	resourceDoc, err := tfutils.GetDocByResourceName(tfutils.ResourcesKind, tfutils.CfDomainType, tfutils.OrganizationLevel)
@@ -35,13 +35,13 @@ func (tf *cloudfoundryDomainImportProvider) GetImportBlock(data map[string]inter
 	}
 	return importBlock, count, nil
 }
-func createDomainImportBlock(data map[string]interface{}, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createDomainImportBlock(data map[string]any, orgId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	domains := data["domains"].([]interface{})
+	domains := data["domains"].([]any)
 	if len(filterValues) != 0 {
 		var cfAllDomains []string
 		for x, value := range domains {
-			domain := value.(map[string]interface{})
+			domain := value.(map[string]any)
 			cfAllDomains = append(cfAllDomains, fmt.Sprintf("%v", domain["name"]))
 			if slices.Contains(filterValues, fmt.Sprintf("%v", domain["name"])) {
 				importBlock += templateDomainImport(x, domain, resourceDoc)
@@ -54,14 +54,14 @@ func createDomainImportBlock(data map[string]interface{}, orgId string, filterVa
 		}
 	} else {
 		for x, value := range domains {
-			domain := value.(map[string]interface{})
+			domain := value.(map[string]any)
 			importBlock += templateDomainImport(x, domain, resourceDoc)
 			count++
 		}
 	}
 	return importBlock, count, nil
 }
-func templateDomainImport(x int, domain map[string]interface{}, resourceDoc tfutils.EntityDocs) string {
+func templateDomainImport(x int, domain map[string]any, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "domain_"+fmt.Sprintf("%v", x))
 	template = strings.ReplaceAll(template, "<domain_guid>", fmt.Sprintf("%v", domain["id"]))
 	return template + "\n"

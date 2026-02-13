@@ -96,7 +96,7 @@ type BtpResources struct {
 	BtpResources []BtpResource
 }
 
-func FetchImportConfiguration(subaccountId string, directoryId string, organizationId string, spaceId string, resourceType string, tmpFolder string) (map[string]interface{}, error) {
+func FetchImportConfiguration(subaccountId string, directoryId string, organizationId string, spaceId string, resourceType string, tmpFolder string) (map[string]any, error) {
 
 	dataBlock, err := readDataSource(subaccountId, directoryId, organizationId, spaceId, resourceType)
 	if err != nil {
@@ -116,7 +116,7 @@ func FetchImportConfiguration(subaccountId string, directoryId string, organizat
 		return nil, fmt.Errorf("error getting Terraform state data: %v", err)
 	}
 
-	var data map[string]interface{}
+	var data map[string]any
 	err = json.Unmarshal(jsonBytes, &data)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling JSON: %v", err)
@@ -384,7 +384,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 	return jsonBytes, nil
 }
 
-func transformDataToStringArray(btpResource string, data map[string]interface{}) []string {
+func transformDataToStringArray(btpResource string, data map[string]any) []string {
 	var stringArr []string
 
 	switch btpResource {
@@ -461,7 +461,7 @@ func generateDataSourcesForList(subaccountId string, directoryId string, organiz
 		return nil, nil, error
 	}
 
-	var data map[string]interface{}
+	var data map[string]any
 
 	err = json.Unmarshal(jsonBytes, &data)
 	if err != nil {
@@ -502,12 +502,12 @@ func handleNotFoundError(err error, resourceName string, iD string) error {
 	return err
 }
 
-func extractFeatureList(data map[string]interface{}, resourceName string) []string {
+func extractFeatureList(data map[string]any, resourceName string) []string {
 
 	featureList := []string{}
 
 	if resourceName == DirectoryType {
-		features := data["features"].([]interface{})
+		features := data["features"].([]any)
 		var featureList []string
 		for _, feature := range features {
 			featureList = append(featureList, fmt.Sprintf("%v", feature.(string)))
@@ -554,51 +554,51 @@ func transformTrustConfigurationStringArray(data map[string]any, stringArr *[]st
 	}
 }
 
-func transformEntitlementStringArray(data map[string]interface{}, stringArr *[]string) {
+func transformEntitlementStringArray(data map[string]any, stringArr *[]string) {
 	for key := range data {
 		key := strings.ReplaceAll(key, ":", "_")
 		*stringArr = append(*stringArr, key)
 	}
 }
 
-func transformServiceInstanceStringArray(data map[string]interface{}, stringArr *[]string) {
-	instances := data["values"].([]interface{})
+func transformServiceInstanceStringArray(data map[string]any, stringArr *[]string) {
+	instances := data["values"].([]any)
 	for _, value := range instances {
-		instance := value.(map[string]interface{})
+		instance := value.(map[string]any)
 		*stringArr = append(*stringArr, output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["serviceplan_id"])))
 	}
 }
 
-func transformSubscriptionsStringArray(data map[string]interface{}, stringArr *[]string) {
-	subscriptions := data["values"].([]interface{})
+func transformSubscriptionsStringArray(data map[string]any, stringArr *[]string) {
+	subscriptions := data["values"].([]any)
 	for _, value := range subscriptions {
-		subscription := value.(map[string]interface{})
+		subscription := value.(map[string]any)
 		if fmt.Sprintf("%v", subscription["state"]) != "NOT_SUBSCRIBED" {
 			*stringArr = append(*stringArr, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 		}
 	}
 }
 
-func transformOrgRolesStringArray(data map[string]interface{}, stringArr *[]string) {
-	roles := data["roles"].([]interface{})
+func transformOrgRolesStringArray(data map[string]any, stringArr *[]string) {
+	roles := data["roles"].([]any)
 	for _, value := range roles {
-		role := value.(map[string]interface{})
+		role := value.(map[string]any)
 		*stringArr = append(*stringArr, output.FormatOrgRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["user"])))
 	}
 }
 
-func transformCfServiceInstanceStringArray(data map[string]interface{}, stringArr *[]string) {
-	instances := data["service_instances"].([]interface{})
+func transformCfServiceInstanceStringArray(data map[string]any, stringArr *[]string) {
+	instances := data["service_instances"].([]any)
 	for _, value := range instances {
-		instance := value.(map[string]interface{})
+		instance := value.(map[string]any)
 		*stringArr = append(*stringArr, output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["service_plan"])))
 	}
 }
 
-func transformCfSpaceRolesStringArray(data map[string]interface{}, stringArr *[]string) {
-	roles := data["roles"].([]interface{})
+func transformCfSpaceRolesStringArray(data map[string]any, stringArr *[]string) {
+	roles := data["roles"].([]any)
 	for _, value := range roles {
-		role := value.(map[string]interface{})
+		role := value.(map[string]any)
 		*stringArr = append(*stringArr, output.FormatSpaceRoleResourceName(fmt.Sprintf("%v", role["type"]), fmt.Sprintf("%v", role["space"]), fmt.Sprintf("%v", role["user"])))
 	}
 }
@@ -611,7 +611,7 @@ func removeUserAgent() {
 	_ = os.Unsetenv("BTP_APPEND_USER_AGENT")
 }
 
-func filterDefaultValues(subaccountId string, directoryId string, btpResourceType string, data map[string]interface{}) map[string]any {
+func filterDefaultValues(subaccountId string, directoryId string, btpResourceType string, data map[string]any) map[string]any {
 
 	switch btpResourceType {
 	case SubaccountRoleCollectionType, DirectoryRoleCollectionType:
@@ -628,7 +628,7 @@ func filterDefaultValues(subaccountId string, directoryId string, btpResourceTyp
 
 }
 
-func discardSpecificResource(btpResourceType string, data map[string]interface{}) map[string]any {
+func discardSpecificResource(btpResourceType string, data map[string]any) map[string]any {
 	switch btpResourceType {
 	case SubaccountServiceInstanceType:
 		const dataSourceListKey = "values"

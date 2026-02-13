@@ -20,7 +20,7 @@ func newSubaccountEnvInstanceImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountEnvInstanceImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *subaccountEnvInstanceImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	subaccountId := levelId
 
@@ -38,15 +38,15 @@ func (tf *subaccountEnvInstanceImportProvider) GetImportBlock(data map[string]in
 
 }
 
-func createEnvironmentInstanceImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createEnvironmentInstanceImportBlock(data map[string]any, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	environmentInstances := data["values"].([]interface{})
+	environmentInstances := data["values"].([]any)
 
 	if len(filterValues) != 0 {
 		var subaccountAllEnvInstances []string
 
 		for _, value := range environmentInstances {
-			environmentInstance := value.(map[string]interface{})
+			environmentInstance := value.(map[string]any)
 			subaccountAllEnvInstances = append(subaccountAllEnvInstances, fmt.Sprintf("%v", environmentInstance["environment_type"]))
 			if slices.Contains(filterValues, fmt.Sprintf("%v", environmentInstance["environment_type"])) {
 				importBlock += templateEnvironmentInstanceImport(environmentInstance, subaccountId, resourceDoc)
@@ -63,7 +63,7 @@ func createEnvironmentInstanceImportBlock(data map[string]interface{}, subaccoun
 	} else {
 
 		for _, value := range environmentInstances {
-			environmentInstance := value.(map[string]interface{})
+			environmentInstance := value.(map[string]any)
 			importBlock += templateEnvironmentInstanceImport(environmentInstance, subaccountId, resourceDoc)
 			count++
 		}
@@ -71,7 +71,7 @@ func createEnvironmentInstanceImportBlock(data map[string]interface{}, subaccoun
 	return importBlock, count, nil
 }
 
-func templateEnvironmentInstanceImport(environmentInstance map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+func templateEnvironmentInstanceImport(environmentInstance map[string]any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", fmt.Sprintf("%v", environmentInstance["environment_type"]))
 	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
 	template = strings.ReplaceAll(template, "<environment_instance_id>", fmt.Sprintf("%v", environmentInstance["id"]))

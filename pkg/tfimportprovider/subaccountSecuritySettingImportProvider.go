@@ -20,7 +20,7 @@ func newSubaccountSecuritySettingImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountSecuritySettingImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *subaccountSecuritySettingImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 
 	subaccountId := levelId
 
@@ -40,7 +40,7 @@ func (tf *subaccountSecuritySettingImportProvider) GetImportBlock(data map[strin
 	return importBlock, 1, nil
 }
 
-func createSecuritySettingImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
+func createSecuritySettingImportBlock(data map[string]any, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, err error) {
 
 	if len(filterValues) != 0 {
 		if filterValues[0] != fmt.Sprintf("%v", data["subaccount_id"]) {

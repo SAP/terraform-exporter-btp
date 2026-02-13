@@ -20,6 +20,9 @@ MAIN_PACKAGE=main.go
 build:
 	go build -v ./...
 
+fix:
+	go fix -v ./...
+
 install: build
 	go build -o $(BINARY_PATH) $(MAIN_PACKAGE)
 
@@ -37,4 +40,4 @@ docs:
 spellchecker:
 	#prerequisite: Install pyspelling and aspell
 	pyspelling -c .spellcheck.yml
-.PHONY: build install lint fmt test docs
+.PHONY: build fix install lint fmt test docs

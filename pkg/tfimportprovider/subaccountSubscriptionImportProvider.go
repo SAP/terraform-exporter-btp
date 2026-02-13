@@ -22,7 +22,7 @@ func newSubaccountSubscriptionImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountSubscriptionImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *subaccountSubscriptionImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	subaccountId := levelId
 
@@ -39,9 +39,9 @@ func (tf *subaccountSubscriptionImportProvider) GetImportBlock(data map[string]i
 	return importBlock, count, nil
 }
 
-func createSubscriptionImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createSubscriptionImportBlock(data map[string]any, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	subscriptions := data["values"].([]interface{})
+	subscriptions := data["values"].([]any)
 
 	var failedSubscriptions []string
 	var inProgressSubscription []string
@@ -49,7 +49,7 @@ func createSubscriptionImportBlock(data map[string]interface{}, subaccountId str
 		var subaccountAllSubscriptions []string
 
 		for x, value := range subscriptions {
-			subscription := value.(map[string]interface{})
+			subscription := value.(map[string]any)
 			subaccountAllSubscriptions = append(subaccountAllSubscriptions, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"])))
 			if slices.Contains(filterValues, output.FormatSubscriptionResourceName(fmt.Sprintf("%v", subscription["app_name"]), fmt.Sprintf("%v", subscription["plan_name"]))) {
 				if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBED" {
@@ -71,7 +71,7 @@ func createSubscriptionImportBlock(data map[string]interface{}, subaccountId str
 
 	} else {
 		for x, value := range subscriptions {
-			subscription := value.(map[string]interface{})
+			subscription := value.(map[string]any)
 			if fmt.Sprintf("%v", subscription["state"]) == "SUBSCRIBED" {
 				importBlock += templateSubscriptionImport(x, subscription, subaccountId, resourceDoc)
 				count++
@@ -94,7 +94,7 @@ func createSubscriptionImportBlock(data map[string]interface{}, subaccountId str
 	return importBlock, count, nil
 }
 
-func templateSubscriptionImport(x int, subscription map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+func templateSubscriptionImport(x int, subscription map[string]any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "subscription_"+fmt.Sprint(x))
 	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
 	template = strings.ReplaceAll(template, "<app_name>", fmt.Sprintf("%v", subscription["app_name"]))

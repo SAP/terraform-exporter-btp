@@ -21,7 +21,7 @@ func newSubaccountServiceBindingImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountServiceBindingImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *subaccountServiceBindingImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	subaccountId := levelId
 
@@ -40,15 +40,15 @@ func (tf *subaccountServiceBindingImportProvider) GetImportBlock(data map[string
 	return importBlock, count, nil
 }
 
-func createServiceBindingImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createServiceBindingImportBlock(data map[string]any, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	serviceBindings := data["values"].([]interface{})
+	serviceBindings := data["values"].([]any)
 
 	if len(filterValues) != 0 {
 		var subaccountAllServiceBindings []string
 
 		for x, value := range serviceBindings {
-			binding := value.(map[string]interface{})
+			binding := value.(map[string]any)
 			resourceName := fmt.Sprintf("%v", binding["name"])
 			subaccountAllServiceBindings = append(subaccountAllServiceBindings, resourceName)
 			if slices.Contains(filterValues, resourceName) {
@@ -65,7 +65,7 @@ func createServiceBindingImportBlock(data map[string]interface{}, subaccountId s
 
 	} else {
 		for x, value := range serviceBindings {
-			binding := value.(map[string]interface{})
+			binding := value.(map[string]any)
 			importBlock += templateServiceBindingImport(x, binding, subaccountId, resourceDoc)
 			count++
 		}
@@ -73,7 +73,7 @@ func createServiceBindingImportBlock(data map[string]interface{}, subaccountId s
 	return importBlock, count, nil
 }
 
-func templateServiceBindingImport(x int, binding map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+func templateServiceBindingImport(x int, binding map[string]any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "servicebinding_"+fmt.Sprint(x))
 	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
 	template = strings.ReplaceAll(template, "<service_binding_id>", fmt.Sprintf("%v", binding["id"]))

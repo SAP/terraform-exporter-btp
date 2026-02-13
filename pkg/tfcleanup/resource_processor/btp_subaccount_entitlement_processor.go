@@ -152,7 +152,8 @@ func addEntitlementVariables(variablesToCreate *generictools.VariableContent, en
 	variableInfo := "Object of entitlements to be assigned to the subaccount."
 	variableType := "map(list(string))"
 
-	defaultValue := "{\n"
+	var defaultValue strings.Builder
+	defaultValue.WriteString("{\n")
 	for key, info := range entitlementAddress {
 		serviceName := key.ServiceName
 		planName := key.PlanName
@@ -160,17 +161,17 @@ func addEntitlementVariables(variablesToCreate *generictools.VariableContent, en
 
 		if amount > 0 {
 			stringForValue := serviceName + "=[\"" + planName + "=" + strconv.Itoa(amount) + "\"]\n"
-			defaultValue += strings.ReplaceAll(stringForValue, " ", "")
+			defaultValue.WriteString(strings.ReplaceAll(stringForValue, " ", ""))
 		} else {
-			defaultValue += "\"" + serviceName + "\" = [\"" + planName + "\"]\n"
+			defaultValue.WriteString("\"" + serviceName + "\" = [\"" + planName + "\"]\n")
 		}
 	}
-	defaultValue += "}"
+	defaultValue.WriteString("}")
 
 	(*variablesToCreate)[variableName] = generictools.VariableInfo{
 		Description:  variableInfo,
 		Type:         variableType,
-		DefaultValue: defaultValue,
+		DefaultValue: defaultValue.String(),
 	}
 }
 

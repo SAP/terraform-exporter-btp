@@ -249,14 +249,14 @@ func prettyPrint(node *bf.Node) string {
 	return string(bytes)
 }
 
-func treeify(node *bf.Node) interface{} {
+func treeify(node *bf.Node) any {
 	if node == nil {
 		return "nil"
 	}
 	if node.Type == bf.Text {
 		return string(node.Literal)
 	}
-	var result []interface{}
+	var result []any
 	result = append(result, fmt.Sprintf("[%s]", node.Type))
 
 	c := node.FirstChild
@@ -965,11 +965,11 @@ func (p *tfMarkdownParser) parseImport(importLines []string) {
 		if tool == "terraform" && resourceIdentitySupport {
 			if strings.Contains(line, "this resource supports import using identity") {
 				identityAttribute := strings.Split(parts[1], ",")
-				var identityObject string
+				var identityObject strings.Builder
 				for _, identity := range identityAttribute {
 					key := strings.ReplaceAll(identity, "<", "")
 					key = strings.ReplaceAll(key, ">", "")
-					identityObject += fmt.Sprintf("%s = \"%s\"\n", key, identity)
+					identityObject.WriteString(fmt.Sprintf("%s = \"%s\"\n", key, identity))
 
 				}
 				importTemplateUsingResourceIdentity := `import {
@@ -979,7 +979,7 @@ func (p *tfMarkdownParser) parseImport(importLines []string) {
 					}
 				  }`
 				importString = []string{}
-				importString = append(importString, fmt.Sprintf(importTemplateUsingResourceIdentity, parts[0], identityObject))
+				importString = append(importString, fmt.Sprintf(importTemplateUsingResourceIdentity, parts[0], identityObject.String()))
 			}
 
 		}

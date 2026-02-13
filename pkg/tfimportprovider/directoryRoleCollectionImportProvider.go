@@ -23,7 +23,7 @@ func newDirectoryRoleCollectionImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *directoryRoleCollectionImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *directoryRoleCollectionImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	directoryId := levelId
 
@@ -42,15 +42,15 @@ func (tf *directoryRoleCollectionImportProvider) GetImportBlock(data map[string]
 	return importBlock, count, nil
 }
 
-func createDirectoryRoleCollectionImportBlock(data map[string]interface{}, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createDirectoryRoleCollectionImportBlock(data map[string]any, directoryId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	roleCollections := data["values"].([]interface{})
+	roleCollections := data["values"].([]any)
 
 	if len(filterValues) != 0 {
 		var directoryAllRoleCollections []string
 
 		for x, value := range roleCollections {
-			roleCollection := value.(map[string]interface{})
+			roleCollection := value.(map[string]any)
 			resourceName := output.FormatResourceNameGeneric(fmt.Sprintf("%v", roleCollection["name"]))
 			directoryAllRoleCollections = append(directoryAllRoleCollections, resourceName)
 			if slices.Contains(filterValues, resourceName) {
@@ -69,7 +69,7 @@ func createDirectoryRoleCollectionImportBlock(data map[string]interface{}, direc
 		defaultRoleCollections := defaultfilter.FetchDefaultRoleCollectionsByDirectory(directoryId)
 
 		for x, value := range roleCollections {
-			roleCollection := value.(map[string]interface{})
+			roleCollection := value.(map[string]any)
 
 			// exclude default role collections from export
 			if defaultfilter.IsRoleCollectionInDefaultList(fmt.Sprintf("%v", roleCollection["name"]), defaultRoleCollections) {
@@ -85,7 +85,7 @@ func createDirectoryRoleCollectionImportBlock(data map[string]interface{}, direc
 
 }
 
-func templateDirectoryRoleCollectionImport(x int, roleCollection map[string]interface{}, directoryId string, resourceDoc tfutils.EntityDocs) string {
+func templateDirectoryRoleCollectionImport(x int, roleCollection map[string]any, directoryId string, resourceDoc tfutils.EntityDocs) string {
 	resourceDoc.Import = strings.ReplaceAll(resourceDoc.Import, "'", "")
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "rolecollection_"+fmt.Sprint(x))
 	template = strings.ReplaceAll(template, "<directory_id>", directoryId)

@@ -23,7 +23,7 @@ func newSubaccountServiceInstanceImportProvider() ITfImportProvider {
 	}
 }
 
-func (tf *subaccountServiceInstanceImportProvider) GetImportBlock(data map[string]interface{}, levelId string, filterValues []string) (string, int, error) {
+func (tf *subaccountServiceInstanceImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
 	count := 0
 	subaccountId := levelId
 
@@ -42,15 +42,15 @@ func (tf *subaccountServiceInstanceImportProvider) GetImportBlock(data map[strin
 	return importBlock, count, nil
 }
 
-func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
+func createServiceInstanceImportBlock(data map[string]any, subaccountId string, filterValues []string, resourceDoc tfutils.EntityDocs) (importBlock string, count int, err error) {
 	count = 0
-	serviceInstances := data["values"].([]interface{})
+	serviceInstances := data["values"].([]any)
 
 	if len(filterValues) != 0 {
 		var subaccountAllServiceInstances []string
 
 		for x, value := range serviceInstances {
-			instance := value.(map[string]interface{})
+			instance := value.(map[string]any)
 			resourceName := output.FormatServiceInstanceResourceName(fmt.Sprintf("%v", instance["name"]), fmt.Sprintf("%v", instance["serviceplan_id"]))
 			subaccountAllServiceInstances = append(subaccountAllServiceInstances, resourceName)
 			if slices.Contains(filterValues, resourceName) {
@@ -67,9 +67,9 @@ func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId 
 
 	} else {
 		for x, value := range serviceInstances {
-			instance := value.(map[string]interface{})
+			instance := value.(map[string]any)
 			context := instance["context"].(string)
-			var contextData map[string]interface{}
+			var contextData map[string]any
 			if err := json.Unmarshal([]byte(context), &contextData); err != nil {
 				fmt.Print("\r\n")
 				log.Printf("error unmarshalling context data: %v", err)
@@ -86,7 +86,7 @@ func createServiceInstanceImportBlock(data map[string]interface{}, subaccountId 
 	return importBlock, count, nil
 }
 
-func templateServiceInstanceImport(x int, instance map[string]interface{}, subaccountId string, resourceDoc tfutils.EntityDocs) string {
+func templateServiceInstanceImport(x int, instance map[string]any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "serviceinstance_"+fmt.Sprint(x))
 	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
 	template = strings.ReplaceAll(template, "<service_instance_id>", fmt.Sprintf("%v", instance["id"]))

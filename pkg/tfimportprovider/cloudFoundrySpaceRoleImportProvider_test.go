@@ -23,7 +23,7 @@ func TestCreateCfSpaceRoleImportBlock(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		data          map[string]interface{}
+		data          map[string]any
 		spaceId       string
 		filterValues  []string
 		expectedBlock string
