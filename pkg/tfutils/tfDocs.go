@@ -969,7 +969,7 @@ func (p *tfMarkdownParser) parseImport(importLines []string) {
 				for _, identity := range identityAttribute {
 					key := strings.ReplaceAll(identity, "<", "")
 					key = strings.ReplaceAll(key, ">", "")
-					identityObject.WriteString(fmt.Sprintf("%s = \"%s\"\n", key, identity))
+					fmt.Fprintf(&identityObject, "%s = \"%s\"\n", key, identity)
 
 				}
 				importTemplateUsingResourceIdentity := `import {

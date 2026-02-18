@@ -62,7 +62,7 @@ type StateResource struct {
 
 	// The version of the resource type schema the "values" property
 	// conforms to.
-	SchemaVersion uint64 `json:"schema_version,"`
+	SchemaVersion uint64 `json:"schema_version"`
 
 	// The JSON representation of the attribute values of the resource,
 	// whose structure depends on the resource type schema. Any unknown
