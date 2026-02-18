@@ -25,7 +25,6 @@ jobs:
       - name: Extract SHA from release
         id: extract-sha
         run: |
-          echo "Event '${{ github.event.action }}'"
           echo "BTP Terraform binary hash:"
           tag=$(echo ${{ steps.latest-release.outputs.LATEST_TAG }} | cut -c 2-)
           darwin_amd64_sha="btptf_${tag}_darwin_amd64.sha256"

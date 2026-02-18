@@ -99,7 +99,7 @@ jobs:
 
       - name: JSON inventory for Subaccount
         id: json-inventory-subaccount
-        if: ${{ success() }} || ${{ failure() }}
+        if: ${{ success() || failure() }}
         run: |
           trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
@@ -152,7 +152,7 @@ jobs:
 
       - name: JSON inventory for Cloud Foundry Org
         id: json-inventory-cforg
-        if: ${{ success() }} || ${{ failure() }}
+        if: ${{ success() || failure() }}
         run: |
           trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           export CF_USER=${{ secrets.BTP_USERNAME }}
@@ -296,7 +296,7 @@ jobs:
 
       - name: Export by JSON for Subaccount
         id: export-by-json-subaccount
-        if: ${{ success() }} || ${{ failure() }}
+        if: ${{ success() || failure() }}
         run: |
           trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
@@ -376,7 +376,7 @@ jobs:
 
       - name: Export by JSON for Cloud Foundry Organization
         id: export-by-json-cforg
-        if: ${{ success() }} || ${{ failure() }}
+        if: ${{ success() || failure() }}
         run: |
           trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
@@ -540,7 +540,7 @@ jobs:
 
       - name: Export by Resource for Subaccount
         id: export-by-resource-subaccount
-        if: ${{ success() }} || ${{ failure() }}
+        if: ${{ success() || failure() }}
         run: |
           trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
@@ -620,7 +620,7 @@ jobs:
 
       - name: Export by Resource for Cloud Foundry Organization
         id: export-by-resource-cforg
-        if: ${{ success() }} || ${{ failure() }}
+        if: ${{ success() || failure() }}
         run: |
           trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
           echo "====================================="
