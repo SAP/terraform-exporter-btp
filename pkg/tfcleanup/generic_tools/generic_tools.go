@@ -347,6 +347,25 @@ func RemoveUnusedImports(directory string, blocksToRemove *[]BlockSpecifier, res
 	}
 }
 
+func RemoveAttributeFromResourceBlocks(body *hclwrite.Body, blockIdentifier string, attributeName string) {
+	for _, block := range body.Blocks() {
+		// Check if this is a resource block
+		if block.Type() != "resource" {
+			continue
+		}
+
+		// Check if this resource matches the specified block identifier
+		labels := block.Labels()
+		if len(labels) >= 1 && labels[0] == blockIdentifier {
+			// Remove the specified attribute from this block
+			blockBody := block.Body()
+			if blockBody.GetAttribute(attributeName) != nil {
+				blockBody.RemoveAttribute(attributeName)
+			}
+		}
+	}
+}
+
 func RemoveEmptyFiles(dir string) error {
 	files, err := os.ReadDir(dir)
 	if err != nil {

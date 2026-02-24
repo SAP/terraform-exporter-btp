@@ -33,3 +33,7 @@ func IsEntitlementModuleGenerationDeactivated() bool {
 
 	return os.Getenv("BTPTF_ADD_ENTITLEMENTMODULE") == ""
 }
+
+func IsPlanUniqueIdentifierRemovalDeactivated() bool {
+	return os.Getenv("BTPTF_SKIP_PLAN_UNIQUE_IDENTIFIER_REMOVAL") != ""
+}

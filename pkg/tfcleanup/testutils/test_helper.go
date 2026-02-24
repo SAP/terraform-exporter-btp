@@ -48,6 +48,10 @@ var testFiles = testFileMapping{
 		sourceFilePath: "resource_subaccount_entitlement.tf",
 		targetFilePath: "resource_subaccount_entitlement.tf",
 	},
+	"sa_entitlement_plan_unique": {
+		sourceFilePath: "resource_subaccount_entitlement_plan_unique_source.tf",
+		targetFilePath: "resource_subaccount_entitlement_plan_unique_target.tf",
+	},
 	"sa_entitlement_error": {
 		sourceFilePath: "resource_subaccount_entitlement_incomplete.tf",
 		targetFilePath: "resource_subaccount_entitlement_incomplete.tf",

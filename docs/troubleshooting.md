@@ -101,6 +101,24 @@ If the generated JSON file (command `btptf create-json`) or the generated Terraf
     export BTPTF_SKIP_ENTITLEMENTFILTER=true
     ```
 
+## The plan_unique_identifier attribute should be kept in the generated code
+
+By default, the btptf CLI removes the `plan_unique_identifier` attribute from `btp_subaccount_entitlement` resources in the generated Terraform code to improve code cleanliness and maintainability, as this attribute is typically not needed for most use cases.
+
+If you need to keep the `plan_unique_identifier` attribute in your exported entitlement resources, you can deactivate its removal by setting the environment variable `BTPTF_SKIP_PLAN_UNIQUE_IDENTIFIER_REMOVAL` to a non-empty value:
+
+=== "Windows"
+
+    ``` powershell
+    $env:BTPTF_SKIP_PLAN_UNIQUE_IDENTIFIER_REMOVAL='true'
+    ```
+
+=== "Linux/Mac"
+
+    ``` bash
+    export BTPTF_SKIP_PLAN_UNIQUE_IDENTIFIER_REMOVAL=true
+    ```
+
 ## The generated code for the subaccount does not contain the right value of the `skip_auto_entitlement` flag
 
 The Terraform provider for SAP BTP is not able to fetch the the information if the subaccount was created with the parameter `skip_auto_entitlement` set to `true`. This impacts the import of the subaccount resource and the import of the assigned entitlements.
