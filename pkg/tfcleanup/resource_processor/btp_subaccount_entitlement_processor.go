@@ -254,6 +254,15 @@ func removeEntitlementConfigBlock(body *hclwrite.Body, entitlementAddress map[ge
 	}
 }
 
+func removePlanUniqueIdentifierAttribute(body *hclwrite.Body, entitlementInfo map[generictools.EntitlementKey]generictools.EntitlementInfo) {
+	if toggles.IsPlanUniqueIdentifierRemovalDeactivated() {
+		return
+	}
+
+	const planUniqueIdentifierAttr = "plan_unique_identifier"
+	generictools.RemoveAttributeFromResourceBlocks(body, subaccountEntitlementBlockIdentifier, planUniqueIdentifierAttr)
+}
+
 func handleGenericEntitlementModule(body *hclwrite.Body, subaccountId string, dependencyAddresses *generictools.DependencyAddresses, variables *generictools.VariableContent) {
 
 	// Add module to main configuration
@@ -267,4 +276,7 @@ func handleGenericEntitlementModule(body *hclwrite.Body, subaccountId string, de
 
 	// Add import blocks for entitlements to be removed
 	appendEntitlementBlocksToRemove(dependencyAddresses)
+
+	// Remove the attribute "plan_unique_identifier"
+	removePlanUniqueIdentifierAttribute(body, dependencyAddresses.EntitlementAddress)
 }

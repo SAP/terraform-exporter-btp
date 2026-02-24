@@ -439,3 +439,41 @@ func TestRemoveConfigBlock(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveAttribute(t *testing.T) {
+	srcFileRemoveAttr, trgtFileRemoveAttr := testutils.GetHclFilesById("sa_entitlement_plan_unique")
+	_, trgtFileBackup := testutils.GetHclFilesById("sa_entitlement_plan_unique")
+
+	tests := []struct {
+		name       string
+		src        *hclwrite.File
+		trgt       *hclwrite.File
+		identifier string
+		atttribute string
+	}{
+		{
+			name:       "Test remove attribute",
+			src:        srcFileRemoveAttr,
+			trgt:       trgtFileRemoveAttr,
+			identifier: "btp_subaccount_entitlement",
+			atttribute: "plan_unique_identifier",
+		},
+		{
+			name:       "Test nothing to remove",
+			src:        trgtFileRemoveAttr,
+			trgt:       trgtFileBackup,
+			identifier: "btp_subaccount_entitlement",
+			atttribute: "plan_unique_identifier",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			body := tt.src.Body()
+			// we assume one resource entry in the blocks file
+			RemoveAttributeFromResourceBlocks(body, tt.identifier, tt.atttribute)
+			assert.NoError(t, testutils.AreHclFilesEqual(tt.src, tt.trgt))
+		})
+	}
+}
