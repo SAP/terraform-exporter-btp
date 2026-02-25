@@ -41,7 +41,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@v4.0.0
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
@@ -92,7 +92,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@v4.0.0
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
@@ -145,7 +145,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@v4.0.0
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
@@ -198,7 +198,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@v4.0.0
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
@@ -278,7 +278,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@v4.0.0
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
@@ -358,7 +358,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@v4.0.0
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
@@ -439,7 +439,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@v4.0.0
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
@@ -518,7 +518,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@v4.0.0
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
@@ -598,7 +598,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3.1.2
+        uses: hashicorp/setup-terraform@v4.0.0
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
