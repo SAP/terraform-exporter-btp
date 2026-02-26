@@ -4,9 +4,9 @@ go 1.26
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
-	github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.18
+	github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.19
 	github.com/fatih/color v1.18.0
-	github.com/go-git/go-git/v5 v5.16.5
+	github.com/go-git/go-git/v5 v5.17.0
 	github.com/jedib0t/go-pretty/v6 v6.7.8
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2
@@ -27,7 +27,7 @@ require (
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
-	github.com/go-git/go-billy/v5 v5.7.0 // indirect
+	github.com/go-git/go-billy/v5 v5.8.0 // indirect
 	github.com/go-martini/martini v0.0.0-20170121215854-22fa46961aab // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
