@@ -95,7 +95,7 @@ jobs:
         with:
           testArguments: -v -cover -coverprofile=cover.out -timeout=900s -parallel=4 ./...
       # Upload coverage report
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: cover.out
