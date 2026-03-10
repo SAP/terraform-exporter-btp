@@ -22,4 +22,5 @@ matrix:
             - "blockquote"
     sources:
       - "**/*.md"
+      - "!CLAUDE.md"
     default_encoding: utf-8
