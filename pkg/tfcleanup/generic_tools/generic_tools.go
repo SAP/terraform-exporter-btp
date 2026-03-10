@@ -259,14 +259,14 @@ func RemoveEmptyAttributes(body *hclwrite.Body) {
 		}
 
 		// Check for an empty JSON encoded string or an empty Map
-		var combinedString string
+		var combinedString strings.Builder
 		if len(tokens) == 5 || len(tokens) == 2 {
 			for _, token := range tokens {
-				combinedString += string(token.Bytes)
+				combinedString.WriteString(string(token.Bytes))
 			}
 		}
 
-		if combinedString == EmptyJson || combinedString == EmptyMap {
+		if combinedString.String() == EmptyJson || combinedString.String() == EmptyMap {
 			body.RemoveAttribute(name)
 		}
 	}
