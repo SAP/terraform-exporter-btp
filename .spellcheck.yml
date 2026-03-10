@@ -21,6 +21,5 @@ matrix:
             - "pre"
             - "blockquote"
     sources:
-      - "**/*.md"
-      - "!CLAUDE.md"
+      - "README.md,CONTRIBUTING.md, docs/*.md, guidelines/DEVELOPER-GUIDE.md"
     default_encoding: utf-8
