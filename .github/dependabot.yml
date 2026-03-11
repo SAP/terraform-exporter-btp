@@ -8,6 +8,43 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      terraform:
+        patterns:
+          - "github.com/hashicorp/*"
+          - "github.com/zclconf/go-cty"
+          - "github.com/apparentlymart/go-textseg*"
+      cobra:
+        patterns:
+          - "github.com/spf13/cobra"
+          - "github.com/spf13/pflag"
+          - "github.com/spf13/viper"
+          - "github.com/spf13/afero"
+          - "github.com/spf13/cast"
+          - "github.com/sagikazarmark/locafero"
+          - "github.com/subosito/gotenv"
+          - "github.com/pelletier/go-toml*"
+          - "github.com/fsnotify/fsnotify"
+          - "github.com/inconshreveable/mousetrap"
+          - "github.com/go-viper/mapstructure*"
+      misc:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "github.com/hashicorp/*"
+          - "github.com/zclconf/go-cty"
+          - "github.com/apparentlymart/go-textseg*"
+          - "github.com/spf13/cobra"
+          - "github.com/spf13/pflag"
+          - "github.com/spf13/viper"
+          - "github.com/spf13/afero"
+          - "github.com/spf13/cast"
+          - "github.com/sagikazarmark/locafero"
+          - "github.com/subosito/gotenv"
+          - "github.com/pelletier/go-toml*"
+          - "github.com/fsnotify/fsnotify"
+          - "github.com/inconshreveable/mousetrap"
+          - "github.com/go-viper/mapstructure*"
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
