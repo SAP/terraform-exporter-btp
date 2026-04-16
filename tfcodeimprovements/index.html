@@ -1,0 +1,985 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../concepts/">
+      
+      
+        <link rel="next" href="../install/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.33">
+    
+    
+      
+        <title>How the btptf CLI Refines the Generated Configurations - Terraform Exporter for SAP BTP</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.3cba04c6.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#how-the-btptf-cli-refines-the-generated-configurations" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Terraform Exporter for SAP BTP" class="md-header__button md-logo" aria-label="Terraform Exporter for SAP BTP" data-md-component="logo">
+      
+  <img src="../img/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Terraform Exporter for SAP BTP
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              How the btptf CLI Refines the Generated Configurations
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/SAP/terraform-exporter-btp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Terraform Exporter for SAP BTP" class="md-nav__button md-logo" aria-label="Terraform Exporter for SAP BTP" data-md-component="logo">
+      
+  <img src="../img/logo.svg" alt="logo">
+
+    </a>
+    Terraform Exporter for SAP BTP
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/SAP/terraform-exporter-btp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Architecture & Concepts
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture & Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How the btptf CLI Works
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    How the btptf CLI Refines the Generated Configurations
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    How the btptf CLI Refines the Generated Configurations
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#general-refinements" class="md-nav__link">
+    <span class="md-ellipsis">
+      General Refinements
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="General Refinements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remove-empty-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remove empty values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract-provider-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Extract provider configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remove-automatically-provided-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remove automatically provided resources
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refinements-on-subaccount-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Refinements on Subaccount Level
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refinements-on-directory-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Refinements on Directory Level
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refinements-on-cloud-foundry-org-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Refinements on Cloud Foundry Org Level
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refinements-in-beta" class="md-nav__link">
+    <span class="md-ellipsis">
+      Refinements in Beta
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Refinements in Beta">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#entitlement-module-generation-on-subaccount-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Entitlement Module Generation on Subaccount Level
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../btptf/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Commands Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Quick Start Guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Quick Start Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prerequisites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Prerequisites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gettingstarted/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How to Export Resources
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Advanced Configuration
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../remotebackend/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How to Add a Remote Backend
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resume/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How to Resume Failed Exports
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../limitations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Limitations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Security Considerations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#general-refinements" class="md-nav__link">
+    <span class="md-ellipsis">
+      General Refinements
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="General Refinements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remove-empty-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remove empty values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract-provider-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Extract provider configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#remove-automatically-provided-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remove automatically provided resources
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refinements-on-subaccount-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Refinements on Subaccount Level
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refinements-on-directory-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Refinements on Directory Level
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refinements-on-cloud-foundry-org-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Refinements on Cloud Foundry Org Level
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#refinements-in-beta" class="md-nav__link">
+    <span class="md-ellipsis">
+      Refinements in Beta
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Refinements in Beta">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#entitlement-module-generation-on-subaccount-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Entitlement Module Generation on Subaccount Level
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="how-the-btptf-cli-refines-the-generated-configurations">How the btptf CLI Refines the Generated Configurations</h1>
+<p>The btptf CLI not only creates the Terraform configuration based on the data available on SAP BTP, but it also cleans up the the resulting configurations by refining the code and adding a <code>variables.tf</code> file.</p>
+<p>The following section outlines the code and, more generally,  configuration refinements carried out by the btptf CLI.</p>
+<h2 id="general-refinements">General Refinements</h2>
+<h3 id="remove-empty-values">Remove empty values</h3>
+<p>Empty values are removed from the code. In particular: attributes:</p>
+<ul>
+<li><code>null</code></li>
+<li>empty JSON strings</li>
+</ul>
+<h3 id="extract-provider-configuration">Extract provider configuration</h3>
+<p>The value of the provider configuration (<code>provider.tf</code> file) is extracted and stored as a variable:</p>
+<ul>
+<li>The subdomain of the SAP BTP global account for the Terraform provider for SAP BTP</li>
+<li>The API URL of Cloud Foundry for the Terraform provider for Cloud Foundry</li>
+</ul>
+<h3 id="remove-automatically-provided-resources">Remove automatically provided resources</h3>
+<p>Some superfluous resources that get automatically created by SAP BTP at, e.g. subaccount or directory creation, are removed:</p>
+<ul>
+<li>Default trust configuration to the SAP IdP</li>
+<li>Default role collections that get created during subaccount or directory creation or when a service instance or app subscription gets created</li>
+<li>Default roles that get created during subaccount or directory creation or when a service instance or app subscription gets created</li>
+<li>Default entitlements that get created during the initial subaccount creation</li>
+</ul>
+<h2 id="refinements-on-subaccount-level">Refinements on Subaccount Level</h2>
+<p>The Terraform configuration on subaccount level gets improved via the following measures:</p>
+<ul>
+<li>The <code>region</code> is extracted as a variable for the resource <code>btp_subaccount</code>.</li>
+<li>All resources that reference a <code>subaccount_id</code> get transformed to reference the resource <code>btp_subaccount</code> if available.</li>
+<li>If the attribute <code>parent_id</code> is the global account, it gets removed from the resource <code>btp_subaccount</code>, as the global account is the default. If not it gets extracted as a variable.</li>
+<li>If a dependency between the resource <code>btp_subaccount_entitlement</code> and the resource <code>btp_subaccount_subscription</code> exists, a corresponding <code>depends_on</code> block will be added to the resource <code>btp_subaccount_subscription</code>.</li>
+<li>If a dependency between the resource <code>btp_subaccount_entitlement</code> and the resource <code>btp_subaccount_service_instance</code> exists, a data source <code>btp_subaccount_service_plan</code> is added to fetch the identifier of the service plan. In addition a <code>depends_on</code> block is added to the data source to make it explicitly dependent to the corresponding entitlement. Finally the technical identifier of the service plan is replaced by the reference to the data source`.</li>
+<li>If a resource <code>btp_subaccount_trust_configuration</code> gets exported that is the SAP default trust, the corresponding resource is removed from the resource configuration as well as the import block from the corresponding import file.</li>
+<li>If a resource <code>btp_subaccount_role_collection</code> as well as <code>btp_subaccount_role</code> a check if there are dependencies is executed. If there are any a corresponding <code>depends_on</code> block is added to the resource <code>btp_subaccount_role_collection</code>.</li>
+</ul>
+<h2 id="refinements-on-directory-level">Refinements on Directory Level</h2>
+<ul>
+<li>If the attribute <code>parent_id</code> is the global account, it gets removed from the resource <code>btp_directory</code>, as the global account is the default. If not it gets extracted as a variable.</li>
+<li>All resources that reference a <code>directory_id</code> get transformed to reference the <code>btp_directory</code> resource if available.</li>
+<li>If a resource <code>btp_directory_role_collection</code> as well as <code>btp_directory_role</code> a check if there are dependencies is executed. If there are any a corresponding <code>depends_on</code> block is added to the resource <code>btp_directory_role_collection</code>.</li>
+</ul>
+<h2 id="refinements-on-cloud-foundry-org-level">Refinements on Cloud Foundry Org Level</h2>
+<ul>
+<li>The ID of the org is extracted as a variable</li>
+</ul>
+<h2 id="refinements-in-beta">Refinements in Beta</h2>
+<p>We continuously improve the generated Terraform configurations. The following refinements are currently in beta and must be explicitly activated via environment variables.</p>
+<h3 id="entitlement-module-generation-on-subaccount-level">Entitlement Module Generation on Subaccount Level</h3>
+<p>By default, the generated code for entitlements contains one resource <code>btp_subaccount_entitlement</code> per entitlement. Depending on the number of entitlements the Terraform configuration can become quite extensive. Therefore, some users rely on the <strong>community</strong> module <a href="https://registry.terraform.io/modules/aydin-ozcan/sap-btp-entitlements/btp/latest">sap-btp-entitlements</a> to make the setup more comprehensive.</p>
+<p>Based on a feature request by these users, we introduced the beta feature to adjust the generated code namely to use the community module instead of the individual resources. The following adjustments are made to the generated code:</p>
+<ul>
+<li>All resources <code>btp_subaccount_entitlement</code> are replaced by the module <code>sap-btp-entitlements</code></li>
+<li>A variable is generated for the module <code>sap-btp-entitlements</code> to hold the entitlements</li>
+<li>Dependencies to the entitlements from subscriptions or service instances are pointing to the module <code>sap-btp-entitlements</code> instead of the individual resources</li>
+<li>The import blocks namely the target address of the import are adjusted to point to the module <code>sap-btp-entitlements</code></li>
+</ul>
+<p>To activate this feature you must set the environment variable <code>BTPTF_ADD_ENTITLEMENTMODULE</code> to any value as follows:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">Linux/Mac</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nv">$env:BBTPTF_ADD_ENTITLEMENTMODULE</span><span class="p">=</span><span class="s1">&#39;true&#39;</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">BTPTF_ADD_ENTITLEMENTMODULE</span><span class="o">=</span><span class="nb">true</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../concepts/" class="md-footer__link md-footer__link--prev" aria-label="Previous: How the btptf CLI Works">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                How the btptf CLI Works
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../install/" class="md-footer__link md-footer__link--next" aria-label="Next: Installation">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Installation
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright © 2026 SAP SE or SAP affiliate company. All rights reserved.
+    </div>
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.footer"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.af256bd8.min.js"></script>
+      
+    
+  </body>
+</html>

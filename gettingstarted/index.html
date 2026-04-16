@@ -1,0 +1,900 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../prerequisites/">
+      
+      
+        <link rel="next" href="../remotebackend/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.33">
+    
+    
+      
+        <title>How to Export Resources - Terraform Exporter for SAP BTP</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.3cba04c6.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#getting-started" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Terraform Exporter for SAP BTP" class="md-header__button md-logo" aria-label="Terraform Exporter for SAP BTP" data-md-component="logo">
+      
+  <img src="../img/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Terraform Exporter for SAP BTP
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              How to Export Resources
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/SAP/terraform-exporter-btp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Terraform Exporter for SAP BTP" class="md-nav__button md-logo" aria-label="Terraform Exporter for SAP BTP" data-md-component="logo">
+      
+  <img src="../img/logo.svg" alt="logo">
+
+    </a>
+    Terraform Exporter for SAP BTP
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/SAP/terraform-exporter-btp" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Architecture & Concepts
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Architecture & Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How the btptf CLI Works
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tfcodeimprovements/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How the btptf CLI Refines the Generated Configurations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../btptf/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Commands Reference
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Quick Start Guide
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Quick Start Guide
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../prerequisites/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Prerequisites
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    How to Export Resources
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    How to Export Resources
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#option-1-basic-flow-to-export-a-subaccount-via-json-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 1: Basic Flow to Export a Subaccount via JSON (Recommended)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#option-2-basic-flow-to-export-a-subaccount-directly" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 2: Basic Flow to Export a Subaccount Directly
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-work-with-the-exported-configuration-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to Work With the Exported Configuration Files
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#detailed-example-of-exporting-a-subaccount-via-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      Detailed Example of Exporting a Subaccount via JSON
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Advanced Configuration
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            Advanced Configuration
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../remotebackend/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How to Add a Remote Backend
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../resume/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How to Resume Failed Exports
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../limitations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Limitations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Security Considerations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Troubleshooting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#option-1-basic-flow-to-export-a-subaccount-via-json-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 1: Basic Flow to Export a Subaccount via JSON (Recommended)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#option-2-basic-flow-to-export-a-subaccount-directly" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 2: Basic Flow to Export a Subaccount Directly
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-work-with-the-exported-configuration-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      How to Work With the Exported Configuration Files
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#detailed-example-of-exporting-a-subaccount-via-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      Detailed Example of Exporting a Subaccount via JSON
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="getting-started">Getting Started</h1>
+<p>The btptf CLI offers two ways to export BTP resources:</p>
+<ul>
+<li>Exporting resources via JSON (recommended)</li>
+<li>Exporting resources</li>
+</ul>
+<p>Let's look at how both flows work for a simple subaccount export.</p>
+<h2 id="option-1-basic-flow-to-export-a-subaccount-via-json-recommended">Option 1: Basic Flow to Export a Subaccount via JSON (Recommended)</h2>
+<p>This is a two-step process where a JSON is created as a resource inventory and used as a basis for the export.</p>
+<ol>
+<li>
+<p>Create a JSON file with a list of BTP resources to be exported.</p>
+<p><div class="highlight"><pre><span></span><code>btptf<span class="w"> </span>create-json<span class="w"> </span>-s<span class="w"> </span>&lt;subaccount<span class="w"> </span>id&gt;
+</code></pre></div>
+Review and adjust the JSON file according to your needs.</p>
+</li>
+<li>
+<p>Export resources from SAP BTP via a JSON file.</p>
+<div class="highlight"><pre><span></span><code>btptf<span class="w"> </span>export-by-json<span class="w"> </span>-s<span class="w"> </span>&lt;subaccount<span class="w"> </span>id&gt;
+</code></pre></div>
+</li>
+</ol>
+<h2 id="option-2-basic-flow-to-export-a-subaccount-directly">Option 2: Basic Flow to Export a Subaccount Directly</h2>
+<p>Export resources from SAP BTP directly, by specifying their IDs.</p>
+<div class="highlight"><pre><span></span><code>btptf<span class="w"> </span><span class="nb">export</span><span class="w"> </span>-s<span class="w"> </span>&lt;subaccount<span class="w"> </span>id&gt;
+</code></pre></div>
+<p>You find a comprehensive overview of the commands and their options and flags in the <a href="../btptf/">documentation</a>.</p>
+<h2 id="how-to-work-with-the-exported-configuration-files">How to Work With the Exported Configuration Files</h2>
+<p>Independent of the flow you have chosen, the export created Terraform configuration files and import blocks for you. You'll need these files to run '<em>terraform apply</em>' and import the state.</p>
+<p>At export, the generated code was refined by the btptf CLI as outlined in the <a href="https://sap.github.io/terraform-exporter-btp/tfcodeimprovements/">documentation</a>.</p>
+<p>However, we strongly recommend that you review the code before you execute the state import.</p>
+<p>Here are some points to consider:</p>
+<ol>
+<li>
+<p><strong>Check provider version constraints</strong>: Check the version constraint in the provider configuration (<em>provider.tf</em>) i.e. make sure that the constraints are compliant with the rules of your company like cherry-picking one explicit version. We recommend to always use the latest version independent of the constraints you add.</p>
+</li>
+<li>
+<p><strong>Cleanup configuration of resources</strong>: The configuration (<em>btp_resources.tf</em>) is generated based on the information about the resources available from the provider plugin. All data including optional data that got defaulted (e.g. usage in the btp_subaccount resource) is added to the configuration. To reduce the amount of data you could remove optional attributes that you don't want to have set explicitly.</p>
+</li>
+<li>
+<p><strong>Declare variables</strong>: The generated code already contains some variables in the <em>variables.tf</em> file. Depending on your requirements you might want to add further parameters to the variable list. For example, the name of a subaccount.</p>
+</li>
+<li>
+<p><strong>Configure backend</strong>: The state of your configuration should be stored in a remote state backend. If you have not injected an existing remote state at export (see <a href="https://sap.github.io/terraform-exporter-btp/remotebackend/">How to Add a Remote Backend Configuration</a>), make sure to add the corresponding configuration in the <em>provider.tf</em> file manually. You find more details in the <a href="https://developer.hashicorp.com/terraform/language/backend">Terraform documentation</a>.</p>
+</li>
+<li>
+<p><strong>Validate the import</strong>: Validate that the import is possible by executing '<em>terraform plan</em>'. Depending on the number of resources, the planing should return a message like this:</p>
+<p>Plan: n to import, 0 to add, 0 to change, 0 to destroy.</p>
+</li>
+</ol>
+<p>Now you're all set to run '<em>terraform apply</em>', which will import the state and thus bring your SAP BTP resources under the management of Terraform.</p>
+<h2 id="detailed-example-of-exporting-a-subaccount-via-json">Detailed Example of Exporting a Subaccount via JSON</h2>
+<p>The below example looks in more detail at how to use the btptf CLI to export an existing subaccount as  Terraform configuration and state.</p>
+<ol>
+<li>
+<p>Launch SAP BTP Cockpit and navigate to an existing subaccount.</p>
+</li>
+<li>
+<p>In the subaccount, navigate to the 'Overview' tab and find the 'Subaccount ID'</p>
+</li>
+<li>
+<p>Open a terminal session.</p>
+</li>
+<li>
+<p>Generate the json file which contains the list of resources to be exported. This json file can be generated by running the btptf CLI command btptf create-json -s <subaccount id></p>
+<p><div class="highlight"><pre><span></span><code>btptf<span class="w"> </span>create-json<span class="w"> </span>-s<span class="w"> </span>&lt;YOUR<span class="w"> </span>SUBACCOUNT<span class="w"> </span>ID&gt;
+</code></pre></div>
+The resources list file with the name btpResources_<subaccount id>.json e.g, <code>btpResources_&lt;YOUR SUBACCOUNT ID&gt;.json</code> gets generated.</p>
+<p><img alt="Console output of create json command of btptf CLI" src="../img/create-json.jpg" /></p>
+</li>
+<li>
+<p>Edit the json file and remove the resources which need not be exported and managed by Terraform.</p>
+</li>
+<li>
+<p>Run the btptf CLI command to export Terraform configuration using the JSON file.</p>
+<div class="highlight"><pre><span></span><code>btptf<span class="w"> </span>export-by-json<span class="w"> </span>-s<span class="w"> </span>&lt;YOUR<span class="w"> </span>SUBACCOUNT<span class="w"> </span>ID&gt;
+</code></pre></div>
+<p>As the JSON file is generated with the default name you do not need to to explicitly specify it.</p>
+</li>
+<li>
+<p>The Terraform configurations will be generated under the folder <code>generated_configurations_&lt;YOUR SUBACCOUNT ID&gt;</code>. The output of the command will show an export summary which contains the information about which 'Resource Names' and their respective count.</p>
+<p><img alt="Display of generated configuration after export" src="../img/generated-config.jpg" /></p>
+</li>
+<li>
+<p>Review the file NextSteps.md under the folder <code>generated_configurations_&lt;YOUR SUBACCOUNT ID&gt;</code> and adapt the Terraform configuration files as mentioned in the document.</p>
+</li>
+<li>
+<p>In the terminal, navigate to the folder <code>generated_configurations_&lt;YOUR SUBACCOUNT ID&gt;</code> and run the <code>terraform plan</code> command. This will show a plan of how many resources will be imported, added, changed and destroyed.</p>
+<p><img alt="Console output of terraform plan after import" src="../img/tf-plan.jpg" /></p>
+</li>
+<li>
+<p>Run the command Terraform apply. This will import the Terraform state and store it in the terraform.state file in under the folder <code>generated_configurations_&lt;YOUR SUBACCOUNT ID&gt;</code>.</p>
+<p><img alt="Console output of terraform apply after import" src="../img/tf-apply.jpg" /></p>
+</li>
+<li>
+<p>Now, to modify your BTP resources in this subaccount you can change to Terraform configuration files and run a Terraform apply to trigger the changes.</p>
+</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../prerequisites/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Prerequisites">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Prerequisites
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../remotebackend/" class="md-footer__link md-footer__link--next" aria-label="Next: How to Add a Remote Backend">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                How to Add a Remote Backend
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright © 2026 SAP SE or SAP affiliate company. All rights reserved.
+    </div>
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.footer"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.af256bd8.min.js"></script>
+      
+    
+  </body>
+</html>
