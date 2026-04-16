@@ -9,7 +9,7 @@ import (
 
 func TestCreateSecuritySettingImportBlock(t *testing.T) {
 	resourceDoc := tfutils.EntityDocs{
-		Import: "import {\n\t\t\t\tto = btp_subaccount_security_settings.<resource_name>\n\t\t\t\tid = \"'<subaccount_id>'\"\"\n\t\t\t  }\n",
+		Import: "import {\n\t\t\t\tto = btp_subaccount_security_settings.<resource_name>\n\t\t\t\tid = \"<subaccount_id>\"\"\n\t\t\t  }\n",
 	}
 
 	jsonString := "{\"access_token_validity\": -1,\"custom_email_domains\": [],\"default_identity_provider\":\"sap.default\",\"iframe_domains\":\"\",\"refresh_token_validity\": -1,\"subaccount_id\":\"12345\",\"treat_users_with_same_email_as_same_user\": false}"
