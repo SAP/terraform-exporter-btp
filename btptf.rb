@@ -5,23 +5,23 @@
 class Btptf < Formula
   desc "Command-line tool for Exporting SAP BTP Resources to Terraform"
   homepage "https://sap.github.io/terraform-exporter-btp/"
-  version "1.5.0"
+  version "1.6.0"
 
   if OS.mac?
     if Hardware::CPU.arm?
-      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.5.0/btptf_1.5.0_darwin_arm64"
-      sha256 "46aff1bdf83bc1e7fa7ebf5985f25133f30545c5853db14a1f8a900c13d1e770"
+      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.6.0/btptf_1.6.0_darwin_arm64"
+      sha256 "74b54d17af61ce45e3ddd3ac3ab5d63e87c6b57fec4de4ae735d251563b841cd"
     else
-      url url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.5.0/btptf_1.5.0_darwin_amd64"
-      sha256 "0554da38617d7febafc65580df771e29641c536185203a7ab88d886ab369b643"
+      url url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.6.0/btptf_1.6.0_darwin_amd64"
+      sha256 "d927ddb618764d8a2207502666e813954e14b104ecb44c2b77dea57647d61bad"
     end
   elsif OS.linux?
     if Hardware::CPU.arm?
-      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.5.0/btptf_1.5.0_linux_arm64"
-      sha256 "7503de150af01d1cc457215bb02eaef41614c34ecbdaed31959e9ec1c2cfaee7"
+      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.6.0/btptf_1.6.0_linux_arm64"
+      sha256 "0a30d9f4358b5a0bf3e0f88af1a71068d0b77ed3faec50ea2e189c82daaba1b3"
     else
-      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.5.0/btptf_1.5.0_linux_amd64"
-      sha256 "97bae73ecb7cf2311ccef4aebde7859c30478928c1846acac84f8ed597170d4a"
+      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.6.0/btptf_1.6.0_linux_amd64"
+      sha256 "07a5a79bf2638bfe8ecc01bd17e2685dd5d018090691bf4ac6a3c3d0123fc648"
       depends_on arch: :x86_64
     end
   end
