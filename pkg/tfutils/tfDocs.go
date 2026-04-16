@@ -936,6 +936,17 @@ func (p *tfMarkdownParser) parseImport(importLines []string) {
 	tool, _ := getIaCTool()
 	resourceIdentitySupport, _ := isResourceIdentitySupported()
 	var parts []string
+
+	// Parse explicit identity blocks (import { to=... identity={...} }) directly from the lines.
+	// This handles the new doc format where the identity block is present without a trigger comment.
+	if tool == "terraform" && resourceIdentitySupport {
+		identityBlock := extractIdentityImportBlock(importLines)
+		if identityBlock != "" {
+			p.ret.Import = p.ret.Import + identityBlock
+			return
+		}
+	}
+
 	for _, line := range importLines {
 		if strings.Contains(line, "**NOTE:") || strings.Contains(line, "**Please Note:") ||
 			strings.Contains(line, "**Note:**") {
@@ -955,11 +966,14 @@ func (p *tfMarkdownParser) parseImport(importLines []string) {
 			  }`
 
 		if strings.Contains(line, "# terraform import") {
-			line = strings.ReplaceAll(line, "$ ", "")
-			line = strings.ReplaceAll(line, "# terraform import ", "")
-
-			parts = strings.Split(line, " ")
-			importString = append(importString, fmt.Sprintf(importTemplateUsingId, parts[0], parts[1]))
+			stripped := strings.ReplaceAll(line, "$ ", "")
+			stripped = strings.ReplaceAll(stripped, "# terraform import ", "")
+			candidate := strings.Fields(stripped)
+			// Only treat as a real import command when exactly 2 tokens follow (resource address + id).
+			if len(candidate) == 2 {
+				parts = candidate
+				importString = append(importString, fmt.Sprintf(importTemplateUsingId, parts[0], parts[1]))
+			}
 		}
 
 		if tool == "terraform" && resourceIdentitySupport {
@@ -986,6 +1000,27 @@ func (p *tfMarkdownParser) parseImport(importLines []string) {
 	}
 
 	p.ret.Import = p.ret.Import + strings.Join(importString, " ")
+}
+
+// extractIdentityImportBlock scans the import section lines for an explicit
+// "import { to = ... identity = { ... } }" block and returns it formatted as a
+// template string (with "<resource_name>" preserved). Returns "" if not found.
+func extractIdentityImportBlock(lines []string) string {
+	// Join lines to search for the identity block as a block of text.
+	joined := strings.Join(lines, "\n")
+
+	// Find the last "import {" block that contains "identity"
+	// (the new doc format places the identity block after the id block).
+	identityBlockRe := regexp.MustCompile(`(?s)import\s*\{[^{}]*identity\s*=\s*\{[^{}]*\}[^{}]*\}`)
+	match := identityBlockRe.FindString(joined)
+	if match == "" {
+		return match
+	}
+
+	// Strip code-fence markers that may have been included.
+	match = strings.ReplaceAll(match, "```terraform", "")
+	match = strings.ReplaceAll(match, "```", "")
+	return strings.TrimSpace(match)
 }
 
 func parseAttrReferenceSection(attributeLines []string, entity *EntityDocs) {
