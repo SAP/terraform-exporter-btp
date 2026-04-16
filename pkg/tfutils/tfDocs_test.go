@@ -23,7 +23,11 @@ func TestParseImport(t *testing.T) {
 		},
 		{
 			input:    readlines(t, "testdata/testImportUsingIdentity.md"),
-			expected: "import {\n\t\t\t\t\tto = btp_subaccount_subscription.<resource_name>\n\t\t\t\t\tidentity = {\n\t\t\t\t\tsubaccount_id = \"<subaccount_id>\"\napp_name = \"<app_name>\"\nplan_name = \"<plan_name>\"\n\n\t\t\t\t\t}\n\t\t\t\t  }",
+			expected: "import {\nto = btp_subaccount_subscription.<resource_name>\nidentity = {\n  subaccount_id = \"<subaccount_id>\"\n  app_name = \"<app_name>\"\n  plan_name = \"<plan_name>\"\n  }\n}",
+		},
+		{
+			input:    readlines(t, "testdata/testImportDirectory.md"),
+			expected: "import {\n  to = btp_directory.<resource_name>\n  identity = {\n    directory_id = \"<directory_id>\"\n  }\n}",
 		},
 	}
 
