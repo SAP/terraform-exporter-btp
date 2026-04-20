@@ -91,7 +91,7 @@ jobs:
           cache: false
       - run: go mod download
       - run: go mod tidy
-      - uses: robherley/go-test-action@v0
+      - uses: robherley/go-test-action@v1
         with:
           testArguments: -v -cover -coverprofile=cover.out -timeout=900s -parallel=4 ./...
       # Upload coverage report
