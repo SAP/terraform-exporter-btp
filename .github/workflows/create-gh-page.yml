@@ -4,8 +4,10 @@ name: Deploy gh-page
 on:
   workflow_dispatch:
   workflow_call:
+
 permissions:
   contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

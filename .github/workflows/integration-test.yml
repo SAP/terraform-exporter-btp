@@ -29,7 +29,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: true
 
       - name: Download dependencies
@@ -80,7 +80,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: true
 
       - name: Download dependencies
@@ -117,7 +117,6 @@ jobs:
           sleep 10s
         shell: bash
 
-
   test-json-inventory-cforg:
     name: Integration Test JSON Inventory for CF org
     if: ${{ always() }}
@@ -133,7 +132,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: true
 
       - name: Download dependencies
@@ -170,7 +169,6 @@ jobs:
           sleep 10s
         shell: bash
 
-
   test-export-by-json-directory:
     name: Integration Test Export by JSON for Directory
     if: ${{ always() }}
@@ -186,7 +184,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: true
 
       - name: Download dependencies
@@ -207,7 +205,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: .github/scripts/package-lock.json
 
       - name: "Install Node.js dependencies"
@@ -250,7 +248,6 @@ jobs:
           sleep 10s
         shell: bash
 
-
   test-export-by-json-subaccount:
     name: Integration Test Export by JSON for Subaccount
     if: ${{ always() }}
@@ -266,7 +263,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: true
 
       - name: Download dependencies
@@ -287,7 +284,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: .github/scripts/package-lock.json
 
       - name: "Install Node.js dependencies"
@@ -346,7 +343,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: true
 
       - name: Download dependencies
@@ -367,7 +364,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: .github/scripts/package-lock.json
 
       - name: "Install Node.js dependencies"
@@ -411,7 +408,6 @@ jobs:
           sleep 10s
         shell: bash
 
-
   test-export-by-resource-directory:
     name: Integration Test Export Directory by Ressource
     if: ${{ always() }}
@@ -427,7 +423,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: true
 
       - name: Download dependencies
@@ -448,7 +444,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: .github/scripts/package-lock.json
 
       - name: "Install Node.js dependencies"
@@ -506,7 +502,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: true
 
       - name: Download dependencies
@@ -527,7 +523,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: .github/scripts/package-lock.json
 
       - name: "Install Node.js dependencies"
@@ -586,7 +582,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: true
 
       - name: Download dependencies
@@ -607,7 +603,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: 'npm'
+          cache: "npm"
           cache-dependency-path: .github/scripts/package-lock.json
 
       - name: "Install Node.js dependencies"

@@ -5,7 +5,7 @@ name: Terraform Exporter Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 # Releases need permissions to read and write the repository contents.
 # GitHub considers creating releases and uploading assets as writing contents.
@@ -35,7 +35,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-go@v6
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
           cache: false
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v7
@@ -45,9 +45,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   generate-gh-pages:
-      uses: ./.github/workflows/create-gh-page.yml
-      secrets: inherit
-      permissions:
-        contents: write
-      needs:
-        - goreleaser
+    uses: ./.github/workflows/create-gh-page.yml
+    secrets: inherit
+    permissions:
+      contents: write
+    needs:
+      - goreleaser

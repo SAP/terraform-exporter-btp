@@ -1,9 +1,11 @@
 name: Update Brew Formula
 on:
   workflow_dispatch:
+
 permissions:
   contents: write
   pull-requests: write
+
 jobs:
   update-btptf-formula:
     runs-on: ubuntu-latest
@@ -15,7 +17,7 @@ jobs:
       - uses: robinraju/release-downloader@v1
         with:
           latest: true
-          fileName: '*'
+          fileName: "*"
           out-file-path: ${{ runner.temp }}/downloaded-assets
       - id: latest-release
         name: latest-release
@@ -43,7 +45,7 @@ jobs:
           echo $linux_arm_sha $(cat ${{ runner.temp }}/downloaded-assets/$linux_arm_sha)
           echo "LINUX_ARM_SHA=$(cat ${{ runner.temp }}/downloaded-assets/$linux_arm_sha)" >> "$GITHUB_OUTPUT"
       - name: Run update script
-        run:  ./.github/scripts/update-btptf-brew-formula.sh ${{ steps.latest-release.outputs.LATEST_TAG }} ${{ steps.extract-sha.outputs.DARWIN_AMD64_SHA }} ${{ steps.extract-sha.outputs.DARWIN_ARM_SHA }} ${{ steps.extract-sha.outputs.LINUX_AMD64_SHA }} ${{ steps.extract-sha.outputs.LINUX_ARM_SHA }}
+        run: ./.github/scripts/update-btptf-brew-formula.sh ${{ steps.latest-release.outputs.LATEST_TAG }} ${{ steps.extract-sha.outputs.DARWIN_AMD64_SHA }} ${{ steps.extract-sha.outputs.DARWIN_ARM_SHA }} ${{ steps.extract-sha.outputs.LINUX_AMD64_SHA }} ${{ steps.extract-sha.outputs.LINUX_ARM_SHA }}
       - name: btptf.rb Contents
         run: cat btptf.rb
       - name: Create Pull Request
