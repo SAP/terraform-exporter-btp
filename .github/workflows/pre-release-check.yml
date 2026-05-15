@@ -6,6 +6,10 @@ name: Terraform Exporter Pre-Release Check
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+  issues: write
+
 jobs:
   call-workflow-test:
     uses: ./.github/workflows/test.yml
