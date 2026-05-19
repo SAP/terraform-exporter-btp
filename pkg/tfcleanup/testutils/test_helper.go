@@ -77,8 +77,8 @@ var testFiles = testFileMapping{
 		targetFilePath: "resource_subaccount_service_instance_dep_target.tf",
 	},
 	"sa_service_instance_no_dependency": {
-		sourceFilePath: "resource_subaccount_service_instance_no_dependency.tf",
-		targetFilePath: "resource_subaccount_service_instance_no_dependency.tf",
+		sourceFilePath: "resource_subaccount_service_instance_no_dependency_source.tf",
+		targetFilePath: "resource_subaccount_service_instance_no_dependency_target.tf",
 	},
 	"sa_role_collection_dependency": {
 		sourceFilePath: "resource_subaccount_role_collection_dep_source.tf",

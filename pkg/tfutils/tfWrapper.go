@@ -39,22 +39,31 @@ var getIaCTool = func() (tool string, err error) {
 	return "", err
 }
 
-func runTfCmdGeneric(args ...string) error {
+func runTfCmdGeneric(args ...string) (errorStream string, err error) {
 	tool, err := getIaCTool()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	verbose := viper.GetViper().GetBool("verbose")
 	cmd := exec.Command(tool, args...)
+	var stderr bytes.Buffer
+
 	if verbose {
 		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
 	} else {
 		cmd.Stdout = nil
+		cmd.Stderr = &stderr
 	}
 
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	// cmd.Stderr = os.Stderr
+	err = cmd.Run()
+	if err != nil {
+
+		return stderr.String(), err
+	}
+	return "", nil
 }
 
 func runTfShowJson(directory string) (*State, error) {

@@ -4,5 +4,4 @@ resource "btp_subaccount_service_instance" "serviceinstance_0" {
   service_offering_name = "alert-notification"
   shared                = false
   subaccount_id         = btp_subaccount.subaccount_0.id
-  depends_on            = [btp_subaccount_entitlement.entitlement_0]
 }

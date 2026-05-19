@@ -76,16 +76,21 @@ func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool
 		return fmt.Errorf("error changing directory to %s: %v", terraformConfigPath, err)
 	}
 
-	if err := runTfCmdGeneric("init"); err != nil {
+	if _, err := runTfCmdGeneric("init"); err != nil {
 		return fmt.Errorf("error running Terraform init: %v", err)
 	}
 
 	planOption := "--generate-config-out=" + resourceFileName
-	if err := runTfCmdGeneric("plan", planOption); err != nil {
-		return fmt.Errorf("error running Terraform plan: %v", err)
+	errStream, err := runTfCmdGeneric("plan", planOption)
+	if err != nil {
+		if resourceNameLong == "BTP_SUBACCOUNT_SERVICE_INSTANCE" && strings.Contains(errStream, "Error: Invalid Attribute Combination") {
+			// This is a known issue with the setup. This will be cleaned afterwards, so we can ignore the error here to not break the export.
+		} else {
+			return fmt.Errorf("error running Terraform plan: %v", err)
+		}
 	}
 
-	if err := runTfCmdGeneric("fmt", "-recursive", "-list=false"); err != nil {
+	if _, err := runTfCmdGeneric("fmt", "-recursive", "-list=false"); err != nil {
 		return fmt.Errorf("error running Terraform fmt: %v", err)
 	}
 
@@ -519,13 +524,13 @@ func FinalizeTfConfig(configFolder string) {
 		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
 	}
 
-	if err := runTfCmdGeneric("init", "-backend=false"); err != nil {
+	if _, err := runTfCmdGeneric("init", "-backend=false"); err != nil {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
 		log.Fatalf("error initializing Terraform: %v", err)
 	}
 
-	if err := runTfCmdGeneric("fmt", "-recursive", "-list=false"); err != nil {
+	if _, err := runTfCmdGeneric("fmt", "-recursive", "-list=false"); err != nil {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
 		log.Fatalf("error running Terraform fmt: %v", err)

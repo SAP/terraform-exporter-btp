@@ -16,8 +16,8 @@ import (
 )
 
 // Constants for TF version for Terraform providers
-const BtpProviderVersion = "v1.21.3"
-const CfProviderVersion = "v1.14.0"
+const BtpProviderVersion = "v1.22.0"
+const CfProviderVersion = "v1.15.0"
 
 const (
 	SubaccountLevel   = "subaccountLevel"
@@ -340,7 +340,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 	addUserAgent()
 	defer removeUserAgent()
 
-	err := runTfCmdGeneric(chDir, "init", "-upgrade")
+	_, err := runTfCmdGeneric(chDir, "init", "-upgrade")
 	if err != nil {
 		removeUserAgent()
 		fmt.Print("\r\n")
@@ -348,7 +348,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 		return nil, err
 	}
 
-	err = runTfCmdGeneric(chDir, "apply", "-auto-approve")
+	_, err = runTfCmdGeneric(chDir, "apply", "-auto-approve")
 	if err != nil {
 		err = handleNotFoundError(err, resourceName, identifier)
 		removeUserAgent()

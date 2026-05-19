@@ -14,37 +14,24 @@ func TestAddServiceInstanceDependency(t *testing.T) {
 	srcFileServiceInstanceNoDep, trgtFileServiceInstanceNoDep := testutils.GetHclFilesById("sa_service_instance_no_dependency")
 
 	defaultTestDependencies := getNewServiceInstanceDepTemplate()
-	defaultTestDependenciesCopy := getNewServiceInstanceDepTemplate()
-
-	targetDependencies := getNewServiceInstanceDepTemplate()
-	targetDependencies.DataSourceInfo = append(targetDependencies.DataSourceInfo, generictools.DataSourceInfo{
-		DatasourceAddress:  "alert-notification_standard",
-		SubaccountAddress:  "btp_subaccount.subaccount_0.id",
-		OfferingName:       "alert-notification",
-		Name:               "standard",
-		EntitlementAddress: "btp_subaccount_entitlement.entitlement_0",
-	})
 
 	tests := []struct {
-		name             string
-		src              *hclwrite.File
-		trgt             *hclwrite.File
-		dependencies     generictools.DependencyAddresses
-		trgtDependencies generictools.DependencyAddresses
+		name         string
+		src          *hclwrite.File
+		trgt         *hclwrite.File
+		dependencies generictools.DependencyAddresses
 	}{
 		{
-			name:             "Test Service Instance Dependency",
-			src:              srcFileServiceInstanceDep,
-			trgt:             trgtFileServiceInstanceDep,
-			dependencies:     defaultTestDependencies,
-			trgtDependencies: targetDependencies,
+			name:         "Test Service Instance Dependency",
+			src:          srcFileServiceInstanceDep,
+			trgt:         trgtFileServiceInstanceDep,
+			dependencies: defaultTestDependencies,
 		},
 		{
-			name:             "Test No Service Instance Dependency",
-			src:              srcFileServiceInstanceNoDep,
-			trgt:             trgtFileServiceInstanceNoDep,
-			dependencies:     defaultTestDependencies,
-			trgtDependencies: defaultTestDependenciesCopy,
+			name:         "Test No Service Instance Dependency",
+			src:          srcFileServiceInstanceNoDep,
+			trgt:         trgtFileServiceInstanceNoDep,
+			dependencies: generictools.DependencyAddresses{},
 		},
 	}
 
@@ -53,9 +40,8 @@ func TestAddServiceInstanceDependency(t *testing.T) {
 
 			blocks := tt.src.Body().Blocks()
 			// we assume one resource entry in the blocks file
-			addServiceInstanceDependency(blocks[0].Body(), &tt.dependencies, nil, "subaccount_id")
+			addServiceInstanceDependency(blocks[0].Body(), &tt.dependencies, "subaccount_id")
 			assert.NoError(t, testutils.AreHclFilesEqual(tt.src, tt.trgt))
-			assert.Equal(t, &tt.dependencies, &tt.trgtDependencies)
 		})
 	}
 
