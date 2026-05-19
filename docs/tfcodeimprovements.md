@@ -37,9 +37,17 @@ The Terraform configuration on subaccount level gets improved via the following 
 - All resources that reference a `subaccount_id` get transformed to reference the resource `btp_subaccount` if available.
 - If the attribute `parent_id` is the global account, it gets removed from the resource `btp_subaccount`, as the global account is the default. If not it gets extracted as a variable.
 - If a dependency between the resource `btp_subaccount_entitlement` and the resource `btp_subaccount_subscription` exists, a corresponding `depends_on` block will be added to the resource `btp_subaccount_subscription`.
-- If a dependency between the resource `btp_subaccount_entitlement` and the resource `btp_subaccount_service_instance` exists, a data source `btp_subaccount_service_plan` is added to fetch the identifier of the service plan. In addition a `depends_on` block is added to the data source to make it explicitly dependent to the corresponding entitlement. Finally the technical identifier of the service plan is replaced by the reference to the data source`.
 - If a resource `btp_subaccount_trust_configuration` gets exported that is the SAP default trust, the corresponding resource is removed from the resource configuration as well as the import block from the corresponding import file.
 - If a resource `btp_subaccount_role_collection` as well as `btp_subaccount_role` a check if there are dependencies is executed. If there are any a corresponding `depends_on` block is added to the resource `btp_subaccount_role_collection`.
+
+### Version 1.6.0 and prior versions
+
+- If a dependency between the resource `btp_subaccount_entitlement` and the resource `btp_subaccount_service_instance` exists, a data source `btp_subaccount_service_plan` is added to fetch the identifier of the service plan. In addition a `depends_on` block is added to the data source to make it explicitly dependent to the corresponding entitlement. Finally the technical identifier of the service plan is replaced by the reference to the data source`.
+
+### Version 1.7.0 and later versions
+
+- The resource `btp_subaccount_service_instance` is adjusted to use the attributes `serviceplan_name` and `service_offering_name` instaed of the attribute `serviceplan_id`. The attribute `serviceplan_id` is removed from the resource configuration.
+- If a dependency between the resource `btp_subaccount_entitlement` and the resource `btp_subaccount_service_instance` exists, a `depends_on` block is added to the resource `btp_subaccount_service_instance` to make it explicitly dependent to the corresponding entitlement.
 
 ## Refinements on Directory Level
 
