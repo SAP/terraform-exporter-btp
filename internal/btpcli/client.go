@@ -12,6 +12,7 @@ import (
 	"path"
 	"strconv"
 
+	"github.com/SAP/terraform-exporter-btp/internal/btpclisession"
 	uuid "github.com/hashicorp/go-uuid"
 )
 
@@ -295,6 +296,33 @@ func (v2 *v2Client) PasscodeLogin(ctx context.Context, loginReq *PasscodeLoginRe
 		Username:               loginReq.Username,
 		Password:               passcodeResponse.Passcode,
 	})
+}
+
+func (v2 *v2Client) BtpCliSessionLogin(ctx context.Context, loginReq *BtpCliSessionLoginRequest) (*LoginResponse, error) {
+	res, err := btpclisession.ReadSession(loginReq.CliConfigPath)
+	if err != nil {
+		return nil, fmt.Errorf("read BTP CLI session information: %w", err)
+	}
+
+	if res.SessionID == "" {
+		return nil, fmt.Errorf("no active BTP CLI session found (source: %s); please run 'btp login' first", res.Source)
+	}
+
+	v2.session = &Session{
+		GlobalAccountSubdomain: loginReq.GlobalAccountSubdomain,
+		IdentityProvider:       loginReq.IdentityProvider,
+		LoggedInUser: &v2LoggedInUser{
+			Email:  res.Config.Authentication.Mail,
+			Issuer: res.Config.Authentication.Issuer,
+		},
+		SessionId: res.SessionID,
+	}
+
+	return &LoginResponse{
+		Email:  res.Config.Authentication.Mail,
+		Issuer: res.Config.Authentication.Issuer,
+	}, nil
+
 }
 
 // Execute executes a command
