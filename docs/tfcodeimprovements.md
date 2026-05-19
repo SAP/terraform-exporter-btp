@@ -46,7 +46,7 @@ The Terraform configuration on subaccount level gets improved via the following 
 
 ### Version 1.7.0 and later versions
 
-- The resource `btp_subaccount_service_instance` is adjusted to use the attributes `serviceplan_name` and `service_offering_name` instaed of the attribute `serviceplan_id`. The attribute `serviceplan_id` is removed from the resource configuration.
+- The resource `btp_subaccount_service_instance` is adjusted to use the attributes `serviceplan_name` and `service_offering_name` instead of the attribute `serviceplan_id`. The attribute `serviceplan_id` is removed from the resource configuration.
 - If a dependency between the resource `btp_subaccount_entitlement` and the resource `btp_subaccount_service_instance` exists, a `depends_on` block is added to the resource `btp_subaccount_service_instance` to make it explicitly dependent to the corresponding entitlement.
 
 ## Refinements on Directory Level
