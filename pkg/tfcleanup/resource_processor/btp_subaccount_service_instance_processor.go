@@ -1,7 +1,6 @@
 package resourceprocessor
 
 import (
-	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -10,42 +9,40 @@ import (
 
 const serviceInstanceBlockIdentifier = "btp_subaccount_service_instance"
 const serviceInstancePlanIdentifier = "serviceplan_id"
+const serviceInstancePlanNameIdentifier = "serviceplan_name"
+const serviceInstanceOfferingNameIdentifier = "service_offering_name"
 
-func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *generictools.DependencyAddresses, btpClient *btpcli.ClientFacade, subaccountId string) {
+func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *generictools.DependencyAddresses, subaccountId string) {
 
 	// 1: Iterate over attributes to find the value for the service name and the plan ID
 	// 2: Fetch the plan name via ID using the BTP CLI client
 	// 3: Check if there is a dependency address for the plan name in the entitlements
 	// 4: If we find such a dependenceny: Create a data source for the service plan that depends on the entitlement
 	// 5: Exchange the explicit plan ID with the data source reference
-	planIdAttr := body.GetAttribute(serviceInstancePlanIdentifier)
-	if planIdAttr == nil {
-		// No plan ID found, no further action will be taken
-		return
+	serviceOfferingNameAttr := body.GetAttribute(serviceInstanceOfferingNameIdentifier)
+	serviceInstancePlanNameIdentifierAttr := body.GetAttribute(serviceInstancePlanNameIdentifier)
+
+	var serviceOfferingName string
+	var servicePlanName string
+
+	serviceOfferingNameAttrTokens := serviceOfferingNameAttr.Expr().BuildTokens(nil)
+	serviceInstancePlanNameAttrTokens := serviceInstancePlanNameIdentifierAttr.Expr().BuildTokens(nil)
+
+	if len(serviceOfferingNameAttrTokens) == 3 {
+		serviceOfferingName = generictools.GetStringToken(serviceOfferingNameAttrTokens)
 	}
 
-	var planId string
-
-	planIdAttrTokens := planIdAttr.Expr().BuildTokens(nil)
-
-	if len(planIdAttrTokens) == 3 {
-		planId = generictools.GetStringToken(planIdAttrTokens)
+	if len(serviceInstancePlanNameAttrTokens) == 3 {
+		servicePlanName = generictools.GetStringToken(serviceInstancePlanNameAttrTokens)
 	}
 
-	if planId == "" {
-		// Nothing found, no further action will be taken
-		return
-	}
+	// Remove the service plan id
+	body.RemoveAttribute(serviceInstancePlanIdentifier)
 
-	planName, serviceName, err := btpcli.GetServiceDataByPlanId(btpClient, subaccountId, planId)
-	if err != nil {
-		// No plan name found, no refinement of the code will be done
-		return
-	}
-
+	// Add dependency to entitlement if necessary
 	key := generictools.EntitlementKey{
-		ServiceName: serviceName,
-		PlanName:    planName,
+		ServiceName: serviceOfferingName,
+		PlanName:    servicePlanName,
 	}
 
 	dependencyInfo := (*dependencyAddresses).EntitlementAddress[key]
@@ -54,88 +51,8 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 		return
 	}
 
-	datasourceAddress := serviceName + "_" + planName
-
-	// replce the plan ID with the data source reference
-	body.SetAttributeRaw(serviceInstancePlanIdentifier, hclwrite.Tokens{
-		{
-			Type:  hclsyntax.TokenStringLit,
-			Bytes: []byte("data.btp_subaccount_service_plan." + datasourceAddress + ".id"),
-		},
-	})
-
-	(*dependencyAddresses).DataSourceInfo = append((*dependencyAddresses).DataSourceInfo, generictools.DataSourceInfo{
-		DatasourceAddress:  datasourceAddress,
-		SubaccountAddress:  (*dependencyAddresses).SubaccountAddress + ".id",
-		OfferingName:       serviceName,
-		Name:               planName,
-		EntitlementAddress: dependencyInfo.Address,
-	},
-	)
-}
-
-func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.DataSourceInfo, levelIds generictools.LevelIds) {
-	body.AppendNewline()
-
-	dsBlock := body.AppendNewBlock("data", []string{"btp_subaccount_service_plan", datasourceInfo.DatasourceAddress})
-
-	if datasourceInfo.SubaccountAddress == ".id" {
-		// Address of subaccount dependency is missing
-		dsBlock.Body().SetAttributeRaw("subaccount_id", hclwrite.Tokens{
-			{
-				Type:  hclsyntax.TokenOQuote,
-				Bytes: []byte((`"`)),
-			},
-			{
-				Type:  hclsyntax.TokenStringLit,
-				Bytes: []byte(levelIds.SubaccountId),
-			},
-			{
-				Type:  hclsyntax.TokenOQuote,
-				Bytes: []byte((`"`)),
-			},
-		})
-	} else {
-		dsBlock.Body().SetAttributeRaw("subaccount_id", hclwrite.Tokens{
-			{
-				Type:  hclsyntax.TokenIdent,
-				Bytes: []byte(datasourceInfo.SubaccountAddress),
-			},
-		})
-	}
-
-	dsBlock.Body().SetAttributeRaw("offering_name", hclwrite.Tokens{
-		{
-			Type:  hclsyntax.TokenOQuote,
-			Bytes: []byte((`"`)),
-		},
-		{
-			Type:  hclsyntax.TokenStringLit,
-			Bytes: []byte(datasourceInfo.OfferingName),
-		},
-		{
-			Type:  hclsyntax.TokenOQuote,
-			Bytes: []byte((`"`)),
-		},
-	})
-
-	dsBlock.Body().SetAttributeRaw("name", hclwrite.Tokens{
-		{
-			Type:  hclsyntax.TokenOQuote,
-			Bytes: []byte(`"`),
-		},
-		{
-			Type:  hclsyntax.TokenStringLit,
-			Bytes: []byte(datasourceInfo.Name),
-		},
-		{
-			Type:  hclsyntax.TokenOQuote,
-			Bytes: []byte(`"`),
-		},
-	})
-
 	if !toggles.IsEntitlementModuleGenerationDeactivated() {
-		dsBlock.Body().SetAttributeRaw("depends_on", hclwrite.Tokens{
+		body.SetAttributeRaw("depends_on", hclwrite.Tokens{
 			{
 				Type:  hclsyntax.TokenOBrack,
 				Bytes: []byte("["),
@@ -150,13 +67,13 @@ func addServicePlanDataSources(body *hclwrite.Body, datasourceInfo generictools.
 		})
 
 	} else {
-		dsBlock.Body().SetAttributeRaw("depends_on", hclwrite.Tokens{
+		body.SetAttributeRaw("depends_on", hclwrite.Tokens{
 			{
 				Type:  hclsyntax.TokenOBrack,
 				Bytes: []byte("["),
 			},
 			{Type: hclsyntax.TokenStringLit,
-				Bytes: []byte(datasourceInfo.EntitlementAddress),
+				Bytes: []byte(dependencyInfo.Address),
 			},
 			{
 				Type:  hclsyntax.TokenCBrack,

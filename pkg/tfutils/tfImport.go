@@ -340,7 +340,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 	addUserAgent()
 	defer removeUserAgent()
 
-	err := runTfCmdGeneric(chDir, "init", "-upgrade")
+	err, _ := runTfCmdGeneric(chDir, "init", "-upgrade")
 	if err != nil {
 		removeUserAgent()
 		fmt.Print("\r\n")
@@ -348,7 +348,7 @@ func getTfStateData(configDir string, resourceName string, identifier string) ([
 		return nil, err
 	}
 
-	err = runTfCmdGeneric(chDir, "apply", "-auto-approve")
+	err, _ = runTfCmdGeneric(chDir, "apply", "-auto-approve")
 	if err != nil {
 		err = handleNotFoundError(err, resourceName, identifier)
 		removeUserAgent()

@@ -54,7 +54,6 @@ type DependencyAddresses struct {
 	SpaceAddress       map[string]string
 	EntitlementAddress map[EntitlementKey]EntitlementInfo
 	RoleAddress        map[RoleKey]string
-	DataSourceInfo     []DataSourceInfo
 	BlocksToRemove     []BlockSpecifier
 }
 

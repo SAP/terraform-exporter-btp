@@ -51,7 +51,7 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 	}
 
 	if blockIdentifier == serviceInstanceBlockIdentifier {
-		addServiceInstanceDependency(body, dependencyAddresses, btpClient, levelIds.SubaccountId)
+		addServiceInstanceDependency(body, dependencyAddresses, levelIds.SubaccountId)
 	}
 
 	if blockIdentifier == subaccountRoleBlockIdentifier {
@@ -104,16 +104,4 @@ func processDependencies(body *hclwrite.Body, dependencyAddresses *generictools.
 	}
 
 	handleGenericEntitlementModule(body, levelIds.SubaccountId, dependencyAddresses, variables)
-
-	// Add datasource for service instances is necessary - Outer loop to have the main body object available
-	processedDataSources := make(map[string]bool)
-
-	for _, datasourceInfo := range dependencyAddresses.DataSourceInfo {
-
-		if !processedDataSources[datasourceInfo.DatasourceAddress] {
-			addServicePlanDataSources(body, datasourceInfo, levelIds)
-			// Avoid duplicate data sources
-			processedDataSources[datasourceInfo.DatasourceAddress] = true
-		}
-	}
 }
