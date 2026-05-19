@@ -23,6 +23,8 @@ func GetLoggedInClient() (*ClientFacade, error) {
 	tlsClientCertificate := os.Getenv("BTP_TLS_CLIENT_CERTIFICATE")
 	tlsClientKey := os.Getenv("BTP_TLS_CLIENT_KEY")
 	tlsIdpURL := os.Getenv("BTP_TLS_IDP_URL")
+	useBtpCLiSession := os.Getenv("USE_BTPCLI_SESSION")
+	btpCliCustomConfigPath := os.Getenv("BTPCLI_CONFIG_PATH")
 
 	if cliServerUrl == "" {
 		cliServerUrl = DefaultServerURL
@@ -53,6 +55,12 @@ func GetLoggedInClient() (*ClientFacade, error) {
 		}
 
 		if _, err := client.PasscodeLogin(ctx, passcodeLoginReq); err != nil {
+			return nil, fmt.Errorf("error logging in: %w", err)
+		}
+	}
+
+	if useBtpCLiSession == "true" {
+		if _, err := client.BtpCliSessionLogin(ctx, NewBtpCliSessionLoginRequest(globalAccount, btpCliCustomConfigPath, idp)); err != nil {
 			return nil, fmt.Errorf("error logging in: %w", err)
 		}
 	}

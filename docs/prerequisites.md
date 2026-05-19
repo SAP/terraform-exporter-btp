@@ -20,9 +20,19 @@
 | BTP_IDP | The identity provider to be used for authentication (only required for custom IDP) |
 | BTP_CLI_SERVER_URL | The URL of the BTP CLI server (Relevant for SAP internal use-cases only)  |
 
+## Release 1.7.0 and later
+
+With release 1.7.0 we introduce the option to reuse the btp CLI login for authentication. The usage flow is as follows:
+
+- Set the environment variable `USE_BTPCLI_SESSION` to `true`.
+- Login via btp CLI e.g, via `btp login --sso`.
+- Optional: if you have a special path to your btp CLI configuration, set it via environment variable `BTPCLI_CONFIG_PATH`.
+
+Be aware that the feature is experimental (see [documentation of Terraform Provider for SAP BTP](https://registry.terraform.io/providers/SAP/btp/latest/docs#sign-on-via-btp-cli-session-experimental)).
+
 !!! Warning
 
-    Do not set the `BTP_ENABLE_SSO` parameter when using the btptf CLI. Processing will abort as this parameter is not supported
+    Do not set the `BTP_ENABLE_SSO` parameter when using the btptf CLI. Processing will abort as this parameter is not supported. 
 
 
 The parameters are the ones required by the [BTP Terraform Provider](https://registry.terraform.io/providers/SAP/btp/latest/docs).

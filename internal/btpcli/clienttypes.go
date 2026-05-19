@@ -27,6 +27,14 @@ func NewIdTokenLoginRequest(globalaccountSubdomain string, idToken string) *IdTo
 	}
 }
 
+func NewBtpCliSessionLoginRequest(globalaccountSubdomain string, cliConfigPath string, idp string) *BtpCliSessionLoginRequest {
+	return &BtpCliSessionLoginRequest{
+		GlobalAccountSubdomain: globalaccountSubdomain,
+		CliConfigPath:          cliConfigPath,
+		IdentityProvider:       idp,
+	}
+}
+
 type LoginRequest struct {
 	IdentityProvider       string `json:"customIdp"`
 	GlobalAccountSubdomain string `json:"subdomain"`
@@ -47,6 +55,12 @@ type PasscodeLoginRequest struct {
 	PEMEncodedCACerts      string
 	PEMEncodedPrivateKey   string
 	PEMEncodedCertificate  string
+}
+
+type BtpCliSessionLoginRequest struct {
+	GlobalAccountSubdomain string
+	IdentityProvider       string
+	CliConfigPath          string
 }
 
 type LoginResponse struct {
