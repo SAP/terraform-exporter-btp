@@ -28,9 +28,9 @@ go test -v -cover -timeout=900s -parallel=4 ./...  # Run tests with verbose outp
 ### Code Quality
 ```bash
 make lint           # Run golangci-lint
-make fmt            # Format code with gofmt
+make fmt            # Format code with gofmt -s -w -e .
 go fix ./...        # Run go fix (required before commits)
-make docs           # Generate markdown documentation (required after changing command descriptions)
+make docs           # Regenerate CLI markdown docs via `go run main.go gendoc` (required after changing any command help text or flags)
 ```
 
 ### Running the CLI
@@ -67,6 +67,7 @@ The codebase follows a layered architecture:
      - Client with custom HTTP transport and session management
      - Facade pattern for different BTP services (accounts, security, services)
      - Type definitions for CIS, Service Manager, XSUAA responses
+   - **btpclisession/** - Reads an existing `btp` CLI session (config + keychain/file fallback) so the exporter can reuse a CLI login instead of requiring username/password
    - **cfcli/** - Cloud Foundry API client wrapper
 
 3. **pkg/** - Public/reusable packages
@@ -82,6 +83,7 @@ The codebase follows a layered architecture:
    - **files/** - File I/O utilities
    - **resume/** - Export session resumption logic
    - **defaultfilter/** - Default filtering for resource selection
+   - **toggles/** - Feature toggle helpers
 
 ### Key Architectural Patterns
 
@@ -95,13 +97,13 @@ The codebase follows a layered architecture:
 
 To add a new resource type at the subaccount level:
 
-1. **Add constants** in `pkg/tfutils/tfutils.go`:
-   - Command parameter name constant
+1. **Add constants** in `pkg/tfutils/tfImport.go`:
+   - Command parameter name constant (e.g., alongside `CmdSubaccountParameter`)
    - Technical resource name constant
 
-2. **Add mapping** in `TranslateResourceParamToTechnicalName` function in `pkg/tfutils/tfutils.go`
+2. **Add mapping** in `TranslateResourceParamToTechnicalName` function in `pkg/tfutils/tfImport.go`
 
-3. **Add to allowed resources** in `AllowedResources` slice in `pkg/tfutils/tfconfig.go`
+3. **Add to allowed resources** in the matching slice in `pkg/tfutils/tfConfig.go` (`AllowedResourcesSubaccount`, `AllowedResourcesDirectory`, or `AllowedResourcesOrganization`)
 
 4. **Create import provider** in `pkg/tfimportprovider/`:
    - Use `subaccountRoleCollectionImportProvider.go` as a template
@@ -109,7 +111,7 @@ To add a new resource type at the subaccount level:
 
 5. **Register in factory** in `GetImportBlockProvider` function in `pkg/tfimportprovider/tfImportProviderFactory.go`
 
-6. **Add data transformation** in `transformDataToStringArray` function in `pkg/tfutils/tfutils.go` if needed
+6. **Add data transformation** in `transformDataToStringArray` function in `pkg/tfutils/tfImport.go` if needed
 
 7. **Add custom formatting** in `pkg/output/format.go` if the generic formatter is insufficient
 
@@ -128,7 +130,7 @@ To create realistic test data for new resources:
 ## Important Conventions
 
 ### Documentation Generation
-After modifying any command descriptions or help text, you MUST run `make docs` to regenerate the markdown documentation. This is checked in CI.
+After modifying any command help text, flags, or descriptions, you MUST run `make docs` to regenerate the CLI markdown documentation (driven by `go run main.go gendoc`). This is checked in CI.
 
 ### Code Fixes
 Run `go fix ./...` after making changes. This is enforced in CI and will cause builds to fail if skipped.
@@ -152,6 +154,21 @@ The CLI requires SAP BTP credentials configured via environment variables:
 - `BTP_USERNAME` - SAP BTP username
 - `BTP_PASSWORD` - SAP BTP password
 - `BTP_GLOBALACCOUNT` - Global account subdomain (optional)
+
+As an alternative (experimental, available from release 1.7.0), the exporter can reuse an existing `btp` CLI login instead of username/password:
+- `USE_BTPCLI_SESSION=true` - reuse the active `btp` CLI session (run `btp login` first)
+- `BTPCLI_CONFIG_PATH` - optional, only needed when the `btp` CLI config lives in a non-default location
+
+Do not set `BTP_ENABLE_SSO` — it is not supported and the CLI will abort.
+
+## User-Facing Documentation
+
+End-user documentation lives in `docs/` (rendered as a MkDocs site). Notable files:
+- `docs/prerequisites.md` - environment variables and authentication options
+- `docs/tfcodeimprovements.md` - resource-specific cleanup behavior, versioned per release
+- `docs/gettingstarted.md`, `docs/install.md`, `docs/troubleshooting.md` - user guides
+
+When changing user-visible behavior (new env vars, new cleanup rules, new commands), update the matching file in `docs/`.
 
 ## Dependencies
 
