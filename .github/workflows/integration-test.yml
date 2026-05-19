@@ -53,6 +53,7 @@ jobs:
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          export BTP_IDP=${{ secrets.BTP_IDP }}
           btptf create-json -d ${{ secrets.BTP_DIRECTORY }} -p integrationTestDirectory.json
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestDirectory.json > temp.json && mv temp.json integrationTestDirectory.json
           diff <(jq -S . integrationTestDirectory.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestDirectoryReference.json)
@@ -105,6 +106,7 @@ jobs:
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          export BTP_IDP=${{ secrets.BTP_IDP }}
           btptf create-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integrationTestSubaccount.json
           jq '.BtpResources[] |= (.Values |= sort)' integrationTestSubaccount.json > temp.json && mv temp.json integrationTestSubaccount.json
           diff <(jq -S . integrationTestSubaccount.json) <(jq -S . integration-test/exporter-reference-data/json-inventory/integrationTestSubaccountReference.json) || echo "JSON inventory for subaccount is not as expected"
@@ -222,6 +224,7 @@ jobs:
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          export BTP_IDP=${{ secrets.BTP_IDP }}
           btptf export-by-json -d ${{ secrets.BTP_DIRECTORY }} -p integration-test/exporter-reference-data/import-by-json/integrationTestDirectoryCurated.json -c directory-export-by-json
           echo "====================================="
           echo "Executing state import for Directory"
@@ -302,6 +305,7 @@ jobs:
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          export BTP_IDP=${{ secrets.BTP_IDP }}
           btptf export-by-json -s ${{ secrets.BTP_SUBACCOUNT }} -p integration-test/exporter-reference-data/import-by-json/integrationTestSubaccountCurated.json -c subaccount-export-by-json
           echo "====================================="
           echo "Executing state import for Subaccount"
@@ -461,6 +465,7 @@ jobs:
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          export BTP_IDP=${{ secrets.BTP_IDP }}
           btptf export -d ${{ secrets.BTP_DIRECTORY }} -c directory-export-by-resource -r=directory
           echo "====================================="
           echo "Executing state import for Directory"
@@ -541,6 +546,7 @@ jobs:
           export BTP_USERNAME=${{ secrets.BTP_USERNAME }}
           export BTP_PASSWORD=${{ secrets.BTP_PASSWORD }}
           export BTP_GLOBALACCOUNT=${{ secrets.BTP_GLOBALACCOUNT }}
+          export BTP_IDP=${{ secrets.BTP_IDP }}
           btptf export -s ${{ secrets.BTP_SUBACCOUNT }} -c subaccount-export-by-resource -r='subaccount,subscriptions'
           echo "====================================="
           echo "Executing state import for Subaccount"
