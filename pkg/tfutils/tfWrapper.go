@@ -46,6 +46,7 @@ func runTfCmdGeneric(args ...string) (errorStream string, err error) {
 	}
 
 	verbose := viper.GetViper().GetBool("verbose")
+	args = append(args, "-no-color")
 	cmd := exec.Command(tool, args...)
 	var stderr bytes.Buffer
 
@@ -57,7 +58,6 @@ func runTfCmdGeneric(args ...string) (errorStream string, err error) {
 		cmd.Stderr = &stderr
 	}
 
-	// cmd.Stderr = os.Stderr
 	err = cmd.Run()
 	if err != nil {
 
