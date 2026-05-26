@@ -21,6 +21,9 @@ permissions:
 jobs:
   update-choco:
     runs-on: ubuntu-latest
+    environment: publish-chocolatey
+    env:
+      CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -112,8 +115,6 @@ jobs:
 
       - name: Push to Chocolatey
         if: ${{ steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
-        env:
-          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
         run: |
           choco apikey --key "$CHOCOLATEY_API_KEY" --source https://push.chocolatey.org/
           choco push sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg --source https://push.chocolatey.org/

@@ -19,6 +19,7 @@ jobs:
   test-json-inventory-directory:
     name: Integration Test JSON Inventory for a Directory
     runs-on: ubuntu-latest
+    environment: release
     timeout-minutes: 10
     outputs:
       output_dir_json_inventory: ${{ steps.json-inventory-directory.outputs.result }}
@@ -71,6 +72,7 @@ jobs:
     if: ${{ always() }}
     needs: test-json-inventory-directory
     runs-on: ubuntu-latest
+    environment: release
     timeout-minutes: 10
     outputs:
       output_subacount_json_inventory: ${{ steps.json-inventory-subaccount.outputs.result }}
@@ -124,6 +126,7 @@ jobs:
     if: ${{ always() }}
     needs: test-json-inventory-subaccount
     runs-on: ubuntu-latest
+    environment: release
     timeout-minutes: 10
     outputs:
       output_cforg_json_inventory: ${{ steps.json-inventory-cforg.outputs.result }}
@@ -176,6 +179,7 @@ jobs:
     if: ${{ always() }}
     needs: test-json-inventory-cforg
     runs-on: ubuntu-latest
+    environment: release
     timeout-minutes: 10
     outputs:
       output_dir_export_by_json: ${{ steps.export-by-json-directory.outputs.result }}
@@ -256,6 +260,7 @@ jobs:
     if: ${{ always() }}
     needs: test-export-by-json-directory
     runs-on: ubuntu-latest
+    environment: release
     timeout-minutes: 10
     outputs:
       output_subacount_export_by_json: ${{ steps.export-by-json-subaccount.outputs.result }}
@@ -337,6 +342,7 @@ jobs:
     if: ${{ always() }}
     needs: test-export-by-json-subaccount
     runs-on: ubuntu-latest
+    environment: release
     timeout-minutes: 10
     outputs:
       output_cforg_export_by_json: ${{ steps.export-by-json-cforg.outputs.result }}
@@ -417,6 +423,7 @@ jobs:
     if: ${{ always() }}
     needs: test-export-by-json-cforg
     runs-on: ubuntu-latest
+    environment: release
     timeout-minutes: 10
     outputs:
       output_dir_export_by_res: ${{ steps.export-by-resource-directory.outputs.result }}
@@ -497,6 +504,7 @@ jobs:
     if: ${{ always() }}
     needs: test-export-by-resource-directory
     runs-on: ubuntu-latest
+    environment: release
     timeout-minutes: 10
     outputs:
       output_subacount_export_by_res: ${{ steps.export-by-resource-subaccount.outputs.result }}
@@ -578,6 +586,7 @@ jobs:
     if: ${{ always() }}
     needs: test-export-by-resource-subaccount
     runs-on: ubuntu-latest
+    environment: release
     timeout-minutes: 10
     outputs:
       output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
