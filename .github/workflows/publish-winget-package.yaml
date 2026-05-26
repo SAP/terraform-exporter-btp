@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Version tag to package (e.g., 1.2.3)'
+        description: "Version tag to package (e.g., 1.2.3)"
         required: false
   release:
     types: [published]
@@ -15,11 +15,12 @@ permissions:
 jobs:
   publish-winget:
     runs-on: ubuntu-latest
+    environment: publish-winget
     env:
       WINGET_FORK_ORG: ${{ vars.FORK_OWNER }}
       WINGET_UPSTREAM_REPO: microsoft/winget-pkgs
       PACKAGE_ID: SAP.btptf
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN_WINGET }}
 
     steps:
       - name: Checkout repository
@@ -73,7 +74,6 @@ jobs:
           git checkout master
           git pull upstream master
           git push origin --force
-
 
       - name: Create new branch
         run: |
