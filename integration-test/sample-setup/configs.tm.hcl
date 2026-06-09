@@ -1,6 +1,6 @@
 // Configure default default Terraform providers
 globals "terraform" "providers" "btp" {
-  version_dev = "~> 1.22.0"
+  version_dev = "~> 1.23.1"
 }
 
 globals "terraform" "providers" "cloudfoundry" {
