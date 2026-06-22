@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Check Spelling
         id: spellcheck
         uses: rojopolis/spellcheck-github-actions@0.62.0
