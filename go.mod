@@ -4,10 +4,10 @@ go 1.26
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
-	github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.20
+	github.com/cloudfoundry/go-cfclient/v3 v3.0.0-alpha.21
 	github.com/fatih/color v1.19.0
 	github.com/go-git/go-git/v5 v5.19.1
-	github.com/jedib0t/go-pretty/v6 v6.8.1
+	github.com/jedib0t/go-pretty/v6 v6.8.2
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
