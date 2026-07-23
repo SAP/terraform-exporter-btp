@@ -1,6 +1,5 @@
 ![Golang](https://img.shields.io/badge/Go-1.26-informational)
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/terraform-exporter-btp)](https://api.reuse.software/info/github.com/SAP/terraform-exporter-btp)
-[![Go Report Card](https://goreportcard.com/badge/github.com/SAP/terraform-exporter-btp)](https://goreportcard.com/report/github.com/SAP/terraform-exporter-btp)
 [![CodeQL](https://github.com/SAP/terraform-exporter-btp/actions/workflows/codeql.yml/badge.svg)](https://github.com/SAP/terraform-exporter-btp/actions/workflows/codeql.yml)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9673/badge)](https://www.bestpractices.dev/projects/9673)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=SAP_terraform-exporter-btp&metric=coverage)](https://sonarcloud.io/summary/new_code?id=SAP_terraform-exporter-btp)
