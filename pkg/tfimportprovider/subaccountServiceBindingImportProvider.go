@@ -15,9 +15,7 @@ type subaccountServiceBindingImportProvider struct {
 
 func newSubaccountServiceBindingImportProvider() ITfImportProvider {
 	return &subaccountServiceBindingImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.SubaccountServiceBindingType,
-		},
+		resourceType: tfutils.SubaccountServiceBindingType,
 	}
 }
 

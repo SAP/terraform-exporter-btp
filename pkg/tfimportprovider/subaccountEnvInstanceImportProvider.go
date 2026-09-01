@@ -14,9 +14,7 @@ type subaccountEnvInstanceImportProvider struct {
 
 func newSubaccountEnvInstanceImportProvider() ITfImportProvider {
 	return &subaccountEnvInstanceImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.SubaccountEnvironmentInstanceType,
-		},
+		resourceType: tfutils.SubaccountEnvironmentInstanceType,
 	}
 }
 

@@ -15,9 +15,7 @@ type cloudfoundryRouteImportProvider struct {
 
 func newCloudfoundryRouteImportProvider() ITfImportProvider {
 	return &cloudfoundryRouteImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.CfRouteType,
-		},
+		resourceType: tfutils.CfRouteType,
 	}
 }
 func (tf *cloudfoundryRouteImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {

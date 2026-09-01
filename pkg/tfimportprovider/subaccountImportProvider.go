@@ -14,9 +14,7 @@ type subaccountImportProvider struct {
 
 func newSubaccountImportProvider() ITfImportProvider {
 	return &subaccountImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.SubaccountType,
-		},
+		resourceType: tfutils.SubaccountType,
 	}
 }
 

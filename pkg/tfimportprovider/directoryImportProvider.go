@@ -14,9 +14,7 @@ type directoryImportProvider struct {
 
 func newDirectoryImportProvider() ITfImportProvider {
 	return &directoryImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.DirectoryType,
-		},
+		resourceType: tfutils.DirectoryType,
 	}
 }
 

@@ -138,7 +138,7 @@ func getTerraformVersion() (string, error) {
 		return "", fmt.Errorf("failed to execute %s version command: %w", "terraform", err)
 	}
 
-	versionOutput := strings.Split(string(output), "\n")[0]
+	versionOutput, _, _ := strings.Cut(string(output), "\n")
 	versionParts := strings.Fields(versionOutput)
 	version := strings.TrimPrefix(versionParts[1], "v")
 

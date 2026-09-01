@@ -17,9 +17,7 @@ type directoryRoleImportProvider struct {
 
 func newDirectoryRoleImportProvider() ITfImportProvider {
 	return &directoryRoleImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.DirectoryRoleType,
-		},
+		resourceType: tfutils.DirectoryRoleType,
 	}
 }
 

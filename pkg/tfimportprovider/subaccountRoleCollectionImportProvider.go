@@ -17,9 +17,7 @@ type subaccountRoleCollectionImportProvider struct {
 
 func newSubaccountRoleCollectionImportProvider() ITfImportProvider {
 	return &subaccountRoleCollectionImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.SubaccountRoleCollectionType,
-		},
+		resourceType: tfutils.SubaccountRoleCollectionType,
 	}
 }
 

@@ -15,9 +15,7 @@ type cloudfoundrySpaceImportProvider struct {
 
 func newcloudfoundrySpaceImportProvider() ITfImportProvider {
 	return &cloudfoundrySpaceImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.CfSpaceType,
-		},
+		resourceType: tfutils.CfSpaceType,
 	}
 }
 

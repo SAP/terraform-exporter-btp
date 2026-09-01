@@ -14,9 +14,7 @@ type directoryEntitlementImportProvider struct {
 
 func newDirectoryEntitlementImportProvider() ITfImportProvider {
 	return &directoryEntitlementImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.DirectoryEntitlementType,
-		},
+		resourceType: tfutils.DirectoryEntitlementType,
 	}
 }
 

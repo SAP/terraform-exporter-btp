@@ -16,9 +16,7 @@ type cloudfoundryServiceInstanceImportProvider struct {
 
 func newCloudfoundryServiceInstanceImportProvider() ITfImportProvider {
 	return &cloudfoundryServiceInstanceImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.CfServiceInstanceType,
-		},
+		resourceType: tfutils.CfServiceInstanceType,
 	}
 }
 

@@ -15,9 +15,7 @@ type cloudfoundrySpaceQuotaImportProvider struct {
 
 func newcloudfoundrySpaceQuotaImportProvider() ITfImportProvider {
 	return &cloudfoundrySpaceQuotaImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.CfSpaceQuotaType,
-		},
+		resourceType: tfutils.CfSpaceQuotaType,
 	}
 }
 

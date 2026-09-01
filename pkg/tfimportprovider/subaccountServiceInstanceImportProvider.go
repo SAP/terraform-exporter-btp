@@ -17,9 +17,7 @@ type subaccountServiceInstanceImportProvider struct {
 
 func newSubaccountServiceInstanceImportProvider() ITfImportProvider {
 	return &subaccountServiceInstanceImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.SubaccountServiceInstanceType,
-		},
+		resourceType: tfutils.SubaccountServiceInstanceType,
 	}
 }
 

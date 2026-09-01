@@ -16,9 +16,7 @@ type subaccountTrustConfigImportProvider struct {
 
 func newSubaccountTrustConfigImportProvider() ITfImportProvider {
 	return &subaccountTrustConfigImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.SubaccountTrustConfigurationType,
-		},
+		resourceType: tfutils.SubaccountTrustConfigurationType,
 	}
 }
 
