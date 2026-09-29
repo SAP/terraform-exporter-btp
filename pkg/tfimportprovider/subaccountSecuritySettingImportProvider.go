@@ -14,9 +14,7 @@ type subaccountSecuritySettingImportProvider struct {
 
 func newSubaccountSecuritySettingImportProvider() ITfImportProvider {
 	return &subaccountSecuritySettingImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.SubaccountSecuritySettingType,
-		},
+		resourceType: tfutils.SubaccountSecuritySettingType,
 	}
 }
 

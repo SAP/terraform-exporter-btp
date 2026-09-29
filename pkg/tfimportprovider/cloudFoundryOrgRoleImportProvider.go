@@ -16,9 +16,7 @@ type cloudfoundryOrgRolesImportProvider struct {
 
 func newCloudfoundryOrgRolesImportProvider() ITfImportProvider {
 	return &cloudfoundryOrgRolesImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.CfOrgRoleType,
-		},
+		resourceType: tfutils.CfOrgRoleType,
 	}
 }
 

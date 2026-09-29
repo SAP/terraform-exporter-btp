@@ -15,9 +15,7 @@ type cloudfoundryUserImportProvider struct {
 
 func newcloudfoundryUserImportProvider() ITfImportProvider {
 	return &cloudfoundryUserImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.CfUserType,
-		},
+		resourceType: tfutils.CfUserType,
 	}
 }
 

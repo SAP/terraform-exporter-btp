@@ -15,9 +15,7 @@ type cloudfoundryDomainImportProvider struct {
 
 func newCloudfoundryDomainImportProvider() ITfImportProvider {
 	return &cloudfoundryDomainImportProvider{
-		TfImportProvider: TfImportProvider{
-			resourceType: tfutils.CfDomainType,
-		},
+		resourceType: tfutils.CfDomainType,
 	}
 }
 func (tf *cloudfoundryDomainImportProvider) GetImportBlock(data map[string]any, levelId string, filterValues []string) (string, int, error) {
