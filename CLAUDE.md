@@ -139,7 +139,7 @@ Run `go fix ./...` after making changes. This is enforced in CI and will cause b
 The CLI suppresses Terraform command output by default. Use the `--verbose` flag to see full Terraform output for debugging.
 
 ### Go Version
-The project uses Go 1.26 as specified in `go.mod`.
+The project uses Go 1.27 as specified in `go.mod`.
 
 ## Workflow Files
 
