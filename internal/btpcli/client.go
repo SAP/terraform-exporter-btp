@@ -18,6 +18,19 @@ import (
 
 const DefaultServerURL string = "https://cli.btp.cloud.sap"
 
+// requireHTTPS validates that the given raw URL is well-formed and uses the
+// https scheme, so credentials and tokens are never sent over plaintext.
+func requireHTTPS(rawURL string) error {
+	parsed, err := url.Parse(rawURL)
+	if err != nil {
+		return fmt.Errorf("invalid URL %q: %w", rawURL, err)
+	}
+	if parsed.Scheme != "https" {
+		return fmt.Errorf("URL must use https, got %q", rawURL)
+	}
+	return nil
+}
+
 // We define an Uber Error type that is used to handle errors from the BTP CLI client.
 // The error structure comprises the possible JSON structure of the error responses
 type BtpClientError struct {
@@ -248,6 +261,10 @@ func (v2 *v2Client) IdTokenLogin(ctx context.Context, loginReq *IdTokenLoginRequ
 func (v2 *v2Client) PasscodeLogin(ctx context.Context, loginReq *PasscodeLoginRequest) (*LoginResponse, error) {
 	ctx = v2.initTrace(ctx)
 
+	if err := requireHTTPS(loginReq.IdentityProviderURL); err != nil {
+		return nil, fmt.Errorf("invalid identity provider URL: %w", err)
+	}
+
 	clientCert, err := tls.X509KeyPair([]byte(loginReq.PEMEncodedCertificate), []byte(loginReq.PEMEncodedPrivateKey))
 	if err != nil {
 		return nil, err
@@ -266,6 +283,7 @@ func (v2 *v2Client) PasscodeLogin(ctx context.Context, loginReq *PasscodeLoginRe
 	tlsConfig := &tls.Config{
 		Certificates: []tls.Certificate{clientCert},
 		RootCAs:      caCertPool,
+		MinVersion:   tls.VersionTLS12,
 	}
 
 	tlsTransport := (http.DefaultTransport.(*http.Transport)).Clone()
