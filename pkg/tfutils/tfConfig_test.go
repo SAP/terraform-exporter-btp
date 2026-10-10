@@ -360,3 +360,27 @@ func TestCleanupRemovesTempDir(t *testing.T) {
 		t.Errorf("expected TmpFolder to be cleared, got %q", TmpFolder)
 	}
 }
+
+func TestValidateConfigDirWithinWd(t *testing.T) {
+	wd := "/home/user/project"
+	tests := []struct {
+		name    string
+		target  string
+		wantErr bool
+	}{
+		{"subdir", "/home/user/project/generated", false},
+		{"nested subdir", "/home/user/project/a/b/c", false},
+		{"working dir itself", "/home/user/project", true},
+		{"parent traversal", "/home/user/project/../../etc", true},
+		{"absolute outside", "/etc", true},
+		{"sibling", "/home/user/other", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateConfigDirWithinWd(wd, tt.target)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("validateConfigDirWithinWd(%q,%q) err=%v, wantErr=%v", wd, tt.target, err, tt.wantErr)
+			}
+		})
+	}
+}

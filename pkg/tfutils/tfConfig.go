@@ -281,6 +281,12 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 
 	configFilepath := filepath.Join(curWd, configFolder)
 
+	if err := validateConfigDirWithinWd(curWd, configFilepath); err != nil {
+		CleanupProviderConfig()
+		fmt.Print("\r\n")
+		log.Fatalf("invalid configuration directory %q: %v", configFolder, err)
+	}
+
 	exist, err := files.Exists(configFilepath)
 	if err != nil {
 		CleanupProviderConfig()
@@ -376,6 +382,26 @@ func handleReturnWoInput(err error) (choice string) {
 		log.Fatalf("error reading input: %v", err)
 	}
 	return choice
+}
+
+// validateConfigDirWithinWd ensures the resolved configuration directory stays
+// inside the current working directory, preventing path traversal (e.g. via a
+// crafted --config-dir) from targeting an arbitrary location for creation or
+// recursive deletion.
+func validateConfigDirWithinWd(curWd string, configFilepath string) error {
+	cleanWd := filepath.Clean(curWd)
+	cleanTarget := filepath.Clean(configFilepath)
+
+	rel, err := filepath.Rel(cleanWd, cleanTarget)
+	if err != nil {
+		return fmt.Errorf("cannot resolve path: %v", err)
+	}
+
+	if rel == "." || rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
+		return fmt.Errorf("path must be a subdirectory of the working directory")
+	}
+
+	return nil
 }
 
 func createNewConfigDir(configFilepath string, configFolder string, curWd string) {
