@@ -651,13 +651,14 @@ func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder st
 
 	if !exist {
 		// In the first run we must create the file if it does not exist
-		_, err := os.Create(targetConfigPath)
+		created, err := os.OpenFile(targetConfigPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
 		if err != nil {
 			return fmt.Errorf("error creating target configuration file: %v", err)
 		}
+		_ = created.Close()
 	}
 
-	targetFile, err := os.OpenFile(targetConfigPath, os.O_APPEND|os.O_WRONLY, 0644)
+	targetFile, err := os.OpenFile(targetConfigPath, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return fmt.Errorf("error opening target configuration file: %v", err)
 	}

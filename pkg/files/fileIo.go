@@ -121,7 +121,13 @@ func copyFile(src, dest string) error {
 		}
 	}()
 
-	destFile, err := os.OpenFile(dest, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	// Avoid following a pre-existing symlink at the destination; appending to a
+	// regular file is preserved so repeated import blocks still merge.
+	if info, lerr := os.Lstat(dest); lerr == nil && info.Mode()&os.ModeSymlink != 0 {
+		_ = os.Remove(dest)
+	}
+
+	destFile, err := os.OpenFile(dest, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
 	}
