@@ -50,7 +50,7 @@ func createSecuritySettingImportBlock(data map[string]any, subaccountId string, 
 	}
 
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "secsetting")
-	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
+	template = strings.ReplaceAll(template, "<subaccount_id>", tfutils.EscapeHclString(subaccountId))
 	importBlock += template + "\n"
 
 	return importBlock, nil

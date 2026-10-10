@@ -71,10 +71,10 @@ func CreateEntitlementImportBlock(data map[string]any, subaccountId string, filt
 
 func templateEntitlementImport(x int, value any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "entitlement_"+fmt.Sprint(x))
-	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
+	template = strings.ReplaceAll(template, "<subaccount_id>", tfutils.EscapeHclString(subaccountId))
 	if subMap, ok := value.(map[string]any); ok {
 		for subKey, subValue := range subMap {
-			template = strings.ReplaceAll(template, "<"+subKey+">", fmt.Sprintf("%v", subValue))
+			template = strings.ReplaceAll(template, "<"+subKey+">", tfutils.EscapeHclString(fmt.Sprintf("%v", subValue)))
 		}
 	}
 	return template + "\n"

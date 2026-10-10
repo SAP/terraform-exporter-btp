@@ -72,6 +72,6 @@ func createUserImportBlock(data map[string]any, orgId string, filterValues []str
 
 func templateUserImport(x int, user map[string]any, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "user_"+fmt.Sprintf("%v", x))
-	template = strings.ReplaceAll(template, "<user_guid>", fmt.Sprintf("%v", user["id"]))
+	template = strings.ReplaceAll(template, "<user_guid>", tfutils.EscapeHclString(fmt.Sprintf("%v", user["id"])))
 	return template + "\n"
 }

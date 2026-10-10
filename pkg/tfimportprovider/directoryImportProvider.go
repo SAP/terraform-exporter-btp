@@ -45,7 +45,7 @@ func createDirectoryImportBlock(data map[string]any, directoryId string, filterV
 	}
 
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "directory_0")
-	template = strings.ReplaceAll(template, "<directory_id>", directoryId)
+	template = strings.ReplaceAll(template, "<directory_id>", tfutils.EscapeHclString(directoryId))
 	importBlock += template + "\n"
 
 	return importBlock, nil

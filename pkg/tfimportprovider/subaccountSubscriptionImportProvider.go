@@ -94,8 +94,8 @@ func createSubscriptionImportBlock(data map[string]any, subaccountId string, fil
 
 func templateSubscriptionImport(x int, subscription map[string]any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "subscription_"+fmt.Sprint(x))
-	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
-	template = strings.ReplaceAll(template, "<app_name>", fmt.Sprintf("%v", subscription["app_name"]))
-	template = strings.ReplaceAll(template, "<plan_name>", fmt.Sprintf("%v", subscription["plan_name"]))
+	template = strings.ReplaceAll(template, "<subaccount_id>", tfutils.EscapeHclString(subaccountId))
+	template = strings.ReplaceAll(template, "<app_name>", tfutils.EscapeHclString(fmt.Sprintf("%v", subscription["app_name"])))
+	template = strings.ReplaceAll(template, "<plan_name>", tfutils.EscapeHclString(fmt.Sprintf("%v", subscription["plan_name"])))
 	return template + "\n"
 }

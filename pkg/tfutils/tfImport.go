@@ -308,25 +308,25 @@ func readDataSource(subaccountId string, directoryId string, organizationId stri
 	switch level {
 	case SubaccountLevel:
 		if resourceName == SubaccountType {
-			dataBlock = strings.ReplaceAll(doc.Import, "The ID of the subaccount", subaccountId)
+			dataBlock = strings.ReplaceAll(doc.Import, "The ID of the subaccount", EscapeHclString(subaccountId))
 		} else {
-			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["subaccount_id"], subaccountId)
+			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["subaccount_id"], EscapeHclString(subaccountId))
 		}
 	case DirectoryLevel:
 		if resourceName == DirectoryType {
-			dataBlock = strings.ReplaceAll(doc.Import, "The ID of the directory.", directoryId)
+			dataBlock = strings.ReplaceAll(doc.Import, "The ID of the directory.", EscapeHclString(directoryId))
 		} else {
-			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["directory_id"], directoryId)
+			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["directory_id"], EscapeHclString(directoryId))
 		}
 	case OrganizationLevel:
 		if resourceName == CfUserType || resourceName == CfUserTypeRead || resourceName == CfDomainType || resourceName == CfRouteType || resourceName == CfServiceInstanceType {
-			dataBlock = strings.ReplaceAll(doc.Import, "The ID of the organization", organizationId)
+			dataBlock = strings.ReplaceAll(doc.Import, "The ID of the organization", EscapeHclString(organizationId))
 		} else {
-			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["org"], organizationId)
+			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["org"], EscapeHclString(organizationId))
 		}
 	case SpaceLevel:
 		if resourceName == CfSpaceRoleType {
-			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["space"], spaceId)
+			dataBlock = strings.ReplaceAll(doc.Import, doc.Attributes["space"], EscapeHclString(spaceId))
 		}
 	}
 

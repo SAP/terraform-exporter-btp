@@ -83,9 +83,9 @@ func templateRoleImport(x int, role map[string]any, subaccountId string, resourc
 
 	resourceDoc.Import = strings.ReplaceAll(resourceDoc.Import, "'", "")
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "role_"+fmt.Sprint(x))
-	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
-	template = strings.ReplaceAll(template, "<name>", fmt.Sprintf("%v", role["name"]))
-	template = strings.ReplaceAll(template, "<role_template_name>", fmt.Sprintf("%v", role["role_template_name"]))
-	template = strings.ReplaceAll(template, "<app_id>", fmt.Sprintf("%v", role["app_id"]))
+	template = strings.ReplaceAll(template, "<subaccount_id>", tfutils.EscapeHclString(subaccountId))
+	template = strings.ReplaceAll(template, "<name>", tfutils.EscapeHclString(fmt.Sprintf("%v", role["name"])))
+	template = strings.ReplaceAll(template, "<role_template_name>", tfutils.EscapeHclString(fmt.Sprintf("%v", role["role_template_name"])))
+	template = strings.ReplaceAll(template, "<app_id>", tfutils.EscapeHclString(fmt.Sprintf("%v", role["app_id"])))
 	return template + "\n"
 }
