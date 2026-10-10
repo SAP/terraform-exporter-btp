@@ -44,7 +44,7 @@ func NewV2Client(serverURL *url.URL) *v2Client {
 
 func NewV2ClientWithHttpClient(client *http.Client, serverURL *url.URL) *v2Client {
 	return &v2Client{
-		httpClient: injectBTPCLITransport(client),
+		httpClient: injectBTPCLITransport(client, serverURL),
 		serverURL:  serverURL,
 		newCorrelationID: func() string {
 			val, err := uuid.GenerateUUID()
