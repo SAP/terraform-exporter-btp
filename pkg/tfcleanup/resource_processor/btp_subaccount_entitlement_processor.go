@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
+	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
@@ -114,7 +115,7 @@ func addEntitlementModule(body *hclwrite.Body, subaccountAddress string, subacco
 			},
 			{
 				Type:  hclsyntax.TokenStringLit,
-				Bytes: []byte(subaccountId),
+				Bytes: []byte(tfutils.EscapeHclString(subaccountId)),
 			},
 			{
 				Type:  hclsyntax.TokenOQuote,
@@ -155,8 +156,8 @@ func addEntitlementVariables(variablesToCreate *generictools.VariableContent, en
 	var defaultValue strings.Builder
 	defaultValue.WriteString("{\n")
 	for key, info := range entitlementAddress {
-		serviceName := key.ServiceName
-		planName := key.PlanName
+		serviceName := tfutils.EscapeHclString(key.ServiceName)
+		planName := tfutils.EscapeHclString(key.PlanName)
 		amount := info.Amount
 
 		if amount > 0 {
@@ -210,8 +211,8 @@ func AppendImportBlocksForEntitlementModule(directory string, entitlementsToAdd 
 
 	for key := range entitlementsToAdd {
 
-		importToKey := key.ServiceName + "-" + key.PlanName
-		importIdKey := levelIds.SubaccountId + "," + key.ServiceName + "," + key.PlanName
+		importToKey := tfutils.EscapeHclString(key.ServiceName) + "-" + tfutils.EscapeHclString(key.PlanName)
+		importIdKey := tfutils.EscapeHclString(levelIds.SubaccountId) + "," + tfutils.EscapeHclString(key.ServiceName) + "," + tfutils.EscapeHclString(key.PlanName)
 
 		body.AppendNewline()
 		importBlock := body.AppendNewBlock("import", []string{})
