@@ -145,26 +145,26 @@ func ConfigureProvider(level string) {
 		validateGlobalAccount(globalAccount)
 
 		providerContent = "terraform {\nrequired_providers {\nbtp = {\nsource  = \"SAP/btp\"\nversion = \"" + BtpProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"btp\" {\n"
-		providerContent = providerContent + "globalaccount = \"" + globalAccount + "\"\n"
+		providerContent = providerContent + "globalaccount = \"" + EscapeHclString(globalAccount) + "\"\n"
 
 		if len(strings.TrimSpace(cliServerUrl)) != 0 {
-			providerContent = providerContent + "cli_server_url=\"" + cliServerUrl + "\"\n"
+			providerContent = providerContent + "cli_server_url=\"" + EscapeHclString(cliServerUrl) + "\"\n"
 		}
 
 		if len(strings.TrimSpace(idp)) != 0 {
-			providerContent = providerContent + "idp=\"" + idp + "\"\n"
+			providerContent = providerContent + "idp=\"" + EscapeHclString(idp) + "\"\n"
 		}
 
 		if len(strings.TrimSpace(tlsClientCertificate)) != 0 {
-			providerContent = providerContent + "tls_client_certificate =\"" + tlsClientCertificate + "\"\n"
+			providerContent = providerContent + "tls_client_certificate =\"" + EscapeHclString(tlsClientCertificate) + "\"\n"
 		}
 
 		if len(strings.TrimSpace(tlsClientKey)) != 0 {
-			providerContent = providerContent + "tls_client_key =\"" + tlsClientKey + "\"\n"
+			providerContent = providerContent + "tls_client_key =\"" + EscapeHclString(tlsClientKey) + "\"\n"
 		}
 
 		if len(strings.TrimSpace(tlsIdpURL)) != 0 {
-			providerContent = providerContent + "tls_idp_url =\"" + tlsIdpURL + "\"\n"
+			providerContent = providerContent + "tls_idp_url =\"" + EscapeHclString(tlsIdpURL) + "\"\n"
 		}
 
 		providerContent = providerContent + "}"
@@ -183,27 +183,20 @@ func ConfigureProvider(level string) {
 		validateCfAuthenticationData(username, password, cfAccessToken, cfRefreshToken, cfClientId, cfClientSecret)
 		validateCfApiUrl(apiUrl)
 
+		// Sensitive credentials (cf_client_secret, cf_access_token, cf_refresh_token)
+		// are intentionally not written to the generated provider configuration.
+		// The Cloud Foundry provider sources them from the CF_CLIENT_SECRET,
+		// CF_ACCESS_TOKEN and CF_REFRESH_TOKEN environment variables, which are
+		// already required to be set for the export to run.
 		providerContent = "terraform {\nrequired_providers {\ncloudfoundry = {\nsource  = \"cloudfoundry/cloudfoundry\"\nversion = \"" + CfProviderVersion[1:] + "\"\n}\n}\n}\n\nprovider \"cloudfoundry\" {\n"
-		providerContent = providerContent + "api_url = \"" + apiUrl + "\"\n"
+		providerContent = providerContent + "api_url = \"" + EscapeHclString(apiUrl) + "\"\n"
 
 		if len(strings.TrimSpace(cfOrigin)) != 0 {
-			providerContent = providerContent + "origin=\"" + cfOrigin + "\"\n"
+			providerContent = providerContent + "origin=\"" + EscapeHclString(cfOrigin) + "\"\n"
 		}
 
 		if len(strings.TrimSpace(cfClientId)) != 0 {
-			providerContent = providerContent + "cf_client_id =\"" + cfClientId + "\"\n"
-		}
-
-		if len(strings.TrimSpace(cfClientSecret)) != 0 {
-			providerContent = providerContent + "cf_client_secret =\"" + cfClientSecret + "\"\n"
-		}
-
-		if len(strings.TrimSpace(cfAccessToken)) != 0 {
-			providerContent = providerContent + "cf_access_token =\"" + cfAccessToken + "\"\n"
-		}
-
-		if len(strings.TrimSpace(cfRefreshToken)) != 0 {
-			providerContent = providerContent + "cf_refresh_token =\"" + cfRefreshToken + "\"\n"
+			providerContent = providerContent + "cf_client_id =\"" + EscapeHclString(cfClientId) + "\"\n"
 		}
 
 		providerContent = providerContent + "}"
@@ -318,7 +311,11 @@ func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
 
 	fullpath := filepath.Join(curWd, configFolder)
 
-	destinationFile, err := os.Create(fullpath + "/provider.tf")
+	destProviderPath := filepath.Join(fullpath, "provider.tf")
+	if info, lerr := os.Lstat(destProviderPath); lerr == nil && info.Mode()&os.ModeSymlink != 0 {
+		_ = os.Remove(destProviderPath)
+	}
+	destinationFile, err := os.OpenFile(destProviderPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
 	if err != nil {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
@@ -493,11 +490,17 @@ func GetValidResourcesByLevel(level string) []string {
 }
 
 func cleanup() {
-	// Cleanup temporary folder variable
+	// Capture the temporary folder path before clearing the global so the
+	// directory (which may hold the provider configuration) is actually removed.
+	dir := TmpFolder
 	TmpFolder = ""
 
+	if dir == "" {
+		return
+	}
+
 	// Cleanup temporary files on disk
-	err := os.RemoveAll(TmpFolder)
+	err := os.RemoveAll(dir)
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("error deleting temp files: %v", err)
