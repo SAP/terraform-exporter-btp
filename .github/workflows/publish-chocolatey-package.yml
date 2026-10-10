@@ -31,20 +31,31 @@ jobs:
           fetch-depth: 0
       - name: Determine tag to use
         id: determine-tag
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.tag }}" != "" ]]; then
-            echo "TAG=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event_name }}" == "release" ]]; then
-            echo "TAG=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$INPUT_TAG" != "" ]]; then
+            TAG="$INPUT_TAG"
+          elif [[ "$EVENT_NAME" == "release" ]]; then
+            TAG="$RELEASE_TAG"
           else
-            latest_tag=$(git describe --tags --abbrev=0 --match "v*")
-            echo "TAG=$latest_tag" >> "$GITHUB_OUTPUT"
+            TAG=$(git describe --tags --abbrev=0 --match "v*")
           fi
+          if ! [[ "$TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid tag format: $TAG" >&2
+            exit 1
+          fi
+          echo "TAG=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Determine Chocolatey push
         id: determine-choco-push
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PUSH_INPUT: ${{ github.event.inputs.push-to-chocolatey }}
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.push-to-chocolatey }}" == "true" ]]; then
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$PUSH_INPUT" == "true" ]]; then
             echo "Choco push enabled"
             echo "PUSH_TO_CHOCOLATEY=true" >> "$GITHUB_OUTPUT"
           else
@@ -75,9 +86,10 @@ jobs:
 
       - name: Set release version
         id: release-version
+        env:
+          TAG: ${{ steps.determine-tag.outputs.TAG }}
         run: |
-          version=${{ steps.determine-tag.outputs.TAG }}
-          version=${version#v}
+          version="${TAG#v}"
           echo "LATEST_TAG=$version" >> "$GITHUB_OUTPUT"
       - uses: robinraju/release-downloader@v1
         id: release-downloader
@@ -85,10 +97,12 @@ jobs:
           tag: "${{ steps.determine-tag.outputs.TAG }}"
           fileName: "btptf_${{ steps.release-version.outputs.LATEST_TAG }}_windows_amd64.exe.sha256"
       - name: Modify choco properties
+        env:
+          LATEST_TAG: ${{ steps.release-version.outputs.LATEST_TAG }}
         run: |
-          RELEASE_VERSION="${{ steps.release-version.outputs.LATEST_TAG }}"
+          RELEASE_VERSION="$LATEST_TAG"
           # awk just to make sure we take only the hash part and no white spaces or filenames
-          SHA256=$(cat btptf_${{ steps.release-version.outputs.LATEST_TAG }}_windows_amd64.exe.sha256 | awk '{print $1}')
+          SHA256=$(awk '{print $1}' "btptf_${LATEST_TAG}_windows_amd64.exe.sha256")
           sed -i "s/VERSION/${RELEASE_VERSION}/g" choco/sap-btptf.nuspec
           sed -i "s/VERSION/${RELEASE_VERSION}/g" choco/tools/chocolateyInstall.ps1
           sed -i "s/CHECKSUM/${SHA256}/g" choco/tools/chocolateyInstall.ps1

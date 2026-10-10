@@ -26,23 +26,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
-          fetch-depth: 0 n
+          fetch-depth: 0
       - name: Set tag and versions
         id: get-tag
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
           TAG=""
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.tag }}" != "" ]]; then
-            TAG="${{ github.event.inputs.tag }}"
-          elif [[ "${{ github.event_name }}" == "release" ]]; then
-            TAG="${{ github.event.release.tag_name }}"
-          # elif [[ "${{ github.event_name }}" == "workflow_call" ]]; then
-          #   TAG="${{ inputs.tag }}"
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$INPUT_TAG" != "" ]]; then
+            TAG="$INPUT_TAG"
+          elif [[ "$EVENT_NAME" == "release" ]]; then
+            TAG="$RELEASE_TAG"
           else
             TAG=$(git describe --tags --abbrev=0 --match "v*") # Added fallback
           fi
 
           if [ -z "$TAG" ]; then
             echo "Error: TAG could not be determined. Exiting."
+            exit 1
+          fi
+          if ! [[ "$TAG" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid tag format: $TAG" >&2
             exit 1
           fi
           RELEASE_VERSION="${TAG#v}"
@@ -76,27 +82,34 @@ jobs:
           git push origin --force
 
       - name: Create new branch
+        env:
+          TAG: ${{ steps.get-tag.outputs.tag }}
         run: |
           cd winget-pkgs
-          git checkout -b update-${{ steps.get-tag.outputs.tag }}
+          git checkout -b "update-${TAG}"
 
       - name: Download SHA256 file
         id: download-sha256
+        env:
+          BTPTF_BASE_URL: ${{ steps.get-tag.outputs.btptf_base_url }}
+          TAG: ${{ steps.get-tag.outputs.tag }}
+          RELEASE_VERSION: ${{ steps.get-tag.outputs.release_version }}
         run: |
-          BTPTF_BASE_URL="${{ steps.get-tag.outputs.btptf_base_url }}"
-          TAG="${{ steps.get-tag.outputs.tag }}"
-          RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
-
-          curl -L "$BTPTF_BASE_URL/download/$TAG/btptf_${RELEASE_VERSION}_windows_amd64.exe.sha256" -o btptf_${RELEASE_VERSION}_windows_amd64.exe.sha256
-          SHA256=$(cat btptf_${RELEASE_VERSION}_windows_amd64.exe.sha256)
+          curl -L "$BTPTF_BASE_URL/download/$TAG/btptf_${RELEASE_VERSION}_windows_amd64.exe.sha256" -o "btptf_${RELEASE_VERSION}_windows_amd64.exe.sha256"
+          SHA256=$(cat "btptf_${RELEASE_VERSION}_windows_amd64.exe.sha256")
+          if ! [[ "$SHA256" =~ ^[A-Fa-f0-9]{64}$ ]]; then
+            echo "Invalid SHA256 downloaded: $SHA256" >&2
+            exit 1
+          fi
           echo "sha256=$SHA256" >> $GITHUB_OUTPUT
 
       - name: Create winget manifest folder and files
+        env:
+          RELEASE_VERSION: ${{ steps.get-tag.outputs.release_version }}
+          BTPTF_BASE_URL: ${{ steps.get-tag.outputs.btptf_base_url }}
+          TAG: ${{ steps.get-tag.outputs.tag }}
+          INSTALLER_SHA256: ${{ steps.download-sha256.outputs.sha256 }}
         run: |
-          RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
-          BTPTF_BASE_URL="${{ steps.get-tag.outputs.btptf_base_url }}"
-          TAG="${{ steps.get-tag.outputs.tag }}"
-
           cd winget-pkgs/manifests/s/SAP/btptf
           mkdir -p "$RELEASE_VERSION"
           cp 1.1.0/*.yaml "$RELEASE_VERSION/"
@@ -108,10 +121,11 @@ jobs:
           yq e -i ".ReleaseNotesUrl = \"$BTPTF_BASE_URL/tag/$TAG\"" "$RELEASE_VERSION/SAP.btptf.locale.en-US.yaml"
           yq e -i ".Installers[0].InstallerUrl = \"$BTPTF_BASE_URL/download/$TAG/btptf_${RELEASE_VERSION}_windows_amd64.exe\"" "$RELEASE_VERSION/SAP.btptf.installer.yaml"
 
-          yq e -i ".Installers[0].InstallerSha256 = \"${{ steps.download-sha256.outputs.sha256 }}\"" "$RELEASE_VERSION/SAP.btptf.installer.yaml"
+          yq e -i ".Installers[0].InstallerSha256 = \"$INSTALLER_SHA256\"" "$RELEASE_VERSION/SAP.btptf.installer.yaml"
       - name: Print files
+        env:
+          RELEASE_VERSION: ${{ steps.get-tag.outputs.release_version }}
         run: |
-          RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
           echo "-------winget-pkgs/manifests/s/SAP/btptf/$RELEASE_VERSION/SAP.btptf.yaml:-----"
           cat winget-pkgs/manifests/s/SAP/btptf/"$RELEASE_VERSION"/SAP.btptf.yaml
           echo "-----winget-pkgs/manifests/s/SAP/btptf/$RELEASE_VERSION/SAP.btptf.locale.en-US.yaml:-----"
@@ -119,18 +133,19 @@ jobs:
           echo "-----winget-pkgs/manifests/s/SAP/btptf/$RELEASE_VERSION/SAP.btptf.installer.yaml:-----"
           cat winget-pkgs/manifests/s/SAP/btptf/"$RELEASE_VERSION"/SAP.btptf.installer.yaml
       - name: Commit and push
+        env:
+          RELEASE_VERSION: ${{ steps.get-tag.outputs.release_version }}
         run: |
-          RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
           cd winget-pkgs
           git add manifests/s/SAP/btptf/"$RELEASE_VERSION"
           git commit -m "New Version: SAP.btptf version $RELEASE_VERSION"
           git push origin HEAD
 
       - name: Create Pull Request
+        env:
+          TAG: ${{ steps.get-tag.outputs.tag }}
+          RELEASE_VERSION: ${{ steps.get-tag.outputs.release_version }}
         run: |
-          TAG="${{ steps.get-tag.outputs.tag }}"
-          RELEASE_VERSION="${{ steps.get-tag.outputs.release_version }}"
-
           cd winget-pkgs
 
           gh repo set-default microsoft/winget-pkgs
@@ -138,6 +153,6 @@ jobs:
           gh pr create \
             --base master \
             --repo microsoft/winget-pkgs \
-            --head $WINGET_FORK_ORG:update-"$TAG" \
+            --head "$WINGET_FORK_ORG:update-${TAG}" \
             --title "Add SAP.btptf $RELEASE_VERSION" \
             --body "Automated PR to publish SAP.btptf version $RELEASE_VERSION"
