@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -88,7 +89,7 @@ func TestBTPCLITransport(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			client := injectBTPCLITransport(srv.Client())
+			client := injectBTPCLITransport(srv.Client(), mustParseURL(srv.URL))
 
 			req, err := http.NewRequest(http.MethodGet, srv.URL+"/path-0", nil)
 
@@ -100,4 +101,45 @@ func TestBTPCLITransport(t *testing.T) {
 			assert.Equal(t, test.returnStatus, res.StatusCode)
 		})
 	}
+}
+
+func mustParseURL(raw string) *url.URL {
+	u, err := url.Parse(raw)
+	if err != nil {
+		panic(err)
+	}
+	return u
+}
+
+func TestBTPCLITransportStripsHeadersOnCrossOriginRedirect(t *testing.T) {
+	var otherReceivedIDToken, otherReceivedSubdomain string
+
+	otherHost := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		otherReceivedIDToken = r.Header.Get(HeaderIDToken)
+		otherReceivedSubdomain = r.Header.Get(HeaderCLISubdomain)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer otherHost.Close()
+
+	trusted := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Redirect to a different origin, emitting sensitive headers.
+		w.Header().Set(HeaderIDToken, "secret-id-token")
+		w.Header().Set(HeaderCLISubdomain, "secret-subdomain")
+		http.Redirect(w, r, otherHost.URL+"/landing", http.StatusTemporaryRedirect)
+	}))
+	defer trusted.Close()
+
+	client := injectBTPCLITransport(trusted.Client(), mustParseURL(trusted.URL))
+
+	req, err := http.NewRequest(http.MethodGet, trusted.URL+"/start", nil)
+	req.Header.Set(HeaderIDToken, "secret-id-token")
+	req.Header.Set(HeaderCLISubdomain, "secret-subdomain")
+	assert.NoError(t, err)
+
+	res, err := client.Do(req)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+
+	assert.Empty(t, otherReceivedIDToken, "X-Id-Token must not be forwarded to a different origin")
+	assert.Empty(t, otherReceivedSubdomain, "X-Cpcli-Subdomain must not be forwarded to a different origin")
 }

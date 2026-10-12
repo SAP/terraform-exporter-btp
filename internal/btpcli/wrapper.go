@@ -30,7 +30,14 @@ func GetLoggedInClient() (*ClientFacade, error) {
 		cliServerUrl = DefaultServerURL
 	}
 
-	u, _ := url.Parse(cliServerUrl)
+	if err := requireHTTPS(cliServerUrl); err != nil {
+		return nil, fmt.Errorf("invalid BTP CLI server URL: %w", err)
+	}
+
+	u, err := url.Parse(cliServerUrl)
+	if err != nil {
+		return nil, fmt.Errorf("invalid BTP CLI server URL %q: %w", cliServerUrl, err)
+	}
 
 	client := NewClientFacade(NewV2ClientWithHttpClient(http.DefaultClient, u))
 
@@ -44,6 +51,10 @@ func GetLoggedInClient() (*ClientFacade, error) {
 	}
 
 	if tlsClientCertificate != "" && tlsClientKey != "" && tlsIdpURL != "" {
+
+		if err := requireHTTPS(tlsIdpURL); err != nil {
+			return nil, fmt.Errorf("invalid BTP TLS IDP URL: %w", err)
+		}
 
 		passcodeLoginReq := &PasscodeLoginRequest{
 			GlobalAccountSubdomain: globalAccount,

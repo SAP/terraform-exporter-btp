@@ -43,7 +43,7 @@ func WriteExportLog(configDir string, resource string, resourceType string, coun
 		if err != nil {
 			return fmt.Errorf("error marshaling initial content: %v", err)
 		}
-		err = os.WriteFile(logFileName, contentBytes, 0644)
+		err = os.WriteFile(logFileName, contentBytes, 0600)
 		if err != nil {
 			return fmt.Errorf("error creating file %s: %v", logFileName, err)
 		}
@@ -79,7 +79,7 @@ func WriteExportLog(configDir string, resource string, resourceType string, coun
 	}
 
 	// Write the updated JSON back to the file
-	err = os.WriteFile(logFileName, updatedContent, 0644)
+	err = os.WriteFile(logFileName, updatedContent, 0600)
 	if err != nil {
 		return fmt.Errorf("error writing to file %s: %v", logFileName, err)
 	}

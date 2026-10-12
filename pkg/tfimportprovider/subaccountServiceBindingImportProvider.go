@@ -73,7 +73,7 @@ func createServiceBindingImportBlock(data map[string]any, subaccountId string, f
 
 func templateServiceBindingImport(x int, binding map[string]any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "servicebinding_"+fmt.Sprint(x))
-	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
-	template = strings.ReplaceAll(template, "<service_binding_id>", fmt.Sprintf("%v", binding["id"]))
+	template = strings.ReplaceAll(template, "<subaccount_id>", tfutils.EscapeHclString(subaccountId))
+	template = strings.ReplaceAll(template, "<service_binding_id>", tfutils.EscapeHclString(fmt.Sprintf("%v", binding["id"])))
 	return template + "\n"
 }

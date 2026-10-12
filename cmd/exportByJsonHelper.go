@@ -17,6 +17,10 @@ import (
 	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 )
 
+// maxJSONInventorySize bounds how many bytes are read from the inventory file
+// as a safeguard in addition to the up-front file-size check.
+const maxJSONInventorySize = 5 * 1024 * 1024 // 5 MB
+
 func exportByJson(subaccount string, directory string, organization string, jsonfile string, resourceFile string, configDir string, backendConfig tfutils.BackendConfig) {
 	// Check if file size is valid
 	validFileSize, err := files.IsFileSizeValid(jsonfile)
@@ -44,7 +48,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 		}
 	}()
 
-	byteValue, err := io.ReadAll(jsonFile)
+	byteValue, err := io.ReadAll(io.LimitReader(jsonFile, maxJSONInventorySize))
 	if err != nil {
 		fmt.Print("\r\n")
 		log.Fatalf("error reading JSON file: %v", err)
@@ -108,7 +112,16 @@ func exportByJson(subaccount string, directory string, organization string, json
 				var finalCount int
 				var resourceType string
 				for _, spaceRole := range value {
-					spaceID := (strings.Split(spaceRole, "_"))[3]
+					parts := strings.Split(spaceRole, "_")
+					if len(parts) < 4 {
+						fmt.Print("\r\n")
+						log.Fatalf("invalid Cloud Foundry space role entry %q in the provided file", spaceRole)
+					}
+					spaceID := parts[3]
+					if !isValidUuid(spaceID) {
+						fmt.Print("\r\n")
+						log.Fatalf("invalid space ID %q derived from space role entry %q; expected a valid UUID", spaceID, spaceRole)
+					}
 					spaceRoles[spaceID] = append(spaceRoles[spaceID], spaceRole)
 				}
 				for spaceRolesKey, spaceRolesValue := range spaceRoles {

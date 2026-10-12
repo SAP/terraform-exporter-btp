@@ -89,7 +89,6 @@ func TestProcessProvider(t *testing.T) {
 }
 
 func TestProcessProviderWithBackend(t *testing.T) {
-
 	btpSrcFileBackend, btpTrgtFileBackend := testutils.GetHclFilesById("provider_withbackend_btp")
 	btpSrcFileBackend2, btpTrgtFileBackend2 := testutils.GetHclFilesById("provider_withbackend_btp")
 	btpSrcFileWoBackend, btpTrgtFileWoBackend := testutils.GetHclFilesById("provider_wobackend_btp")
@@ -151,4 +150,21 @@ func TestProcessProviderWithBackend(t *testing.T) {
 
 		})
 	}
+}
+
+func TestAppendBackendBlockByParamsPreservesEquals(t *testing.T) {
+	f := hclwrite.NewEmptyFile()
+	f.Body().AppendNewBlock("terraform", nil)
+
+	backendConfig := tfutils.BackendConfig{
+		BackendType:   "azurerm",
+		BackendConfig: []string{"key=terraform.tfstate", "sas_token=sv=2021&sig=a==b"},
+	}
+
+	contentToCreate := make(generictools.VariableContent)
+	ProcessProvider(f, &contentToCreate, backendConfig)
+
+	out := string(f.Bytes())
+	assert.Contains(t, out, `sas_token = "sv=2021&sig=a==b"`)
+	assert.Contains(t, out, `key       = "terraform.tfstate"`)
 }

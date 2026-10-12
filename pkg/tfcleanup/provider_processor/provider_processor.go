@@ -57,9 +57,18 @@ func addBackendBlock(body *hclwrite.Body, backendConfig tfutils.BackendConfig) {
 
 func appendBackendBlockByFile(filePath string, body *hclwrite.Body) {
 	backendFile := generictools.GetHclFile(filePath)
+	if backendFile == nil {
+		return
+	}
 	backendBody := backendFile.Body()
 
+	if len(backendBody.Blocks()) == 0 {
+		return
+	}
 	terraformBlock := backendBody.Blocks()[0]
+	if len(terraformBlock.Body().Blocks()) == 0 {
+		return
+	}
 	backendBlock := terraformBlock.Body().Blocks()[0]
 
 	if backendBlock.Type() == "backend" {
@@ -70,18 +79,21 @@ func appendBackendBlockByFile(filePath string, body *hclwrite.Body) {
 
 func appendBackendBlockByParams(backendType string, backendConfig []string, body *hclwrite.Body) {
 	body.AppendNewline()
-	backendBlock := body.AppendNewBlock("backend", []string{backendType})
+	backendBlock := body.AppendNewBlock("backend", []string{tfutils.SanitizeHclLabel(backendType)})
 
 	backendBody := backendBlock.Body()
 
 	for _, config := range backendConfig {
-		configParts := strings.Split(config, "=")
+		configParts := strings.SplitN(config, "=", 2)
+		if len(configParts) < 2 {
+			continue
+		}
 
-		backendBody.SetAttributeRaw(configParts[0],
+		backendBody.SetAttributeRaw(tfutils.SanitizeHclLabel(configParts[0]),
 			hclwrite.Tokens{
 				{
 					Type:  hclsyntax.TokenIdent,
-					Bytes: []byte("\"" + configParts[1] + "\""),
+					Bytes: []byte("\"" + tfutils.EscapeHclString(configParts[1]) + "\""),
 				},
 			},
 		)

@@ -65,10 +65,10 @@ func CreateDirEntitlementImportBlock(data map[string]any, directoryId string, fi
 
 func templateDirEntitlementImport(x int, value any, directoryId string, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "entitlement_"+fmt.Sprint(x))
-	template = strings.ReplaceAll(template, "<directory_id>", directoryId)
+	template = strings.ReplaceAll(template, "<directory_id>", tfutils.EscapeHclString(directoryId))
 	if subMap, ok := value.(map[string]any); ok {
 		for subKey, subValue := range subMap {
-			template = strings.ReplaceAll(template, "<"+subKey+">", fmt.Sprintf("%v", subValue))
+			template = strings.ReplaceAll(template, "<"+subKey+">", tfutils.EscapeHclString(fmt.Sprintf("%v", subValue)))
 		}
 	}
 	return template + "\n"

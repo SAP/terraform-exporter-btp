@@ -61,6 +61,6 @@ func createRouteImportBlock(data map[string]any, orgId string, filterValues []st
 }
 func templateRouteImport(x int, route map[string]any, resourceDoc tfutils.EntityDocs) string {
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "route_"+fmt.Sprintf("%v", x))
-	template = strings.ReplaceAll(template, "<route_guid>", fmt.Sprintf("%v", route["id"]))
+	template = strings.ReplaceAll(template, "<route_guid>", tfutils.EscapeHclString(fmt.Sprintf("%v", route["id"])))
 	return template + "\n"
 }

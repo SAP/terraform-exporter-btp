@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -181,6 +182,21 @@ func readFromFile(hash string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	info, err := os.Stat(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+
+	// The cached session is a bearer credential; warn if it is readable by
+	// group or other users (permission bits are not meaningful on Windows).
+	if runtime.GOOS != "windows" && info.Mode().Perm()&0o077 != 0 {
+		log.Printf("warning: BTP CLI session cache %q is accessible by other users (mode %04o); consider restricting it to 0600", path, info.Mode().Perm())
+	}
+
 	data, err := os.ReadFile(path)
 	if errors.Is(err, os.ErrNotExist) {
 		return "", nil

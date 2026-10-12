@@ -19,6 +19,13 @@ var getIaCTool = func() (tool string, err error) {
 	//For TESTING purposes, we can set the tool to be used
 	tool = toggles.GetIacTool()
 	if tool != "" {
+		// Restrict the configurable IaC tool to a known allowlist so an
+		// unexpected BTPTF_IAC_TOOL value cannot cause an arbitrary executable
+		// to be run.
+		if tool != "terraform" && tool != "tofu" {
+			fmt.Print("\r\n")
+			log.Fatalf("unsupported IaC tool %q: only \"terraform\" or \"tofu\" are supported", tool)
+		}
 		return tool, nil
 	}
 

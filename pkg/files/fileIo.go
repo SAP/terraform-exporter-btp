@@ -20,8 +20,14 @@ func DeleteSourceFolder(srcDir string) {
 
 func CreateFileWithContent(fileName string, content string) error {
 
-	// Create the file
-	file, err := os.Create(fileName)
+	// Avoid following a pre-existing symlink at the target path.
+	if info, lerr := os.Lstat(fileName); lerr == nil && info.Mode()&os.ModeSymlink != 0 {
+		_ = os.Remove(fileName)
+	}
+
+	// Create the file with owner-only permissions as it may hold credentials
+	// or exported resource data.
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
 	if err != nil {
 		fmt.Println("error:", err)
 		return err
@@ -115,7 +121,13 @@ func copyFile(src, dest string) error {
 		}
 	}()
 
-	destFile, err := os.OpenFile(dest, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	// Avoid following a pre-existing symlink at the destination; appending to a
+	// regular file is preserved so repeated import blocks still merge.
+	if info, lerr := os.Lstat(dest); lerr == nil && info.Mode()&os.ModeSymlink != 0 {
+		_ = os.Remove(dest)
+	}
+
+	destFile, err := os.OpenFile(dest, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
 	}

@@ -10,6 +10,7 @@ import (
 
 	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/testutils"
+	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
@@ -41,8 +42,7 @@ func ProcessChanges(f *hclwrite.File, path string) {
 	changed := checkForChanges(f, path)
 
 	if changed {
-		info, _ := os.Lstat(path)
-		err := os.WriteFile(path, f.Bytes(), info.Mode())
+		err := writeFileNoFollow(path, f.Bytes(), 0600)
 		if err != nil {
 			log.Printf("Failed to write file %q: %s", path, err)
 			return
@@ -69,7 +69,7 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 		varBody.SetAttributeRaw("description", hclwrite.Tokens{
 			{
 				Type:  hclsyntax.TokenStringLit,
-				Bytes: []byte("\"" + value.Description + "\""),
+				Bytes: []byte("\"" + tfutils.EscapeHclString(value.Description) + "\""),
 			},
 		})
 
@@ -77,7 +77,7 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 			varBody.SetAttributeRaw("default", hclwrite.Tokens{
 				{
 					Type:  hclsyntax.TokenStringLit,
-					Bytes: []byte("\"" + value.DefaultValue + "\""),
+					Bytes: []byte("\"" + tfutils.EscapeHclString(value.DefaultValue) + "\""),
 				},
 			})
 		} else {
@@ -95,11 +95,23 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 	variablesSrc := hclwrite.Format(f.Bytes())
 
 	path := filepath.Join(directory, "variables.tf")
-	err := os.WriteFile(path, variablesSrc, 0644)
+	err := writeFileNoFollow(path, variablesSrc, 0600)
 	if err != nil {
 		log.Printf("Failed to write file %q: %s", path, err)
 		return
 	}
+}
+
+// writeFileNoFollow writes data to path without following a pre-existing
+// symlink: if the target is a symlink it is removed first and recreated as a
+// regular file with the given permissions.
+func writeFileNoFollow(path string, data []byte, perm os.FileMode) error {
+	if info, err := os.Lstat(path); err == nil && info.Mode()&os.ModeSymlink != 0 {
+		if rmErr := os.Remove(path); rmErr != nil {
+			return rmErr
+		}
+	}
+	return os.WriteFile(path, data, perm)
 }
 
 func ReplaceStringTokenVar(tokens hclwrite.Tokens, identifier string) (replacedTokens hclwrite.Tokens, valueForVariable string) {

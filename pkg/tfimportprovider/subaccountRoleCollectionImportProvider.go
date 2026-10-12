@@ -87,7 +87,7 @@ func createRoleCollectionImportBlock(data map[string]any, subaccountId string, f
 func templateRoleCollectionImport(x int, roleCollection map[string]any, subaccountId string, resourceDoc tfutils.EntityDocs) string {
 	resourceDoc.Import = strings.ReplaceAll(resourceDoc.Import, "'", "")
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "rolecollection_"+fmt.Sprint(x))
-	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
-	template = strings.ReplaceAll(template, "<name>", fmt.Sprintf("%v", roleCollection["name"]))
+	template = strings.ReplaceAll(template, "<subaccount_id>", tfutils.EscapeHclString(subaccountId))
+	template = strings.ReplaceAll(template, "<name>", tfutils.EscapeHclString(fmt.Sprintf("%v", roleCollection["name"])))
 	return template + "\n"
 }

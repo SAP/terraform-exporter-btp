@@ -86,7 +86,7 @@ func createDirectoryRoleCollectionImportBlock(data map[string]any, directoryId s
 func templateDirectoryRoleCollectionImport(x int, roleCollection map[string]any, directoryId string, resourceDoc tfutils.EntityDocs) string {
 	resourceDoc.Import = strings.ReplaceAll(resourceDoc.Import, "'", "")
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "rolecollection_"+fmt.Sprint(x))
-	template = strings.ReplaceAll(template, "<directory_id>", directoryId)
-	template = strings.ReplaceAll(template, "<name>", fmt.Sprintf("%v", roleCollection["name"]))
+	template = strings.ReplaceAll(template, "<directory_id>", tfutils.EscapeHclString(directoryId))
+	template = strings.ReplaceAll(template, "<name>", tfutils.EscapeHclString(fmt.Sprintf("%v", roleCollection["name"])))
 	return template + "\n"
 }

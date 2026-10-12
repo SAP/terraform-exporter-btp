@@ -50,6 +50,13 @@ type EntityDocs struct {
 
 var repoPaths sync.Map
 
+// expectedProviderCommits optionally pins provider documentation repositories
+// to immutable commit hashes. The key is "<githubHost>/<organization>/
+// terraform-provider-<provider>@<version>" and the value is the full commit
+// SHA that the pinned tag must resolve to. When an entry is present the clone
+// is verified against it; when absent the tag is used as-is (no enforcement).
+var expectedProviderCommits = map[string]string{}
+
 func getRepositoryPath(githubHost, organization, provider, version string) (string, error) {
 	relativePath := fmt.Sprintf("%s/%s/terraform-provider-%s", githubHost, organization, provider)
 
@@ -60,13 +67,25 @@ func getRepositoryPath(githubHost, organization, provider, version string) (stri
 	gitRepoDownloadPath := TmpFolder + "/" + relativePath
 	gitUrl := "https://" + relativePath
 
-	_, err := git.PlainClone(gitRepoDownloadPath, false, &git.CloneOptions{
+	repo, err := git.PlainClone(gitRepoDownloadPath, false, &git.CloneOptions{
 		URL:           gitUrl,
 		ReferenceName: plumbing.NewTagReferenceName(version),
 	})
 
 	if err != nil {
 		return "", fmt.Errorf("error cloning git repo: %w", err)
+	}
+
+	// Verify the checked-out commit against an optional pin so documentation is
+	// only converted to Terraform when it matches a known-good commit.
+	if expected, ok := expectedProviderCommits[relativePath+"@"+version]; ok {
+		head, headErr := repo.Head()
+		if headErr != nil {
+			return "", fmt.Errorf("error resolving cloned commit for %s: %w", relativePath, headErr)
+		}
+		if head.Hash().String() != expected {
+			return "", fmt.Errorf("provider docs %s@%s resolved to commit %s, expected %s", relativePath, version, head.Hash(), expected)
+		}
 	}
 
 	repoPaths.Store(relativePath, gitRepoDownloadPath)

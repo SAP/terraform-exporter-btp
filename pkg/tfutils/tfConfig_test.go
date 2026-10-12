@@ -307,3 +307,85 @@ func TestGetValidResourcesByLevel(t *testing.T) {
 		}
 	})
 }
+
+func TestConfigureProviderCFOmitsSecrets(t *testing.T) {
+	tempDir, cleanupFn := setupTestEnvironment()
+	defer cleanupFn()
+
+	TmpFolder = tempDir
+
+	t.Setenv("CF_USER", "testuser")
+	t.Setenv("CF_PASSWORD", "testpass")
+	t.Setenv("CF_API_URL", "https://test.com")
+	t.Setenv("CF_CLIENT_SECRET", "super-secret-value")
+	t.Setenv("CF_ACCESS_TOKEN", "access-token-value")
+	t.Setenv("CF_REFRESH_TOKEN", "refresh-token-value")
+
+	ConfigureProvider(OrganizationLevel)
+
+	providerPath := filepath.Join(TmpFolder, "provider.tf")
+	content, err := os.ReadFile(providerPath)
+	if err != nil {
+		t.Fatalf("Failed to read file %s: %v", providerPath, err)
+	}
+
+	for _, secret := range []string{"super-secret-value", "access-token-value", "refresh-token-value", "cf_client_secret", "cf_access_token", "cf_refresh_token"} {
+		if strings.Contains(string(content), secret) {
+			t.Errorf("generated provider.tf must not contain %q, got:\n%s", secret, string(content))
+		}
+	}
+
+	info, err := os.Stat(providerPath)
+	if err != nil {
+		t.Fatalf("Failed to stat file %s: %v", providerPath, err)
+	}
+	if info.Mode().Perm() != 0600 {
+		t.Errorf("expected provider.tf mode 0600, got %o", info.Mode().Perm())
+	}
+}
+
+func TestCleanupRemovesTempDir(t *testing.T) {
+	// cleanup() clears the package-global TmpFolder; restore it afterwards so
+	// this test does not perturb global state relied on by other tests.
+	origTmpFolder := TmpFolder
+	defer func() { TmpFolder = origTmpFolder }()
+
+	tempDir, err := os.MkdirTemp("", "cleanupTest")
+	if err != nil {
+		t.Fatalf("failed to create temp dir: %v", err)
+	}
+
+	TmpFolder = tempDir
+	cleanup()
+
+	if _, statErr := os.Stat(tempDir); !os.IsNotExist(statErr) {
+		t.Errorf("expected temp dir %s to be removed", tempDir)
+	}
+	if TmpFolder != "" {
+		t.Errorf("expected TmpFolder to be cleared, got %q", TmpFolder)
+	}
+}
+
+func TestValidateConfigDirWithinWd(t *testing.T) {
+	wd := "/home/user/project"
+	tests := []struct {
+		name    string
+		target  string
+		wantErr bool
+	}{
+		{"subdir", "/home/user/project/generated", false},
+		{"nested subdir", "/home/user/project/a/b/c", false},
+		{"working dir itself", "/home/user/project", true},
+		{"parent traversal", "/home/user/project/../../etc", true},
+		{"absolute outside", "/etc", true},
+		{"sibling", "/home/user/other", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateConfigDirWithinWd(wd, tt.target)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("validateConfigDirWithinWd(%q,%q) err=%v, wantErr=%v", wd, tt.target, err, tt.wantErr)
+			}
+		})
+	}
+}

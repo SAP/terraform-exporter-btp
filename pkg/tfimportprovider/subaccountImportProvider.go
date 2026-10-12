@@ -45,7 +45,7 @@ func createSubaccountImportBlock(data map[string]any, subaccountId string, filte
 	}
 
 	template := strings.ReplaceAll(resourceDoc.Import, "<resource_name>", "subaccount_0")
-	template = strings.ReplaceAll(template, "<subaccount_id>", subaccountId)
+	template = strings.ReplaceAll(template, "<subaccount_id>", tfutils.EscapeHclString(subaccountId))
 	importBlock += template + "\n"
 
 	return importBlock, nil
