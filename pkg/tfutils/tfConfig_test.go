@@ -345,6 +345,11 @@ func TestConfigureProviderCFOmitsSecrets(t *testing.T) {
 }
 
 func TestCleanupRemovesTempDir(t *testing.T) {
+	// cleanup() clears the package-global TmpFolder; restore it afterwards so
+	// this test does not perturb global state relied on by other tests.
+	origTmpFolder := TmpFolder
+	defer func() { TmpFolder = origTmpFolder }()
+
 	tempDir, err := os.MkdirTemp("", "cleanupTest")
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
