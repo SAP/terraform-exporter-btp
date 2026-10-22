@@ -490,6 +490,11 @@ func FinalizeTfConfig(configFolder string) {
 	}
 
 	terraformConfigPath := filepath.Join(currentDir, configFolder)
+	if err := normalizeGeneratedResourceAddresses(terraformConfigPath); err != nil {
+		CleanupProviderConfig()
+		fmt.Print("\r\n")
+		log.Fatalf("error normalizing generated resource addresses: %v", err)
+	}
 
 	err = os.Chdir(terraformConfigPath)
 	if err != nil {
