@@ -21,7 +21,7 @@ import (
 // as a safeguard in addition to the up-front file-size check.
 const maxJSONInventorySize = 5 * 1024 * 1024 // 5 MB
 
-func exportByJson(subaccount string, directory string, organization string, jsonfile string, resourceFile string, configDir string, backendConfig tfutils.BackendConfig) {
+func exportByJson(subaccount string, directory string, organization string, jsonfile string, resourceFile string, configDir string, backendConfig tfutils.BackendConfig, target tfutils.ExecutionTarget) {
 	// Check if file size is valid
 	validFileSize, err := files.IsFileSizeValid(jsonfile)
 
@@ -87,6 +87,9 @@ func exportByJson(subaccount string, directory string, organization string, json
 	}
 
 	tfutils.SetupConfigDir(configDir, true, level)
+	if err := tfutils.WriteExecutionTargetTFVars(configDir, target); err != nil {
+		log.Fatalf("error writing terraform.tfvars: %v", err)
+	}
 	resultStore := make(map[string]int)
 
 	exportLog, _ := resume.GetExistingExportLog(configDir)
@@ -120,7 +123,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 	}
 
 	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig)
-	tfutils.FinalizeTfConfig(configDir)
+	tfutils.FinalizeTfConfig(configDir, target)
 	generateNextStepsDocument(configDir, subaccount, directory, organization, "")
 	_ = resume.RemoveExportLog(configDir)
 	resultStoreNew := resume.MergeSummaryTable(resultStore, fullExportLog)
