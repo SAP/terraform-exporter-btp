@@ -41,6 +41,91 @@ func setupTestEnvironment() (string, func()) {
 	}
 }
 
+func TestNormalizeGeneratedResourceAddresses(t *testing.T) {
+	tempDir := t.TempDir()
+	resources := `resource "btp_subaccount" "export_0" {
+  description = "btp_subaccount.export_0 must stay unchanged in strings"
+}
+
+resource "btp_subaccount_service_instance" "export_2" {
+  depends_on = [btp_subaccount.export_0]
+}
+
+resource "cloudfoundry_user_cf" "export_3" {}
+resource "btp_directory" "custom_name" {}
+resource "other_resource" "export_4" {}
+`
+	imports := `import {
+  to = btp_subaccount.export_0
+  id = "subaccount-id"
+}
+
+import {
+  to = cloudfoundry_user_cf.export_3
+  id = "user-id"
+}
+`
+	if err := os.WriteFile(filepath.Join(tempDir, "resources.tf"), []byte(resources), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(tempDir, "imports.tf"), []byte(imports), 0600); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := normalizeGeneratedResourceAddresses(tempDir); err != nil {
+		t.Fatalf("normalizeGeneratedResourceAddresses() error = %v", err)
+	}
+
+	resourceResult, err := os.ReadFile(filepath.Join(tempDir, "resources.tf"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	resourceText := string(resourceResult)
+	for _, expected := range []string{
+		`resource "btp_subaccount" "subaccount_0"`,
+		`resource "btp_subaccount_service_instance" "subaccount_service_instance_2"`,
+		`depends_on = [btp_subaccount.subaccount_0]`,
+		`resource "cloudfoundry_user_cf" "user_cf_3"`,
+		`resource "btp_directory" "custom_name"`,
+		`resource "other_resource" "export_4"`,
+		`"btp_subaccount.export_0 must stay unchanged in strings"`,
+	} {
+		if !strings.Contains(resourceText, expected) {
+			t.Errorf("resources.tf does not contain %q:\n%s", expected, resourceText)
+		}
+	}
+
+	importResult, err := os.ReadFile(filepath.Join(tempDir, "imports.tf"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	importText := string(importResult)
+	for _, expected := range []string{
+		"to = btp_subaccount.subaccount_0",
+		"to = cloudfoundry_user_cf.user_cf_3",
+	} {
+		if !strings.Contains(importText, expected) {
+			t.Errorf("imports.tf does not contain %q:\n%s", expected, importText)
+		}
+	}
+}
+
+func TestNormalizeGeneratedResourceAddressesRejectsCollision(t *testing.T) {
+	tempDir := t.TempDir()
+	config := `resource "btp_subaccount" "export_0" {}
+resource "btp_subaccount" "subaccount_0" {}
+`
+	configPath := filepath.Join(tempDir, "resources.tf")
+	if err := os.WriteFile(configPath, []byte(config), 0600); err != nil {
+		t.Fatal(err)
+	}
+
+	err := normalizeGeneratedResourceAddresses(tempDir)
+	if err == nil || !strings.Contains(err.Error(), "target resource address already exists") {
+		t.Fatalf("normalizeGeneratedResourceAddresses() error = %v, want collision error", err)
+	}
+}
+
 func TestConfigureProviderBtp(t *testing.T) {
 	tempDir, cleanup := setupTestEnvironment()
 	defer cleanup()
