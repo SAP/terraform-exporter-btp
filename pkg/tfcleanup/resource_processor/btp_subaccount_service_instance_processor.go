@@ -21,6 +21,13 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 	// 5: Exchange the explicit plan ID with the data source reference
 	serviceOfferingNameAttr := body.GetAttribute(serviceInstanceOfferingNameIdentifier)
 	serviceInstancePlanNameIdentifierAttr := body.GetAttribute(serviceInstancePlanNameIdentifier)
+	if serviceOfferingNameAttr == nil || serviceInstancePlanNameIdentifierAttr == nil {
+		// List-query configuration guarantees serviceplan_id, but the two
+		// descriptive name attributes can be absent. Keep the ID-based
+		// configuration unchanged when the name-based optimization is not
+		// possible.
+		return
+	}
 
 	var serviceOfferingName string
 	var servicePlanName string
@@ -35,8 +42,12 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 	if len(serviceInstancePlanNameAttrTokens) == 3 {
 		servicePlanName = generictools.GetStringToken(serviceInstancePlanNameAttrTokens)
 	}
+	if serviceOfferingName == "" || servicePlanName == "" {
+		return
+	}
 
-	// Remove the service plan id
+	// The name-based configuration is complete, so remove the mutually
+	// exclusive service plan ID.
 	body.RemoveAttribute(serviceInstancePlanIdentifier)
 
 	// Add dependency to entitlement if necessary

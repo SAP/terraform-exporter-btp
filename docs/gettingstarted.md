@@ -7,6 +7,18 @@ The btptf CLI offers two ways to export BTP resources:
 
 Let's look at how both flows work for a simple subaccount export.
 
+## Select an Export Target with terraform.tfvars
+
+Instead of passing the target ID on every command, create `terraform.tfvars` in the directory from which you run `btptf`. Define exactly one target:
+
+```hcl
+subaccount_id   = "<subaccount ID>"
+# directory_id  = "<directory ID>"
+# org_id        = "<Cloud Foundry org ID>"
+```
+
+The CLI uses this value for `create-json`, `export`, and `export-by-json`. For exports, the file is copied to the generated Terraform configuration, and that configuration declares and uses the corresponding variable. A supplied scope flag takes precedence over a value for the same scope in the file; different scopes are rejected.
+
 ## Option 1: Basic Flow to Export a Subaccount via JSON (Recommended)
 
 This is a two-step process where a JSON is created as a resource inventory and used as a basis for the export.

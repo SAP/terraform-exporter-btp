@@ -79,6 +79,7 @@ terraform
 Terraform's
 Terramate
 tf
+tfvars
 TLS
 toolchain
 UIs

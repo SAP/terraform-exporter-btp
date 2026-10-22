@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
+	"github.com/zclconf/go-cty/cty"
 )
 
 func GetHclFile(entryName string) (f *hclwrite.File) {
@@ -297,6 +298,17 @@ func ReplaceMainDependency(body *hclwrite.Body, mainIdentifier string, mainAddre
 			body.SetAttributeRaw(name, replacedTokens)
 		}
 	}
+}
+
+// EnsureStringAttribute restores a required scope attribute when Terraform's
+// generated configuration represented it as null and RemoveEmptyAttributes
+// removed it. A later ReplaceMainDependency call can still replace this
+// literal with the corresponding exported resource reference.
+func EnsureStringAttribute(body *hclwrite.Body, identifier string, value string) {
+	if value == "" || body.GetAttribute(identifier) != nil {
+		return
+	}
+	body.SetAttributeValue(identifier, cty.StringVal(value))
 }
 
 func ProcessParentAttribute(body *hclwrite.Body, description string, btpClient *btpcli.ClientFacade, variables *VariableContent) {
