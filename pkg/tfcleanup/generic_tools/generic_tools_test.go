@@ -309,6 +309,16 @@ func TestReplaceMainDependency(t *testing.T) {
 	}
 }
 
+func TestEnsureStringAttribute(t *testing.T) {
+	f := hclwrite.NewEmptyFile()
+	body := f.Body()
+
+	EnsureStringAttribute(body, "directory_id", "directory-guid")
+	EnsureStringAttribute(body, "directory_id", "different-guid")
+
+	assert.Equal(t, "directory_id = \"directory-guid\"\n", string(f.Bytes()))
+}
+
 func TestReplaceAttribute(t *testing.T) {
 	srcFileReplaceAttr, trgtFileReplaceAttr := testutils.GetHclFilesById("replace_attribute")
 	_, trgtFileBackup := testutils.GetHclFilesById("replace_attribute")

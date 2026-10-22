@@ -33,7 +33,7 @@ class Btptf < Formula
   def caveats
     <<~EOS
       [HINT]
-      Please ensure you have Terraform or OpenTofu installed.
+      Please ensure you have Terraform 1.14 or newer installed.
       Run:
          btptf --help for more information.
     EOS

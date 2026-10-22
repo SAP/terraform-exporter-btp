@@ -1,6 +1,0 @@
-{
-    "Description": "Creates a subaccount in a global account or directory.\n\n__Tip:__\nYou must be assigned admin role of the global account or directory.\n\n__Further documentation:__\n<https://help.sap.com/docs/btp/sap-business-technology-platform/account-model>",
-    "Arguments": {},
-    "Attributes": {},
-    "Import": "import {\n\t\t\t\tto = btp_subaccount.<resource_name>\n\t\t\t\tid = \"<subaccount_id>\"\n\t\t\t  }"
-}

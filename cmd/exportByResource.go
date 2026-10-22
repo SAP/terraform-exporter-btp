@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/SAP/terraform-exporter-btp/internal/cfcli"
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	"github.com/SAP/terraform-exporter-btp/pkg/resume"
 	tfcleantypes "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
@@ -65,28 +64,9 @@ var exportByResourceCmd = &cobra.Command{
 		}
 
 		for _, resourceToImport := range resourcesList {
-			if resourceToImport == tfutils.CmdCfSpaceRoleParameter {
-				var finalCount int
-				var resourceType string
-				spaces, err := cfcli.GetSpaceList(organization)
-				if err != nil {
-					tfutils.CleanupProviderConfig()
-					log.Fatalln(fmt.Errorf("unable to get space list for space role. err = %s", err))
-				}
-				for _, spaceID := range spaces {
-					space := spaceID
-					var count int
-					resourceType, count = generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName)
-					finalCount = finalCount + count
-				}
-				resultStore[resourceType] = finalCount
-				_ = resume.WriteExportLog(configDir, resourceToImport, resourceType, finalCount)
-
-			} else {
-				resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName)
-				resultStore[resourceType] = count
-				_ = resume.WriteExportLog(configDir, resourceToImport, resourceType, count)
-			}
+			resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName)
+			resultStore[resourceType] = count
+			_ = resume.WriteExportLog(configDir, resourceToImport, resourceType, count)
 		}
 
 		levelIds := tfcleantypes.LevelIds{
@@ -267,7 +247,7 @@ func getExportByResourceCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("btptf export --org"),
 			output.ColorStringYellow("<CF org ID>"),
 			output.ColorStringCyan("--resources"),
-			output.ColorStringYellow("'users_cf'"),
+			output.ColorStringYellow("'users'"),
 		),
 	})
 }

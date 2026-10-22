@@ -7,123 +7,85 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/SAP/terraform-exporter-btp/internal/cfcli"
-	files "github.com/SAP/terraform-exporter-btp/pkg/files"
-	output "github.com/SAP/terraform-exporter-btp/pkg/output"
-	tfimportprovider "github.com/SAP/terraform-exporter-btp/pkg/tfimportprovider"
-	tfutils "github.com/SAP/terraform-exporter-btp/pkg/tfutils"
+	"github.com/SAP/terraform-exporter-btp/pkg/files"
+	"github.com/SAP/terraform-exporter-btp/pkg/output"
+	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 	"github.com/google/uuid"
-	"github.com/theckman/yacspin"
 )
 
 const tfConfigFileName = "btp_resources.tf"
 const configDirDefault = "generated_configurations_<account-id>"
 const jsonFileDefault = "btpResources_<account-id>.json"
 
-func generateConfigForResource(resource string, values []string, subaccountId string, directoryId string, organizationId string, spaceId string, configDir string, resourceFileName string) (resourceType string, count int) {
+func generateConfigForResource(resource string, values []string, subaccountID, directoryID, organizationID, spaceID, configDir, resourceFileName string) (string, int) {
 	tempConfigDir := resource + "-config"
-
-	level, iD := tfutils.GetExecutionLevelAndId(subaccountId, directoryId, organizationId, spaceId)
-
-	importProvider, _ := tfimportprovider.GetImportBlockProvider(resource, level)
-	resourceType = importProvider.GetResourceType()
-	techResourceNameLong := strings.ToUpper(resourceType)
+	level, _ := tfutils.GetExecutionLevelAndId(subaccountID, directoryID, organizationID, spaceID)
+	spec, err := tfutils.GetListResourceSpec(resource, func() string {
+		if resource == tfutils.CmdCfSpaceRoleParameter {
+			return tfutils.OrganizationLevel
+		}
+		return level
+	}())
+	if err != nil {
+		log.Fatalf("error resolving list resource: %v", err)
+	}
 
 	tfutils.ExecPreExportSteps(tempConfigDir, level)
+	if err := tfutils.ValidateTerraformQuerySupport(); err != nil {
+		tfutils.CleanupProviderConfig(tempConfigDir)
+		log.Fatalf("cannot query resources: %v", err)
+	}
+	if err := tfutils.PrepareQueryDirectory(tempConfigDir); err != nil {
+		tfutils.CleanupProviderConfig(tempConfigDir)
+		log.Fatalf("cannot prepare Terraform query: %v", err)
+	}
 
 	output.AddNewLine()
-	var spinner *yacspin.Spinner
-	if level == tfutils.SpaceLevel {
-		spaceName, _ := cfcli.GetSpaceName(spaceId)
-		spinner = output.StartSpinner("crafting import block for " + techResourceNameLong + " under " + strings.ToUpper(spaceName) + " space")
-	} else {
-		spinner = output.StartSpinner("crafting import block for " + techResourceNameLong)
-	}
-
-	data, err := tfutils.FetchImportConfiguration(subaccountId, directoryId, organizationId, spaceId, resourceType, tfutils.TmpFolder)
+	spinner := output.StartSpinner("querying and generating " + strings.ToUpper(spec.ResourceType))
+	resourceType, results, err := tfutils.QueryResource(tempConfigDir, resource, subaccountID, directoryID, organizationID, spaceID, values, true)
 	if err != nil {
 		tfutils.CleanupProviderConfig(tempConfigDir)
 		fmt.Print("\r\n")
-		log.Fatalf("error fetching impport configuration for %s: %v", resourceType, err)
+		log.Fatalf("error querying %s: %v", spec.ResourceType, err)
 	}
-
-	importBlock, count, err := importProvider.GetImportBlock(data, iD, values)
-	if err != nil {
-		tfutils.CleanupProviderConfig(tempConfigDir)
-		fmt.Print("\r\n")
-		log.Fatalf("error crafting import block: %v", err)
-	}
-
-	if len(importBlock) == 0 {
+	resourceType = tfutils.ExportResourceType(resourceType)
+	if len(results) == 0 {
 		output.StopSpinner(spinner)
-
-		fmt.Println(output.ColorStringCyan("   no " + techResourceNameLong + " found for the given subaccount"))
-
-		// Just clean up the temporary files, remaining setup remains untouched
+		fmt.Println(output.ColorStringCyan("   no " + strings.ToUpper(resourceType) + " found"))
 		tfutils.CleanupTempFiles(tempConfigDir)
-		fmt.Println(output.ColorStringGrey("   temporary files deleted"))
-
-	} else {
-
-		err = files.WriteImportConfiguration(tempConfigDir, resourceType, importBlock)
-		if err != nil {
-			tfutils.CleanupProviderConfig(tempConfigDir)
-			fmt.Print("\r\n")
-			log.Fatalf("error writing import configuration for %s: %v", resourceType, err)
-		}
-
-		output.StopSpinner(spinner)
-
-		tfutils.ExecPostExportSteps(tempConfigDir, configDir, resourceFileName, techResourceNameLong)
+		return resourceType, 0
 	}
-
-	return resourceType, count
+	if err := tfutils.WriteQueryResults(tempConfigDir, resourceFileName, resourceType, results); err != nil {
+		tfutils.CleanupProviderConfig(tempConfigDir)
+		log.Fatalf("error writing generated configuration for %s: %v", resourceType, err)
+	}
+	output.StopSpinner(spinner)
+	tfutils.ExecPostQuerySteps(tempConfigDir, configDir, resourceFileName, strings.ToUpper(resourceType))
+	return resourceType, len(results)
 }
 
-func isValidUuid(u string) bool {
-	_, err := uuid.Parse(u)
-	return err == nil
-}
+func isValidUuid(value string) bool { _, err := uuid.Parse(value); return err == nil }
 
-func getUuidError(level string, iD string) string {
+func getUuidError(level, id string) string {
 	switch level {
 	case tfutils.SubaccountLevel:
-		return fmt.Sprintf("Invalid subaccount ID: %s. Please provide a valid UUID.", iD)
+		return fmt.Sprintf("Invalid subaccount ID: %s. Please provide a valid UUID.", id)
 	case tfutils.DirectoryLevel:
-		return fmt.Sprintf("Invalid directory ID: %s Please provide a valid UUID.", iD)
+		return fmt.Sprintf("Invalid directory ID: %s Please provide a valid UUID.", id)
 	}
 	return ""
 }
 
-func generateNextStepsDocument(configDir string, subaccount string, directory string, organization string, space string) {
-
-	level, iD := tfutils.GetExecutionLevelAndId(subaccount, directory, organization, space)
-
-	// remove the sring "level" from the level string
+func generateNextStepsDocument(configDir, subaccount, directory, organization, space string) {
+	level, id := tfutils.GetExecutionLevelAndId(subaccount, directory, organization, space)
 	level = strings.ReplaceAll(level, "Level", "")
-
-	// Create a data structure to hold the data
-	inputData := output.NextStepTemplateData{
-		ConfigDir: configDir,
-		UUID:      iD,
-		Level:     level,
-	}
-
-	markdownContent := output.GetNextStepsTemplate(inputData)
-
+	content := output.GetNextStepsTemplate(output.NextStepTemplateData{ConfigDir: configDir, UUID: id, Level: level})
 	currentDir, err := os.Getwd()
-
 	if err != nil {
-		fmt.Print("\r\n")
-		// Not critical, so just an informatio that this did not work
-		log.Println("error creating NextSteps.md file (getting workdir): ", err)
+		log.Println("error creating NextSteps.md file: ", err)
+		return
 	}
-
-	targetPath := filepath.Join(currentDir, configDir, "NextSteps.md")
-
-	err = files.CreateFileWithContent(targetPath, markdownContent)
-	if err != nil {
-		// Not critical, so just an informatio that this did not work
+	if err := files.CreateFileWithContent(filepath.Join(currentDir, configDir, "NextSteps.md"), content); err != nil {
 		log.Println("error creating NextSteps.md file: ", err)
 	}
 }

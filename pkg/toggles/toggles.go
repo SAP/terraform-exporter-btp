@@ -5,10 +5,6 @@ import (
 	"testing"
 )
 
-func GetIacTool() string {
-	return os.Getenv("BTPTF_IAC_TOOL")
-}
-
 func IsCodeCleanupDeactivated() bool {
 	return os.Getenv("BTPTF_SKIP_CODECLEANUP") != ""
 }

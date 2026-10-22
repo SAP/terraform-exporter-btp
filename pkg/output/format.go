@@ -14,23 +14,9 @@ func FormatResourceNameGenericNoCapConversion(name string) string {
 	return strings.ReplaceAll(name, " ", "_")
 }
 
-func FormatDirEntitlementResourceName(appName string, planName string) string {
-	return appName + "_" + planName
-}
-
-func FormatSubscriptionResourceName(appName string, planName string) string {
-	return appName + "_" + planName
-}
-
-func FormatServiceInstanceResourceName(serviceInstanceName string, planId string) string {
-	return serviceInstanceName + "_" + planId
-}
-
 func FormatOrgRoleResourceName(orgRoleType string, userId string) string {
 	return orgRoleType + "_" + userId
 }
-
-var FormatRoles = FormatSpaceRoleResourceName
 
 func FormatSpaceRoleResourceName(spaceRoleType string, spaceId string, userId string) string {
 	spaceName, _ := cfcli.GetSpaceName(spaceId)

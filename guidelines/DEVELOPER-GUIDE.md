@@ -58,14 +58,14 @@ To enable new resources on the subaccount level, you must execute the following 
 1. Add the corresponding *constants* for the command parameter and the technical resource name in the `tfutils/tfutils.go` file.
 1. Add the *mapping of the constants* into the function `TranslateResourceParamToTechnicalName` in the `tfutils/tfutils.go` file.
 1. Add the command constant to the slice of `AllowedResources` in the `tfutil/tfconfig.go` file.
-1. Create a new implementation for the import factory in the directory `tfimportprovider`. You can take the file `subaccountRoleCollectionImportProvider.go` as an example concerning the structure of the file.
-1. Add the new implementation to the import factory function `GetImportBlockProvider` in the file `tfimportprovider/tfImportProviderFactory.go`.
-1. Depending on the resource, you must define a transformation of the data from the data source to a string array. Place this logic into the function `transformDataToStringArray` in the `tfutils/tfutils.go` file.
-1. Depending on your resource you might also need to add custom formatting logic for the resource address in the Terraform configuration. Place that into the file `output/format.go`. In most cases the function `FormatResourceNameGeneric` is sufficient.
+1. Add a descriptor to `listResourceSpecs` in `pkg/tfutils/tfQuery.go`.
+1. Add the provider-specific query filters to `queryFilters`.
+1. Add an inventory identity mapping to `inventoryValue`.
+1. Add any platform-default exclusion to `filterQueryResults`. Terraform generates the resource and import blocks; do not add handwritten import templates.
 
 ### Adding Unit Tests
 
-The main domain logic that we must test is located in the factory implementations in the directory `tfimportprovider`. Creating these tests should reflect the real-world setup, so we need to extract the test data from subaccounts and store them in the tests. In the following sections, we describe how to best extract this data namely the JSON string that you need as input for your test.
+The main query logic is located in `pkg/tfutils/tfQuery.go`. Unit tests should cover query HCL, JSON event parsing, inventory identities, filtering, and diagnostics. Provider integration tests should validate representative live query results.
 
 #### Prerequisites
 
@@ -73,7 +73,7 @@ As a prerequisite you should have a Terraform account with the resource that you
 
 #### Extracting the Data
 
-First create a Terraform setup that allows you to read the data via a data source. The basic setup could look like this:
+First create a Terraform setup and `.tfquery.hcl` file that list the resource. The basic provider setup could look like this:
 
 - `provider.tf`:
 
@@ -93,39 +93,26 @@ provider "btp" {
 }
 ```
 
-- Assuming we want to fetch subscriptions the `main.tf`would look like this
+- Assuming we want to fetch subscriptions, `subscriptions.tfquery.hcl` would look like this:
 
 ```terraform
-data "btp_subaccount_subscriptions" "all" {
-  subaccount_id = "<YOUR SUBACCOUNT ID>"
-}
-
-output "all" {
-  value = data.btp_subaccount_subscriptions.all
+list "btp_subaccount_subscription" "all" {
+  provider         = btp
+  include_resource = true
+  config {
+    subaccount_id = "<YOUR SUBACCOUNT ID>"
+  }
 }
 
 ```
 
-Next we execute a planning and store the plan file:
+Run the query as machine-readable JSON:
 
 ```bash
-terraform plan -out plan.out
+terraform query -json -generate-config-out=generated.tf
 ```
 
-you have two options now:
-
-- If you want to create a JSON string with all the resources contained in the `plan.out`, execute the script `guidelines/scripts/transform_all.sh` that needs to be located at the same level as the `plan.out` file.
-- If you want to adjust the result you must execute the following steps:
-   1. Generate the JSON file via: Terraform show -json plan.out |  jq .planned_values.outputs.all.value > restrictedplan.json
-   1. Adjust the JSON file e.g., remove some entries
-   1. execute the script `guidelines/scripts/transform_json.sh` that needs to be located at the same level as the `restrictedplan.json` file.
-
-With that you get a file that contains the JSON string that you can use as input for your tests of the creation of the import block functions.
-
-#### Creating the Unit Test
-
-An example how to create test case is given by the unit test implemented in `tfimportprovider/subaccountSubscriptionImportProvider_test.go`.
-GitHub Copilot can be quite useful to setup the basics for the test, but some rework is needed.
+Use the `list_resource_found` events as fixtures for parser and inventory tests. Avoid fixtures containing credentials or sensitive resource attributes.
 
 ## Creating Console Help
 

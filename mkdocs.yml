@@ -24,6 +24,7 @@ nav:
       - How the btptf CLI Works: concepts.md
       - How the btptf CLI Refines the Generated Configurations: tfcodeimprovements.md
   - Installation: install.md
+  - Migrating to Version 2: v2migration.md
   - Commands Reference: btptf.md
   - Quick Start Guide:
       - Prerequisites: prerequisites.md

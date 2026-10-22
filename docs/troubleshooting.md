@@ -5,29 +5,9 @@ To narrow down the issue we provide some environment variables that allow you to
 
 The following sections describe the environment variables that you can set to influence the behavior of the btptf CLI depending on the situation you are in.
 
-## Neither the Terraform nor OpenTofu CLI is detected although the binary is available
+## Terraform is not detected
 
-The btptf CLI tries to autodetect the Terraform CLI and the OpenTofu CLI by checking if the binary is available in the `PATH` environment variable. If this error occurs please check if the binary is available in the `PATH` environment variable.
-
-## The Terraform CLI is used instead of OpenTofu (or vice versa)
-
-You are expecting the the generated code uses the providers from the OpenTofu registry but it downloaded the ones from the HashiCorp Terraform registry or vice versa.
-
-This can happen if you have both CLIs namely the Terraform *and* the OpenTofu CLI installed on your machine. To guide the btptf CLI to use the correct CLI you can set the environment variable `BTPTF_IAC_TOOL` to `terraform` or `tofu` depending on the CLI you want to use.
-
-As an example if you want to use the OpenTofu CLI you can set the environment variable as follows:
-
-=== "Windows"
-
-    ``` powershell
-    $env:BTPTF_IAC_TOOL='tofu'
-    ```
-
-=== "Linux/Mac"
-
-    ``` bash
-    export BTPTF_IAC_TOOL=tofu
-    ```
+Version 2 requires Terraform CLI 1.14 or newer. Check that the `terraform` binary is available in `PATH` and that `terraform version` reports a supported version. OpenTofu does not implement the query workflow used by the exporter and is not supported.
 
 ## The generated code looks different than expected
 
@@ -128,4 +108,4 @@ The following workaround must be applied if the subaccount was created with this
 1. Set the flag `BTPTF_SKIP_ENTITLEMENTFILTER` to `false` to make sure that the all entitlements are exported.
 2. Execute the export via the btptf CLI.
 3. Manually set the parameter `skip_auto_entitlement` to `true` in the generated Terraform code for the subaccount resource.
-4. Execute the import of the generated code via the Terraform or OpenTofu CLI.
+4. Execute the import of the generated code via the Terraform CLI.
