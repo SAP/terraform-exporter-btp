@@ -21,6 +21,11 @@ var exportByJsonCmd = &cobra.Command{
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		directory, _ := cmd.Flags().GetString("directory")
 		organization, _ := cmd.Flags().GetString("org")
+		target, err := tfutils.ResolveExecutionTarget(subaccount, directory, organization)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		subaccount, directory, organization = target.SubaccountID, target.DirectoryID, target.OrgID
 		configDir, _ := cmd.Flags().GetString("config-dir")
 		path, _ := cmd.Flags().GetString("path")
 
@@ -49,7 +54,7 @@ var exportByJsonCmd = &cobra.Command{
 		}
 
 		output.PrintExportStartMessage()
-		exportByJson(subaccount, directory, organization, path, tfConfigFileName, configDir, backendConfig)
+		exportByJson(subaccount, directory, organization, path, tfConfigFileName, configDir, backendConfig, target)
 		output.PrintExportSuccessMessage(configDir)
 	},
 }
@@ -80,7 +85,6 @@ func init() {
 	exportByJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	exportByJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
 	exportByJsonCmd.Flags().StringVarP(&organization, "org", "o", "", "ID of the Cloud Foundry org")
-	exportByJsonCmd.MarkFlagsOneRequired("subaccount", "directory", "org")
 	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "org")
 
 	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
@@ -105,7 +109,7 @@ func getExportByJsonCmdDescription(c *cobra.Command) string {
 }
 
 func getExportByJsonCmdDescriptionNote(c *cobra.Command) string {
-	point1 := formatHelpNote("You must specify one of --subaccount, --directory, or --org.")
+	point1 := formatHelpNote("Specify one of --subaccount, --directory, or --org, or define exactly one of subaccount_id, directory_id, or org_id in terraform.tfvars in the current directory.")
 	point2 := formatHelpNote("If you already have a remote state backend for SAP BTP resources which you want to use, specify the remote backend by providing the `--backend-path` or `--backend-type` and `--backend-config`.")
 
 	content := fmt.Sprintf("%s\n%s", point1, point2)

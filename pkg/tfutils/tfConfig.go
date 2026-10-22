@@ -477,7 +477,7 @@ func cleanup() {
 	}
 }
 
-func FinalizeTfConfig(configFolder string) {
+func FinalizeTfConfig(configFolder string, target ExecutionTarget) {
 
 	output.AddNewLine()
 	spinner := output.StartSpinner("finalizing Terraform configuration")
@@ -490,6 +490,11 @@ func FinalizeTfConfig(configFolder string) {
 	}
 
 	terraformConfigPath := filepath.Join(currentDir, configFolder)
+	if err := applyExecutionTargetVariables(terraformConfigPath, target); err != nil {
+		CleanupProviderConfig()
+		fmt.Print("\r\n")
+		log.Fatalf("error applying target variables: %v", err)
+	}
 	if err := normalizeGeneratedResourceAddresses(terraformConfigPath); err != nil {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
