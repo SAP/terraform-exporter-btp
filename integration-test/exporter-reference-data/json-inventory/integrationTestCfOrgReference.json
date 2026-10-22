@@ -8,7 +8,7 @@
       ]
     },
     {
-      "Name": "users_cf",
+      "Name": "users",
       "Values": [
         "christian.lechner@sap.com",
         "john.doe@sap.com"

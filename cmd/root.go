@@ -12,7 +12,7 @@ import (
 
 var verbose bool
 
-const version = "1.6.0"
+const version = "2.0.0"
 
 var rootCmd = &cobra.Command{
 	Use:               "btptf",
@@ -68,7 +68,7 @@ func getRootCmdDescription(c *cobra.Command) string {
 
 	btptf := output.BoldString("btptf")
 
-	description := `The Terraform Exporter for SAP BTP, or ` + btptf + `, exports existing SAP BTP resources as Terraform code, so you can start adopting Infrastructure-as-Code with Terraform or OpenTofu.
+	description := `The Terraform Exporter for SAP BTP, or ` + btptf + `, exports existing SAP BTP resources as Terraform code, so you can start adopting Infrastructure-as-Code with Terraform.
 
 The following SAP BTP account levels can be exported:
 ` + list + `

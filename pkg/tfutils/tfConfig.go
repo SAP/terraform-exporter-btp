@@ -14,7 +14,6 @@ import (
 	output "github.com/SAP/terraform-exporter-btp/pkg/output"
 	"github.com/SAP/terraform-exporter-btp/pkg/resume"
 	"github.com/spf13/viper"
-	"github.com/theckman/yacspin"
 )
 
 var TmpFolder string
@@ -54,61 +53,6 @@ const selectionOverwrite = "Overwrite the existing directory and continue"
 const selectionResume = "Resume the existing export"
 const selectionAbort = "Abort the processing"
 const selectionInvalid = "Invalid selection"
-
-func GenerateConfig(resourceFileName string, configFolder string, isMainCmd bool, resourceNameLong string) error {
-
-	var spinner *yacspin.Spinner
-	var err error
-
-	if isMainCmd {
-		// We must distinguish if the command is run from a main command or via delegation from helper functions
-		spinner = output.StartSpinner("generating Terraform configuration for " + resourceNameLong)
-	}
-
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("error getting current directory: %v", err)
-	}
-
-	terraformConfigPath := filepath.Join(currentDir, configFolder)
-	err = os.Chdir(terraformConfigPath)
-	if err != nil {
-		return fmt.Errorf("error changing directory to %s: %v", terraformConfigPath, err)
-	}
-
-	if _, err := runTfCmdGeneric("init"); err != nil {
-		return fmt.Errorf("error running Terraform init: %v", err)
-	}
-
-	planOption := "--generate-config-out=" + resourceFileName
-	errStream, err := runTfCmdGeneric("plan", planOption)
-	if err != nil {
-		if resourceNameLong == "BTP_SUBACCOUNT_SERVICE_INSTANCE" && strings.Contains(errStream, "Error: Invalid Attribute Combination") {
-			// This is a known issue with the setup. This will be cleaned afterwards, so we can ignore the error here to not break the export.
-		} else {
-			return fmt.Errorf("error running Terraform plan: %v", err)
-		}
-	}
-
-	if _, err := runTfCmdGeneric("fmt", "-recursive", "-list=false"); err != nil {
-		return fmt.Errorf("error running Terraform fmt: %v", err)
-	}
-
-	//Switch back to the original directory
-	err = os.Chdir(currentDir)
-	if err != nil {
-		return fmt.Errorf("error changing directory to %s: %v", currentDir, err)
-	}
-
-	cleanup()
-
-	if isMainCmd {
-		output.StopSpinner(spinner)
-		fmt.Println(output.ColorStringGrey("   temporary files deleted"))
-	}
-
-	return nil
-}
 
 func ConfigureProvider(level string) {
 	tmpdir, err := os.MkdirTemp("", "provider.tf")
@@ -582,18 +526,16 @@ func ExecPreExportSteps(tempConfigDir string, level string) {
 	SetupConfigDir(tempConfigDir, false, level)
 }
 
-func ExecPostExportSteps(tempConfigDir string, targetConfigDir string, targetResourceFileName string, resourceNameLong string) {
+func ExecPostQuerySteps(tempConfigDir string, targetConfigDir string, targetResourceFileName string, resourceNameLong string) {
 
 	spinner := output.StartSpinner("generating Terraform configuration for " + resourceNameLong)
 
-	err := GenerateConfig(targetResourceFileName, tempConfigDir, false, resourceNameLong)
-	if err != nil {
+	if _, err := runTfCmdGeneric(fmt.Sprintf("-chdir=%s", tempConfigDir), "fmt", "-recursive", "-list=false"); err != nil {
 		CleanupTempFiles(tempConfigDir)
-		fmt.Print("\r\n")
-		log.Fatalf("error generating Terraform configuration for %s: %v", resourceNameLong, err)
+		log.Fatalf("error formatting Terraform configuration for %s: %v", resourceNameLong, err)
 	}
 
-	err = mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)
+	err := mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)
 	if err != nil {
 		CleanupTempFiles(tempConfigDir)
 		fmt.Print("\r\n")
