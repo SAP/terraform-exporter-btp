@@ -24,18 +24,18 @@ func createJson(subaccount string, directory string, organization string, fileNa
 
 	spinner := output.StartSpinner("collecting resources")
 
-	result, err := tfutils.ReadDataSources(subaccount, directory, organization, resources)
+	result, err := tfutils.ReadListResources(subaccount, directory, organization, resources)
 	if err != nil {
 		tfutils.CleanupProviderConfig()
 		fmt.Print("\r\n")
-		log.Fatalf("error reading data sources: %v", err)
+		log.Fatalf("error querying resources: %v", err)
 	}
 
 	jsonBytes, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		tfutils.CleanupProviderConfig()
 		fmt.Print("\r\n")
-		log.Fatalf("error processing JSON of data source: %s", err)
+		log.Fatalf("error processing query results: %s", err)
 	}
 
 	currentDir, err := os.Getwd()

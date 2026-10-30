@@ -4,150 +4,79 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 
-	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/spf13/viper"
 )
 
-var getIaCTool = func() (tool string, err error) {
+const minimumTerraformQueryMinor = 14
 
-	//For TESTING purposes, we can set the tool to be used
-	tool = toggles.GetIacTool()
-	if tool != "" {
-		// Restrict the configurable IaC tool to a known allowlist so an
-		// unexpected BTPTF_IAC_TOOL value cannot cause an arbitrary executable
-		// to be run.
-		if tool != "terraform" && tool != "tofu" {
-			fmt.Print("\r\n")
-			log.Fatalf("unsupported IaC tool %q: only \"terraform\" or \"tofu\" are supported", tool)
-		}
-		return tool, nil
+var getIaCTool = func() (string, error) {
+	if _, err := exec.LookPath("terraform"); err != nil {
+		return "", fmt.Errorf("terraform executable not found: %w", err)
 	}
-
-	_, localerr := exec.LookPath("terraform")
-	if localerr == nil {
-		tool = "terraform"
-		return tool, nil
-	}
-
-	_, localerr = exec.LookPath("tofu")
-	if localerr == nil {
-		tool = "tofu"
-		return tool, nil
-	}
-
-	fmt.Print("\r\n")
-	log.Fatalf("error finding Terraform or OpenTofu executable: %v", err)
-	return "", err
+	return "terraform", nil
 }
 
-func runTfCmdGeneric(args ...string) (errorStream string, err error) {
+func runTfCmdGeneric(args ...string) (string, error) {
 	tool, err := getIaCTool()
 	if err != nil {
 		return "", err
 	}
-
-	verbose := viper.GetViper().GetBool("verbose")
 	args = append(args, "-no-color")
 	cmd := exec.Command(tool, args...)
 	var stderr bytes.Buffer
-
-	if verbose {
+	if viper.GetViper().GetBool("verbose") {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 	} else {
-		cmd.Stdout = nil
 		cmd.Stderr = &stderr
 	}
-
-	err = cmd.Run()
-	if err != nil {
-
+	if err := cmd.Run(); err != nil {
 		return stderr.String(), err
 	}
 	return "", nil
 }
 
-func runTfShowJson(directory string) (*State, error) {
-	chDir := fmt.Sprintf("-chdir=%s", directory)
-
-	tool, err := getIaCTool()
-	if err != nil {
-		return nil, err
+func ValidateTerraformQuerySupport() error {
+	if _, err := getIaCTool(); err != nil {
+		return err
 	}
-
-	cmd := exec.Command(tool, chDir, "show", "-json")
-
-	var outBuffer bytes.Buffer
-	cmd.Stdout = &outBuffer
-
-	err = cmd.Run()
+	version, err := getTerraformVersion()
 	if err != nil {
-		fmt.Println("Error executing command:", err)
-		return nil, err
+		return err
 	}
-
-	var state State
-
-	err = json.Unmarshal(outBuffer.Bytes(), &state)
+	parts := strings.Split(version, ".")
+	if len(parts) < 2 {
+		return fmt.Errorf("invalid Terraform version %q", version)
+	}
+	major, err := strconv.Atoi(parts[0])
 	if err != nil {
-		fmt.Println("Error unmarshalling JSON:", err)
-		return nil, err
+		return fmt.Errorf("invalid Terraform version %q: %w", version, err)
 	}
-
-	return &state, nil
+	minor, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return fmt.Errorf("invalid Terraform version %q: %w", version, err)
+	}
+	if major < 1 || (major == 1 && minor < minimumTerraformQueryMinor) {
+		return fmt.Errorf("terraform 1.%d or newer is required; found %s", minimumTerraformQueryMinor, version)
+	}
+	return nil
 }
 
-// function return true if resource identity is supported in the installed terraform version, false otherwise
-var isResourceIdentitySupported = func() (bool, error) {
-	tool, err := getIaCTool()
-	if err != nil {
-		return false, err
-	}
-
-	if tool == "terraform" {
-		version, err := getTerraformVersion()
-		if err != nil {
-			return false, fmt.Errorf("failed to get Terraform version: %w", err)
-		}
-
-		terraformVersion := strings.Split(version, ".")
-		majorVersion, err := strconv.Atoi(terraformVersion[0])
-		if err != nil {
-			return false, fmt.Errorf("failed to parse Terraform version %s: %w", strconv.Itoa(majorVersion), err)
-		}
-		minorVersion, err := strconv.Atoi(terraformVersion[1])
-		if err != nil {
-			return false, fmt.Errorf("failed to parse Terraform version %s: %w", strconv.Itoa(minorVersion), err)
-		}
-
-		if majorVersion > 1 || (majorVersion == 1 && minorVersion >= 12) {
-			// Terraform version 1.12 or higher supports resource identity
-			return true, nil
-		}
-		return false, nil
-	} else {
-		return false, nil
-	}
-}
-
-// This function returns terraform version.
 func getTerraformVersion() (string, error) {
-
-	cmd := exec.Command("terraform", "version")
-	output, err := cmd.Output()
+	output, err := exec.Command("terraform", "version", "-json").Output()
 	if err != nil {
-		return "", fmt.Errorf("failed to execute %s version command: %w", "terraform", err)
+		return "", fmt.Errorf("failed to read Terraform version: %w", err)
 	}
-
-	versionOutput, _, _ := strings.Cut(string(output), "\n")
-	versionParts := strings.Fields(versionOutput)
-	version := strings.TrimPrefix(versionParts[1], "v")
-
-	return version, nil
+	var response struct {
+		TerraformVersion string `json:"terraform_version"`
+	}
+	if err := json.Unmarshal(output, &response); err != nil {
+		return "", fmt.Errorf("failed to parse Terraform version: %w", err)
+	}
+	return response.TerraformVersion, nil
 }

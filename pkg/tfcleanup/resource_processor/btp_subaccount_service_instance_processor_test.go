@@ -7,6 +7,8 @@ import (
 	"github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/testutils"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/zclconf/go-cty/cty"
 )
 
 func TestAddServiceInstanceDependency(t *testing.T) {
@@ -45,6 +47,23 @@ func TestAddServiceInstanceDependency(t *testing.T) {
 		})
 	}
 
+}
+
+func TestAddServiceInstanceDependencyKeepsQueryGeneratedPlanID(t *testing.T) {
+	f := hclwrite.NewEmptyFile()
+	block := f.Body().AppendNewBlock("resource", []string{serviceInstanceBlockIdentifier, "instance"})
+	body := block.Body()
+	body.SetAttributeValue("name", cty.StringVal("my-instance"))
+	body.SetAttributeValue(serviceInstancePlanIdentifier, cty.StringVal("plan-id"))
+
+	dependencies := generictools.NewDependencyAddresses()
+	require.NotPanics(t, func() {
+		addServiceInstanceDependency(body, &dependencies, "subaccount-id")
+	})
+
+	planID := body.GetAttribute(serviceInstancePlanIdentifier)
+	require.NotNil(t, planID)
+	assert.Equal(t, "plan-id", generictools.GetStringToken(planID.Expr().BuildTokens(nil)))
 }
 
 func getNewServiceInstanceDepTemplate() generictools.DependencyAddresses {

@@ -23,7 +23,7 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 		case tfutils.SubaccountLevel:
 			processSubaccountLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient, levelIds)
 		case tfutils.DirectoryLevel:
-			processDirectoryLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient)
+			processDirectoryLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient, levelIds.DirectoryId)
 		case tfutils.OrganizationLevel:
 			processCfOrgLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress)
 		}
@@ -31,7 +31,11 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 
 	blocks := body.Blocks()
 	for _, block := range blocks {
-		inBlocks := append(inBlocks, block.Type()+","+block.Labels()[0]+","+block.Labels()[1])
+		labels := block.Labels()
+		if len(labels) < 2 {
+			continue
+		}
+		inBlocks := append(inBlocks, block.Type()+","+labels[0]+","+labels[1])
 		processResourceAttributes(block.Body(), inBlocks, level, variables, dependencyAddresses, btpClient, levelIds)
 	}
 }
@@ -63,11 +67,12 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 	}
 
 	if blockIdentifier != subaccountBlockIdentifier {
+		generictools.EnsureStringAttribute(body, subaccountIdentifier, levelIds.SubaccountId)
 		generictools.ReplaceMainDependency(body, subaccountIdentifier, dependencyAddresses.SubaccountAddress)
 	}
 }
 
-func processDirectoryLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DependencyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade) {
+func processDirectoryLevel(body *hclwrite.Body, variables *generictools.VariableContent, dependencyAddresses *generictools.DependencyAddresses, blockIdentifier string, resourceAddress string, btpClient *btpcli.ClientFacade, directoryID string) {
 	if blockIdentifier == directoryBlockIdentifier {
 		processDirectoryAttributes(body, variables, btpClient)
 		dependencyAddresses.DirectoryAddress = resourceAddress
@@ -82,6 +87,7 @@ func processDirectoryLevel(body *hclwrite.Body, variables *generictools.Variable
 	}
 
 	if blockIdentifier != directoryBlockIdentifier {
+		generictools.EnsureStringAttribute(body, directoryIdentifier, directoryID)
 		generictools.ReplaceMainDependency(body, directoryIdentifier, dependencyAddresses.DirectoryAddress)
 	}
 }
