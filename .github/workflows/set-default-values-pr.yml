@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add PR to default project
-        uses: actions/add-to-project@v2.0.0
+        uses: actions/add-to-project@v2.0.1
         with:
           project-url: https://github.com/orgs/SAP/projects/72
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
