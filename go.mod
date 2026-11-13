@@ -16,6 +16,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/theckman/yacspin v0.13.12
 	github.com/zalando/go-keyring v0.2.8
+	github.com/zclconf/go-cty v1.19.0
 )
 
 require (
@@ -46,7 +47,6 @@ require (
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/zclconf/go-cty v1.19.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/mod v0.41.0 // indirect
 	golang.org/x/oauth2 v0.37.0 // indirect
