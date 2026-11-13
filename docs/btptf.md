@@ -10,9 +10,9 @@ Terraform Exporter for SAP BTP
 ### Options
 
 ```
-  -h, --help      help for btptf
-      --verbose   Enable verbose output for debugging
-  -v, --version   Print the version number of btptf
+  -h, --help[=true|false]      help for btptf
+      --verbose[=true|false]   Enable verbose output for debugging
+  -v, --version[=true|false]   Print the version number of btptf
 ```
 
 ### See also
@@ -33,7 +33,7 @@ btptf create-json [flags]
 
 ```
   -d, --directory string    ID of the directory
-  -h, --help                help for create-json
+  -h, --help[=true|false]   help for create-json
   -o, --org string          ID of the Cloud Foundry org
   -p, --path string         Path to JSON file with list of resources (default "btpResources_<account-id>.json")
   -r, --resources string    Comma-separated list of resources to be included (default "all")
@@ -43,7 +43,7 @@ btptf create-json [flags]
 ### Options inherited from parent commands
 
 ```
-      --verbose   Enable verbose output for debugging
+      --verbose[=true|false]   Enable verbose output for debugging
 ```
 
 ### See also
@@ -61,22 +61,22 @@ btptf export [flags]
 ### Options
 
 ```
-      --backend-config strings   Backend configuration
-  -b, --backend-path string      Path to the Terraform backend configuration file
-      --backend-type string      Type of the Terraform backend
-  -c, --config-dir string        Directory for the Terraform code (default "generated_configurations_<account-id>")
-  -d, --directory string         ID of the directory
-  -h, --help                     help for export
-      --imports-only             Keep imports and provider configuration without resource configuration or NextSteps.md
-  -o, --org string               ID of the Cloud Foundry org
-  -r, --resources string         Comma-separated list of resources to be included (default "all")
-  -s, --subaccount string        ID of the subaccount
+      --backend-config strings      Backend configuration
+  -b, --backend-path string         Path to the Terraform backend configuration file
+      --backend-type string         Type of the Terraform backend
+  -c, --config-dir string           Directory for the Terraform code (default "generated_configurations_<account-id>")
+  -d, --directory string            ID of the directory
+  -h, --help[=true|false]           help for export
+      --imports-only[=true|false]   Keep imports and provider configuration without resource configuration or NextSteps.md
+  -o, --org string                  ID of the Cloud Foundry org
+  -r, --resources string            Comma-separated list of resources to be included (default "all")
+  -s, --subaccount string           ID of the subaccount
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --verbose   Enable verbose output for debugging
+      --verbose[=true|false]   Enable verbose output for debugging
 ```
 
 ### See also
@@ -94,22 +94,22 @@ btptf export-by-json [flags]
 ### Options
 
 ```
-      --backend-config strings   Backend configuration
-  -b, --backend-path string      Path to the Terraform backend configuration file
-      --backend-type string      Type of the Terraform backend
-  -c, --config-dir string        Directory for the Terraform code (default "generated_configurations_<account-id>")
-  -d, --directory string         ID of the directory
-  -h, --help                     help for export-by-json
-      --imports-only             Keep imports and provider configuration without resource configuration or NextSteps.md
-  -o, --org string               ID of the Cloud Foundry org
-  -p, --path string              Full path to JSON file with list of resources (default "btpResources_<account-id>.json")
-  -s, --subaccount string        ID of the subaccount
+      --backend-config strings      Backend configuration
+  -b, --backend-path string         Path to the Terraform backend configuration file
+      --backend-type string         Type of the Terraform backend
+  -c, --config-dir string           Directory for the Terraform code (default "generated_configurations_<account-id>")
+  -d, --directory string            ID of the directory
+  -h, --help[=true|false]           help for export-by-json
+      --imports-only[=true|false]   Keep imports and provider configuration without resource configuration or NextSteps.md
+  -o, --org string                  ID of the Cloud Foundry org
+  -p, --path string                 Full path to JSON file with list of resources (default "btpResources_<account-id>.json")
+  -s, --subaccount string           ID of the subaccount
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --verbose   Enable verbose output for debugging
+      --verbose[=true|false]   Enable verbose output for debugging
 ```
 
 ### See also
