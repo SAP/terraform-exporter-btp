@@ -21,7 +21,7 @@ import (
 // as a safeguard in addition to the up-front file-size check.
 const maxJSONInventorySize = 5 * 1024 * 1024 // 5 MB
 
-func exportByJson(subaccount string, directory string, organization string, jsonfile string, resourceFile string, configDir string, backendConfig tfutils.BackendConfig, target tfutils.ExecutionTarget) {
+func exportByJson(subaccount string, directory string, organization string, jsonfile string, resourceFile string, configDir string, backendConfig tfutils.BackendConfig, target tfutils.ExecutionTarget, importsOnly bool) {
 	// Check if file size is valid
 	validFileSize, err := files.IsFileSizeValid(jsonfile)
 
@@ -110,7 +110,7 @@ func exportByJson(subaccount string, directory string, organization string, json
 		}
 
 		if len(value) != 0 {
-			resourceType, count := generateConfigForResource(resName, value, subaccount, directory, organization, "", configDir, resourceFile)
+			resourceType, count := generateConfigForResource(resName, value, subaccount, directory, organization, "", configDir, resourceFile, importsOnly)
 			resultStore[resourceType] = count
 			_ = resume.WriteExportLog(configDir, resName, resourceType, count)
 		}
@@ -122,9 +122,11 @@ func exportByJson(subaccount string, directory string, organization string, json
 		CfOrgId:      organization,
 	}
 
-	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig)
-	tfutils.FinalizeTfConfig(configDir, target)
-	generateNextStepsDocument(configDir, subaccount, directory, organization, "")
+	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig, importsOnly)
+	tfutils.FinalizeTfConfig(configDir, target, importsOnly)
+	if !importsOnly {
+		generateNextStepsDocument(configDir, subaccount, directory, organization, "")
+	}
 	_ = resume.RemoveExportLog(configDir)
 	resultStoreNew := resume.MergeSummaryTable(resultStore, fullExportLog)
 	output.RenderSummaryTable(resultStoreNew)

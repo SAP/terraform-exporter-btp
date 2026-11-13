@@ -67,6 +67,7 @@ btptf export [flags]
   -c, --config-dir string        Directory for the Terraform code (default "generated_configurations_<account-id>")
   -d, --directory string         ID of the directory
   -h, --help                     help for export
+      --imports-only             Keep imports and provider configuration without resource configuration or NextSteps.md
   -o, --org string               ID of the Cloud Foundry org
   -r, --resources string         Comma-separated list of resources to be included (default "all")
   -s, --subaccount string        ID of the subaccount
@@ -99,6 +100,7 @@ btptf export-by-json [flags]
   -c, --config-dir string        Directory for the Terraform code (default "generated_configurations_<account-id>")
   -d, --directory string         ID of the directory
   -h, --help                     help for export-by-json
+      --imports-only             Keep imports and provider configuration without resource configuration or NextSteps.md
   -o, --org string               ID of the Cloud Foundry org
   -p, --path string              Full path to JSON file with list of resources (default "btpResources_<account-id>.json")
   -s, --subaccount string        ID of the subaccount

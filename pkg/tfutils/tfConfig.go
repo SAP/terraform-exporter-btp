@@ -478,7 +478,7 @@ func cleanup() {
 	}
 }
 
-func FinalizeTfConfig(configFolder string, target ExecutionTarget) {
+func FinalizeTfConfig(configFolder string, target ExecutionTarget, importsOnly bool) {
 
 	output.AddNewLine()
 	spinner := output.StartSpinner("finalizing Terraform configuration")
@@ -500,6 +500,13 @@ func FinalizeTfConfig(configFolder string, target ExecutionTarget) {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
 		log.Fatalf("error normalizing generated resource addresses: %v", err)
+	}
+
+	if importsOnly {
+		if err := removeResourceConfiguration(terraformConfigPath); err != nil {
+			CleanupProviderConfig()
+			log.Fatalf("error preparing imports-only output: %v", err)
+		}
 	}
 
 	err = os.Chdir(terraformConfigPath)
@@ -537,13 +544,15 @@ func ExecPreExportSteps(tempConfigDir string, level string) {
 	SetupConfigDir(tempConfigDir, false, level)
 }
 
-func ExecPostQuerySteps(tempConfigDir string, targetConfigDir string, targetResourceFileName string, resourceNameLong string) {
+func ExecPostQuerySteps(tempConfigDir string, targetConfigDir string, targetResourceFileName string, resourceNameLong string, importsOnly bool) {
 
 	spinner := output.StartSpinner("generating Terraform configuration for " + resourceNameLong)
 
-	if _, err := runTfCmdGeneric(fmt.Sprintf("-chdir=%s", tempConfigDir), "fmt", "-recursive", "-list=false"); err != nil {
-		CleanupTempFiles(tempConfigDir)
-		log.Fatalf("error formatting Terraform configuration for %s: %v", resourceNameLong, err)
+	if !importsOnly {
+		if _, err := runTfCmdGeneric(fmt.Sprintf("-chdir=%s", tempConfigDir), "fmt", "-recursive", "-list=false"); err != nil {
+			CleanupTempFiles(tempConfigDir)
+			log.Fatalf("error formatting Terraform configuration for %s: %v", resourceNameLong, err)
+		}
 	}
 
 	err := mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)

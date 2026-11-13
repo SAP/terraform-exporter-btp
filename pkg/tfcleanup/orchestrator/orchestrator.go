@@ -15,7 +15,7 @@ import (
 	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 )
 
-func CleanUpGeneratedCode(configFolder string, level string, levelIds generictools.LevelIds, resultStore *map[string]int, backendConfig tfutils.BackendConfig) {
+func CleanUpGeneratedCode(configFolder string, level string, levelIds generictools.LevelIds, resultStore *map[string]int, backendConfig tfutils.BackendConfig, importsOnly bool) {
 	if toggles.IsCodeCleanupDeactivated() {
 		return
 	}
@@ -32,9 +32,13 @@ func CleanUpGeneratedCode(configFolder string, level string, levelIds generictoo
 
 	terraformConfigPath := filepath.Join(currentDir, configFolder)
 
-	err = orchestrateCodeCleanup(terraformConfigPath, level, levelIds, resultStore, backendConfig)
+	err = orchestrateCodeCleanup(terraformConfigPath, level, levelIds, resultStore, backendConfig, importsOnly)
 
 	if err != nil {
+		if importsOnly {
+			tfutils.CleanupProviderConfig()
+			log.Fatalf("error preparing imports-only configuration: %v", err)
+		}
 		fmt.Print("\r\n")
 		log.Printf("error improving Terraform configuration: %v", err)
 		log.Println("skipping improvement steps")
@@ -43,7 +47,7 @@ func CleanUpGeneratedCode(configFolder string, level string, levelIds generictoo
 	output.StopSpinner(spinner)
 }
 
-func orchestrateCodeCleanup(dir string, level string, levelIds generictools.LevelIds, resultStore *map[string]int, backendConfig tfutils.BackendConfig) error {
+func orchestrateCodeCleanup(dir string, level string, levelIds generictools.LevelIds, resultStore *map[string]int, backendConfig tfutils.BackendConfig, importsOnly bool) error {
 	dir = filepath.Clean(dir)
 
 	_, err := os.Lstat(dir)
@@ -61,10 +65,12 @@ func orchestrateCodeCleanup(dir string, level string, levelIds generictools.Leve
 	contentToCreate := make(generictools.VariableContent)
 	dependencyAddresses := generictools.NewDependencyAddresses()
 
-	btpClient, err := btpcli.GetLoggedInClient()
-
-	if err != nil {
-		return err
+	var btpClient *btpcli.ClientFacade
+	if !importsOnly {
+		btpClient, err = btpcli.GetLoggedInClient()
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, file := range files {
@@ -73,10 +79,22 @@ func orchestrateCodeCleanup(dir string, level string, levelIds generictools.Leve
 
 		if file.Name() == "btp_resources.tf" {
 			f := generictools.GetHclFile(path)
-			resourceprocessor.ProcessResources(f, level, &contentToCreate, &dependencyAddresses, btpClient, levelIds)
-			generictools.ProcessChanges(f, path)
+			if f == nil {
+				return fmt.Errorf("cannot read generated resources at %s", path)
+			}
+			if importsOnly {
+				if level == tfutils.SubaccountLevel && !toggles.IsEntitlementModuleGenerationDeactivated() {
+					resourceprocessor.CollectEntitlementImports(f, &dependencyAddresses)
+				}
+			} else {
+				resourceprocessor.ProcessResources(f, level, &contentToCreate, &dependencyAddresses, btpClient, levelIds)
+				generictools.ProcessChanges(f, path)
+			}
 		} else if file.Name() == "provider.tf" {
 			f := generictools.GetHclFile(path)
+			if f == nil {
+				return fmt.Errorf("cannot read provider configuration at %s", path)
+			}
 			providerprocessor.ProcessProvider(f, &contentToCreate, backendConfig)
 			generictools.ProcessChanges(f, path)
 		}

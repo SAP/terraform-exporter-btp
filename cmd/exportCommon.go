@@ -17,7 +17,7 @@ const tfConfigFileName = "btp_resources.tf"
 const configDirDefault = "generated_configurations_<account-id>"
 const jsonFileDefault = "btpResources_<account-id>.json"
 
-func generateConfigForResource(resource string, values []string, subaccountID, directoryID, organizationID, spaceID, configDir, resourceFileName string) (string, int) {
+func generateConfigForResource(resource string, values []string, subaccountID, directoryID, organizationID, spaceID, configDir, resourceFileName string, importsOnly bool) (string, int) {
 	tempConfigDir := resource + "-config"
 	level, _ := tfutils.GetExecutionLevelAndId(subaccountID, directoryID, organizationID, spaceID)
 	spec, err := tfutils.GetListResourceSpec(resource, func() string {
@@ -59,7 +59,7 @@ func generateConfigForResource(resource string, values []string, subaccountID, d
 		log.Fatalf("error writing generated configuration for %s: %v", resourceType, err)
 	}
 	output.StopSpinner(spinner)
-	tfutils.ExecPostQuerySteps(tempConfigDir, configDir, resourceFileName, strings.ToUpper(resourceType))
+	tfutils.ExecPostQuerySteps(tempConfigDir, configDir, resourceFileName, strings.ToUpper(resourceType), importsOnly)
 	return resourceType, len(results)
 }
 

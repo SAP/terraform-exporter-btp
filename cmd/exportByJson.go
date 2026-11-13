@@ -27,6 +27,7 @@ var exportByJsonCmd = &cobra.Command{
 		}
 		subaccount, directory, organization = target.SubaccountID, target.DirectoryID, target.OrgID
 		configDir, _ := cmd.Flags().GetString("config-dir")
+		importsOnly, _ := cmd.Flags().GetBool("imports-only")
 		path, _ := cmd.Flags().GetString("path")
 
 		backendPath, _ := cmd.Flags().GetString("backend-path")
@@ -54,7 +55,7 @@ var exportByJsonCmd = &cobra.Command{
 		}
 
 		output.PrintExportStartMessage()
-		exportByJson(subaccount, directory, organization, path, tfConfigFileName, configDir, backendConfig, target)
+		exportByJson(subaccount, directory, organization, path, tfConfigFileName, configDir, backendConfig, target, importsOnly)
 		output.PrintExportSuccessMessage(configDir)
 	},
 }
@@ -87,6 +88,7 @@ func init() {
 	exportByJsonCmd.Flags().StringVarP(&organization, "org", "o", "", "ID of the Cloud Foundry org")
 	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "org")
 
+	exportByJsonCmd.Flags().Bool("imports-only", false, "Keep imports and provider configuration without resource configuration or NextSteps.md")
 	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")
 
@@ -123,6 +125,11 @@ func getExportByJsonCmdExamples(c *cobra.Command) string {
 	filePathDirectory := filepath.Join("BTP", "resources", "my-btp-directory.json")
 
 	return generateCmdHelpCustomExamplesBlock(map[string]string{
+		"Export only imports and provider configuration": fmt.Sprintf("%s %s %s",
+			output.ColorStringCyan("btptf export-by-json --subaccount"),
+			output.ColorStringYellow("<subaccount ID>"),
+			output.ColorStringCyan("--imports-only"),
+		),
 		"Export the resources of a directory that are listed in a JSON with a custom file name and in a custom directory": fmt.Sprintf("%s %s %s %s",
 			output.ColorStringCyan("btptf export-by-json --directory"),
 			output.ColorStringYellow("<directory ID>"),

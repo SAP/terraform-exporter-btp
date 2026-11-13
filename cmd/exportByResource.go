@@ -29,6 +29,7 @@ var exportByResourceCmd = &cobra.Command{
 		}
 		subaccount, directory, organization = target.SubaccountID, target.DirectoryID, target.OrgID
 		configDir, _ := cmd.Flags().GetString("config-dir")
+		importsOnly, _ := cmd.Flags().GetBool("imports-only")
 		resources, _ := cmd.Flags().GetString("resources")
 
 		backendPath, _ := cmd.Flags().GetString("backend-path")
@@ -72,7 +73,7 @@ var exportByResourceCmd = &cobra.Command{
 		}
 
 		for _, resourceToImport := range resourcesList {
-			resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName)
+			resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName, importsOnly)
 			resultStore[resourceType] = count
 			_ = resume.WriteExportLog(configDir, resourceToImport, resourceType, count)
 		}
@@ -83,9 +84,11 @@ var exportByResourceCmd = &cobra.Command{
 			CfOrgId:      organization,
 		}
 
-		tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig)
-		tfutils.FinalizeTfConfig(configDir, target)
-		generateNextStepsDocument(configDir, subaccount, directory, organization, space)
+		tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig, importsOnly)
+		tfutils.FinalizeTfConfig(configDir, target, importsOnly)
+		if !importsOnly {
+			generateNextStepsDocument(configDir, subaccount, directory, organization, space)
+		}
 		tfutils.CleanupProviderConfig()
 		_ = resume.RemoveExportLog(configDir)
 		resultStoreNew := resume.MergeSummaryTable(resultStore, fullExportLog)
@@ -122,6 +125,7 @@ func init() {
 	exportByResourceCmd.Flags().StringVarP(&organization, "org", "o", "", "ID of the Cloud Foundry org")
 	exportByResourceCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "org")
 
+	exportByResourceCmd.Flags().Bool("imports-only", false, "Keep imports and provider configuration without resource configuration or NextSteps.md")
 	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
 
@@ -194,6 +198,11 @@ func getExportCmdDescriptionNote(c *cobra.Command) string {
 func getExportByResourceCmdExamples(c *cobra.Command) string {
 
 	return generateCmdHelpCustomExamplesBlock(map[string]string{
+		"Export only imports and provider configuration": fmt.Sprintf("%s %s %s",
+			output.ColorStringCyan("btptf export --subaccount"),
+			output.ColorStringYellow("<subaccount ID>"),
+			output.ColorStringCyan("--imports-only"),
+		),
 		"Export a directory that manages entitlements, but no users": fmt.Sprintf("%s %s %s %s",
 			output.ColorStringCyan("btptf export --directory"),
 			output.ColorStringYellow("<directory ID>"),
