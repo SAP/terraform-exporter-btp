@@ -8,6 +8,9 @@ import (
 )
 
 func ProcessResources(hclFile *hclwrite.File, level string, variables *generictools.VariableContent, dependencyAddresses *generictools.DependencyAddresses, btpClient *btpcli.ClientFacade, levelIds generictools.LevelIds) {
+	if level == tfutils.SubaccountLevel {
+		linkRoleCollectionAssignments(hclFile.Body())
+	}
 	processResourceAttributes(hclFile.Body(), nil, level, variables, dependencyAddresses, btpClient, levelIds)
 	processDependencies(hclFile.Body(), dependencyAddresses, variables, levelIds)
 }

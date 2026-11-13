@@ -68,6 +68,7 @@ var listResourceSpecs = []ListResourceSpec{
 	{CmdTrustConfigurationParameter, SubaccountTrustConfigurationType, "btp", SubaccountLevel},
 	{CmdRoleParameter, SubaccountRoleType, "btp", SubaccountLevel},
 	{CmdRoleCollectionParameter, SubaccountRoleCollectionType, "btp", SubaccountLevel},
+	{CmdRoleCollectionAssignmentParameter, SubaccountRoleCollectionAssignmentType, "btp", SubaccountLevel},
 	{CmdServiceBindingParameter, SubaccountServiceBindingType, "btp", SubaccountLevel},
 	{CmdServiceInstanceParameter, SubaccountServiceInstanceType, "btp", SubaccountLevel},
 	{CmdSecuritySettingParameter, SubaccountSecuritySettingType, "btp", SubaccountLevel},
@@ -92,31 +93,40 @@ func GetListResourceSpec(commandName, level string) (ListResourceSpec, error) {
 
 func ReadListResources(subaccountID, directoryID, organizationID string, resourceList []string) (BtpResources, error) {
 	level, _ := GetExecutionLevelAndId(subaccountID, directoryID, organizationID, "")
+
 	if err := ValidateTerraformQuerySupport(); err != nil {
 		return BtpResources{}, err
 	}
+
 	if err := PrepareQueryDirectory(TmpFolder); err != nil {
 		return BtpResources{}, err
 	}
 
 	resources := make([]BtpResource, 0, len(resourceList))
 	var directoryFeatures []string
+
 	for _, commandName := range resourceList {
 		if level == DirectoryLevel && !directoryResourceEnabled(commandName, directoryFeatures) {
 			continue
 		}
+
 		_, results, err := QueryResource(TmpFolder, commandName, subaccountID, directoryID, organizationID, "", nil, false)
 		if err != nil {
 			return BtpResources{}, err
 		}
+
 		if commandName == CmdDirectoryParameter && len(results) == 1 {
 			directoryFeatures = stringSlice(results[0].Resource["features"])
 		}
+
 		values := make([]string, 0, len(results))
+
 		for _, result := range results {
 			values = append(values, result.InventoryValue)
 		}
+
 		sort.Strings(values)
+
 		if len(values) > 0 {
 			resources = append(resources, BtpResource{Name: commandName, Values: values})
 		}
@@ -127,9 +137,11 @@ func ReadListResources(subaccountID, directoryID, organizationID string, resourc
 func QueryResource(configDir, commandName, subaccountID, directoryID, organizationID, spaceID string, selected []string, generate bool) (string, []QueryResult, error) {
 	level, _ := GetExecutionLevelAndId(subaccountID, directoryID, organizationID, spaceID)
 	lookupLevel := level
+
 	if commandName == CmdCfSpaceRoleParameter {
 		lookupLevel = OrganizationLevel
 	}
+
 	spec, err := GetListResourceSpec(commandName, lookupLevel)
 	if err != nil {
 		return "", nil, err
@@ -140,55 +152,72 @@ func QueryResource(configDir, commandName, subaccountID, directoryID, organizati
 		if err != nil {
 			return spec.ResourceType, nil, err
 		}
+
 		var all []QueryResult
+
 		for _, space := range spaces {
 			id := firstString(space.Identity, "space_guid", "id")
+
 			if id == "" {
 				id = firstString(space.Resource, "id")
 			}
+
 			if id == "" {
 				return spec.ResourceType, nil, fmt.Errorf("space query returned a result without an identity")
 			}
+
 			results, err := runListQuery(configDir, spec, map[string]string{"space": id}, generate)
 			if err != nil {
 				return spec.ResourceType, nil, err
 			}
+
 			all = append(all, results...)
 		}
+
 		results, err := filterQueryResults(spec, all, subaccountID, directoryID, selected)
 		return spec.ResourceType, results, err
 	}
 
 	scope := queryScope(spec.ResourceType, subaccountID, directoryID, organizationID, spaceID)
+
 	results, err := runListQuery(configDir, spec, scope, generate)
 	if err != nil {
 		return spec.ResourceType, nil, err
 	}
+
 	results = filterTargetResource(spec, results, subaccountID, directoryID)
+
 	results, err = filterQueryResults(spec, results, subaccountID, directoryID, selected)
+
 	return spec.ResourceType, results, err
 }
 
 func WriteQueryResults(configDir, resourceFileName, resourceType string, results []QueryResult) error {
 	var configs, imports strings.Builder
+
 	for _, result := range results {
 		if result.Config == "" || result.ImportConfig == "" {
 			return fmt.Errorf("terraform query did not generate configuration for %s", resourceType)
 		}
+
 		configs.WriteString(result.Config)
 		configs.WriteString("\n\n")
 		imports.WriteString(result.ImportConfig)
 		imports.WriteString("\n\n")
 	}
+
 	if err := files.CreateFileWithContent(filepath.Join(configDir, resourceFileName), configs.String()); err != nil {
 		return err
 	}
+
 	return files.WriteImportConfiguration(configDir, resourceType, imports.String())
 }
 
 func PrepareQueryDirectory(directory string) error {
+
 	addUserAgent()
 	defer removeUserAgent()
+
 	chdir := fmt.Sprintf("-chdir=%s", directory)
 	if stderr, err := runTfCmdGeneric(chdir, "init", "-backend=false"); err != nil {
 		return fmt.Errorf("error initializing Terraform query directory: %v: %s", err, stderr)
@@ -211,6 +240,7 @@ func runListQuery(directory string, spec ListResourceSpec, scope map[string]stri
 		defer func() { _ = removeQueryGeneratedFile(generatedPath) }()
 		args = append(args, "-generate-config-out="+queryGeneratedFileName)
 	}
+
 	cmd := exec.Command("terraform", args...)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -218,16 +248,20 @@ func runListQuery(directory string, spec ListResourceSpec, scope map[string]stri
 	addUserAgent()
 	err := cmd.Run()
 	removeUserAgent()
+
 	results, diagnostics, parseErr := parseQueryOutput(stdout.Bytes(), spec)
 	if parseErr != nil {
 		return nil, parseErr
 	}
+
 	if err != nil {
 		return nil, fmt.Errorf("terraform query failed: %v: %s%s", err, stderr.String(), diagnostics)
 	}
+
 	if diagnostics != "" {
 		return nil, fmt.Errorf("terraform query failed: %s", diagnostics)
 	}
+
 	return results, nil
 }
 
@@ -240,10 +274,12 @@ func removeQueryGeneratedFile(path string) error {
 
 func renderListQuery(spec ListResourceSpec, scope map[string]string) string {
 	var b strings.Builder
+
 	label := "export"
 	if spec.ResourceType == CfSpaceRoleType {
 		label = SanitizeHclLabel("space_" + scope["space"])
 	}
+
 	fmt.Fprintf(&b, "list %q %q {\n  provider         = %s\n  include_resource = true\n  limit            = %d\n", spec.ResourceType, label, spec.Provider, queryResultLimit)
 	if len(scope) > 0 {
 		b.WriteString("  config {\n")
@@ -257,6 +293,7 @@ func renderListQuery(spec ListResourceSpec, scope map[string]string) string {
 		}
 		b.WriteString("  }\n")
 	}
+
 	b.WriteString("}\n")
 	return b.String()
 }
@@ -264,8 +301,10 @@ func renderListQuery(spec ListResourceSpec, scope map[string]string) string {
 func parseQueryOutput(data []byte, spec ListResourceSpec) ([]QueryResult, string, error) {
 	var results []QueryResult
 	var diagnostics strings.Builder
+
 	scanner := bufio.NewScanner(bytes.NewReader(data))
 	scanner.Buffer(make([]byte, 64*1024), 16*1024*1024)
+
 	for scanner.Scan() {
 		var event queryEvent
 		if err := json.Unmarshal(scanner.Bytes(), &event); err != nil {
@@ -283,6 +322,7 @@ func parseQueryOutput(data []byte, spec ListResourceSpec) ([]QueryResult, string
 			results = append(results, result)
 		}
 	}
+
 	if err := scanner.Err(); err != nil {
 		return nil, "", err
 	}
@@ -296,7 +336,7 @@ func queryScope(resourceType, subaccountID, directoryID, organizationID, spaceID
 	switch resourceType {
 	case DirectoryEntitlementType, DirectoryRoleType, DirectoryRoleCollectionType:
 		return map[string]string{"directory_id": directoryID}
-	case SubaccountEntitlementType, SubaccountEnvironmentInstanceType, SubaccountSubscriptionType, SubaccountTrustConfigurationType, SubaccountRoleType, SubaccountRoleCollectionType, SubaccountServiceInstanceType, SubaccountServiceBindingType, SubaccountSecuritySettingType:
+	case SubaccountEntitlementType, SubaccountEnvironmentInstanceType, SubaccountSubscriptionType, SubaccountTrustConfigurationType, SubaccountRoleType, SubaccountRoleCollectionType, SubaccountRoleCollectionAssignmentType, SubaccountServiceInstanceType, SubaccountServiceBindingType, SubaccountSecuritySettingType:
 		return map[string]string{"subaccount_id": subaccountID}
 	case CfSpaceType, CfOrgRoleType, CfDomainType, CfRouteType, CfSpaceQuotaType, CfServiceInstanceType, CfUserType:
 		return map[string]string{"org": organizationID}
@@ -316,6 +356,8 @@ func inventoryValue(resourceType string, result QueryResult) string {
 		return output.FormatResourceNameGeneric(firstString(r, "name", "username", "url"))
 	case CfUserType:
 		return cfUserInventoryValue(r, i)
+	case SubaccountRoleCollectionAssignmentType:
+		return roleCollectionAssignmentInventoryValue(i)
 	case DirectoryEntitlementType, SubaccountEntitlementType:
 		return firstString(i, "service_name") + "_" + firstString(i, "plan_name")
 	case SubaccountEnvironmentInstanceType:

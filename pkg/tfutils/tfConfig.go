@@ -26,6 +26,7 @@ var AllowedResourcesSubaccount = []string{
 	CmdTrustConfigurationParameter,
 	CmdRoleParameter,
 	CmdRoleCollectionParameter,
+	CmdRoleCollectionAssignmentParameter,
 	CmdServiceBindingParameter,
 	CmdServiceInstanceParameter,
 	CmdSecuritySettingParameter,
