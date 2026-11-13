@@ -1,6 +1,7 @@
 package tfutils
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -21,17 +22,56 @@ func TestRemoveQueryGeneratedFile(t *testing.T) {
 	require.NoError(t, removeQueryGeneratedFile(path))
 }
 
-func TestReplaceGeneratedCloudFoundryUserType(t *testing.T) {
-	config := `resource "cloudfoundry_user" "export_0" {
+func TestCloudFoundryUserQueryAndExport(t *testing.T) {
+	spec, err := GetListResourceSpec(CmdCfUserParameter, OrganizationLevel)
+	require.NoError(t, err)
+	assert.Equal(t, "cloudfoundry_user_cf", spec.ResourceType)
+
+	scope := queryScope(spec.ResourceType, "", "", "org-guid", "")
+	assert.Equal(t, map[string]string{"org": "org-guid"}, scope)
+	query := renderListQuery(spec, scope)
+	assert.Contains(t, query, `list "cloudfoundry_user_cf" "export"`)
+	assert.Contains(t, query, `org = "org-guid"`)
+	assert.Contains(t, query, "include_resource = true")
+
+	config := `resource "cloudfoundry_user_cf" "export_0" {
   username = "user@example.com"
+  origin = "ldap"
+  annotations = { description = "cloudfoundry_user.literal" }
 }`
 	importConfig := `import {
-  to = cloudfoundry_user.export_0
+  to = cloudfoundry_user_cf.export_0
+  identity = { user_guid = "user-guid" }
 }`
+	input, err := json.Marshal(map[string]any{
+		"type": "list_resource_found",
+		"list_resource_found": map[string]any{
+			"identity":        map[string]any{"user_guid": "user-guid"},
+			"resource_object": map[string]any{"username": "user@example.com", "origin": "ldap"},
+			"config":          config,
+			"import_config":   importConfig,
+		},
+	})
+	require.NoError(t, err)
+	results, diagnostics, err := parseQueryOutput(input, spec)
+	require.NoError(t, err)
+	assert.Empty(t, diagnostics)
+	require.Len(t, results, 1)
+	assert.Equal(t, "user@example.com__ldap", results[0].InventoryValue)
 
-	assert.Contains(t, replaceGeneratedResourceType(config, CfUserType, CfUserExportType), `resource "cloudfoundry_user_cf" "export_0"`)
-	assert.Contains(t, replaceGeneratedResourceType(importConfig, CfUserType, CfUserExportType), "to = cloudfoundry_user_cf.export_0")
-	assert.Equal(t, CfUserExportType, ExportResourceType(CfUserType))
+	tempDir := t.TempDir()
+	currentDir, err := os.Getwd()
+	require.NoError(t, err)
+	configDir, err := filepath.Rel(currentDir, tempDir)
+	require.NoError(t, err)
+	require.NoError(t, WriteQueryResults(configDir, "users.tf", spec.ResourceType, results))
+
+	generated, err := os.ReadFile(filepath.Join(tempDir, "users.tf"))
+	require.NoError(t, err)
+	assert.Equal(t, config+"\n\n", string(generated))
+	imports, err := os.ReadFile(filepath.Join(tempDir, "cloudfoundry_user_cf_import.tf"))
+	require.NoError(t, err)
+	assert.Equal(t, importConfig+"\n\n", string(imports))
 }
 
 func TestListResourceCatalogCoversEveryAllowedResource(t *testing.T) {

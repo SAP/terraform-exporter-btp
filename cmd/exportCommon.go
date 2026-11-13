@@ -48,7 +48,6 @@ func generateConfigForResource(resource string, values []string, subaccountID, d
 		fmt.Print("\r\n")
 		log.Fatalf("error querying %s: %v", spec.ResourceType, err)
 	}
-	resourceType = tfutils.ExportResourceType(resourceType)
 	if len(results) == 0 {
 		output.StopSpinner(spinner)
 		fmt.Println(output.ColorStringCyan("   no " + strings.ToUpper(resourceType) + " found"))

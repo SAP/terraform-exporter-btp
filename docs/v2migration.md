@@ -6,7 +6,7 @@ Version 2 uses Terraform's list-resource query workflow for discovery, import bl
 
 - Terraform CLI 1.14 or newer is required.
 - OpenTofu is no longer supported because it does not provide the required `query` command.
-- Cloud Foundry users are discovered with the `cloudfoundry_user` list resource, then generated resource and import blocks are converted to `cloudfoundry_user_cf`.
+- Cloud Foundry users are discovered and exported directly with `cloudfoundry_user_cf`, using its list resource available in Cloud Foundry provider 1.19.0.
 - The JSON inventory name for Cloud Foundry users is `users` instead of `users_cf`.
 - When Cloud Foundry users have the same username from multiple identity-provider origins, their inventory values use `username__origin` so they can be selected independently.
 - Terraform assigns generated resource addresses from query labels. Resource addresses can therefore differ from Version 1 output.

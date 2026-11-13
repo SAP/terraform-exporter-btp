@@ -175,33 +175,15 @@ func WriteQueryResults(configDir, resourceFileName, resourceType string, results
 		if result.Config == "" || result.ImportConfig == "" {
 			return fmt.Errorf("terraform query did not generate configuration for %s", resourceType)
 		}
-		config := result.Config
-		importConfig := result.ImportConfig
-		if resourceType == CfUserExportType {
-			config = replaceGeneratedResourceType(config, CfUserType, CfUserExportType)
-			importConfig = replaceGeneratedResourceType(importConfig, CfUserType, CfUserExportType)
-		}
-		configs.WriteString(config)
+		configs.WriteString(result.Config)
 		configs.WriteString("\n\n")
-		imports.WriteString(importConfig)
+		imports.WriteString(result.ImportConfig)
 		imports.WriteString("\n\n")
 	}
 	if err := files.CreateFileWithContent(filepath.Join(configDir, resourceFileName), configs.String()); err != nil {
 		return err
 	}
 	return files.WriteImportConfiguration(configDir, resourceType, imports.String())
-}
-
-func ExportResourceType(queryResourceType string) string {
-	if queryResourceType == CfUserType {
-		return CfUserExportType
-	}
-	return queryResourceType
-}
-
-func replaceGeneratedResourceType(content, sourceType, targetType string) string {
-	content = strings.ReplaceAll(content, `resource "`+sourceType+`"`, `resource "`+targetType+`"`)
-	return strings.ReplaceAll(content, sourceType+".", targetType+".")
 }
 
 func PrepareQueryDirectory(directory string) error {
@@ -359,7 +341,7 @@ func inventoryValue(resourceType string, result QueryResult) string {
 
 // cfUserInventoryValue distinguishes identities that share a username but
 // belong to different identity-provider origins. The origin is part of the
-// cloudfoundry_user resource schema and is returned as resource data by the
+// cloudfoundry_user_cf resource schema and is returned as resource data by the
 // list query. It may also be included in the identity, so use that as a
 // fallback for provider versions that omit it from the resource object.
 func cfUserInventoryValue(resource, identity map[string]any) string {
