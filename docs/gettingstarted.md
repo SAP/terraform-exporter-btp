@@ -30,6 +30,8 @@ This is a two-step process where a JSON is created as a resource inventory and u
     ```
 Review and adjust the JSON file according to your needs.
 
+Space-role inventory identifiers include the user GUID so users with the same username in different identity-provider origins can be selected independently. If you have an older inventory whose space-role identifiers end with only the space GUID, regenerate it with `btptf create-json` before using `export-by-json`.
+
 2. Export resources from SAP BTP via a JSON file.
 
     ```bash

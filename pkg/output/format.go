@@ -24,5 +24,7 @@ func FormatSpaceRoleResourceName(spaceRoleType string, spaceId string, userId st
 	cleanSpaceName := strings.ReplaceAll(spaceName, "_", "-")
 	cleanUserName := strings.ReplaceAll(userName, "_", "-")
 	cleanRoleType := strings.ReplaceAll(spaceRoleType, "_", "-")
-	return cleanSpaceName + "_" + cleanRoleType + "_" + cleanUserName + "_" + spaceId
+	// Usernames can be shared across identity-provider origins. Retain the user
+	// GUID so each assignment has a distinct inventory identifier.
+	return cleanSpaceName + "_" + cleanRoleType + "_" + cleanUserName + "_" + spaceId + "_" + userId
 }
