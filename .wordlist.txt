@@ -30,6 +30,7 @@ GLOBALACCOUNT
 Golang
 GOLANG
 GOPATH
+GUID
 html
 https
 HCL
