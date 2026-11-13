@@ -1,7 +1,7 @@
 package tfutils
 
-const BtpProviderVersion = "v1.27.0"
-const CfProviderVersion = "v1.18.0"
+const BtpProviderVersion = "v1.28.0"
+const CfProviderVersion = "v1.19.0"
 
 const (
 	SubaccountLevel   = "subaccountLevel"
