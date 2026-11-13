@@ -10,23 +10,28 @@
     {
       "Name": "users",
       "Values": [
-        "christian.lechner@sap.com",
-        "john.doe@sap.com"
+        "christian.lechner@sap.com__sap.ids",
+        "christian.lechner@sap.com__terraformeds-platform",
+        "john.doe@sap.com__sap.ids"
       ]
     },
     {
       "Name": "org-roles",
       "Values": [
-        "organization_manager_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac",
+        "organization_manager_77d7a261-0509-46bf-bee5-be097e7dccca",
         "organization_manager_ac6fdb62-db37-4658-966d-fb55909b45aa",
+        "organization_user_77d7a261-0509-46bf-bee5-be097e7dccca",
         "organization_user_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac"
       ]
     },
     {
       "Name": "space-roles",
       "Values": [
-        "dev-project-abc_space-developer_christian.lechner@sap.com_ea325b7e-179e-442f-aec2-5e692dfdb884",
-        "dev-project-abc_space-manager_christian.lechner@sap.com_ea325b7e-179e-442f-aec2-5e692dfdb884"
+        "dev-project-abc_space-auditor_christian.lechner@sap.com_ea325b7e-179e-442f-aec2-5e692dfdb884_77d7a261-0509-46bf-bee5-be097e7dccca",
+        "dev-project-abc_space-developer_christian.lechner@sap.com_ea325b7e-179e-442f-aec2-5e692dfdb884_77d7a261-0509-46bf-bee5-be097e7dccca",
+        "dev-project-abc_space-developer_christian.lechner@sap.com_ea325b7e-179e-442f-aec2-5e692dfdb884_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac",
+        "dev-project-abc_space-manager_christian.lechner@sap.com_ea325b7e-179e-442f-aec2-5e692dfdb884_77d7a261-0509-46bf-bee5-be097e7dccca",
+        "dev-project-abc_space-manager_christian.lechner@sap.com_ea325b7e-179e-442f-aec2-5e692dfdb884_7da73cac-f7b4-4ebc-9ac6-e343ccc7c8ac"
       ]
     }
   ]

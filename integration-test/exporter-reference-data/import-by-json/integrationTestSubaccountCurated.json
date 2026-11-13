@@ -35,15 +35,30 @@
     {
       "Name": "roles",
       "Values": [
-        "custom_xsuaa_auditor_role",
-        "subaccount_admin"
+        "custom_xsuaa_auditor_role"
       ]
     },
     {
       "Name": "role-collections",
       "Values": [
         "subaccount_custom_role_collection",
-        "subaccount_administrator"
+        "subaccount_custom_role_collection_attribute",
+        "subaccount_custom_role_collection_group"
+      ]
+    },
+    {
+      "Name": "role-collection-assignments",
+      "Values": [
+        "Cloud%20Connector%20Administrator|sap.default|user|christian.lechner@sap.com",
+        "Cloud%20Connector%20Administrator|terraformeds-platform|user|christian.lechner@sap.com",
+        "Subaccount%20Custom%20Role%20Collection%20Attribute|terraformeds-platform|attribute|attribute_key|Attribute%20value",
+        "Subaccount%20Custom%20Role%20Collection%20Group|terraformeds-platform|group|TestGroup"
+      ]
+    },
+    {
+      "Name": "service-bindings",
+      "Values": [
+        "dev-inttest-exporter-sb-af"
       ]
     },
     {
