@@ -13,7 +13,7 @@ The following SAP BTP account levels are available for export either as complete
 - Cloud Foundry orgs
 
 !!! info
-    The btptf CLI is fully compatible with [OpenTofu](https://opentofu.org/). All steps outlined in this guide can be executed using either the Terraform CLI or the OpenTofu CLI. For simplicity, this documentation will only reference [Terraform](https://www.terraform.io/).
+    Version 2 uses Terraform list resources and requires Terraform CLI 1.14 or newer. OpenTofu is not supported.
 
 ## Benefits
 
@@ -28,6 +28,7 @@ The btptf CLI automatically converts BTP resources into Terraform code, minimizi
 
 - **Bulk Resource Generation**
 Users can generate Terraform code for multiple resources with one command, specifying which resources to include for tailored exports. Per export command, users need to specify an SAP BTP account level as execution level: directory, subaccount, or Cloud Foundry org.
+Resource discovery, import blocks, and resource configuration are generated through Terraform list-resource queries.
 
 - **Quality Code Practices**
 The btptf CLI ensures clean, maintainable Terraform code generation, adhering to good practices for readability and efficiency.

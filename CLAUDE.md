@@ -71,10 +71,7 @@ The codebase follows a layered architecture:
    - **cfcli/** - Cloud Foundry API client wrapper
 
 3. **pkg/** - Public/reusable packages
-   - **tfimportprovider/** - Factory pattern for generating Terraform import blocks per resource type
-     - Each resource has its own import provider implementation
-     - Factory function `GetImportBlockProvider` routes to the correct implementation
-   - **tfutils/** - Terraform operations (init, plan, import, config generation)
+   - **tfutils/** - Terraform list-resource discovery, query parsing, import/resource generation, initialization, and finalization
    - **tfcleanup/** - Post-processing of generated Terraform code
      - Orchestrator coordinates cleanup across resources
      - Resource processors handle resource-specific transformations
@@ -87,7 +84,7 @@ The codebase follows a layered architecture:
 
 ### Key Architectural Patterns
 
-**Import Provider Factory Pattern**: Each BTP resource type has a dedicated import provider (e.g., `subaccountRoleCollectionImportProvider.go`). The factory function in `tfImportProviderFactory.go` returns the appropriate provider based on resource type.
+**List Resource Catalog**: `pkg/tfutils/tfQuery.go` maps each CLI resource to its Terraform list resource, scope filters, inventory identity, and exclusions. Terraform generates both resource and identity-based import blocks.
 
 **BTP Client Facade Pattern**: The `internal/btpcli/client.go` provides low-level HTTP communication with the BTP API. Facade implementations (e.g., `facade_accounts.go`, `facade_security.go`) provide domain-specific methods on top of the base client.
 
@@ -105,27 +102,21 @@ To add a new resource type at the subaccount level:
 
 3. **Add to allowed resources** in the matching slice in `pkg/tfutils/tfConfig.go` (`AllowedResourcesSubaccount`, `AllowedResourcesDirectory`, or `AllowedResourcesOrganization`)
 
-4. **Create import provider** in `pkg/tfimportprovider/`:
-   - Use `subaccountRoleCollectionImportProvider.go` as a template
-   - Implement `CreateImportBlock` method
+4. **Register the list resource** in `listResourceSpecs` in `pkg/tfutils/tfQuery.go`.
 
-5. **Register in factory** in `GetImportBlockProvider` function in `pkg/tfimportprovider/tfImportProviderFactory.go`
+5. **Add its scope filters and inventory identity** in `queryFilters` and `inventoryValue`.
 
-6. **Add data transformation** in `transformDataToStringArray` function in `pkg/tfutils/tfImport.go` if needed
+6. **Add exclusions** in `filterQueryResults` when platform defaults must not be exported.
 
-7. **Add custom formatting** in `pkg/output/format.go` if the generic formatter is insufficient
-
-8. **Create unit tests** using the pattern from `tfimportprovider/subaccountSubscriptionImportProvider_test.go`
+7. **Create query parser and filtering tests** using machine-readable `terraform query -json` events.
 
 ### Extracting Test Data
 
 To create realistic test data for new resources:
 
-1. Create a Terraform configuration with the BTP provider that uses a data source to read the resource
-2. Run `terraform plan -out plan.out`
-3. Use provided scripts:
-   - `guidelines/scripts/transform_all.sh` - Convert entire plan to JSON string
-   - `guidelines/scripts/transform_json.sh` - Convert filtered JSON to test string
+1. Create a Terraform configuration and `.tfquery.hcl` list block.
+2. Run `terraform query -json -generate-config-out=generated.tf`.
+3. Store sanitized `list_resource_found` events as test fixtures.
 
 ## Important Conventions
 

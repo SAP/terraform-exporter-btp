@@ -7,6 +7,18 @@ The btptf CLI offers two ways to export BTP resources:
 
 Let's look at how both flows work for a simple subaccount export.
 
+## Select an Export Target with terraform.tfvars
+
+Instead of passing the target ID on every command, create `terraform.tfvars` in the directory from which you run `btptf`. Define exactly one target:
+
+```hcl
+subaccount_id   = "<subaccount ID>"
+# directory_id  = "<directory ID>"
+# org_id        = "<Cloud Foundry org ID>"
+```
+
+The CLI uses this value for `create-json`, `export`, and `export-by-json`. For exports, the file is copied to the generated Terraform configuration, and that configuration declares and uses the corresponding variable. A supplied scope flag takes precedence over a value for the same scope in the file; different scopes are rejected.
+
 ## Option 1: Basic Flow to Export a Subaccount via JSON (Recommended)
 
 This is a two-step process where a JSON is created as a resource inventory and used as a basis for the export.
@@ -17,6 +29,8 @@ This is a two-step process where a JSON is created as a resource inventory and u
     btptf create-json -s <subaccount id>
     ```
 Review and adjust the JSON file according to your needs.
+
+Space-role inventory identifiers include the user GUID so users with the same username in different identity-provider origins can be selected independently. If you have an older inventory whose space-role identifiers end with only the space GUID, regenerate it with `btptf create-json` before using `export-by-json`.
 
 2. Export resources from SAP BTP via a JSON file.
 
@@ -34,9 +48,20 @@ btptf export -s <subaccount id>
 
 You find a comprehensive overview of the commands and their options and flags in the [documentation](btptf.md).
 
+## Export Only Imports and Provider Configuration
+
+Add `--imports-only` to either export command to omit resource and module configuration and `NextSteps.md`. Import blocks, provider/backend configuration, and supporting `variables.tf` and `terraform.tfvars` are retained.
+
+```bash
+btptf export -s <subaccount id> --imports-only
+btptf export-by-json -s <subaccount id> --path resources.json --imports-only
+```
+
+Supply matching resource or module configuration before running Terraform plan/apply. When entitlement module generation is enabled, imports retain their module targets.
+
 ## How to Work With the Exported Configuration Files
 
-Independent of the flow you have chosen, the export created Terraform configuration files and import blocks for you. You'll need these files to run '*terraform apply*' and import the state.
+Without `--imports-only`, either export flow creates Terraform resource configuration files and import blocks for you. You'll need these files to run '*terraform apply*' and import the state.
 
 At export, the generated code was refined by the btptf CLI as outlined in the [documentation](https://sap.github.io/terraform-exporter-btp/tfcodeimprovements/).
 

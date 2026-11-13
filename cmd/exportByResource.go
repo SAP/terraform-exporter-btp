@@ -5,7 +5,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/SAP/terraform-exporter-btp/internal/cfcli"
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	"github.com/SAP/terraform-exporter-btp/pkg/resume"
 	tfcleantypes "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
@@ -24,7 +23,13 @@ var exportByResourceCmd = &cobra.Command{
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		directory, _ := cmd.Flags().GetString("directory")
 		organization, _ := cmd.Flags().GetString("org")
+		target, err := tfutils.ResolveExecutionTarget(subaccount, directory, organization)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		subaccount, directory, organization = target.SubaccountID, target.DirectoryID, target.OrgID
 		configDir, _ := cmd.Flags().GetString("config-dir")
+		importsOnly, _ := cmd.Flags().GetBool("imports-only")
 		resources, _ := cmd.Flags().GetString("resources")
 
 		backendPath, _ := cmd.Flags().GetString("backend-path")
@@ -53,6 +58,9 @@ var exportByResourceCmd = &cobra.Command{
 
 		output.PrintExportStartMessage()
 		tfutils.SetupConfigDir(configDir, true, level)
+		if err := tfutils.WriteExecutionTargetTFVars(configDir, target); err != nil {
+			log.Fatalf("error writing %s: %v", "terraform.tfvars", err)
+		}
 
 		resourcesList := tfutils.GetResourcesList(resources, level)
 
@@ -65,28 +73,9 @@ var exportByResourceCmd = &cobra.Command{
 		}
 
 		for _, resourceToImport := range resourcesList {
-			if resourceToImport == tfutils.CmdCfSpaceRoleParameter {
-				var finalCount int
-				var resourceType string
-				spaces, err := cfcli.GetSpaceList(organization)
-				if err != nil {
-					tfutils.CleanupProviderConfig()
-					log.Fatalln(fmt.Errorf("unable to get space list for space role. err = %s", err))
-				}
-				for _, spaceID := range spaces {
-					space := spaceID
-					var count int
-					resourceType, count = generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName)
-					finalCount = finalCount + count
-				}
-				resultStore[resourceType] = finalCount
-				_ = resume.WriteExportLog(configDir, resourceToImport, resourceType, finalCount)
-
-			} else {
-				resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName)
-				resultStore[resourceType] = count
-				_ = resume.WriteExportLog(configDir, resourceToImport, resourceType, count)
-			}
+			resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName, importsOnly)
+			resultStore[resourceType] = count
+			_ = resume.WriteExportLog(configDir, resourceToImport, resourceType, count)
 		}
 
 		levelIds := tfcleantypes.LevelIds{
@@ -95,9 +84,11 @@ var exportByResourceCmd = &cobra.Command{
 			CfOrgId:      organization,
 		}
 
-		tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig)
-		tfutils.FinalizeTfConfig(configDir)
-		generateNextStepsDocument(configDir, subaccount, directory, organization, space)
+		tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig, importsOnly)
+		tfutils.FinalizeTfConfig(configDir, target, importsOnly)
+		if !importsOnly {
+			generateNextStepsDocument(configDir, subaccount, directory, organization, space)
+		}
 		tfutils.CleanupProviderConfig()
 		_ = resume.RemoveExportLog(configDir)
 		resultStoreNew := resume.MergeSummaryTable(resultStore, fullExportLog)
@@ -132,9 +123,9 @@ func init() {
 	exportByResourceCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	exportByResourceCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
 	exportByResourceCmd.Flags().StringVarP(&organization, "org", "o", "", "ID of the Cloud Foundry org")
-	exportByResourceCmd.MarkFlagsOneRequired("subaccount", "directory", "org")
 	exportByResourceCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "org")
 
+	exportByResourceCmd.Flags().Bool("imports-only", false, "Keep imports and provider configuration without resource configuration or NextSteps.md")
 	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
 
@@ -196,7 +187,7 @@ func getExportByResourceCmdDescription(c *cobra.Command) string {
 
 func getExportCmdDescriptionNote(c *cobra.Command) string {
 	point1 := formatHelpNote("We recommend to run this command only if you’re familiar with the Terraform resources in your SAP BTP accounts. For a safer approach, use 'btptf export-by-json'.")
-	point2 := formatHelpNote("You must specify one of --subaccount, --directory, or --org.")
+	point2 := formatHelpNote("Specify one of --subaccount, --directory, or --org, or define exactly one of subaccount_id, directory_id, or org_id in terraform.tfvars in the current directory.")
 	point3 := formatHelpNote("If you already have a remote state backend for SAP BTP resources which you want to use, specify the remote backend by providing the `--backend-path` or `--backend-type` and `--backend-config`.")
 
 	content := fmt.Sprintf("%s\n%s\n%s", point1, point2, point3)
@@ -207,6 +198,11 @@ func getExportCmdDescriptionNote(c *cobra.Command) string {
 func getExportByResourceCmdExamples(c *cobra.Command) string {
 
 	return generateCmdHelpCustomExamplesBlock(map[string]string{
+		"Export only imports and provider configuration": fmt.Sprintf("%s %s %s",
+			output.ColorStringCyan("btptf export --subaccount"),
+			output.ColorStringYellow("<subaccount ID>"),
+			output.ColorStringCyan("--imports-only"),
+		),
 		"Export a directory that manages entitlements, but no users": fmt.Sprintf("%s %s %s %s",
 			output.ColorStringCyan("btptf export --directory"),
 			output.ColorStringYellow("<directory ID>"),
@@ -267,7 +263,7 @@ func getExportByResourceCmdExamples(c *cobra.Command) string {
 			output.ColorStringCyan("btptf export --org"),
 			output.ColorStringYellow("<CF org ID>"),
 			output.ColorStringCyan("--resources"),
-			output.ColorStringYellow("'users_cf'"),
+			output.ColorStringYellow("'users'"),
 		),
 	})
 }

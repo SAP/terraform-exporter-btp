@@ -5,9 +5,50 @@ import (
 
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/testutils"
+	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestCollectEntitlementImportsWithoutResourceRefinements(t *testing.T) {
+	source := []byte(`resource "btp_subaccount_entitlement" "export_0" {
+  service_name = "service"
+  plan_name = "plan"
+  amount = 2
+  plan_unique_identifier = null
+}
+resource "btp_subaccount_subscription" "export_0" {
+  app_name = "app"
+}
+`)
+	file, diagnostics := hclwrite.ParseConfig(source, "resources.tf", hcl.InitialPos)
+	require.False(t, diagnostics.HasErrors(), diagnostics.Error())
+	original := string(file.Bytes())
+	dependencies := generictools.NewDependencyAddresses()
+	CollectEntitlementImports(file, &dependencies)
+	assert.Equal(t, original, string(file.Bytes()), "resource configuration must not be refined")
+	require.Len(t, dependencies.EntitlementAddress, 1)
+	require.Len(t, dependencies.BlocksToRemove, 1)
+	assert.Equal(t, "btp_subaccount_entitlement.export_0", dependencies.BlocksToRemove[0].ResourceAddress)
+
+	imports, diagnostics := hclwrite.ParseConfig([]byte(`import {
+  to = btp_subaccount_entitlement.export_0
+  identity = { subaccount_id = "account-id", service_name = "service", plan_name = "plan" }
+}
+`), "imports.tf", hcl.InitialPos)
+	require.False(t, diagnostics.HasErrors(), diagnostics.Error())
+	counts := map[string]int{subaccountEntitlementBlockIdentifier: 1}
+	for _, block := range dependencies.BlocksToRemove {
+		generictools.RemoveImportBlock(imports.Body(), block.ResourceAddress, &counts)
+	}
+	appendEntitlementModuleImports(imports.Body(), dependencies.EntitlementAddress, generictools.LevelIds{SubaccountId: "account-id"})
+	require.Len(t, imports.Body().Blocks(), 1)
+	assert.Equal(t, "import", imports.Body().Blocks()[0].Type())
+	assert.Contains(t, string(imports.Bytes()), `module.btp_subaccount_entitlement.btp_subaccount_entitlement.entitlement["service-plan"]`)
+	assert.Contains(t, string(imports.Bytes()), `"account-id,service,plan"`)
+	assert.Equal(t, 1, counts[subaccountEntitlementBlockIdentifier])
+}
 
 func TestFillSubaccountEntitlementDependencyAddresses(t *testing.T) {
 

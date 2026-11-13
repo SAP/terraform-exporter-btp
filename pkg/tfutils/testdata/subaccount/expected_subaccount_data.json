@@ -1,6 +1,0 @@
-{
-    "Description": "Gets details about a subaccount.\n\n__Tip:__\nYou must be assigned to the admin or viewer role of the global account, directory, or subaccount.\n\n## Example Usage\n\n```terraform\n# Read a subaccount by ID\ndata \"btp_subaccount\" \"my_account_byid\" {\n  id = \"6aa64c2f-38c1-49a9-b2e8-cf9fea769b7f\"\n}\n\n# Read a subaccount by region and subdomain\ndata \"btp_subaccount\" \"my_account_bysubdomain\" {\n  region    = \"eu10\"\n  subdomain = \"my-subaccount-subdomain\"\n}\n```",
-    "Arguments": {},
-    "Attributes": {},
-    "Import": "data \"btp_subaccount\" \"all\"{\n  id = \"The ID of the subaccount\" \n}\n"
-}

@@ -11,6 +11,7 @@
       "Values": [
         "alert-notification_standard",
         "auditlog-management_default",
+        "cloudfoundry_standard",
         "content-agent-ui_free"
       ]
     },
@@ -41,7 +42,29 @@
     {
       "Name": "role-collections",
       "Values": [
-        "subaccount_custom_role_collection"
+        "subaccount_custom_role_collection",
+        "subaccount_custom_role_collection_attribute",
+        "subaccount_custom_role_collection_group"
+      ]
+    },
+    {
+      "Name": "role-collection-assignments",
+      "Values": [
+        "Cloud%20Connector%20Administrator|sap.default|user|christian.lechner@sap.com",
+        "Cloud%20Connector%20Administrator|terraformeds-platform|user|christian.lechner@sap.com",
+        "Connectivity%20and%20Destination%20Administrator|sap.default|user|christian.lechner@sap.com",
+        "Connectivity%20and%20Destination%20Administrator|terraformeds-platform|user|christian.lechner@sap.com",
+        "Destination%20Administrator|sap.default|user|christian.lechner@sap.com",
+        "Destination%20Administrator|terraformeds-platform|user|christian.lechner@sap.com",
+        "Destination%20Fragment%20Administrator|terraformeds-platform|user|christian.lechner@sap.com",
+        "Subaccount%20Administrator|sap.default|user|anugrah.gupta@sap.com",
+        "Subaccount%20Administrator|sap.default|user|christian.lechner@sap.com",
+        "Subaccount%20Administrator|sap.default|user|vipin.vijaykumar@sap.com",
+        "Subaccount%20Administrator|terraformeds-platform|user|christian.lechner@sap.com",
+        "Subaccount%20Custom%20Role%20Collection%20Attribute|terraformeds-platform|attribute|attribute_key|Attribute%20value",
+        "Subaccount%20Custom%20Role%20Collection%20Group|terraformeds-platform|group|TestGroup",
+        "Subaccount%20Service%20Administrator|sap.default|user|christian.lechner@sap.com",
+        "Subaccount%20Service%20Administrator|terraformeds-platform|user|christian.lechner@sap.com"
       ]
     },
     {

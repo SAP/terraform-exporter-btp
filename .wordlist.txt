@@ -30,6 +30,7 @@ GLOBALACCOUNT
 Golang
 GOLANG
 GOPATH
+GUID
 html
 https
 HCL
@@ -79,6 +80,7 @@ terraform
 Terraform's
 Terramate
 tf
+tfvars
 TLS
 toolchain
 UIs

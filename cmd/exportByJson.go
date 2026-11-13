@@ -21,7 +21,13 @@ var exportByJsonCmd = &cobra.Command{
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		directory, _ := cmd.Flags().GetString("directory")
 		organization, _ := cmd.Flags().GetString("org")
+		target, err := tfutils.ResolveExecutionTarget(subaccount, directory, organization)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		subaccount, directory, organization = target.SubaccountID, target.DirectoryID, target.OrgID
 		configDir, _ := cmd.Flags().GetString("config-dir")
+		importsOnly, _ := cmd.Flags().GetBool("imports-only")
 		path, _ := cmd.Flags().GetString("path")
 
 		backendPath, _ := cmd.Flags().GetString("backend-path")
@@ -49,7 +55,7 @@ var exportByJsonCmd = &cobra.Command{
 		}
 
 		output.PrintExportStartMessage()
-		exportByJson(subaccount, directory, organization, path, tfConfigFileName, configDir, backendConfig)
+		exportByJson(subaccount, directory, organization, path, tfConfigFileName, configDir, backendConfig, target, importsOnly)
 		output.PrintExportSuccessMessage(configDir)
 	},
 }
@@ -80,9 +86,9 @@ func init() {
 	exportByJsonCmd.Flags().StringVarP(&subaccount, "subaccount", "s", "", "ID of the subaccount")
 	exportByJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
 	exportByJsonCmd.Flags().StringVarP(&organization, "org", "o", "", "ID of the Cloud Foundry org")
-	exportByJsonCmd.MarkFlagsOneRequired("subaccount", "directory", "org")
 	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "org")
 
+	exportByJsonCmd.Flags().Bool("imports-only", false, "Keep imports and provider configuration without resource configuration or NextSteps.md")
 	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")
 
@@ -105,7 +111,7 @@ func getExportByJsonCmdDescription(c *cobra.Command) string {
 }
 
 func getExportByJsonCmdDescriptionNote(c *cobra.Command) string {
-	point1 := formatHelpNote("You must specify one of --subaccount, --directory, or --org.")
+	point1 := formatHelpNote("Specify one of --subaccount, --directory, or --org, or define exactly one of subaccount_id, directory_id, or org_id in terraform.tfvars in the current directory.")
 	point2 := formatHelpNote("If you already have a remote state backend for SAP BTP resources which you want to use, specify the remote backend by providing the `--backend-path` or `--backend-type` and `--backend-config`.")
 
 	content := fmt.Sprintf("%s\n%s", point1, point2)
@@ -119,6 +125,11 @@ func getExportByJsonCmdExamples(c *cobra.Command) string {
 	filePathDirectory := filepath.Join("BTP", "resources", "my-btp-directory.json")
 
 	return generateCmdHelpCustomExamplesBlock(map[string]string{
+		"Export only imports and provider configuration": fmt.Sprintf("%s %s %s",
+			output.ColorStringCyan("btptf export-by-json --subaccount"),
+			output.ColorStringYellow("<subaccount ID>"),
+			output.ColorStringCyan("--imports-only"),
+		),
 		"Export the resources of a directory that are listed in a JSON with a custom file name and in a custom directory": fmt.Sprintf("%s %s %s %s",
 			output.ColorStringCyan("btptf export-by-json --directory"),
 			output.ColorStringYellow("<directory ID>"),

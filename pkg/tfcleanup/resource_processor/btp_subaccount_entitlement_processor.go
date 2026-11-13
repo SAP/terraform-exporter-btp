@@ -21,6 +21,19 @@ const genericEntitlementModuleAddress = "module." + moduleName
 const entitlementModuleName = "aydin-ozcan/sap-btp-entitlements/btp"
 const entitlementModuleVersion = "1.0.1"
 
+// CollectEntitlementImports retains the entitlement module's import mapping
+// without generating its configuration or refining resource attributes.
+// The caller decides whether the entitlement module feature is enabled.
+func CollectEntitlementImports(file *hclwrite.File, dependencies *generictools.DependencyAddresses) {
+	for _, block := range file.Body().Blocks() {
+		labels := block.Labels()
+		if block.Type() == "resource" && len(labels) == 2 && labels[0] == subaccountEntitlementBlockIdentifier {
+			fillSubaccountEntitlementDependencyAddresses(block.Body(), labels[0]+"."+labels[1], dependencies)
+		}
+	}
+	recordEntitlementImportsToRemove(dependencies)
+}
+
 func fillSubaccountEntitlementDependencyAddresses(body *hclwrite.Body, resourceAddress string, dependencyAddresses *generictools.DependencyAddresses) {
 	planNameAttr := body.GetAttribute(entitlementPlanNameIdentifier)
 	serviceNameAttr := body.GetAttribute(entitlementServiceNameIdentifier)
@@ -186,6 +199,10 @@ func appendEntitlementBlocksToRemove(dependencyAddresses *generictools.Dependenc
 		return
 	}
 
+	recordEntitlementImportsToRemove(dependencyAddresses)
+}
+
+func recordEntitlementImportsToRemove(dependencyAddresses *generictools.DependencyAddresses) {
 	const blockIdentifier = "btp_subaccount_entitlement"
 	for _, entitlementDependencyInfo := range dependencyAddresses.EntitlementAddress {
 		entitlementImportToRemove := generictools.BlockSpecifier{
@@ -209,6 +226,11 @@ func AppendImportBlocksForEntitlementModule(directory string, entitlementsToAdd 
 	f := generictools.GetHclFile(filePath)
 	body := f.Body()
 
+	appendEntitlementModuleImports(body, entitlementsToAdd, levelIds)
+	generictools.ProcessChanges(f, filePath)
+}
+
+func appendEntitlementModuleImports(body *hclwrite.Body, entitlementsToAdd map[generictools.EntitlementKey]generictools.EntitlementInfo, levelIds generictools.LevelIds) {
 	for key := range entitlementsToAdd {
 
 		importToKey := tfutils.EscapeHclString(key.ServiceName) + "-" + tfutils.EscapeHclString(key.PlanName)
@@ -238,7 +260,6 @@ func AppendImportBlocksForEntitlementModule(directory string, entitlementsToAdd 
 			},
 		})
 	}
-	generictools.ProcessChanges(f, filePath)
 }
 
 func removeEntitlementConfigBlock(body *hclwrite.Body, entitlementAddress map[generictools.EntitlementKey]generictools.EntitlementInfo) {

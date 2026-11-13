@@ -20,6 +20,11 @@ var createJsonCmd = &cobra.Command{
 		subaccount, _ := cmd.Flags().GetString("subaccount")
 		directory, _ := cmd.Flags().GetString("directory")
 		organization, _ := cmd.Flags().GetString("org")
+		target, err := tfutils.ResolveExecutionTarget(subaccount, directory, organization)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		subaccount, directory, organization = target.SubaccountID, target.DirectoryID, target.OrgID
 		path, _ := cmd.Flags().GetString("path")
 		resources, _ := cmd.Flags().GetString("resources")
 		space := ""
@@ -67,7 +72,6 @@ func init() {
 	createJsonCmd.Flags().StringVarP(&directory, "directory", "d", "", "ID of the directory")
 	createJsonCmd.Flags().StringVarP(&organization, "org", "o", "", "ID of the Cloud Foundry org")
 
-	createJsonCmd.MarkFlagsOneRequired("subaccount", "directory", "org")
 	createJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "org")
 	createJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Path to JSON file with list of resources")
 	createJsonCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
@@ -126,7 +130,7 @@ Depending on the account level you specify, the JSON file will include the follo
 }
 
 func getCreateJsonUsageNote(c *cobra.Command) string {
-	return getSectionWithHeader("Note", "You must specify one of --subaccount, --directory, or --org.")
+	return getSectionWithHeader("Note", "Specify one of --subaccount, --directory, or --org, or define exactly one of subaccount_id, directory_id, or org_id in terraform.tfvars in the current directory.")
 }
 
 func getCreateJsonCmdExamples(c *cobra.Command) string {
@@ -160,7 +164,7 @@ func getCreateJsonCmdExamples(c *cobra.Command) string {
 		),
 		"Create a JSON file for the users of a Cloud Foundry org": fmt.Sprintf("%s%s %s %s",
 			output.ColorStringCyan("btptf create-json --resources="),
-			output.ColorStringYellow("'users_cf'"),
+			output.ColorStringYellow("'users'"),
 			output.ColorStringCyan("--org"),
 			output.ColorStringYellow("<CF org ID>"),
 		),
