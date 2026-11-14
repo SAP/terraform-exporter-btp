@@ -4,7 +4,7 @@ go 1.27
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
-	github.com/cloudfoundry/go-cfclient/v3 v3.0.0-beta.1
+	github.com/cloudfoundry/go-cfclient/v3 v3.0.0-beta.2
 	github.com/fatih/color v1.19.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-uuid v1.0.4
@@ -49,7 +49,7 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/mod v0.41.0 // indirect
-	golang.org/x/oauth2 v0.37.0 // indirect
+	golang.org/x/oauth2 v0.38.0 // indirect
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/term v0.46.0 // indirect
