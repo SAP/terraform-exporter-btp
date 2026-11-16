@@ -245,7 +245,7 @@ jobs:
           terraform -chdir=directory-export-by-json init
           terraform -chdir=directory-export-by-json apply -auto-approve
           echo "Preparing state file for Directory in JSON format"
-          terraform -chdir=directory-export-by-json show -json > directory-export-by-json-state.json
+          terraform -chdir=directory-export-by-json state pull > directory-export-by-json-state.json
           printf '%s' "$DIRECTORY_EXPORT_BY_JSON_REF" | base64 -d > directory-export-by-json-state-reference.json
           echo "====================================="
           echo "List imported state"
@@ -330,7 +330,7 @@ jobs:
           terraform -chdir=subaccount-export-by-json init
           terraform -chdir=subaccount-export-by-json apply -auto-approve
           echo "Preparing state file for Subaccount in JSON format"
-          terraform -chdir=subaccount-export-by-json show -json > subaccount-export-by-json-state.json
+          terraform -chdir=subaccount-export-by-json state pull > subaccount-export-by-json-state.json
           printf '%s' "$SUBACCOUNT_EXPORT_BY_JSON_REF" | base64 -d > subaccount-export-by-json-state-reference.json
           echo "====================================="
           echo "List imported state"
@@ -414,7 +414,7 @@ jobs:
           terraform -chdir=cforg-export-by-json init
           terraform -chdir=cforg-export-by-json apply -auto-approve
           echo "Preparing state file for CF Organization in JSON format"
-          terraform -chdir=cforg-export-by-json show -json > cforg-export-by-json-state.json
+          terraform -chdir=cforg-export-by-json state pull > cforg-export-by-json-state.json
           printf '%s' "$CFORG_EXPORT_BY_JSON_REF" | base64 -d > cforg-export-by-json-state-reference.json
           echo "====================================="
           echo "List imported state"
@@ -498,7 +498,7 @@ jobs:
           terraform -chdir=directory-export-by-resource init
           terraform -chdir=directory-export-by-resource apply -auto-approve
           echo "Preparing state file for Directory in JSON format"
-          terraform -chdir=directory-export-by-resource show -json > directory-export-by-resource-state.json
+          terraform -chdir=directory-export-by-resource state pull > directory-export-by-resource-state.json
           printf '%s' "$DIRECTORY_EXPORT_BY_RESOURCE_REF" | base64 -d > directory-export-by-resource-state-reference.json
           echo "====================================="
           echo "List imported state"
@@ -583,7 +583,7 @@ jobs:
           terraform -chdir=subaccount-export-by-resource init
           terraform -chdir=subaccount-export-by-resource apply -auto-approve
           echo "Preparing state file for Subaccount in JSON format"
-          terraform -chdir=subaccount-export-by-resource show -json > subaccount-export-by-resource-state.json
+          terraform -chdir=subaccount-export-by-resource state pull > subaccount-export-by-resource-state.json
           printf '%s' "$SUBACCOUNT_EXPORT_BY_RESOURCE_REF" | base64 -d > subaccount-export-by-resource-state-reference.json
           echo "====================================="
           echo "List imported state"
@@ -667,7 +667,7 @@ jobs:
           terraform -chdir=cforg-export-by-resource init
           terraform -chdir=cforg-export-by-resource apply -auto-approve
           echo "Preparing state file for CF Organization in JSON format"
-          terraform -chdir=cforg-export-by-resource show -json > cforg-export-by-resource-state.json
+          terraform -chdir=cforg-export-by-resource state pull > cforg-export-by-resource-state.json
           printf '%s' "$CFORG_EXPORT_BY_RESOURCE_REF" | base64 -d > cforg-export-by-resource-state-reference.json
           echo "====================================="
           echo "List imported state"

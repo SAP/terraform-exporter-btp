@@ -1,9 +1,9 @@
 {
   "name": "scripts",
   "version": "1.0.0",
-  "main": "compareJSON.js",
+  "main": "compareJson.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test"
   },
   "author": "BTPTF Exporter Team",
   "license": "Apache-2.0",
