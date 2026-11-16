@@ -165,6 +165,7 @@ jobs:
           CF_USER: ${{ secrets.BTP_USERNAME }}
           CF_PASSWORD: ${{ secrets.BTP_PASSWORD }}
           CF_API_URL: ${{ secrets.CF_API_URL }}
+          CF_ORIGIN: ${{ secrets.CF_ORIGIN }}
           CF_ORGANIZATION: ${{ secrets.CF_ORGANIZATION }}
         run: |
           trap 'exit_code=$?; if [ $exit_code -ne 0 ]; then echo "result=failure" >> "$GITHUB_OUTPUT"; fi' EXIT
@@ -400,6 +401,7 @@ jobs:
           CF_USER: ${{ secrets.BTP_USERNAME }}
           CF_PASSWORD: ${{ secrets.BTP_PASSWORD }}
           CF_API_URL: ${{ secrets.CF_API_URL }}
+          CF_ORIGIN: ${{ secrets.CF_ORIGIN }}
           CFORG_EXPORT_BY_JSON_REF: ${{ secrets.CFORG_EXPORT_BY_JSON_REF }}
           CF_ORGANIZATION: ${{ secrets.CF_ORGANIZATION }}
         run: |
@@ -653,6 +655,7 @@ jobs:
           CF_USER: ${{ secrets.BTP_USERNAME }}
           CF_PASSWORD: ${{ secrets.BTP_PASSWORD }}
           CF_API_URL: ${{ secrets.CF_API_URL }}
+          CF_ORIGIN: ${{ secrets.CF_ORIGIN }}
           CFORG_EXPORT_BY_RESOURCE_REF: ${{ secrets.CFORG_EXPORT_BY_RESOURCE_REF }}
           CF_ORGANIZATION: ${{ secrets.CF_ORGANIZATION }}
         run: |

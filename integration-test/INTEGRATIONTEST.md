@@ -37,6 +37,8 @@ terramate script run --tags dev -X --reverse teardown
 
 The integration test for the exporter is based on the reference setup described in the previous section
 
+Configure the `CF_ORIGIN` secret in the GitHub `release` environment to select the Cloud Foundry identity provider. All three CF flows (JSON inventory, export by JSON, and export by resource) expose it as the `CF_ORIGIN` environment variable, following the same pattern as `BTP_IDP` for BTP. For local runs and reference generation, export `CF_ORIGIN` alongside the other CF credentials.
+
 The test comprises the different flows and compares the results with a reference file:
 
 - JSON inventory: reference file for the resulting JSON
