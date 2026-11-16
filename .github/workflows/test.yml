@@ -22,6 +22,22 @@ permissions:
   contents: read
 
 jobs:
+  state-comparison:
+    name: State Comparison Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: .github/scripts/package-lock.json
+      - run: npm ci --omit=dev
+        working-directory: .github/scripts
+      - run: npm test
+        working-directory: .github/scripts
+
   # Ensure project builds before running tests
   build:
     name: Build
