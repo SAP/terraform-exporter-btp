@@ -73,16 +73,13 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y mono-complete
-          awk '/-----BEGIN CERTIFICATE-----/{n++; f="/tmp/ca-cert-"n".pem"} f{print > f} /-----END CERTIFICATE-----/{close(f); f=""}' /etc/ssl/certs/ca-certificates.crt
-          find /tmp -name 'ca-cert-*.pem' -exec certmgr -add -c Trust {} \; 2>/dev/null || true
-          echo "Imported $(find /tmp -name 'ca-cert-*.pem' | wc -l) certs into Mono trust store"
 
       - name: Install Chocolatey
         run: |
           mkdir -p /opt/chocolatey
           wget -q -O - "https://github.com/chocolatey/choco/releases/download/${CHOCOLATEY_VERSION}/chocolatey.v${CHOCOLATEY_VERSION}.tar.gz" | tar -xz -C "/opt/chocolatey"
           echo '#!/bin/bash' >> /usr/local/bin/choco
-          echo 'mono /opt/chocolatey/choco.exe $@' >> /usr/local/bin/choco
+          echo 'MONO_TLS_PROVIDER=legacy mono /opt/chocolatey/choco.exe $@' >> /usr/local/bin/choco
           chmod +x /usr/local/bin/choco
         env:
           CHOCOLATEY_VERSION: 2.4.3
@@ -141,6 +138,8 @@ jobs:
           class T { static void Main() { try { new WebClient().DownloadString("https://push.chocolatey.org/"); Console.WriteLine("Mono SSL: OK"); } catch(Exception e) { Console.WriteLine("Mono SSL Error: " + e.Message); }}}
           EOF
           mcs /tmp/test_ssl.cs -out:/tmp/test_ssl.exe 2>/dev/null && mono /tmp/test_ssl.exe || echo "Could not run Mono SSL test"
+          echo "--- Testing Mono SSL with legacy provider ---"
+          mcs /tmp/test_ssl.cs -out:/tmp/test_ssl.exe 2>/dev/null && MONO_TLS_PROVIDER=legacy mono /tmp/test_ssl.exe || echo "Could not run Mono SSL legacy test"
 
       - name: Push to Chocolatey
         if: ${{ false && steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
