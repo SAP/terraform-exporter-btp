@@ -72,7 +72,8 @@ jobs:
       - name: Install Mono & dependencies
         run: |
           sudo apt update
-          sudo apt install -y mono-complete
+          sudo apt install -y mono-complete ca-certificates-mono
+          sudo cert-sync /etc/ssl/certs/ca-certificates.crt
 
       - name: Install Chocolatey
         run: |
@@ -127,8 +128,16 @@ jobs:
           name: sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg
           path: sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg
 
-      - name: Push to Chocolatey
+      - name: Test SSL connection to Chocolatey
         if: ${{ steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
+        run: |
+          echo "--- Testing SSL from OS (curl) ---"
+          curl -v https://push.chocolatey.org/ 2>&1 | grep -E "SSL|TLS|Connected|certificate|error|Error"
+          echo "--- Testing SSL from Mono ---"
+          mono /opt/chocolatey/choco.exe list --source https://push.chocolatey.org/ 2>&1 | head -20 || true
+
+      - name: Push to Chocolatey
+        if: ${{ false && steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
         run: |
           choco apikey --key "$CHOCOLATEY_API_KEY" --source https://push.chocolatey.org/
           choco push sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg --source https://push.chocolatey.org/
