@@ -73,7 +73,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y mono-complete
-          sudo cert-sync /etc/ssl/certs/ca-certificates.crt
 
       - name: Install Chocolatey
         run: |
