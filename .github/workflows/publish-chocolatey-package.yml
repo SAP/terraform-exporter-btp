@@ -72,7 +72,7 @@ jobs:
       - name: Install Mono & dependencies
         run: |
           sudo apt update
-          sudo apt install -y mono-complete ca-certificates-mono
+          sudo apt install -y mono-complete
           sudo cert-sync /etc/ssl/certs/ca-certificates.crt
 
       - name: Install Chocolatey
