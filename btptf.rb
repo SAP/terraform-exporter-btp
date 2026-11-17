@@ -5,23 +5,23 @@
 class Btptf < Formula
   desc "Command-line tool for Exporting SAP BTP Resources to Terraform"
   homepage "https://sap.github.io/terraform-exporter-btp/"
-  version "1.6.0"
+  version "2.0.0"
 
   if OS.mac?
     if Hardware::CPU.arm?
-      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.6.0/btptf_1.6.0_darwin_arm64"
-      sha256 "74b54d17af61ce45e3ddd3ac3ab5d63e87c6b57fec4de4ae735d251563b841cd"
+      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v2.0.0/btptf_2.0.0_darwin_arm64"
+      sha256 "c7069b879bf9907fb3daccefdc9f90188c0b9f25712ac2a77c69e0b5f66677c7"
     else
-      url url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.6.0/btptf_1.6.0_darwin_amd64"
-      sha256 "d927ddb618764d8a2207502666e813954e14b104ecb44c2b77dea57647d61bad"
+      url url "https://github.com/SAP/terraform-exporter-btp/releases/download/v2.0.0/btptf_2.0.0_darwin_amd64"
+      sha256 "c48d4eb1b9e316d86a5d1098685e813f170503dd0d97bea383906d0591a39f4a"
     end
   elsif OS.linux?
     if Hardware::CPU.arm?
-      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.6.0/btptf_1.6.0_linux_arm64"
-      sha256 "0a30d9f4358b5a0bf3e0f88af1a71068d0b77ed3faec50ea2e189c82daaba1b3"
+      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v2.0.0/btptf_2.0.0_linux_arm64"
+      sha256 "03f25b90463d168553ec642006172faea1ad3e24a7455f784e723831d416a7b9"
     else
-      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v1.6.0/btptf_1.6.0_linux_amd64"
-      sha256 "07a5a79bf2638bfe8ecc01bd17e2685dd5d018090691bf4ac6a3c3d0123fc648"
+      url "https://github.com/SAP/terraform-exporter-btp/releases/download/v2.0.0/btptf_2.0.0_linux_amd64"
+      sha256 "230fd523046cf088ecf417664a913836df6038a6da3611c67361ba86649ef68a"
       depends_on arch: :x86_64
     end
   end
@@ -33,7 +33,7 @@ class Btptf < Formula
   def caveats
     <<~EOS
       [HINT]
-      Please ensure you have Terraform 1.14 or newer installed.
+      Please ensure you have Terraform or OpenTofu installed.
       Run:
          btptf --help for more information.
     EOS
