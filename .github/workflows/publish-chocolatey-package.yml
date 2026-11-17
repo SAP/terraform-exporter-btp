@@ -73,6 +73,9 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y mono-complete
+          awk '/-----BEGIN CERTIFICATE-----/{n++; f="/tmp/ca-cert-"n".pem"} f{print > f} /-----END CERTIFICATE-----/{close(f); f=""}' /etc/ssl/certs/ca-certificates.crt
+          find /tmp -name 'ca-cert-*.pem' -exec certmgr -add -c Trust {} \; 2>/dev/null || true
+          echo "Imported $(find /tmp -name 'ca-cert-*.pem' | wc -l) certs into Mono trust store"
 
       - name: Install Chocolatey
         run: |
@@ -133,7 +136,11 @@ jobs:
           echo "--- Testing SSL from OS (curl) ---"
           curl -v https://push.chocolatey.org/ 2>&1 | grep -E "SSL|TLS|Connected|certificate|error|Error"
           echo "--- Testing SSL from Mono ---"
-          mono /opt/chocolatey/choco.exe list --source https://push.chocolatey.org/ 2>&1 | head -20 || true
+          cat > /tmp/test_ssl.cs << 'EOF'
+          using System; using System.Net;
+          class T { static void Main() { try { new WebClient().DownloadString("https://push.chocolatey.org/"); Console.WriteLine("Mono SSL: OK"); } catch(Exception e) { Console.WriteLine("Mono SSL Error: " + e.Message); }}}
+          EOF
+          mcs /tmp/test_ssl.cs -out:/tmp/test_ssl.exe 2>/dev/null && mono /tmp/test_ssl.exe || echo "Could not run Mono SSL test"
 
       - name: Push to Chocolatey
         if: ${{ false && steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
