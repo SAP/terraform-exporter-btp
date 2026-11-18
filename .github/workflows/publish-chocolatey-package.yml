@@ -79,7 +79,7 @@ jobs:
           mkdir -p /opt/chocolatey
           wget -q -O - "https://github.com/chocolatey/choco/releases/download/${CHOCOLATEY_VERSION}/chocolatey.v${CHOCOLATEY_VERSION}.tar.gz" | tar -xz -C "/opt/chocolatey"
           echo '#!/bin/bash' >> /usr/local/bin/choco
-          echo 'MONO_TLS_PROVIDER=legacy mono /opt/chocolatey/choco.exe $@' >> /usr/local/bin/choco
+          echo 'mono /opt/chocolatey/choco.exe $@' >> /usr/local/bin/choco
           chmod +x /usr/local/bin/choco
         env:
           CHOCOLATEY_VERSION: 2.4.3
@@ -144,5 +144,6 @@ jobs:
       - name: Push to Chocolatey
         if: ${{ false && steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
         run: |
-          choco apikey --key "$CHOCOLATEY_API_KEY" --source https://push.chocolatey.org/
-          choco push sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg --source https://push.chocolatey.org/
+          dotnet nuget push sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg \
+            --source https://push.chocolatey.org/ \
+            --api-key "$CHOCOLATEY_API_KEY"
