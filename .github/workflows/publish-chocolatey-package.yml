@@ -127,15 +127,6 @@ jobs:
           name: sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg
           path: sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg
 
-      - name: Test SSL connection to Chocolatey
-        if: ${{ steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
-        run: |
-          echo "--- Testing SSL from OS (curl) ---"
-          curl -v https://push.chocolatey.org/ 2>&1 | grep -E "SSL|TLS|Connected|certificate|error|Error"
-          echo "--- Testing dotnet connectivity ---"
-          dotnet --version
-          curl -s -o /dev/null -w "HTTP status: %{http_code}\n" https://push.chocolatey.org/
-
       - name: Push to Chocolatey
         if: ${{ steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
         run: |
