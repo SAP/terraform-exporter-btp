@@ -132,17 +132,12 @@ jobs:
         run: |
           echo "--- Testing SSL from OS (curl) ---"
           curl -v https://push.chocolatey.org/ 2>&1 | grep -E "SSL|TLS|Connected|certificate|error|Error"
-          echo "--- Testing SSL from Mono ---"
-          cat > /tmp/test_ssl.cs << 'EOF'
-          using System; using System.Net;
-          class T { static void Main() { try { new WebClient().DownloadString("https://push.chocolatey.org/"); Console.WriteLine("Mono SSL: OK"); } catch(Exception e) { Console.WriteLine("Mono SSL Error: " + e.Message); }}}
-          EOF
-          mcs /tmp/test_ssl.cs -out:/tmp/test_ssl.exe 2>/dev/null && mono /tmp/test_ssl.exe || echo "Could not run Mono SSL test"
-          echo "--- Testing Mono SSL with legacy provider ---"
-          mcs /tmp/test_ssl.cs -out:/tmp/test_ssl.exe 2>/dev/null && MONO_TLS_PROVIDER=legacy mono /tmp/test_ssl.exe || echo "Could not run Mono SSL legacy test"
+          echo "--- Testing dotnet connectivity ---"
+          dotnet --version
+          curl -s -o /dev/null -w "HTTP status: %{http_code}\n" https://push.chocolatey.org/
 
       - name: Push to Chocolatey
-        if: ${{ false && steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
+        if: ${{ steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
         run: |
           dotnet nuget push sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg \
             --source https://push.chocolatey.org/ \
