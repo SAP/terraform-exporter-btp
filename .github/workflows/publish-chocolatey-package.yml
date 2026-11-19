@@ -130,5 +130,6 @@ jobs:
       - name: Push to Chocolatey
         if: ${{ steps.determine-choco-push.outputs.PUSH_TO_CHOCOLATEY == 'true' }}
         run: |
-          choco apikey --key "$CHOCOLATEY_API_KEY" --source https://push.chocolatey.org/
-          choco push sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg --source https://push.chocolatey.org/
+          dotnet nuget push sap-btptf.${{ steps.release-version.outputs.LATEST_TAG }}.nupkg \
+            --source https://push.chocolatey.org/ \
+            --api-key "$CHOCOLATEY_API_KEY"
