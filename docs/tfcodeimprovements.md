@@ -44,6 +44,27 @@ The Terraform configuration on subaccount level gets improved via the following 
 - If a resource `btp_subaccount_trust_configuration` gets exported that is the SAP default trust, the corresponding resource is removed from the resource configuration as well as the import block from the corresponding import file.
 - If a resource `btp_subaccount_role_collection` as well as `btp_subaccount_role` a check if there are dependencies is executed. If there are any a corresponding `depends_on` block is added to the resource `btp_subaccount_role_collection`.
 
+### Cloud Foundry environment instances
+
+For `btp_subaccount_environment_instance` resources with `environment_type = "cloudfoundry"`, post-processing removes the top-level `status` entry from the object passed to `jsonencode` in `parameters`, regardless of its value. If this leaves the object empty, the entire `parameters` attribute is removed. Other parameters, including nested `status` entries, are preserved. This refinement applies only to Cloud Foundry environment instances.
+
+For example, these exported parameters:
+
+```hcl
+parameters = jsonencode({
+  instance_name = "cf-instance"
+  status        = "ACTIVE"
+})
+```
+
+become:
+
+```hcl
+parameters = jsonencode({
+  instance_name = "cf-instance"
+})
+```
+
 ### Role collection assignments
 
 For `btp_subaccount_role_collection_assignment`, post-processing removes `null` attributes for unused assignment types. User assignments retain `user_name`; group assignments retain `group_name`; attribute assignments retain `attribute_name` and `attribute_value`. Populated values, including the string `"null"`, are preserved.
