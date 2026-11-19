@@ -13,6 +13,8 @@ Version 2 requires Terraform CLI 1.14 or newer. Check that the `terraform` binar
 
 The Terraform Provider for SAP BTP tries to optimize the generated code to make it more readable and maintainable. This includes several actions like removing empty values and introducing implicit and explicit dependencies between resources.
 
+For Cloud Foundry environment instances, post-processing also removes the top-level `status` parameter regardless of its value and removes the `parameters` attribute if it becomes empty. See [Cloud Foundry environment instances](tfcodeimprovements.md#cloud-foundry-environment-instances) for an example.
+
 If the generated code looks different than expected you can switch off this feature by setting the environment variable `BTPTF_SKIP_CODECLEANUP` to a non-empty value:
 
 === "Windows"

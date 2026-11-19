@@ -20,10 +20,13 @@ func processResourceAttributes(body *hclwrite.Body, inBlocks []string, level str
 
 		generictools.RemoveEmptyAttributes(body)
 
-		_, blockIdentifier, resourceAddress := generictools.ExtractBlockInformation(inBlocks)
+		blockType, blockIdentifier, resourceAddress := generictools.ExtractBlockInformation(inBlocks)
 
 		switch level {
 		case tfutils.SubaccountLevel:
+			if blockType == "resource" && blockIdentifier == tfutils.SubaccountEnvironmentInstanceType {
+				processEnvironmentInstanceParameters(body)
+			}
 			processSubaccountLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient, levelIds)
 		case tfutils.DirectoryLevel:
 			processDirectoryLevel(body, variables, dependencyAddresses, blockIdentifier, resourceAddress, btpClient, levelIds.DirectoryId)
