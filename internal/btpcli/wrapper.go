@@ -8,8 +8,6 @@ import (
 	"os"
 	"slices"
 	"testing"
-
-	"github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/testutils"
 )
 
 func GetLoggedInClient() (*ClientFacade, error) {
@@ -91,9 +89,11 @@ func GetGlobalAccountId(client *ClientFacade) (string, error) {
 }
 
 func GetServiceDataByPlanId(client *ClientFacade, subaccountId string, planId string) (planName string, serviceName string, err error) {
-	if testing.Testing() {
-		planName, serviceName = testutils.GetServiceMockData(planId)
-		return planName, serviceName, nil
+	if client == nil {
+		return "", "", fmt.Errorf("BTP CLI client is unavailable")
+	}
+	if subaccountId == "" || planId == "" {
+		return "", "", fmt.Errorf("subaccount and service plan IDs are required")
 	}
 
 	cliRes, _, err := client.Services.Plan.GetById(context.Background(), subaccountId, planId)
@@ -102,12 +102,19 @@ func GetServiceDataByPlanId(client *ClientFacade, subaccountId string, planId st
 		return "", "", fmt.Errorf("error getting service plan name: %w", err)
 	}
 
+	if cliRes.Name == "" || cliRes.ServiceOfferingId == "" {
+		return "", "", fmt.Errorf("service plan response is missing its name or offering ID")
+	}
+
 	cliRes2, _, err := client.Services.Offering.GetById(context.Background(), subaccountId, cliRes.ServiceOfferingId)
 
 	if err != nil {
 		return "", "", fmt.Errorf("error getting service offering name: %w", err)
 	}
 
+	if cliRes2.Name == "" {
+		return "", "", fmt.Errorf("service offering response is missing its name")
+	}
 	return cliRes.Name, cliRes2.Name, nil
 }
 

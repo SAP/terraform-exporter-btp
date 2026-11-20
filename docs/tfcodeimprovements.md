@@ -77,8 +77,26 @@ When the matching `btp_subaccount_role_collection` is exported, `role_collection
 
 ### Version 1.7.0 and later versions
 
-- The resource `btp_subaccount_service_instance` is adjusted to use the attributes `serviceplan_name` and `service_offering_name` instead of the attribute `serviceplan_id`. The attribute `serviceplan_id` is removed from the resource configuration.
-- If a dependency between the resource `btp_subaccount_entitlement` and the resource `btp_subaccount_service_instance` exists, a `depends_on` block is added to the resource `btp_subaccount_service_instance` to make it explicitly dependent to the corresponding entitlement.
+For `btp_subaccount_service_instance`, post-processing replaces `serviceplan_id` with `serviceplan_name` and `service_offering_name`. If both names are already populated as nonempty literal strings, they are retained and the redundant ID is removed.
+
+When either name is missing, the exporter uses its internal BTP CLI client to look up the service plan by ID in the exported subaccount, then looks up the associated service offering. Both names are written and `serviceplan_id` is removed only after both lookups return nonempty names. For example:
+
+```hcl
+serviceplan_id = "<service-plan-id>"
+```
+
+becomes:
+
+```hcl
+serviceplan_name      = "standard"
+service_offering_name = "alert-notification"
+```
+
+If a lookup fails or returns incomplete data, the exporter logs a warning and leaves the service-plan attributes unchanged. Missing, null, empty, or expression-based IDs are not looked up. Other cleanup rules, such as removing null attributes, still apply.
+
+When both names are available and a matching entitlement is exported, a `depends_on` block is added to the service instance. It references the entitlement resource, or the entitlement module when [entitlement module generation](#entitlement-module-generation-on-subaccount-level) is enabled. No service-plan data source is created.
+
+This refinement is skipped for `--imports-only` exports and when `BTPTF_SKIP_CODECLEANUP` is set to a nonempty value.
 
 ## Refinements on Directory Level
 
@@ -110,7 +128,7 @@ To activate this feature you must set the environment variable `BTPTF_ADD_ENTITL
 === "Windows"
 
     ``` powershell
-    $env:BBTPTF_ADD_ENTITLEMENTMODULE='true'
+    $env:BTPTF_ADD_ENTITLEMENTMODULE='true'
     ```
 
 === "Linux/Mac"
