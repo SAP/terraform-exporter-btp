@@ -43,6 +43,8 @@ JSON
 js
 JS
 jq
+lookup
+lookups
 macOS
 md
 NextSteps

@@ -1,10 +1,13 @@
 package resourceprocessor
 
 import (
+	"log"
+
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
-	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
+	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
+	"github.com/zclconf/go-cty/cty"
 )
 
 const serviceInstanceBlockIdentifier = "btp_subaccount_service_instance"
@@ -12,36 +15,57 @@ const serviceInstancePlanIdentifier = "serviceplan_id"
 const serviceInstancePlanNameIdentifier = "serviceplan_name"
 const serviceInstanceOfferingNameIdentifier = "service_offering_name"
 
-func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *generictools.DependencyAddresses, subaccountId string) {
+// servicePlanLookup allows cleanup tests to supply explicit lookup results.
+type servicePlanLookup func(subaccountID, planID string) (planName, offeringName string, err error)
 
-	// 1: Iterate over attributes to find the value for the service name and the plan ID
-	// 2: Fetch the plan name via ID using the BTP CLI client
-	// 3: Check if there is a dependency address for the plan name in the entitlements
-	// 4: If we find such a dependenceny: Create a data source for the service plan that depends on the entitlement
-	// 5: Exchange the explicit plan ID with the data source reference
-	serviceOfferingNameAttr := body.GetAttribute(serviceInstanceOfferingNameIdentifier)
-	serviceInstancePlanNameIdentifierAttr := body.GetAttribute(serviceInstancePlanNameIdentifier)
-	if serviceOfferingNameAttr == nil || serviceInstancePlanNameIdentifierAttr == nil {
-		// List-query configuration guarantees serviceplan_id, but the two
-		// descriptive name attributes can be absent. Keep the ID-based
-		// configuration unchanged when the name-based optimization is not
-		// possible.
-		return
+func processServiceInstance(body *hclwrite.Body, dependencies *generictools.DependencyAddresses, subaccountID string, lookup servicePlanLookup, generateEntitlementModule bool) {
+	planName := serviceInstanceLiteral(body, serviceInstancePlanNameIdentifier)
+	offeringName := serviceInstanceLiteral(body, serviceInstanceOfferingNameIdentifier)
+	if planName == "" || offeringName == "" {
+		planID := serviceInstanceLiteral(body, serviceInstancePlanIdentifier)
+		if planID == "" {
+			return
+		}
+		planName, offeringName, err := lookup(subaccountID, planID)
+		if err != nil {
+			log.Printf("Error resolving service plan %s in subaccount %s; keeping original configuration: %s", planID, subaccountID, err)
+			return
+		}
+		if planName == "" || offeringName == "" {
+			log.Printf("Incomplete names for service plan %s in subaccount %s; keeping original configuration", planID, subaccountID)
+			return
+		}
+		body.SetAttributeValue(serviceInstancePlanNameIdentifier, cty.StringVal(planName))
+		body.SetAttributeValue(serviceInstanceOfferingNameIdentifier, cty.StringVal(offeringName))
 	}
+	addServiceInstanceDependency(body, dependencies, generateEntitlementModule)
+}
 
-	var serviceOfferingName string
-	var servicePlanName string
-
-	serviceOfferingNameAttrTokens := serviceOfferingNameAttr.Expr().BuildTokens(nil)
-	serviceInstancePlanNameAttrTokens := serviceInstancePlanNameIdentifierAttr.Expr().BuildTokens(nil)
-
-	if len(serviceOfferingNameAttrTokens) == 3 {
-		serviceOfferingName = generictools.GetStringToken(serviceOfferingNameAttrTokens)
+// Only literal strings are eligible for platform lookup or entitlement matching.
+// Parsing also decodes HCL escapes without treating expressions as IDs.
+func serviceInstanceLiteral(body *hclwrite.Body, name string) string {
+	attr := body.GetAttribute(name)
+	if attr == nil {
+		return ""
 	}
-
-	if len(serviceInstancePlanNameAttrTokens) == 3 {
-		servicePlanName = generictools.GetStringToken(serviceInstancePlanNameAttrTokens)
+	expr, diags := hclsyntax.ParseExpression(attr.Expr().BuildTokens(nil).Bytes(), "", hcl.InitialPos)
+	if diags.HasErrors() {
+		return ""
 	}
+	template, ok := expr.(*hclsyntax.TemplateExpr)
+	if !ok || !template.IsStringLiteral() {
+		return ""
+	}
+	value, diags := template.Value(nil)
+	if diags.HasErrors() || value.IsNull() || !value.IsKnown() || value.Type() != cty.String {
+		return ""
+	}
+	return value.AsString()
+}
+
+func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *generictools.DependencyAddresses, generateEntitlementModule bool) {
+	serviceOfferingName := serviceInstanceLiteral(body, serviceInstanceOfferingNameIdentifier)
+	servicePlanName := serviceInstanceLiteral(body, serviceInstancePlanNameIdentifier)
 	if serviceOfferingName == "" || servicePlanName == "" {
 		return
 	}
@@ -62,7 +86,7 @@ func addServiceInstanceDependency(body *hclwrite.Body, dependencyAddresses *gene
 		return
 	}
 
-	if !toggles.IsEntitlementModuleGenerationDeactivated() {
+	if generateEntitlementModule {
 		body.SetAttributeRaw("depends_on", hclwrite.Tokens{
 			{
 				Type:  hclsyntax.TokenOBrack,

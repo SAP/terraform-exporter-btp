@@ -4,6 +4,7 @@ import (
 	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	generictools "github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/generic_tools"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
+	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
@@ -61,7 +62,9 @@ func processSubaccountLevel(body *hclwrite.Body, variables *generictools.Variabl
 	}
 
 	if blockIdentifier == serviceInstanceBlockIdentifier {
-		addServiceInstanceDependency(body, dependencyAddresses, levelIds.SubaccountId)
+		processServiceInstance(body, dependencyAddresses, levelIds.SubaccountId, func(subaccountID, planID string) (string, string, error) {
+			return btpcli.GetServiceDataByPlanId(btpClient, subaccountID, planID)
+		}, !toggles.IsEntitlementModuleGenerationDeactivated())
 	}
 
 	if blockIdentifier == subaccountRoleBlockIdentifier {
