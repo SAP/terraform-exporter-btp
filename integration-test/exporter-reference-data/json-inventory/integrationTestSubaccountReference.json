@@ -44,7 +44,8 @@
       "Values": [
         "subaccount_custom_role_collection",
         "subaccount_custom_role_collection_attribute",
-        "subaccount_custom_role_collection_group"
+        "subaccount_custom_role_collection_group",
+        "subaccount_custom_role_collection_misc"
       ]
     },
     {
@@ -63,6 +64,8 @@
         "Subaccount%20Administrator|terraformeds-platform|user|christian.lechner@sap.com",
         "Subaccount%20Custom%20Role%20Collection%20Attribute|terraformeds-platform|attribute|attribute_key|Attribute%20value",
         "Subaccount%20Custom%20Role%20Collection%20Group|terraformeds-platform|group|TestGroup",
+        "Subaccount%20Custom%20Role%20Collection%20Misc|sap.default|user|christian.lechner@sap.com",
+        "Subaccount%20Custom%20Role%20Collection%20Misc|terraformeds-platform|group|test-group2",
         "Subaccount%20Service%20Administrator|sap.default|user|christian.lechner@sap.com",
         "Subaccount%20Service%20Administrator|terraformeds-platform|user|christian.lechner@sap.com"
       ]
@@ -70,7 +73,7 @@
     {
       "Name": "service-bindings",
       "Values": [
-        "dev-inttest-exporter-sb-af"
+        "dev-inttest-exporter-af-sb"
       ]
     },
     {
