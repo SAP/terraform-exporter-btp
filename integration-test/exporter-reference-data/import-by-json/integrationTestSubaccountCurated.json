@@ -58,7 +58,7 @@
     {
       "Name": "service-bindings",
       "Values": [
-        "dev-inttest-exporter-sb-af"
+        "dev-inttest-exporter-af-sb"
       ]
     },
     {
