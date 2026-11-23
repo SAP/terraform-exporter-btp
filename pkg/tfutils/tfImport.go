@@ -1,6 +1,6 @@
 package tfutils
 
-const BtpProviderVersion = "v1.28.0"
+const BtpProviderVersion = "v1.28.1"
 const CfProviderVersion = "v1.19.0"
 
 const (
