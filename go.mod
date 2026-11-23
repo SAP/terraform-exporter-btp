@@ -4,7 +4,7 @@ go 1.27
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
-	github.com/cloudfoundry/go-cfclient/v3 v3.0.0-beta.2
+	github.com/cloudfoundry/go-cfclient/v3 v3.0.0
 	github.com/fatih/color v1.19.0
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/go-uuid v1.0.4
