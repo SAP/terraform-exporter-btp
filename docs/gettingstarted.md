@@ -48,6 +48,14 @@ btptf export -s <subaccount id>
 
 You find a comprehensive overview of the commands and their options and flags in the [documentation](btptf.md).
 
+## Choose an Output Directory
+
+Both export commands accept a relative output directory, for example `--config-dir exports/my-account`. The parent directory must already exist. Absolute paths, the working directory itself, and paths that escape it are rejected. To export elsewhere, run the command from the intended parent directory.
+
+An existing directory still offers overwrite or resume when an export log is available. Overwrite recursively removes the selected output directory, so select a directory dedicated to the export.
+
+Escaping symbolic links are rejected, including links under `.terraform/providers` to a shared provider cache. Disable `TF_PLUGIN_CACHE_DIR` and Terraform's `plugin_cache_dir` setting for exports. Before resuming an existing export, remove external cache links or replace them with regular local files. See [Security Considerations](security.md) for the filesystem boundary.
+
 ## Export Only Imports and Provider Configuration
 
 Add `--imports-only` to either export command to omit resource and module configuration and `NextSteps.md`. Import blocks, provider/backend configuration, and supporting `variables.tf` and `terraform.tfvars` are retained.

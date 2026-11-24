@@ -16,10 +16,10 @@ func TestRemoveQueryGeneratedFile(t *testing.T) {
 	path := filepath.Join(t.TempDir(), queryGeneratedFileName)
 	require.NoError(t, os.WriteFile(path, []byte("generated"), 0o600))
 
-	require.NoError(t, removeQueryGeneratedFile(path))
+	require.NoError(t, removeQueryGeneratedFile(openTestRoot(t, filepath.Dir(path)), filepath.Base(path)))
 	_, err := os.Stat(path)
 	assert.ErrorIs(t, err, os.ErrNotExist)
-	require.NoError(t, removeQueryGeneratedFile(path))
+	require.NoError(t, removeQueryGeneratedFile(openTestRoot(t, filepath.Dir(path)), filepath.Base(path)))
 }
 
 func TestCloudFoundryUserQueryAndExport(t *testing.T) {
@@ -64,7 +64,7 @@ func TestCloudFoundryUserQueryAndExport(t *testing.T) {
 	require.NoError(t, err)
 	configDir, err := filepath.Rel(currentDir, tempDir)
 	require.NoError(t, err)
-	require.NoError(t, WriteQueryResults(configDir, "users.tf", spec.ResourceType, results))
+	require.NoError(t, WriteQueryResults(openTestRoot(t, configDir), "users.tf", spec.ResourceType, results))
 
 	generated, err := os.ReadFile(filepath.Join(tempDir, "users.tf"))
 	require.NoError(t, err)

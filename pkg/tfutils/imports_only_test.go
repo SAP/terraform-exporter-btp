@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"testing"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/files"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -77,7 +78,7 @@ printf '%s\n' "$*" >> commands.log
 			getIaCTool = func() (string, error) { return script, nil }
 			t.Cleanup(func() { getIaCTool = originalTool })
 
-			FinalizeTfConfig("export", ExecutionTarget{SubaccountID: "account-id"}, importsOnly)
+			FinalizeTfConfig(openTestRoot(t, "export"), ExecutionTarget{SubaccountID: "account-id"}, importsOnly)
 
 			for _, filename := range []string{"btp_resources.tf", "NextSteps.md", "resources-present-at-init"} {
 				if importsOnly {
@@ -110,12 +111,14 @@ printf '%s\n' "$*" >> commands.log
 
 func TestImportsOnlyPostQuerySkipsTerraformFormatting(t *testing.T) {
 	t.Chdir(t.TempDir())
-	require.NoError(t, os.Mkdir("query", 0700))
+	query, err := files.NewTempDirectory("query-")
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = query.Cleanup() })
 	require.NoError(t, os.Mkdir("export", 0700))
 	resources := `resource "btp_subaccount" "export_0" {}`
 	imports := "import {\n  to = btp_subaccount.export_0\n  id = \"account-id\"\n}\n"
-	require.NoError(t, os.WriteFile(filepath.Join("query", "btp_resources.tf"), []byte(resources), 0600))
-	require.NoError(t, os.WriteFile(filepath.Join("query", "btp_subaccount_import.tf"), []byte(imports), 0600))
+	require.NoError(t, query.Root.WriteFile("btp_resources.tf", []byte(resources), 0600))
+	require.NoError(t, query.Root.WriteFile("btp_subaccount_import.tf", []byte(imports), 0600))
 	originalTool := getIaCTool
 	getIaCTool = func() (string, error) {
 		t.Fatal("imports-only post-query processing must not run Terraform fmt")
@@ -123,9 +126,9 @@ func TestImportsOnlyPostQuerySkipsTerraformFormatting(t *testing.T) {
 	}
 	t.Cleanup(func() { getIaCTool = originalTool })
 
-	ExecPostQuerySteps("query", "export", "btp_resources.tf", SubaccountType, true)
+	ExecPostQuerySteps(query, openTestRoot(t, "export"), "btp_resources.tf", SubaccountType, true)
 
-	assert.NoDirExists(t, "query")
+	assert.NoDirExists(t, query.Root.Name())
 	merged, err := os.ReadFile(filepath.Join("export", "btp_subaccount_import.tf"))
 	require.NoError(t, err)
 	assert.Equal(t, imports, string(merged))
@@ -139,14 +142,14 @@ func TestImportsOnlyPostQuerySkipsTerraformFormatting(t *testing.T) {
 func TestRemoveResourceConfiguration(t *testing.T) {
 	t.Run("empty or already finalized export", func(t *testing.T) {
 		dir := t.TempDir()
-		require.NoError(t, removeResourceConfiguration(dir))
-		require.NoError(t, removeResourceConfiguration(dir))
+		require.NoError(t, removeResourceConfiguration(openTestRoot(t, dir)))
+		require.NoError(t, removeResourceConfiguration(openTestRoot(t, dir)))
 	})
 	t.Run("removal failure is returned", func(t *testing.T) {
 		dir := t.TempDir()
 		path := filepath.Join(dir, "btp_resources.tf")
 		require.NoError(t, os.Mkdir(path, 0700))
 		require.NoError(t, os.WriteFile(filepath.Join(path, "keep"), nil, 0600))
-		require.ErrorContains(t, removeResourceConfiguration(dir), "remove btp_resources.tf")
+		require.ErrorContains(t, removeResourceConfiguration(openTestRoot(t, dir)), "remove btp_resources.tf")
 	})
 }

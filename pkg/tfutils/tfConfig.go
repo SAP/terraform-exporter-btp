@@ -1,6 +1,7 @@
 package tfutils
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -16,7 +17,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var TmpFolder string
+var providerDirectory *files.TempDirectory
 
 var AllowedResourcesSubaccount = []string{
 	CmdSubaccountParameter,
@@ -56,13 +57,14 @@ const selectionAbort = "Abort the processing"
 const selectionInvalid = "Invalid selection"
 
 func ConfigureProvider(level string) {
-	tmpdir, err := os.MkdirTemp("", "provider.tf")
+	tmpdir, err := files.NewTempDirectory("btptf-provider-")
 	if err != nil {
 		panic(err)
 	}
 
-	TmpFolder = tmpdir
-	abspath := filepath.Join(tmpdir, "provider.tf")
+	cleanup()
+	providerDirectory = tmpdir
+	abspath := filepath.Join(tmpdir.Root.Name(), "provider.tf")
 
 	verbose := viper.GetViper().GetBool("verbose")
 
@@ -148,7 +150,7 @@ func ConfigureProvider(level string) {
 
 	}
 
-	err = files.CreateFileWithContent(abspath, providerContent)
+	err = tmpdir.Root.WriteFile("provider.tf", []byte(providerContent), 0600)
 	if err != nil {
 		cleanup()
 		fmt.Print("\r\n")
@@ -207,115 +209,88 @@ func allStringsEmpty(stringsToCheck ...string) bool {
 	return true
 }
 
-func SetupConfigDir(configFolder string, isMainCmd bool, level string) {
-
-	if isMainCmd {
-		message := "set up config directory \"" + configFolder + "\""
-		fmt.Println(output.ColorStringGrey(message))
-	}
-
-	if len(TmpFolder) == 0 {
-		ConfigureProvider(level)
-	}
-	curWd, err := os.Getwd()
-	if err != nil {
-		CleanupProviderConfig()
-		fmt.Print("\r\n")
-		log.Fatalf("error getting current working directory: %v", err)
-	}
-
-	configFilepath := filepath.Join(curWd, configFolder)
-
-	if err := validateConfigDirWithinWd(curWd, configFilepath); err != nil {
-		CleanupProviderConfig()
-		fmt.Print("\r\n")
-		log.Fatalf("invalid configuration directory %q: %v", configFolder, err)
-	}
-
-	exist, err := files.Exists(configFilepath)
-	if err != nil {
-		CleanupProviderConfig()
-		fmt.Print("\r\n")
-		log.Fatalf("error reading configuration folder %s: %v", configFolder, err)
-	}
-
-	if !exist {
-		createNewConfigDir(configFilepath, configFolder, curWd)
-	} else {
-		handleExistingDir(isMainCmd, configFilepath, configFolder, curWd)
-	}
-
-	sourceFile, err := os.Open(TmpFolder + "/provider.tf")
-	if err != nil {
-		CleanupProviderConfig()
-		fmt.Print("\r\n")
-		log.Fatalf("failed to open file 'provider.tf' at %s: %v", TmpFolder, err)
-	}
-
-	defer func() {
-		if tempErrSrc := sourceFile.Close(); tempErrSrc != nil {
-			CleanupProviderConfig()
-			fmt.Print("\r\n")
-			log.Fatalf("failed to close file 'provider.tf' at %s: %v", TmpFolder, tempErrSrc)
-		}
-	}()
-
-	fullpath := filepath.Join(curWd, configFolder)
-
-	destProviderPath := filepath.Join(fullpath, "provider.tf")
-	if info, lerr := os.Lstat(destProviderPath); lerr == nil && info.Mode()&os.ModeSymlink != 0 {
-		_ = os.Remove(destProviderPath)
-	}
-	destinationFile, err := os.OpenFile(destProviderPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
-	if err != nil {
-		CleanupProviderConfig()
-		fmt.Print("\r\n")
-		log.Fatalf("failed to create file 'provider.tf' at %s: %v", fullpath, err)
-	}
-
-	defer func() {
-		if tempErrDest := destinationFile.Close(); tempErrDest != nil {
-			CleanupProviderConfig(fullpath)
-			fmt.Print("\r\n")
-			log.Fatalf("failed to close file 'provider.tf' at %s: %v", fullpath, tempErrDest)
-		}
-	}()
-
-	_, err = io.Copy(destinationFile, sourceFile)
-	if err != nil {
-		CleanupProviderConfig(fullpath)
-		fmt.Print("\r\n")
-		log.Fatalf("failed to copy file from temporary (%s) to final configuration directory (%s): %v", TmpFolder, fullpath, err)
-	}
+// SetupConfigDir validates the CLI path before touching the destination and
+// returns the handle used by all subsequent export operations.
+func SetupConfigDir(configFolder string, isMainCmd bool, level string) (*os.Root, error) {
+	return setupConfigDir(configFolder, isMainCmd, level, handleExistingDir)
 }
 
-func handleInputExistingDir(choice string, configFilepath string, configFolder string, curWd string) {
-	switch choice {
-	case selectionAbort:
-		CleanupProviderConfig()
-		os.Exit(0)
-	case selectionOverwrite:
-		output.AddNewLine()
-		fmt.Println(output.ColorStringCyan("existing files will be overwritten"))
-		output.AddNewLine()
-
-		err := recreateExistingConfigDir(configFilepath)
-		if err != nil {
-			CleanupProviderConfig()
-			output.AddNewLine()
-			log.Fatalf("error recreating configuration folder %s at %s: %v", configFolder, curWd, err)
-		}
-	case selectionResume:
-		// Can only happen if we are in the main command
-		// Do nothing, the processing will be resumed with the existing directory
-		output.AddNewLine()
-		fmt.Println(output.ColorStringCyan("export will be resumed"))
-		output.AddNewLine()
-	default:
-		CleanupProviderConfig()
-		output.AddNewLine()
-		log.Fatalf("invalid input. exiting the process")
+func setupConfigDir(configFolder string, isMainCmd bool, level string, choose func(bool, *os.Root, string) (string, error)) (*os.Root, error) {
+	if err := files.ValidateConfigDir(configFolder); err != nil {
+		return nil, err
 	}
+	configFolder = filepath.Clean(configFolder)
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	work, err := os.OpenRoot(cwd)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = work.Close() }()
+	if isMainCmd {
+		fmt.Println(output.ColorStringGrey(fmt.Sprintf("set up config directory %q", configFolder)))
+	}
+	if _, err := work.Stat(configFolder); os.IsNotExist(err) {
+		// Check the existing parent through the working root before configuring
+		// credentials or creating anything at a user-supplied location.
+		parent, err := work.OpenRoot(filepath.Dir(configFolder))
+		if err != nil {
+			return nil, err
+		}
+		_ = parent.Close()
+		if providerDirectory == nil {
+			ConfigureProvider(level)
+		}
+		if err := work.Mkdir(configFolder, 0700); err != nil {
+			return nil, err
+		}
+	} else if err != nil {
+		return nil, fmt.Errorf("invalid configuration directory %q: %w", configFolder, err)
+	} else {
+		existing, err := openConfigDir(work, configFolder)
+		if err != nil {
+			return nil, err
+		}
+		if providerDirectory == nil {
+			ConfigureProvider(level)
+		}
+		choice, err := choose(isMainCmd, existing, configFolder)
+		_ = existing.Close()
+		if err != nil {
+			return nil, err
+		}
+		switch choice {
+		case selectionAbort:
+			CleanupProviderConfig()
+			os.Exit(0)
+		case selectionOverwrite:
+			output.AddNewLine()
+			fmt.Println(output.ColorStringCyan("existing files will be overwritten"))
+			output.AddNewLine()
+			if err := recreateExistingConfigDir(work, configFolder); err != nil {
+				return nil, err
+			}
+		case selectionResume:
+			fmt.Println(output.ColorStringCyan("export will be resumed"))
+		default:
+			return nil, fmt.Errorf("invalid input. exiting the process")
+		}
+	}
+	root, err := openConfigDir(work, configFolder)
+	if err != nil {
+		return nil, err
+	}
+	if err := files.ValidateTerraformDirectory(root); err != nil {
+		_ = root.Close()
+		return nil, err
+	}
+	if err := files.CopyFile(providerDirectory.Root, root, "provider.tf", os.O_TRUNC); err != nil {
+		_ = root.Close()
+		return nil, fmt.Errorf("copy provider configuration: %w", err)
+	}
+	return root, nil
 }
 
 func handleReturnWoInput(err error) (choice string) {
@@ -329,41 +304,12 @@ func handleReturnWoInput(err error) (choice string) {
 	return choice
 }
 
-// validateConfigDirWithinWd ensures the resolved configuration directory stays
-// inside the current working directory, preventing path traversal (e.g. via a
-// crafted --config-dir) from targeting an arbitrary location for creation or
-// recursive deletion.
-func validateConfigDirWithinWd(curWd string, configFilepath string) error {
-	cleanWd := filepath.Clean(curWd)
-	cleanTarget := filepath.Clean(configFilepath)
-
-	rel, err := filepath.Rel(cleanWd, cleanTarget)
-	if err != nil {
-		return fmt.Errorf("cannot resolve path: %v", err)
-	}
-
-	if rel == "." || rel == ".." || strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
-		return fmt.Errorf("path must be a subdirectory of the working directory")
-	}
-
-	return nil
-}
-
-func createNewConfigDir(configFilepath string, configFolder string, curWd string) {
-	err := os.Mkdir(configFilepath, 0700)
-	if err != nil {
-		CleanupProviderConfig()
-		fmt.Print("\r\n")
-		log.Fatalf("error creating configuration folder %s at %s: %v", configFolder, curWd, err)
-	}
-}
-
-func handleExistingDir(isMainCmd bool, configFilepath string, configFolder string, curWd string) {
+func handleExistingDir(isMainCmd bool, directory *os.Root, configFolder string) (string, error) {
 	var err error
 	var importLog []string
 	if isMainCmd {
 		// check if an import log exists to decide how to proceed
-		importLog, _ = resume.GetExistingExportLog(configFolder)
+		importLog, _ = resume.GetExistingExportLog(directory)
 	}
 
 	surveyName := "existingdir"
@@ -398,7 +344,7 @@ func handleExistingDir(isMainCmd bool, configFilepath string, configFolder strin
 	if err != nil {
 		answer.ExistingDir = selectionInvalid
 	}
-	handleInputExistingDir(answer.ExistingDir, configFilepath, configFolder, curWd)
+	return answer.ExistingDir, err
 
 }
 
@@ -439,7 +385,7 @@ func FilterResourcesListByLog(resources []string, exportLog []string) []string {
 	return filteredResources
 }
 
-func CleanupProviderConfig(directory ...string) {
+func CleanupProviderConfig(directory ...*files.TempDirectory) {
 	cleanup()
 
 	for _, dir := range directory {
@@ -461,101 +407,81 @@ func GetValidResourcesByLevel(level string) []string {
 }
 
 func cleanup() {
-	// Capture the temporary folder path before clearing the global so the
-	// directory (which may hold the provider configuration) is actually removed.
-	dir := TmpFolder
-	TmpFolder = ""
-
-	if dir == "" {
-		return
-	}
-
-	// Cleanup temporary files on disk
-	err := os.RemoveAll(dir)
-	if err != nil {
-		fmt.Print("\r\n")
-		log.Fatalf("error deleting temp files: %v", err)
+	dir := providerDirectory
+	providerDirectory = nil
+	if err := dir.Cleanup(); err != nil {
+		log.Printf("error deleting provider temporary files: %v", err)
 	}
 }
 
-func FinalizeTfConfig(configFolder string, target ExecutionTarget, importsOnly bool) {
+func FinalizeTfConfig(configFolder *os.Root, target ExecutionTarget, importsOnly bool) {
 
 	output.AddNewLine()
 	spinner := output.StartSpinner("finalizing Terraform configuration")
-
-	currentDir, err := os.Getwd()
-	if err != nil {
+	if err := files.ValidateTerraformDirectory(configFolder); err != nil {
 		CleanupProviderConfig()
-		fmt.Print("\r\n")
-		log.Fatalf("error getting current directory: %v", err)
+		log.Fatal(err)
 	}
 
-	terraformConfigPath := filepath.Join(currentDir, configFolder)
-	if err := applyExecutionTargetVariables(terraformConfigPath, target); err != nil {
+	if err := applyExecutionTargetVariables(configFolder, target); err != nil {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
 		log.Fatalf("error applying target variables: %v", err)
 	}
-	if err := normalizeGeneratedResourceAddresses(terraformConfigPath); err != nil {
+	if err := normalizeGeneratedResourceAddresses(configFolder); err != nil {
 		CleanupProviderConfig()
 		fmt.Print("\r\n")
 		log.Fatalf("error normalizing generated resource addresses: %v", err)
 	}
 
 	if importsOnly {
-		if err := removeResourceConfiguration(terraformConfigPath); err != nil {
+		if err := removeResourceConfiguration(configFolder); err != nil {
 			CleanupProviderConfig()
 			log.Fatalf("error preparing imports-only output: %v", err)
 		}
 	}
 
-	err = os.Chdir(terraformConfigPath)
-	if err != nil {
+	if _, err := runTfCmdInDirectory(configFolder, "init", "-backend=false"); err != nil {
 		CleanupProviderConfig()
-		fmt.Print("\r\n")
-		log.Fatalf("error changing directory to %s: %v \n", terraformConfigPath, err)
-	}
-
-	if _, err := runTfCmdGeneric("init", "-backend=false"); err != nil {
-		CleanupProviderConfig()
-		fmt.Print("\r\n")
 		log.Fatalf("error initializing Terraform: %v", err)
 	}
-
-	if _, err := runTfCmdGeneric("fmt", "-recursive", "-list=false"); err != nil {
+	if _, err := runTfCmdInDirectory(configFolder, "fmt", "-recursive", "-list=false"); err != nil {
 		CleanupProviderConfig()
-		fmt.Print("\r\n")
 		log.Fatalf("error running Terraform fmt: %v", err)
-	}
-
-	//Switch back to the original directory
-	err = os.Chdir(currentDir)
-	if err != nil {
-		CleanupProviderConfig()
-		fmt.Print("\r\n")
-		log.Fatalf("error changing directory to %s: %v \n", currentDir, err)
 	}
 
 	output.StopSpinner(spinner)
 }
 
-// Convenience functions that wrap repetitive steps
-func ExecPreExportSteps(tempConfigDir string, level string) {
-	SetupConfigDir(tempConfigDir, false, level)
+// NewQueryDirectory allocates private scratch space with explicit cleanup
+// ownership instead of reusing predictable resource-config directories.
+func NewQueryDirectory(level string) (*files.TempDirectory, error) {
+	if providerDirectory == nil {
+		ConfigureProvider(level)
+	}
+	directory, err := files.NewTempDirectory("btptf-query-")
+	if err != nil {
+		return nil, err
+	}
+	if err := files.CopyFile(providerDirectory.Root, directory.Root, "provider.tf", os.O_TRUNC); err != nil {
+		_ = directory.Cleanup()
+		return nil, err
+	}
+	return directory, nil
 }
 
-func ExecPostQuerySteps(tempConfigDir string, targetConfigDir string, targetResourceFileName string, resourceNameLong string, importsOnly bool) {
+func ExecPostQuerySteps(tempConfigDir *files.TempDirectory, targetConfigDir *os.Root, targetResourceFileName string, resourceNameLong string, importsOnly bool) {
 
 	spinner := output.StartSpinner("generating Terraform configuration for " + resourceNameLong)
 
 	if !importsOnly {
-		if _, err := runTfCmdGeneric(fmt.Sprintf("-chdir=%s", tempConfigDir), "fmt", "-recursive", "-list=false"); err != nil {
+		if _, err := runTfCmdInDirectory(tempConfigDir.Root, "fmt", "-recursive", "-list=false"); err != nil {
 			CleanupTempFiles(tempConfigDir)
 			log.Fatalf("error formatting Terraform configuration for %s: %v", resourceNameLong, err)
 		}
 	}
 
-	err := mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir, resourceNameLong)
+	err := mergeTfConfig(targetConfigDir, targetResourceFileName, tempConfigDir.Root, resourceNameLong)
 	if err != nil {
 		CleanupTempFiles(tempConfigDir)
 		fmt.Print("\r\n")
@@ -569,98 +495,74 @@ func ExecPostQuerySteps(tempConfigDir string, targetConfigDir string, targetReso
 	fmt.Println(output.ColorStringGrey("   temporary files deleted"))
 }
 
-func CleanupTempFiles(tempConfigDir string) {
-	files.DeleteSourceFolder(tempConfigDir)
+func CleanupTempFiles(directory *files.TempDirectory) {
+	if err := directory.Cleanup(); err != nil {
+		log.Printf("error deleting temporary files: %v", err)
+	}
 }
 
-func mergeTfConfig(configFolder string, fileName string, resourceConfigFolder string, resourceName string) error {
-
-	currentDir, err := os.Getwd()
-
-	if err != nil {
-		return fmt.Errorf("error getting current directory: %v", err)
+func mergeTfConfig(configFolder *os.Root, fileName string, resourceConfigFolder *os.Root, resourceName string) error {
+	if err := files.ValidateFilename(fileName); err != nil {
+		return err
 	}
-
-	sourceConfigPath := filepath.Join(currentDir, resourceConfigFolder, fileName)
-
-	// Check if the source file exists
-	exist, err := files.Exists(sourceConfigPath)
-	if err != nil {
-		return fmt.Errorf("error checking if source directory exists: %v", err)
-	}
-
-	if !exist {
-		// Nothing to do as the source file does not exist
+	sourceFile, err := resourceConfigFolder.Open(fileName)
+	if os.IsNotExist(err) {
 		return nil
 	}
-
-	sourceFile, err := os.Open(sourceConfigPath)
 	if err != nil {
-		return fmt.Errorf("error opening resource config file: %v", err)
+		return fmt.Errorf("open resource configuration: %w", err)
 	}
-	defer func() {
-		if tempErr := sourceFile.Close(); tempErr != nil {
-			err = tempErr
-		}
-	}()
-
-	targetConfigPath := filepath.Join(currentDir, configFolder, fileName)
-
-	exist, err = files.Exists(targetConfigPath)
+	defer func() { _ = sourceFile.Close() }()
+	targetFile, err := configFolder.OpenFile(fileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		return fmt.Errorf("error checking if target directory exists: %v", err)
+		return fmt.Errorf("open target configuration: %w", err)
 	}
-
-	if !exist {
-		// In the first run we must create the file if it does not exist
-		created, err := os.OpenFile(targetConfigPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
-		if err != nil {
-			return fmt.Errorf("error creating target configuration file: %v", err)
-		}
-		_ = created.Close()
+	header := "\n###\n# Resource: " + resourceName + "\n###\n"
+	_, writeErr := io.WriteString(targetFile, header)
+	if writeErr == nil {
+		_, writeErr = io.Copy(targetFile, sourceFile)
 	}
-
-	targetFile, err := os.OpenFile(targetConfigPath, os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		return fmt.Errorf("error opening target configuration file: %v", err)
+	closeErr := targetFile.Close()
+	if err := errors.Join(writeErr, closeErr); err != nil {
+		return err
 	}
-
-	defer func() {
-		if tempErr := targetFile.Close(); tempErr != nil {
-			err = tempErr
-		}
-	}()
-
-	headerTemplate := `
-###
-# Resource: ` + resourceName + `
-###
-`
-	if _, err := targetFile.Write([]byte(headerTemplate)); err != nil {
-		return fmt.Errorf("error adding header line to target file: %v", err)
-	}
-
-	if _, err := io.Copy(targetFile, sourceFile); err != nil {
-		return fmt.Errorf("error copying resource file to target file: %v", err)
-	}
-
-	err = files.CopyImportFiles(resourceConfigFolder, configFolder)
-	if err != nil {
-		return fmt.Errorf("error copying import files: %v", err)
-	}
-	return nil
+	return files.CopyImportFiles(resourceConfigFolder, configFolder)
 }
 
-func recreateExistingConfigDir(filepath string) error {
-	err := os.RemoveAll(filepath)
-	if err != nil {
-		return fmt.Errorf("error recreating existing configuration folder %s: %v", filepath, err)
+func recreateExistingConfigDir(work *os.Root, name string) error {
+	if err := files.ValidateConfigDir(name); err != nil {
+		return err
 	}
-
-	err = os.Mkdir(filepath, 0700)
+	existing, err := openConfigDir(work, name)
 	if err != nil {
-		return fmt.Errorf("error recreating configuration folder %s: %v", filepath, err)
+		return err
 	}
+	_ = existing.Close()
+	if err := work.RemoveAll(name); err != nil {
+		return fmt.Errorf("remove configuration directory: %w", err)
+	}
+	return work.Mkdir(name, 0700)
+}
 
-	return nil
+// A symlink to the working directory itself is not a strict descendant either.
+func openConfigDir(work *os.Root, name string) (*os.Root, error) {
+	root, err := work.OpenRoot(name)
+	if err != nil {
+		return nil, err
+	}
+	base, err := work.Stat(".")
+	if err != nil {
+		_ = root.Close()
+		return nil, err
+	}
+	target, err := root.Stat(".")
+	if err != nil {
+		_ = root.Close()
+		return nil, err
+	}
+	if os.SameFile(base, target) {
+		_ = root.Close()
+		return nil, fmt.Errorf("configuration directory must not resolve to the working directory")
+	}
+	return root, nil
 }

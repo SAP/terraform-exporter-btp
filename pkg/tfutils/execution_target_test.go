@@ -50,7 +50,7 @@ func TestResolveExecutionTarget(t *testing.T) {
 func TestWriteExecutionTargetTFVars(t *testing.T) {
 	directory := t.TempDir()
 	target := ExecutionTarget{OrgID: "org-id", TFVars: []byte("org_id = \"org-id\"\nregion = \"eu10\"\n")}
-	if err := WriteExecutionTargetTFVars(directory, target); err != nil {
+	if err := WriteExecutionTargetTFVars(openTestRoot(t, directory), target); err != nil {
 		t.Fatal(err)
 	}
 	actual, err := os.ReadFile(filepath.Join(directory, terraformVarsFileName))
@@ -69,7 +69,7 @@ func TestWriteExecutionTargetTFVarsAppliesCommandLinePrecedence(t *testing.T) {
 		TFVars:      []byte("directory_id = \"directory-from-file\"\nregion = \"eu10\"\n"),
 		fromFlag:    true,
 	}
-	if err := WriteExecutionTargetTFVars(directory, target); err != nil {
+	if err := WriteExecutionTargetTFVars(openTestRoot(t, directory), target); err != nil {
 		t.Fatal(err)
 	}
 	actual, err := os.ReadFile(filepath.Join(directory, terraformVarsFileName))
@@ -89,7 +89,7 @@ func TestWriteExecutionTargetTFVarsPreservesExistingFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	target := ExecutionTarget{DirectoryID: "directory-id", TFVars: []byte("directory_id = \"directory-id\"\nregion = \"source-region\"\n")}
-	if err := WriteExecutionTargetTFVars(directory, target); err != nil {
+	if err := WriteExecutionTargetTFVars(openTestRoot(t, directory), target); err != nil {
 		t.Fatal(err)
 	}
 	actual, err := os.ReadFile(path)
@@ -107,7 +107,7 @@ func TestWriteExecutionTargetTFVarsRejectsExistingDifferentTarget(t *testing.T) 
 	if err := os.WriteFile(path, []byte("org_id = \"other-org\"\n"), 0600); err != nil {
 		t.Fatal(err)
 	}
-	err := WriteExecutionTargetTFVars(directory, ExecutionTarget{OrgID: "requested-org"})
+	err := WriteExecutionTargetTFVars(openTestRoot(t, directory), ExecutionTarget{OrgID: "requested-org"})
 	if err == nil || !strings.Contains(err.Error(), "refusing to overwrite") {
 		t.Fatalf("error = %v, want overwrite-protection error", err)
 	}

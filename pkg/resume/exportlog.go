@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"maps"
 	"os"
-	"path/filepath"
 )
 
 type Logentry struct {
@@ -18,16 +17,11 @@ type Log struct {
 	Resources []Logentry `json:"resources"`
 }
 
-func WriteExportLog(configDir string, resource string, resourceType string, count int) error {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("error getting current directory: %v", err)
-	}
-
-	logFileName := filepath.Join(currentDir, configDir, "importlog.json")
+func WriteExportLog(configDir *os.Root, resource string, resourceType string, count int) error {
+	logFileName := "importlog.json"
 
 	// Check if the log file exists
-	_, err = os.Stat(logFileName)
+	_, err := configDir.Stat(logFileName)
 	if os.IsNotExist(err) {
 		// Create a new log file with the initial resource
 		initialContent := Log{
@@ -43,7 +37,7 @@ func WriteExportLog(configDir string, resource string, resourceType string, coun
 		if err != nil {
 			return fmt.Errorf("error marshaling initial content: %v", err)
 		}
-		err = os.WriteFile(logFileName, contentBytes, 0600)
+		err = configDir.WriteFile(logFileName, contentBytes, 0600)
 		if err != nil {
 			return fmt.Errorf("error creating file %s: %v", logFileName, err)
 		}
@@ -53,7 +47,7 @@ func WriteExportLog(configDir string, resource string, resourceType string, coun
 	}
 
 	// Read the existing log file
-	fileContent, err := os.ReadFile(logFileName)
+	fileContent, err := configDir.ReadFile(logFileName)
 	if err != nil {
 		return fmt.Errorf("error reading file %s: %v", logFileName, err)
 	}
@@ -79,7 +73,7 @@ func WriteExportLog(configDir string, resource string, resourceType string, coun
 	}
 
 	// Write the updated JSON back to the file
-	err = os.WriteFile(logFileName, updatedContent, 0600)
+	err = configDir.WriteFile(logFileName, updatedContent, 0600)
 	if err != nil {
 		return fmt.Errorf("error writing to file %s: %v", logFileName, err)
 	}
@@ -87,16 +81,11 @@ func WriteExportLog(configDir string, resource string, resourceType string, coun
 	return nil
 }
 
-func GetExistingExportLog(configDir string) ([]string, error) {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return nil, fmt.Errorf("error getting current directory: %v", err)
-	}
-
-	logFileName := filepath.Join(currentDir, configDir, "importlog.json")
+func GetExistingExportLog(configDir *os.Root) ([]string, error) {
+	logFileName := "importlog.json"
 
 	// Check if the log file exists
-	_, err = os.Stat(logFileName)
+	_, err := configDir.Stat(logFileName)
 	if os.IsNotExist(err) {
 		return nil, nil
 	} else if err != nil {
@@ -104,7 +93,7 @@ func GetExistingExportLog(configDir string) ([]string, error) {
 	}
 
 	// Read the existing log file
-	fileContent, err := os.ReadFile(logFileName)
+	fileContent, err := configDir.ReadFile(logFileName)
 	if err != nil {
 		return nil, fmt.Errorf("error reading file %s: %v", logFileName, err)
 	}
@@ -125,18 +114,13 @@ func GetExistingExportLog(configDir string) ([]string, error) {
 	return resources, nil
 }
 
-func GetExistingExportLogComplete(configDir string) (Log, error) {
+func GetExistingExportLogComplete(configDir *os.Root) (Log, error) {
 	var logData Log
 
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return logData, fmt.Errorf("error getting current directory: %v", err)
-	}
-
-	logFileName := filepath.Join(currentDir, configDir, "importlog.json")
+	logFileName := "importlog.json"
 
 	// Check if the log file exists
-	_, err = os.Stat(logFileName)
+	_, err := configDir.Stat(logFileName)
 	if os.IsNotExist(err) {
 		return logData, nil
 	} else if err != nil {
@@ -144,7 +128,7 @@ func GetExistingExportLogComplete(configDir string) (Log, error) {
 	}
 
 	// Read the existing log file
-	fileContent, err := os.ReadFile(logFileName)
+	fileContent, err := configDir.ReadFile(logFileName)
 	if err != nil {
 		return logData, fmt.Errorf("error reading file %s: %v", logFileName, err)
 	}
@@ -158,23 +142,18 @@ func GetExistingExportLogComplete(configDir string) (Log, error) {
 	return logData, nil
 }
 
-func RemoveExportLog(configDir string) error {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("error getting current directory: %v", err)
-	}
-
-	logFileName := filepath.Join(currentDir, configDir, "importlog.json")
+func RemoveExportLog(configDir *os.Root) error {
+	logFileName := "importlog.json"
 
 	// Check if the log file exists
-	_, err = os.Stat(logFileName)
+	_, err := configDir.Stat(logFileName)
 	if os.IsNotExist(err) {
 		return nil
 	} else if err != nil {
 		return fmt.Errorf("error checking file %s: %v", logFileName, err)
 	}
 
-	err = os.Remove(logFileName)
+	err = configDir.Remove(logFileName)
 	if err != nil {
 		return fmt.Errorf("error removing file %s: %v", logFileName, err)
 	}

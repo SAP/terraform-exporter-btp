@@ -119,9 +119,9 @@ func readExecutionTargetTFVars() (ExecutionTarget, []byte, error) {
 	return values, source, nil
 }
 
-func WriteExecutionTargetTFVars(configDir string, target ExecutionTarget) error {
-	path := filepath.Join(configDir, terraformVarsFileName)
-	if existing, err := os.ReadFile(path); err == nil {
+func WriteExecutionTargetTFVars(configDir *os.Root, target ExecutionTarget) error {
+	path := terraformVarsFileName
+	if existing, err := configDir.ReadFile(path); err == nil {
 		if err := validateExistingExecutionTargetTFVars(path, existing, target); err != nil {
 			return err
 		}
@@ -141,7 +141,7 @@ func WriteExecutionTargetTFVars(configDir string, target ExecutionTarget) error 
 		file.Body().SetAttributeValue(target.VariableName(), cty.StringVal(target.ID()))
 		source = hclwrite.Format(file.Bytes())
 	}
-	return os.WriteFile(path, source, 0600)
+	return configDir.WriteFile(path, source, 0600)
 }
 
 func validateExistingExecutionTargetTFVars(path string, source []byte, target ExecutionTarget) error {

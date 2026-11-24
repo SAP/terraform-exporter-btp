@@ -30,7 +30,7 @@ func TestApplyExecutionTargetVariablesForSubaccount(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := applyExecutionTargetVariables(directory, ExecutionTarget{SubaccountID: "subaccount-id"}); err != nil {
+	if err := applyExecutionTargetVariables(openTestRoot(t, directory), ExecutionTarget{SubaccountID: "subaccount-id"}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -80,7 +80,7 @@ func TestApplyExecutionTargetVariablesMigratesCloudFoundryOrgVariable(t *testing
 		t.Fatal(err)
 	}
 
-	if err := applyExecutionTargetVariables(directory, ExecutionTarget{OrgID: "org-id"}); err != nil {
+	if err := applyExecutionTargetVariables(openTestRoot(t, directory), ExecutionTarget{OrgID: "org-id"}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -107,7 +107,7 @@ func TestApplyExecutionTargetVariablesForDirectory(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := applyExecutionTargetVariables(directory, ExecutionTarget{DirectoryID: "directory-id"}); err != nil {
+	if err := applyExecutionTargetVariables(openTestRoot(t, directory), ExecutionTarget{DirectoryID: "directory-id"}); err != nil {
 		t.Fatal(err)
 	}
 

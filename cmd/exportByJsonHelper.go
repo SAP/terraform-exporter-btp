@@ -86,14 +86,19 @@ func exportByJson(subaccount string, directory string, organization string, json
 		return
 	}
 
-	tfutils.SetupConfigDir(configDir, true, level)
-	if err := tfutils.WriteExecutionTargetTFVars(configDir, target); err != nil {
+	exportDir, err := tfutils.SetupConfigDir(configDir, true, level)
+	if err != nil {
+		tfutils.CleanupProviderConfig()
+		log.Fatal(err)
+	}
+	defer func() { _ = exportDir.Close() }()
+	if err := tfutils.WriteExecutionTargetTFVars(exportDir, target); err != nil {
 		log.Fatalf("error writing terraform.tfvars: %v", err)
 	}
 	resultStore := make(map[string]int)
 
-	exportLog, _ := resume.GetExistingExportLog(configDir)
-	fullExportLog, _ := resume.GetExistingExportLogComplete(configDir)
+	exportLog, _ := resume.GetExistingExportLog(exportDir)
+	fullExportLog, _ := resume.GetExistingExportLogComplete(exportDir)
 
 	for _, resName := range resNames {
 		// Check if the resource is already exported
@@ -110,9 +115,9 @@ func exportByJson(subaccount string, directory string, organization string, json
 		}
 
 		if len(value) != 0 {
-			resourceType, count := generateConfigForResource(resName, value, subaccount, directory, organization, "", configDir, resourceFile, importsOnly)
+			resourceType, count := generateConfigForResource(resName, value, subaccount, directory, organization, "", exportDir, resourceFile, importsOnly)
 			resultStore[resourceType] = count
-			_ = resume.WriteExportLog(configDir, resName, resourceType, count)
+			_ = resume.WriteExportLog(exportDir, resName, resourceType, count)
 		}
 	}
 
@@ -122,12 +127,12 @@ func exportByJson(subaccount string, directory string, organization string, json
 		CfOrgId:      organization,
 	}
 
-	tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig, importsOnly)
-	tfutils.FinalizeTfConfig(configDir, target, importsOnly)
+	tfcleanorchestrator.CleanUpGeneratedCode(exportDir, level, levelIds, &resultStore, backendConfig, importsOnly)
+	tfutils.FinalizeTfConfig(exportDir, target, importsOnly)
 	if !importsOnly {
-		generateNextStepsDocument(configDir, subaccount, directory, organization, "")
+		generateNextStepsDocument(exportDir, configDir, subaccount, directory, organization, "")
 	}
-	_ = resume.RemoveExportLog(configDir)
+	_ = resume.RemoveExportLog(exportDir)
 	resultStoreNew := resume.MergeSummaryTable(resultStore, fullExportLog)
 	output.RenderSummaryTable(resultStoreNew)
 	tfutils.CleanupProviderConfig()

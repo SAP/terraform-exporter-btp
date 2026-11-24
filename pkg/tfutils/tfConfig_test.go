@@ -2,6 +2,8 @@ package tfutils
 
 import (
 	"fmt"
+	"github.com/SAP/terraform-exporter-btp/pkg/files"
+	"github.com/stretchr/testify/require"
 	"os"
 	"path/filepath"
 	"slices"
@@ -15,9 +17,11 @@ func TestSetupConfigDir(t *testing.T) {
 	t.Setenv("BTP_PASSWORD", "password")
 	t.Setenv("BTP_GLOBALACCOUNT", "ga")
 
+	t.Chdir(t.TempDir())
 	curWd, _ := os.Getwd()
-
-	SetupConfigDir("configFolder", true, SubaccountLevel)
+	root, err := SetupConfigDir("configFolder", true, SubaccountLevel)
+	require.NoError(t, err)
+	require.NoError(t, root.Close())
 	if _, err := os.Stat(filepath.Join(curWd, "configFolder")); os.IsNotExist(err) {
 		t.Errorf("Directory should have been created")
 	}
@@ -28,17 +32,6 @@ func TestSetupConfigDir(t *testing.T) {
 
 	_ = os.RemoveAll(filepath.Join(curWd, "configFolder"))
 	cleanup()
-}
-
-func setupTestEnvironment() (string, func()) {
-	tempDir, err := os.MkdirTemp("", "providerTest")
-	if err != nil {
-		panic(err)
-	}
-
-	return tempDir, func() {
-		_ = os.RemoveAll(tempDir)
-	}
 }
 
 func TestNormalizeGeneratedResourceAddresses(t *testing.T) {
@@ -72,7 +65,7 @@ import {
 		t.Fatal(err)
 	}
 
-	if err := normalizeGeneratedResourceAddresses(tempDir); err != nil {
+	if err := normalizeGeneratedResourceAddresses(openTestRoot(t, tempDir)); err != nil {
 		t.Fatalf("normalizeGeneratedResourceAddresses() error = %v", err)
 	}
 
@@ -120,17 +113,14 @@ resource "btp_subaccount" "subaccount_0" {}
 		t.Fatal(err)
 	}
 
-	err := normalizeGeneratedResourceAddresses(tempDir)
+	err := normalizeGeneratedResourceAddresses(openTestRoot(t, tempDir))
 	if err == nil || !strings.Contains(err.Error(), "target resource address already exists") {
 		t.Fatalf("normalizeGeneratedResourceAddresses() error = %v, want collision error", err)
 	}
 }
 
 func TestConfigureProviderBtp(t *testing.T) {
-	tempDir, cleanup := setupTestEnvironment()
-	defer cleanup()
-
-	TmpFolder = tempDir
+	t.Cleanup(cleanup)
 
 	t.Setenv("BTP_USERNAME", "testuser")
 	t.Setenv("BTP_PASSWORD", "testpass")
@@ -138,7 +128,7 @@ func TestConfigureProviderBtp(t *testing.T) {
 	t.Setenv("BTP_CLI_SERVER_URL", "https://test.com")
 
 	ConfigureProvider(SubaccountLevel)
-	expectedFilePath := filepath.Join(TmpFolder, "provider.tf")
+	expectedFilePath := filepath.Join(providerDirectory.Root.Name(), "provider.tf")
 	if _, err := os.Stat(expectedFilePath); os.IsNotExist(err) {
 		t.Errorf("Expected file %s does not exist", expectedFilePath)
 	}
@@ -169,17 +159,14 @@ cli_server_url="https://test.com"
 }
 
 func TestConfigureProviderCF(t *testing.T) {
-	tempDir, cleanup := setupTestEnvironment()
-	defer cleanup()
-
-	TmpFolder = tempDir
+	t.Cleanup(cleanup)
 
 	t.Setenv("CF_USER", "testuser")
 	t.Setenv("CF_PASSWORD", "testpass")
 	t.Setenv("CF_API_URL", "https://test.com")
 
 	ConfigureProvider(OrganizationLevel)
-	expectedFilePath := filepath.Join(TmpFolder, "provider.tf")
+	expectedFilePath := filepath.Join(providerDirectory.Root.Name(), "provider.tf")
 	if _, err := os.Stat(expectedFilePath); os.IsNotExist(err) {
 		t.Errorf("Expected file %s does not exist", expectedFilePath)
 	}
@@ -394,10 +381,7 @@ func TestGetValidResourcesByLevel(t *testing.T) {
 }
 
 func TestConfigureProviderCFOmitsSecrets(t *testing.T) {
-	tempDir, cleanupFn := setupTestEnvironment()
-	defer cleanupFn()
-
-	TmpFolder = tempDir
+	t.Cleanup(cleanup)
 
 	t.Setenv("CF_USER", "testuser")
 	t.Setenv("CF_PASSWORD", "testpass")
@@ -408,7 +392,7 @@ func TestConfigureProviderCFOmitsSecrets(t *testing.T) {
 
 	ConfigureProvider(OrganizationLevel)
 
-	providerPath := filepath.Join(TmpFolder, "provider.tf")
+	providerPath := filepath.Join(providerDirectory.Root.Name(), "provider.tf")
 	content, err := os.ReadFile(providerPath)
 	if err != nil {
 		t.Fatalf("Failed to read file %s: %v", providerPath, err)
@@ -430,47 +414,21 @@ func TestConfigureProviderCFOmitsSecrets(t *testing.T) {
 }
 
 func TestCleanupRemovesTempDir(t *testing.T) {
-	// cleanup() clears the package-global TmpFolder; restore it afterwards so
-	// this test does not perturb global state relied on by other tests.
-	origTmpFolder := TmpFolder
-	defer func() { TmpFolder = origTmpFolder }()
-
-	tempDir, err := os.MkdirTemp("", "cleanupTest")
-	if err != nil {
-		t.Fatalf("failed to create temp dir: %v", err)
-	}
-
-	TmpFolder = tempDir
+	directory, err := files.NewTempDirectory("provider-cleanup-")
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = directory.Cleanup() })
+	providerDirectory = directory
+	path := directory.Root.Name()
 	cleanup()
-
-	if _, statErr := os.Stat(tempDir); !os.IsNotExist(statErr) {
-		t.Errorf("expected temp dir %s to be removed", tempDir)
-	}
-	if TmpFolder != "" {
-		t.Errorf("expected TmpFolder to be cleared, got %q", TmpFolder)
-	}
+	require.NoDirExists(t, path)
+	require.Nil(t, providerDirectory)
+	cleanup() // Idempotent.
 }
 
-func TestValidateConfigDirWithinWd(t *testing.T) {
-	wd := "/home/user/project"
-	tests := []struct {
-		name    string
-		target  string
-		wantErr bool
-	}{
-		{"subdir", "/home/user/project/generated", false},
-		{"nested subdir", "/home/user/project/a/b/c", false},
-		{"working dir itself", "/home/user/project", true},
-		{"parent traversal", "/home/user/project/../../etc", true},
-		{"absolute outside", "/etc", true},
-		{"sibling", "/home/user/other", true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := validateConfigDirWithinWd(wd, tt.target)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("validateConfigDirWithinWd(%q,%q) err=%v, wantErr=%v", wd, tt.target, err, tt.wantErr)
-			}
-		})
-	}
+func openTestRoot(t *testing.T, path string) *os.Root {
+	t.Helper()
+	root, err := os.OpenRoot(path)
+	require.NoError(t, err)
+	t.Cleanup(func() { _ = root.Close() })
+	return root
 }

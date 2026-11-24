@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"slices"
 	"sort"
 	"strings"
@@ -98,7 +97,7 @@ func ReadListResources(subaccountID, directoryID, organizationID string, resourc
 		return BtpResources{}, err
 	}
 
-	if err := PrepareQueryDirectory(TmpFolder); err != nil {
+	if err := PrepareQueryDirectory(providerDirectory.Root); err != nil {
 		return BtpResources{}, err
 	}
 
@@ -110,7 +109,7 @@ func ReadListResources(subaccountID, directoryID, organizationID string, resourc
 			continue
 		}
 
-		_, results, err := QueryResource(TmpFolder, commandName, subaccountID, directoryID, organizationID, "", nil, false)
+		_, results, err := QueryResource(providerDirectory.Root, commandName, subaccountID, directoryID, organizationID, "", nil, false)
 		if err != nil {
 			return BtpResources{}, err
 		}
@@ -134,7 +133,7 @@ func ReadListResources(subaccountID, directoryID, organizationID string, resourc
 	return BtpResources{BtpResources: resources}, nil
 }
 
-func QueryResource(configDir, commandName, subaccountID, directoryID, organizationID, spaceID string, selected []string, generate bool) (string, []QueryResult, error) {
+func QueryResource(configDir *os.Root, commandName, subaccountID, directoryID, organizationID, spaceID string, selected []string, generate bool) (string, []QueryResult, error) {
 	level, _ := GetExecutionLevelAndId(subaccountID, directoryID, organizationID, spaceID)
 	lookupLevel := level
 
@@ -192,7 +191,13 @@ func QueryResource(configDir, commandName, subaccountID, directoryID, organizati
 	return spec.ResourceType, results, err
 }
 
-func WriteQueryResults(configDir, resourceFileName, resourceType string, results []QueryResult) error {
+func WriteQueryResults(configDir *os.Root, resourceFileName, resourceType string, results []QueryResult) error {
+	if err := files.ValidateFilename(resourceFileName); err != nil {
+		return err
+	}
+	if err := files.ValidateFilename(resourceType); err != nil {
+		return err
+	}
 	var configs, imports strings.Builder
 
 	for _, result := range results {
@@ -206,41 +211,43 @@ func WriteQueryResults(configDir, resourceFileName, resourceType string, results
 		imports.WriteString("\n\n")
 	}
 
-	if err := files.CreateFileWithContent(filepath.Join(configDir, resourceFileName), configs.String()); err != nil {
+	if err := configDir.WriteFile(resourceFileName, []byte(configs.String()), 0600); err != nil {
 		return err
 	}
 
 	return files.WriteImportConfiguration(configDir, resourceType, imports.String())
 }
 
-func PrepareQueryDirectory(directory string) error {
+func PrepareQueryDirectory(directory *os.Root) error {
 
 	addUserAgent()
 	defer removeUserAgent()
 
-	chdir := fmt.Sprintf("-chdir=%s", directory)
-	if stderr, err := runTfCmdGeneric(chdir, "init", "-backend=false"); err != nil {
+	if stderr, err := runTfCmdInDirectory(directory, "init", "-backend=false"); err != nil {
 		return fmt.Errorf("error initializing Terraform query directory: %v: %s", err, stderr)
 	}
 	return nil
 }
 
-func runListQuery(directory string, spec ListResourceSpec, scope map[string]string, generate bool) ([]QueryResult, error) {
-	queryPath := filepath.Join(directory, "resources.tfquery.hcl")
-	if err := files.CreateFileWithContent(queryPath, renderListQuery(spec, scope)); err != nil {
+func runListQuery(directory *os.Root, spec ListResourceSpec, scope map[string]string, generate bool) ([]QueryResult, error) {
+	queryPath := "resources.tfquery.hcl"
+	if err := directory.WriteFile(queryPath, []byte(renderListQuery(spec, scope)), 0600); err != nil {
 		return nil, err
 	}
 
-	args := []string{fmt.Sprintf("-chdir=%s", directory), "query", "-json", "-no-color"}
+	args := []string{fmt.Sprintf("-chdir=%s", directory.Name()), "query", "-json", "-no-color"}
 	if generate {
-		generatedPath := filepath.Join(directory, queryGeneratedFileName)
-		if err := removeQueryGeneratedFile(generatedPath); err != nil {
+		generatedPath := queryGeneratedFileName
+		if err := removeQueryGeneratedFile(directory, generatedPath); err != nil {
 			return nil, err
 		}
-		defer func() { _ = removeQueryGeneratedFile(generatedPath) }()
+		defer func() { _ = removeQueryGeneratedFile(directory, generatedPath) }()
 		args = append(args, "-generate-config-out="+queryGeneratedFileName)
 	}
 
+	if err := files.ValidateTerraformDirectory(directory); err != nil {
+		return nil, err
+	}
 	cmd := exec.Command("terraform", args...)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -265,8 +272,8 @@ func runListQuery(directory string, spec ListResourceSpec, scope map[string]stri
 	return results, nil
 }
 
-func removeQueryGeneratedFile(path string) error {
-	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+func removeQueryGeneratedFile(directory *os.Root, path string) error {
+	if err := directory.Remove(path); err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("cannot remove Terraform query scratch file %q: %w", path, err)
 	}
 	return nil

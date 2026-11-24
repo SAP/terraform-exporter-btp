@@ -2,13 +2,15 @@ package generictools
 
 import (
 	"bytes"
+	"fmt"
+	"io/fs"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
+	"github.com/SAP/terraform-exporter-btp/pkg/files"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfcleanup/testutils"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 	"github.com/hashicorp/hcl/v2"
@@ -39,19 +41,37 @@ func GetHclFile(entryName string) (f *hclwrite.File) {
 	return f
 }
 
-func ProcessChanges(f *hclwrite.File, path string) {
-	changed := checkForChanges(f, path)
-
-	if changed {
-		err := writeFileNoFollow(path, f.Bytes(), 0600)
-		if err != nil {
-			log.Printf("Failed to write file %q: %s", path, err)
-			return
-		}
+// GetRootedHclFile reads exported configuration through its retained root.
+func GetRootedHclFile(directory *os.Root, name string) (*hclwrite.File, error) {
+	if err := files.ValidateFilename(name); err != nil {
+		return nil, err
 	}
+	source, err := directory.ReadFile(name)
+	if err != nil {
+		return nil, err
+	}
+	f, diagnostics := hclwrite.ParseConfig(source, name, hcl.InitialPos)
+	if diagnostics.HasErrors() {
+		return nil, fmt.Errorf("parse %s: %s", name, diagnostics.Error())
+	}
+	return f, nil
 }
 
-func CreateVariablesFile(contentToCreate VariableContent, directory string) {
+func ProcessChanges(directory *os.Root, f *hclwrite.File, name string) error {
+	if err := files.ValidateFilename(name); err != nil {
+		return err
+	}
+	original, err := directory.ReadFile(name)
+	if err != nil {
+		return err
+	}
+	if bytes.Equal(original, f.Bytes()) {
+		return nil
+	}
+	return directory.WriteFile(name, f.Bytes(), 0600)
+}
+
+func CreateVariablesFile(contentToCreate VariableContent, directory *os.Root) error {
 	f := hclwrite.NewEmptyFile()
 
 	rootBody := f.Body()
@@ -95,24 +115,7 @@ func CreateVariablesFile(contentToCreate VariableContent, directory string) {
 
 	variablesSrc := hclwrite.Format(f.Bytes())
 
-	path := filepath.Join(directory, "variables.tf")
-	err := writeFileNoFollow(path, variablesSrc, 0600)
-	if err != nil {
-		log.Printf("Failed to write file %q: %s", path, err)
-		return
-	}
-}
-
-// writeFileNoFollow writes data to path without following a pre-existing
-// symlink: if the target is a symlink it is removed first and recreated as a
-// regular file with the given permissions.
-func writeFileNoFollow(path string, data []byte, perm os.FileMode) error {
-	if info, err := os.Lstat(path); err == nil && info.Mode()&os.ModeSymlink != 0 {
-		if rmErr := os.Remove(path); rmErr != nil {
-			return rmErr
-		}
-	}
-	return os.WriteFile(path, data, perm)
+	return directory.WriteFile("variables.tf", variablesSrc, 0600)
 }
 
 func ReplaceStringTokenVar(tokens hclwrite.Tokens, identifier string) (replacedTokens hclwrite.Tokens, valueForVariable string) {
@@ -186,22 +189,6 @@ func ExtractBlockInformation(inBlocks []string) (blockType string, blockIdentifi
 	}
 
 	return blockType, blockIdentifier, resourceAddress
-}
-
-func checkForChanges(f *hclwrite.File, path string) (changed bool) {
-	changed = false
-
-	originalContent, err := os.ReadFile(path)
-	if err != nil {
-		log.Printf("Failed to read file %q: %s", path, err)
-		return
-	}
-
-	updatedContent := f.Bytes()
-	if !bytes.Equal(originalContent, updatedContent) {
-		changed = true
-	}
-	return changed
 }
 
 func IsGlobalAccountParent(btpClient *btpcli.ClientFacade, parentId string) (isParent bool) {
@@ -361,14 +348,19 @@ func ReplaceAttribute(body *hclwrite.Body, identifier string, description string
 	}
 }
 
-func RemoveUnusedImports(directory string, blocksToRemove *[]BlockSpecifier, resultStore *map[string]int) {
+func RemoveUnusedImports(directory *os.Root, blocksToRemove *[]BlockSpecifier, resultStore *map[string]int) error {
 	for _, block := range *blocksToRemove {
-		filePath := filepath.Join(directory, block.BlockIdentifier+"_import.tf")
-		f := GetHclFile(filePath)
-		body := f.Body()
-		RemoveImportBlock(body, block.ResourceAddress, resultStore)
-		ProcessChanges(f, filePath)
+		fileName := block.BlockIdentifier + "_import.tf"
+		f, err := GetRootedHclFile(directory, fileName)
+		if err != nil {
+			return err
+		}
+		RemoveImportBlock(f.Body(), block.ResourceAddress, resultStore)
+		if err := ProcessChanges(directory, f, fileName); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 func RemoveAttributeFromResourceBlocks(body *hclwrite.Body, blockIdentifier string, attributeName string) {
@@ -390,18 +382,20 @@ func RemoveAttributeFromResourceBlocks(body *hclwrite.Body, blockIdentifier stri
 	}
 }
 
-func RemoveEmptyFiles(dir string) error {
-	files, err := os.ReadDir(dir)
+func RemoveEmptyFiles(dir *os.Root) error {
+	entries, err := fs.ReadDir(dir.FS(), ".")
 	if err != nil {
-		log.Printf("Failed to read directory %q: %s", dir, err)
 		return err
 	}
-
-	for _, file := range files {
-		path := filepath.Join(dir, file.Name())
-		info, _ := os.Lstat(path)
-		if info.Size() == 0 {
-			_ = os.Remove(path)
+	for _, entry := range entries {
+		info, err := dir.Lstat(entry.Name())
+		if err != nil {
+			return err
+		}
+		if info.Mode().IsRegular() && info.Size() == 0 {
+			if err := dir.Remove(entry.Name()); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

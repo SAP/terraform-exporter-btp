@@ -3,7 +3,6 @@ package tfutils
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -14,7 +13,7 @@ import (
 // applyExecutionTargetVariables makes the exported configuration consume the
 // selected target from terraform.tfvars. Existing resource references are left
 // untouched so that cleanup-created dependencies remain in place.
-func applyExecutionTargetVariables(directory string, target ExecutionTarget) error {
+func applyExecutionTargetVariables(directory *os.Root, target ExecutionTarget) error {
 	terraformFiles, err := readTerraformFiles(directory)
 	if err != nil {
 		return err
@@ -26,7 +25,7 @@ func applyExecutionTargetVariables(directory string, target ExecutionTarget) err
 			changed = true
 		}
 		if changed {
-			if err := os.WriteFile(terraformFile.path, terraformFile.file.Bytes(), terraformFile.mode.Perm()); err != nil {
+			if err := directory.WriteFile(terraformFile.path, terraformFile.file.Bytes(), terraformFile.mode.Perm()); err != nil {
 				return fmt.Errorf("write Terraform configuration %q: %w", terraformFile.path, err)
 			}
 		}
@@ -122,10 +121,10 @@ func rewriteLegacyOrgVariable(body *hclwrite.Body) bool {
 	return changed
 }
 
-func ensureExecutionTargetVariable(directory string, target ExecutionTarget) error {
-	path := filepath.Join(directory, "variables.tf")
+func ensureExecutionTargetVariable(directory *os.Root, target ExecutionTarget) error {
+	path := "variables.tf"
 	f := hclwrite.NewEmptyFile()
-	if source, err := os.ReadFile(path); err == nil {
+	if source, err := directory.ReadFile(path); err == nil {
 		parsed, diagnostics := hclwrite.ParseConfig(source, path, hcl.InitialPos)
 		if diagnostics.HasErrors() {
 			return fmt.Errorf("parse Terraform configuration %q: %s", path, diagnostics.Error())
@@ -159,7 +158,7 @@ func ensureExecutionTargetVariable(directory string, target ExecutionTarget) err
 	variableBody.SetAttributeValue("description", cty.StringVal(scopeVariableDescription(target)))
 	variableBody.RemoveAttribute("default")
 
-	return os.WriteFile(path, hclwrite.Format(f.Bytes()), 0600)
+	return directory.WriteFile(path, hclwrite.Format(f.Bytes()), 0600)
 }
 
 func scopeVariableDescription(target ExecutionTarget) string {

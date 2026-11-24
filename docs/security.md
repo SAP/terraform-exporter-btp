@@ -13,3 +13,11 @@ When using the Terraform Exporter for SAP BTP, following security best practices
 5. **Review and Update Terraform Configurations Regularly**: Ensure that exported configurations align with current security and compliance requirements. Regularly review and update configurations, removing any deprecated or unused resources that could expose vulnerabilities.
 
 Following these guidelines can greatly reduce the security risks associated with managing SAP BTP resources using Terraform.
+
+## Export Directory Containment
+
+The exporter's file operations use retained directory handles to keep generated files inside the selected output directory. Export paths must be relative descendants of the working directory. Recursive overwrite is confined to that directory tree and still requires confirmation. Temporary query directories have random names and are cleaned up only through their allocation handles.
+
+Before invoking Terraform, the exporter verifies that its directory has not been replaced and rejects escaping or dangling symbolic links in the directory tree. This includes external provider-cache links under `.terraform/providers`; shared provider caches that create those links must be disabled for exports. Relative symbolic links whose targets remain inside the directory are supported. Absolute symbolic links are rejected by the rooted filesystem operations, even if their target is inside the directory.
+
+Terraform execution is not isolated. The directory must be trusted against concurrent modification while Terraform runs. These checks do not sandbox Terraform configuration, provider executables, environment settings, hard links, or filesystem mounts.

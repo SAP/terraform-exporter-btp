@@ -25,7 +25,7 @@ type terraformFile struct {
 // resource labels with labels derived from the resource type. It updates all
 // traversals in the configuration from the same address map, including import
 // targets and dependencies created during code cleanup.
-func normalizeGeneratedResourceAddresses(directory string) error {
+func normalizeGeneratedResourceAddresses(directory *os.Root) error {
 	terraformFiles, err := readTerraformFiles(directory)
 	if err != nil {
 		return err
@@ -62,7 +62,7 @@ func normalizeGeneratedResourceAddresses(directory string) error {
 			changed = true
 		}
 		if changed {
-			if err := os.WriteFile(terraformFile.path, terraformFile.file.Bytes(), terraformFile.mode.Perm()); err != nil {
+			if err := directory.WriteFile(terraformFile.path, terraformFile.file.Bytes(), terraformFile.mode.Perm()); err != nil {
 				return fmt.Errorf("write Terraform configuration %q: %w", terraformFile.path, err)
 			}
 		}
@@ -71,9 +71,9 @@ func normalizeGeneratedResourceAddresses(directory string) error {
 	return nil
 }
 
-func readTerraformFiles(directory string) ([]terraformFile, error) {
+func readTerraformFiles(directory *os.Root) ([]terraformFile, error) {
 	var terraformFiles []terraformFile
-	err := filepath.WalkDir(directory, func(path string, entry fs.DirEntry, walkErr error) error {
+	err := fs.WalkDir(directory.FS(), ".", func(path string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
 		}
@@ -85,7 +85,7 @@ func readTerraformFiles(directory string) ([]terraformFile, error) {
 		if err != nil {
 			return err
 		}
-		source, err := os.ReadFile(path)
+		source, err := directory.ReadFile(filepath.FromSlash(path))
 		if err != nil {
 			return err
 		}
@@ -93,7 +93,7 @@ func readTerraformFiles(directory string) ([]terraformFile, error) {
 		if diagnostics.HasErrors() {
 			return fmt.Errorf("parse Terraform configuration %q: %s", path, diagnostics.Error())
 		}
-		terraformFiles = append(terraformFiles, terraformFile{path: path, mode: info.Mode(), file: parsed})
+		terraformFiles = append(terraformFiles, terraformFile{path: filepath.FromSlash(path), mode: info.Mode(), file: parsed})
 		return nil
 	})
 	if err != nil {
