@@ -25,10 +25,10 @@ jobs:
       output_dir_json_inventory: ${{ steps.json-inventory-directory.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: "go.mod"
           cache: true
@@ -42,7 +42,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v4.0.1
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
@@ -80,10 +80,10 @@ jobs:
       output_subacount_json_inventory: ${{ steps.json-inventory-subaccount.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: "go.mod"
           cache: true
@@ -97,7 +97,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v4.0.1
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
@@ -136,10 +136,10 @@ jobs:
       output_cforg_json_inventory: ${{ steps.json-inventory-cforg.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: "go.mod"
           cache: true
@@ -153,7 +153,7 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v4.0.1
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
@@ -192,10 +192,10 @@ jobs:
       output_dir_export_by_json: ${{ steps.export-by-json-directory.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: "go.mod"
           cache: true
@@ -209,13 +209,13 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v4.0.1
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
       - name: "Setup Node.js"
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: "npm"
@@ -276,10 +276,10 @@ jobs:
       output_subacount_export_by_json: ${{ steps.export-by-json-subaccount.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: "go.mod"
           cache: true
@@ -293,13 +293,13 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v4.0.1
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
       - name: "Setup Node.js"
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: "npm"
@@ -361,10 +361,10 @@ jobs:
       output_cforg_export_by_json: ${{ steps.export-by-json-cforg.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: "go.mod"
           cache: true
@@ -378,13 +378,13 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v4.0.1
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
       - name: "Setup Node.js"
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: "npm"
@@ -446,10 +446,10 @@ jobs:
       output_dir_export_by_res: ${{ steps.export-by-resource-directory.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: "go.mod"
           cache: true
@@ -463,13 +463,13 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v4.0.1
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
       - name: "Setup Node.js"
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: "npm"
@@ -530,10 +530,10 @@ jobs:
       output_subacount_export_by_res: ${{ steps.export-by-resource-subaccount.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: "go.mod"
           cache: true
@@ -547,13 +547,13 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v4.0.1
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
       - name: "Setup Node.js"
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: "npm"
@@ -615,10 +615,10 @@ jobs:
       output_cforg_export_by_res: ${{ steps.export-by-resource-cforg.outputs.result }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Go
-        uses: actions/setup-go@v7
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: "go.mod"
           cache: true
@@ -632,13 +632,13 @@ jobs:
         run: make install
 
       - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v4.0.1
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: ${{ env.TF_VERSION }}
           terraform_wrapper: false
 
       - name: "Setup Node.js"
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
           cache: "npm"
@@ -723,7 +723,7 @@ jobs:
           echo "failed=$failed" >> "$GITHUB_OUTPUT"
       - name: Require manual approval if any job failed
         if: steps.aggregate.outputs.failed == '1'
-        uses: trstringer/manual-approval@v1
+        uses: trstringer/manual-approval@fa642940caf8412403569b28b2db4a1df08a83a3 # v1.13.1
         timeout-minutes: 30
         with:
           secret: ${{ secrets.GITHUB_TOKEN }}
