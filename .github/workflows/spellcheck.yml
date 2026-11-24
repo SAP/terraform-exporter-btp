@@ -17,10 +17,10 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Check Spelling
         id: spellcheck
-        uses: rojopolis/spellcheck-github-actions@0.69.0
+        uses: rojopolis/spellcheck-github-actions@46744bf125ab863939a56ecfe2c12cce6f9f7388 # 0.70.0
         with:
           config_path: .spellcheck.yml
           task_name: Markdown
