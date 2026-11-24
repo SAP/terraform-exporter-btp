@@ -10,8 +10,8 @@ github.com/apparentlymart/go-textseg/v17 v17.0.1 h1:bpMXRgQ5cEoRNuQke1a80/Nl6w3G
 github.com/apparentlymart/go-textseg/v17 v17.0.1/go.mod h1:fa8X4jgGeevslICIY6LcdjkSecWnXmYd9Lk34z/VxZs=
 github.com/clipperhouse/uax29/v2 v2.7.0 h1:+gs4oBZ2gPfVrKPthwbMzWZDaAFPGYK72F0NJv2v7Vk=
 github.com/clipperhouse/uax29/v2 v2.7.0/go.mod h1:EFJ2TJMRUaplDxHKj1qAEhCtQPW2tJSwu5BF98AuoVM=
-github.com/cloudfoundry/go-cfclient/v3 v3.0.0-beta.2 h1:1HKWIT9rW8ba9D1hvZ8pp8tw1oUtJTOnkm+weMMgzs0=
-github.com/cloudfoundry/go-cfclient/v3 v3.0.0-beta.2/go.mod h1:2hKF056rrPFalZQJVwfFY0qvjfcZTQMcuCLACubHCn8=
+github.com/cloudfoundry/go-cfclient/v3 v3.0.0 h1:6E7GCExYkHWKfXaDNp0ofcoJS2wB3ZT09H1wDPYV+II=
+github.com/cloudfoundry/go-cfclient/v3 v3.0.0/go.mod h1:2hKF056rrPFalZQJVwfFY0qvjfcZTQMcuCLACubHCn8=
 github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0 h1:sDMmm+q/3+BukdIpxwO365v/Rbspp2Nt5XntgQRXq8Q=
 github.com/codegangsta/inject v0.0.0-20150114235600-33e0aa1cb7c0/go.mod h1:4Zcjuz89kmFXt9morQgcfYZAYZ5n8WHjt81YYWIwtTM=
 github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=
