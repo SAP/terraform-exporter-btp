@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/SAP/terraform-exporter-btp/pkg/files"
 	"github.com/spf13/viper"
 )
 
@@ -21,13 +22,18 @@ var getIaCTool = func() (string, error) {
 	return "terraform", nil
 }
 
-func runTfCmdGeneric(args ...string) (string, error) {
+func runTfCmdInDirectory(directory *os.Root, args ...string) (string, error) {
+	if err := files.ValidateTerraformDirectory(directory); err != nil {
+		return "", err
+	}
+
 	tool, err := getIaCTool()
 	if err != nil {
 		return "", err
 	}
 	args = append(args, "-no-color")
 	cmd := exec.Command(tool, args...)
+	cmd.Dir = directory.Name()
 	var stderr bytes.Buffer
 	if viper.GetViper().GetBool("verbose") {
 		cmd.Stdout = os.Stdout

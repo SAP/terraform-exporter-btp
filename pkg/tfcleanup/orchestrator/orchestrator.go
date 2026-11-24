@@ -2,9 +2,9 @@ package orchestrator
 
 import (
 	"fmt"
+	"io/fs"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/SAP/terraform-exporter-btp/internal/btpcli"
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
@@ -15,7 +15,7 @@ import (
 	"github.com/SAP/terraform-exporter-btp/pkg/toggles"
 )
 
-func CleanUpGeneratedCode(configFolder string, level string, levelIds generictools.LevelIds, resultStore *map[string]int, backendConfig tfutils.BackendConfig, importsOnly bool) {
+func CleanUpGeneratedCode(configFolder *os.Root, level string, levelIds generictools.LevelIds, resultStore *map[string]int, backendConfig tfutils.BackendConfig, importsOnly bool) {
 	if toggles.IsCodeCleanupDeactivated() {
 		return
 	}
@@ -23,16 +23,7 @@ func CleanUpGeneratedCode(configFolder string, level string, levelIds generictoo
 	output.AddNewLine()
 	spinner := output.StartSpinner("📈 making the Terraform configuration even better")
 
-	currentDir, err := os.Getwd()
-	if err != nil {
-		tfutils.CleanupProviderConfig()
-		fmt.Print("\r\n")
-		log.Fatalf("error getting current directory: %v", err)
-	}
-
-	terraformConfigPath := filepath.Join(currentDir, configFolder)
-
-	err = orchestrateCodeCleanup(terraformConfigPath, level, levelIds, resultStore, backendConfig, importsOnly)
+	err := orchestrateCodeCleanup(configFolder, level, levelIds, resultStore, backendConfig, importsOnly)
 
 	if err != nil {
 		if importsOnly {
@@ -47,18 +38,9 @@ func CleanUpGeneratedCode(configFolder string, level string, levelIds generictoo
 	output.StopSpinner(spinner)
 }
 
-func orchestrateCodeCleanup(dir string, level string, levelIds generictools.LevelIds, resultStore *map[string]int, backendConfig tfutils.BackendConfig, importsOnly bool) error {
-	dir = filepath.Clean(dir)
-
-	_, err := os.Lstat(dir)
+func orchestrateCodeCleanup(dir *os.Root, level string, levelIds generictools.LevelIds, resultStore *map[string]int, backendConfig tfutils.BackendConfig, importsOnly bool) error {
+	entries, err := fs.ReadDir(dir.FS(), ".")
 	if err != nil {
-		log.Printf("Failed to stat %q: %s\n", dir, err)
-		return err
-	}
-
-	files, err := os.ReadDir(dir)
-	if err != nil {
-		log.Printf("Failed to read directory %q: %s", dir, err)
 		return err
 	}
 
@@ -73,14 +55,14 @@ func orchestrateCodeCleanup(dir string, level string, levelIds generictools.Leve
 		}
 	}
 
-	for _, file := range files {
+	for _, file := range entries {
 		// We only process the resources and the provider files
-		path := filepath.Join(dir, file.Name())
+		path := file.Name()
 
 		if file.Name() == "btp_resources.tf" {
-			f := generictools.GetHclFile(path)
-			if f == nil {
-				return fmt.Errorf("cannot read generated resources at %s", path)
+			f, err := generictools.GetRootedHclFile(dir, path)
+			if err != nil {
+				return err
 			}
 			if importsOnly {
 				if level == tfutils.SubaccountLevel && !toggles.IsEntitlementModuleGenerationDeactivated() {
@@ -88,23 +70,31 @@ func orchestrateCodeCleanup(dir string, level string, levelIds generictools.Leve
 				}
 			} else {
 				resourceprocessor.ProcessResources(f, level, &contentToCreate, &dependencyAddresses, btpClient, levelIds)
-				generictools.ProcessChanges(f, path)
+				if err := generictools.ProcessChanges(dir, f, path); err != nil {
+					return err
+				}
 			}
 		} else if file.Name() == "provider.tf" {
-			f := generictools.GetHclFile(path)
-			if f == nil {
-				return fmt.Errorf("cannot read provider configuration at %s", path)
+			f, err := generictools.GetRootedHclFile(dir, path)
+			if err != nil {
+				return err
 			}
 			providerprocessor.ProcessProvider(f, &contentToCreate, backendConfig)
-			generictools.ProcessChanges(f, path)
+			if err := generictools.ProcessChanges(dir, f, path); err != nil {
+				return err
+			}
 		}
 	}
 
 	// Remove unused imports
-	generictools.RemoveUnusedImports(dir, &dependencyAddresses.BlocksToRemove, resultStore)
+	if err := generictools.RemoveUnusedImports(dir, &dependencyAddresses.BlocksToRemove, resultStore); err != nil {
+		return err
+	}
 
 	//Manipulate the import block to comprise the module addresses
-	resourceprocessor.AppendImportBlocksForEntitlementModule(dir, dependencyAddresses.EntitlementAddress, levelIds)
+	if err := resourceprocessor.AppendImportBlocksForEntitlementModule(dir, dependencyAddresses.EntitlementAddress, levelIds); err != nil {
+		return err
+	}
 
 	err = generictools.RemoveEmptyFiles(dir)
 	if err != nil {
@@ -112,7 +102,7 @@ func orchestrateCodeCleanup(dir string, level string, levelIds generictools.Leve
 	}
 
 	if len(contentToCreate) > 0 {
-		generictools.CreateVariablesFile(contentToCreate, dir)
+		return generictools.CreateVariablesFile(contentToCreate, dir)
 	}
 	return nil
 }

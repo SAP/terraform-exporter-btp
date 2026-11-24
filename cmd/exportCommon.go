@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 
-	"github.com/SAP/terraform-exporter-btp/pkg/files"
 	"github.com/SAP/terraform-exporter-btp/pkg/output"
 	"github.com/SAP/terraform-exporter-btp/pkg/tfutils"
 	"github.com/google/uuid"
@@ -17,8 +15,7 @@ const tfConfigFileName = "btp_resources.tf"
 const configDirDefault = "generated_configurations_<account-id>"
 const jsonFileDefault = "btpResources_<account-id>.json"
 
-func generateConfigForResource(resource string, values []string, subaccountID, directoryID, organizationID, spaceID, configDir, resourceFileName string, importsOnly bool) (string, int) {
-	tempConfigDir := resource + "-config"
+func generateConfigForResource(resource string, values []string, subaccountID, directoryID, organizationID, spaceID string, configDir *os.Root, resourceFileName string, importsOnly bool) (string, int) {
 	level, _ := tfutils.GetExecutionLevelAndId(subaccountID, directoryID, organizationID, spaceID)
 	spec, err := tfutils.GetListResourceSpec(resource, func() string {
 		if resource == tfutils.CmdCfSpaceRoleParameter {
@@ -30,19 +27,23 @@ func generateConfigForResource(resource string, values []string, subaccountID, d
 		log.Fatalf("error resolving list resource: %v", err)
 	}
 
-	tfutils.ExecPreExportSteps(tempConfigDir, level)
+	tempConfigDir, err := tfutils.NewQueryDirectory(level)
+	if err != nil {
+		tfutils.CleanupProviderConfig()
+		log.Fatal(err)
+	}
 	if err := tfutils.ValidateTerraformQuerySupport(); err != nil {
 		tfutils.CleanupProviderConfig(tempConfigDir)
 		log.Fatalf("cannot query resources: %v", err)
 	}
-	if err := tfutils.PrepareQueryDirectory(tempConfigDir); err != nil {
+	if err := tfutils.PrepareQueryDirectory(tempConfigDir.Root); err != nil {
 		tfutils.CleanupProviderConfig(tempConfigDir)
 		log.Fatalf("cannot prepare Terraform query: %v", err)
 	}
 
 	output.AddNewLine()
 	spinner := output.StartSpinner("querying and generating " + strings.ToUpper(spec.ResourceType))
-	resourceType, results, err := tfutils.QueryResource(tempConfigDir, resource, subaccountID, directoryID, organizationID, spaceID, values, true)
+	resourceType, results, err := tfutils.QueryResource(tempConfigDir.Root, resource, subaccountID, directoryID, organizationID, spaceID, values, true)
 	if err != nil {
 		tfutils.CleanupProviderConfig(tempConfigDir)
 		fmt.Print("\r\n")
@@ -54,7 +55,7 @@ func generateConfigForResource(resource string, values []string, subaccountID, d
 		tfutils.CleanupTempFiles(tempConfigDir)
 		return resourceType, 0
 	}
-	if err := tfutils.WriteQueryResults(tempConfigDir, resourceFileName, resourceType, results); err != nil {
+	if err := tfutils.WriteQueryResults(tempConfigDir.Root, resourceFileName, resourceType, results); err != nil {
 		tfutils.CleanupProviderConfig(tempConfigDir)
 		log.Fatalf("error writing generated configuration for %s: %v", resourceType, err)
 	}
@@ -75,16 +76,11 @@ func getUuidError(level, id string) string {
 	return ""
 }
 
-func generateNextStepsDocument(configDir, subaccount, directory, organization, space string) {
+func generateNextStepsDocument(exportDir *os.Root, configDir, subaccount, directory, organization, space string) {
 	level, id := tfutils.GetExecutionLevelAndId(subaccount, directory, organization, space)
 	level = strings.ReplaceAll(level, "Level", "")
 	content := output.GetNextStepsTemplate(output.NextStepTemplateData{ConfigDir: configDir, UUID: id, Level: level})
-	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Println("error creating NextSteps.md file: ", err)
-		return
-	}
-	if err := files.CreateFileWithContent(filepath.Join(currentDir, configDir, "NextSteps.md"), content); err != nil {
+	if err := exportDir.WriteFile("NextSteps.md", []byte(content), 0600); err != nil {
 		log.Println("error creating NextSteps.md file: ", err)
 	}
 }

@@ -64,7 +64,7 @@ btptf export [flags]
       --backend-config strings      Backend configuration
   -b, --backend-path string         Path to the Terraform backend configuration file
       --backend-type string         Type of the Terraform backend
-  -c, --config-dir string           Directory for the Terraform code (default "generated_configurations_<account-id>")
+  -c, --config-dir string           Relative subdirectory of the working directory for the Terraform code (default "generated_configurations_<account-id>")
   -d, --directory string            ID of the directory
   -h, --help[=true|false]           help for export
       --imports-only[=true|false]   Keep imports and provider configuration without resource configuration or NextSteps.md
@@ -97,7 +97,7 @@ btptf export-by-json [flags]
       --backend-config strings      Backend configuration
   -b, --backend-path string         Path to the Terraform backend configuration file
       --backend-type string         Type of the Terraform backend
-  -c, --config-dir string           Directory for the Terraform code (default "generated_configurations_<account-id>")
+  -c, --config-dir string           Relative subdirectory of the working directory for the Terraform code (default "generated_configurations_<account-id>")
   -d, --directory string            ID of the directory
   -h, --help[=true|false]           help for export-by-json
       --imports-only[=true|false]   Keep imports and provider configuration without resource configuration or NextSteps.md

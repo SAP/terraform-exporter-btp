@@ -89,7 +89,7 @@ func init() {
 	exportByJsonCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "org")
 
 	exportByJsonCmd.Flags().Bool("imports-only", false, "Keep imports and provider configuration without resource configuration or NextSteps.md")
-	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
+	exportByJsonCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Relative subdirectory of the working directory for the Terraform code")
 	exportByJsonCmd.Flags().StringVarP(&path, "path", "p", jsonFileDefault, "Full path to JSON file with list of resources")
 
 	exportByJsonCmd.Flags().StringVarP(&backendPath, "backend-path", "b", "", "Path to the Terraform backend configuration file")

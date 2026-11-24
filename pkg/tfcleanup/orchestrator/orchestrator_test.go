@@ -35,7 +35,10 @@ provider "btp" {
 			}
 			counts := map[string]int{tfutils.SubaccountType: 1}
 			backend := tfutils.BackendConfig{BackendType: "local", BackendConfig: []string{"path=state.tfstate"}}
-			require.NoError(t, orchestrateCodeCleanup(dir, level, generictools.LevelIds{}, &counts, backend, true))
+			root, err := os.OpenRoot(dir)
+			require.NoError(t, err)
+			t.Cleanup(func() { _ = root.Close() })
+			require.NoError(t, orchestrateCodeCleanup(root, level, generictools.LevelIds{}, &counts, backend, true))
 			// Resource refinements would remove description and query the parent.
 			unchanged, err := os.ReadFile(filepath.Join(dir, "btp_resources.tf"))
 			require.NoError(t, err)

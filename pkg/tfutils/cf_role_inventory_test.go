@@ -87,7 +87,7 @@ func TestCfRoleInventoryDistinguishesUserOrigins(t *testing.T) {
 				require.NoError(t, err)
 				relative, err := filepath.Rel(cwd, directory)
 				require.NoError(t, err)
-				require.NoError(t, WriteQueryResults(relative, "roles.tf", spec.ResourceType, selected))
+				require.NoError(t, WriteQueryResults(openTestRoot(t, relative), "roles.tf", spec.ResourceType, selected))
 				imports, err := os.ReadFile(filepath.Join(directory, spec.ResourceType+"_import.tf"))
 				require.NoError(t, err)
 				assert.Equal(t, result.ImportConfig+"\n\n", string(imports))

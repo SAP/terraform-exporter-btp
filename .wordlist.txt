@@ -23,7 +23,12 @@ dependabot
 devcontainer
 devcontainers
 dir
+executable
+Executable
+executables
+Executables
 faq
+filesystem
 Github
 github
 GLOBALACCOUNT

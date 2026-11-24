@@ -1,7 +1,7 @@
 package resourceprocessor
 
 import (
-	"path/filepath"
+	"os"
 	"strconv"
 	"strings"
 
@@ -213,21 +213,17 @@ func recordEntitlementImportsToRemove(dependencyAddresses *generictools.Dependen
 	}
 }
 
-func AppendImportBlocksForEntitlementModule(directory string, entitlementsToAdd map[generictools.EntitlementKey]generictools.EntitlementInfo, levelIds generictools.LevelIds) {
-	if toggles.IsEntitlementModuleGenerationDeactivated() {
-		return
+func AppendImportBlocksForEntitlementModule(directory *os.Root, entitlementsToAdd map[generictools.EntitlementKey]generictools.EntitlementInfo, levelIds generictools.LevelIds) error {
+	if toggles.IsEntitlementModuleGenerationDeactivated() || len(entitlementsToAdd) == 0 {
+		return nil
 	}
-
-	if len(entitlementsToAdd) == 0 {
-		return
+	const name = "btp_subaccount_entitlement_import.tf"
+	f, err := generictools.GetRootedHclFile(directory, name)
+	if err != nil {
+		return err
 	}
-
-	filePath := filepath.Join(directory, "btp_subaccount_entitlement_import.tf")
-	f := generictools.GetHclFile(filePath)
-	body := f.Body()
-
-	appendEntitlementModuleImports(body, entitlementsToAdd, levelIds)
-	generictools.ProcessChanges(f, filePath)
+	appendEntitlementModuleImports(f.Body(), entitlementsToAdd, levelIds)
+	return generictools.ProcessChanges(directory, f, name)
 }
 
 func appendEntitlementModuleImports(body *hclwrite.Body, entitlementsToAdd map[generictools.EntitlementKey]generictools.EntitlementInfo, levelIds generictools.LevelIds) {

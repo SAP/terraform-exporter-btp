@@ -57,25 +57,30 @@ var exportByResourceCmd = &cobra.Command{
 		}
 
 		output.PrintExportStartMessage()
-		tfutils.SetupConfigDir(configDir, true, level)
-		if err := tfutils.WriteExecutionTargetTFVars(configDir, target); err != nil {
+		exportDir, err := tfutils.SetupConfigDir(configDir, true, level)
+		if err != nil {
+			tfutils.CleanupProviderConfig()
+			log.Fatal(err)
+		}
+		defer func() { _ = exportDir.Close() }()
+		if err := tfutils.WriteExecutionTargetTFVars(exportDir, target); err != nil {
 			log.Fatalf("error writing %s: %v", "terraform.tfvars", err)
 		}
 
 		resourcesList := tfutils.GetResourcesList(resources, level)
 
-		exportLog, _ := resume.GetExistingExportLog(configDir)
+		exportLog, _ := resume.GetExistingExportLog(exportDir)
 
 		var fullExportLog resume.Log
 		if len(exportLog) > 0 {
 			resourcesList = tfutils.FilterResourcesListByLog(resourcesList, exportLog)
-			fullExportLog, _ = resume.GetExistingExportLogComplete(configDir)
+			fullExportLog, _ = resume.GetExistingExportLogComplete(exportDir)
 		}
 
 		for _, resourceToImport := range resourcesList {
-			resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, configDir, tfConfigFileName, importsOnly)
+			resourceType, count := generateConfigForResource(resourceToImport, nil, subaccount, directory, organization, space, exportDir, tfConfigFileName, importsOnly)
 			resultStore[resourceType] = count
-			_ = resume.WriteExportLog(configDir, resourceToImport, resourceType, count)
+			_ = resume.WriteExportLog(exportDir, resourceToImport, resourceType, count)
 		}
 
 		levelIds := tfcleantypes.LevelIds{
@@ -84,13 +89,13 @@ var exportByResourceCmd = &cobra.Command{
 			CfOrgId:      organization,
 		}
 
-		tfcleanorchestrator.CleanUpGeneratedCode(configDir, level, levelIds, &resultStore, backendConfig, importsOnly)
-		tfutils.FinalizeTfConfig(configDir, target, importsOnly)
+		tfcleanorchestrator.CleanUpGeneratedCode(exportDir, level, levelIds, &resultStore, backendConfig, importsOnly)
+		tfutils.FinalizeTfConfig(exportDir, target, importsOnly)
 		if !importsOnly {
-			generateNextStepsDocument(configDir, subaccount, directory, organization, space)
+			generateNextStepsDocument(exportDir, configDir, subaccount, directory, organization, space)
 		}
 		tfutils.CleanupProviderConfig()
-		_ = resume.RemoveExportLog(configDir)
+		_ = resume.RemoveExportLog(exportDir)
 		resultStoreNew := resume.MergeSummaryTable(resultStore, fullExportLog)
 		output.RenderSummaryTable(resultStoreNew)
 		output.PrintExportSuccessMessage(configDir)
@@ -126,7 +131,7 @@ func init() {
 	exportByResourceCmd.MarkFlagsMutuallyExclusive("subaccount", "directory", "org")
 
 	exportByResourceCmd.Flags().Bool("imports-only", false, "Keep imports and provider configuration without resource configuration or NextSteps.md")
-	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Directory for the Terraform code")
+	exportByResourceCmd.Flags().StringVarP(&configDir, "config-dir", "c", configDirDefault, "Relative subdirectory of the working directory for the Terraform code")
 	exportByResourceCmd.Flags().StringVarP(&resources, "resources", "r", "all", "Comma-separated list of resources to be included")
 
 	exportByResourceCmd.Flags().StringVarP(&backendPath, "backend-path", "b", "", "Path to the Terraform backend configuration file")

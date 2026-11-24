@@ -1,22 +1,16 @@
 package files
 
 import (
+	"errors"
 	"fmt"
 	"io"
-	"log"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const maxJsonFileSize = 5242880 // 5 MB
-
-func DeleteSourceFolder(srcDir string) {
-	err := os.RemoveAll(srcDir)
-	if err != nil {
-		fmt.Print("\r\n")
-		log.Fatalf("error deleting source folder %s: %v", srcDir, err)
-	}
-}
 
 func CreateFileWithContent(fileName string, content string) error {
 
@@ -48,41 +42,55 @@ func CreateFileWithContent(fileName string, content string) error {
 	return nil
 }
 
-func WriteImportConfiguration(configDir string, resourceType string, importBlock string) error {
-
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return fmt.Errorf("error getting current directory: %v", err)
+func WriteImportConfiguration(configDir *os.Root, resourceType string, importBlock string) error {
+	if err := ValidateFilename(resourceType); err != nil {
+		return err
 	}
-
-	importFileName := fmt.Sprintf("%s_import.tf", resourceType)
-	importFileName = filepath.Join(currentDir, configDir, importFileName)
-
-	err = CreateFileWithContent(importFileName, importBlock)
-	if err != nil {
-		return fmt.Errorf("create file %s failed: %v", importFileName, err)
-	}
-
-	return nil
+	return configDir.WriteFile(resourceType+"_import.tf", []byte(importBlock), 0600)
 }
 
-func CopyImportFiles(srcDir, destDir string) error {
-	// Find all files ending with "_import.tf" in the source directory
-	files, err := filepath.Glob(filepath.Join(srcDir, "*_import.tf"))
+func CopyImportFiles(srcDir, destDir *os.Root) error {
+	entries, err := fs.ReadDir(srcDir.FS(), ".")
 	if err != nil {
-		return fmt.Errorf("error finding files: %v", err)
+		return err
 	}
-
-	// Copy each file to the destination directory
-	for _, srcFile := range files {
-		destFile := filepath.Join(destDir, filepath.Base(srcFile))
-
-		err := copyFile(srcFile, destFile)
-		if err != nil {
-			return fmt.Errorf("error copying file %s to %s: %v", srcFile, destFile, err)
+	for _, entry := range entries {
+		if !strings.HasSuffix(entry.Name(), "_import.tf") {
+			continue
+		}
+		if err := CopyFile(srcDir, destDir, entry.Name(), os.O_APPEND); err != nil {
+			return fmt.Errorf("copy import %s: %w", entry.Name(), err)
 		}
 	}
 	return nil
+}
+
+// CopyFile reads and writes relative to retained directory handles. In
+// particular, neither a filename nor a symlink can redirect either operation
+// outside its directory.
+func CopyFile(srcDir, destDir *os.Root, name string, flag int) error {
+	if err := ValidateFilename(name); err != nil {
+		return err
+	}
+	source, err := srcDir.Open(name)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = source.Close() }()
+	info, err := source.Stat()
+	if err != nil {
+		return err
+	}
+	if !info.Mode().IsRegular() {
+		return fmt.Errorf("%q is not a regular file", name)
+	}
+	destination, err := destDir.OpenFile(name, os.O_CREATE|os.O_WRONLY|flag, 0600)
+	if err != nil {
+		return err
+	}
+	_, copyErr := io.Copy(destination, source)
+	closeErr := destination.Close()
+	return errors.Join(copyErr, closeErr)
 }
 
 func Exists(path string) (bool, error) {
@@ -107,39 +115,6 @@ func IsFileSizeValid(filePath string) (bool, error) {
 		return false, nil
 	}
 	return true, nil
-}
-
-func copyFile(src, dest string) error {
-	sourceFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		if tempErr := sourceFile.Close(); tempErr != nil {
-			err = tempErr
-		}
-	}()
-
-	// Avoid following a pre-existing symlink at the destination; appending to a
-	// regular file is preserved so repeated import blocks still merge.
-	if info, lerr := os.Lstat(dest); lerr == nil && info.Mode()&os.ModeSymlink != 0 {
-		_ = os.Remove(dest)
-	}
-
-	destFile, err := os.OpenFile(dest, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		if tempErr := destFile.Close(); tempErr != nil {
-			err = tempErr
-		}
-	}()
-
-	_, err = io.Copy(destFile, sourceFile)
-	return err
 }
 
 func GetFullPath(inputPath string) string {
