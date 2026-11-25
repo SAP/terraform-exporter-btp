@@ -2,7 +2,9 @@
 
 - You must have [Terraform CLI](https://developer.hashicorp.com/terraform/install) 1.14 or newer installed. Version 2 relies on Terraform list-resource queries and does not support OpenTofu. Make sure the `terraform` binary is in your `PATH`.
 
-- To export directories or subaccounts, you need to set the following environment variables to authenticate against SAP BTP:
+## SAP BTP Directories and Subaccounts
+
+To export directories or subaccounts, you need to set the following environment variables to authenticate against SAP BTP:
 
 | Environment Variable Name  | Description |
 | --- | --- |
@@ -15,7 +17,7 @@
 | BTP_IDP | The identity provider to be used for authentication (only required for custom IDP) |
 | BTP_CLI_SERVER_URL | The URL of the BTP CLI server (Relevant for SAP internal use-cases only)  |
 
-## Release 1.7.0 and later
+### Release 1.7.0 and later
 
 With release 1.7.0 we introduce the option to reuse the btp CLI login for authentication. The usage flow is as follows:
 
@@ -23,18 +25,18 @@ With release 1.7.0 we introduce the option to reuse the btp CLI login for authen
 - Login via btp CLI e.g, via `btp login --sso`.
 - Optional: if you have a special path to your btp CLI configuration, set it via environment variable `BTPCLI_CONFIG_PATH`.
 
-Be aware that the feature is experimental (see [documentation of Terraform Provider for SAP BTP](https://registry.terraform.io/providers/SAP/btp/latest/docs#sign-on-via-btp-cli-session-experimental)).
-
 !!! Warning
 
-    Do not set the `BTP_ENABLE_SSO` parameter when using the btptf CLI. Processing will abort as this parameter is not supported. 
-
+    Do not set the `BTP_ENABLE_SSO` parameter when using the btptf CLI. Processing will abort as this parameter is not supported.
 
 The parameters are the ones required by the [BTP Terraform Provider](https://registry.terraform.io/providers/SAP/btp/latest/docs).
 
-- To export directories or subaccounts, you need global account administrator permissions.
+To export directories or subaccounts, you need global account administrator permissions.
 
-- To export Cloud Foundry orgs, you need to authenticate against Cloud Foundry by setting the following environment variables:
+
+## Cloud Foundry
+
+To export Cloud Foundry orgs etc., you need to authenticate against Cloud Foundry by setting the following environment variables:
 
 | Environment Variable Name  | Description |
 | --- | --- |
@@ -49,9 +51,10 @@ The parameters are the ones required by the [BTP Terraform Provider](https://reg
 
 These environment variables are the ones required by the [Terraform provider for Cloud Foundry](https://registry.terraform.io/providers/cloudfoundry/cloudfoundry/latest/docs).
 
-- To export Cloud Foundry orgs, you need the Org Manager role.
+To export Cloud Foundry orgs, you need the Org Manager role.
 
 ## How to set the parameters
+
 Depending on your operating systems, you set the environment variables as follows:
 
 === "Windows"
