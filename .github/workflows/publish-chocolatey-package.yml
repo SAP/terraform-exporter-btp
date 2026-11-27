@@ -91,7 +91,7 @@ jobs:
         run: |
           version="${TAG#v}"
           echo "LATEST_TAG=$version" >> "$GITHUB_OUTPUT"
-      - uses: robinraju/release-downloader@v1
+      - uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
         id: release-downloader
         with:
           tag: "${{ steps.determine-tag.outputs.TAG }}"

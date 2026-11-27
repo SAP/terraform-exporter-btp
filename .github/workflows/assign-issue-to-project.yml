@@ -13,8 +13,10 @@ jobs:
   add-to-project:
     name: Add issue/pr to project
     runs-on: ubuntu-latest
+    environment:
+      name: project
     steps:
-      - uses: actions/add-to-project@v2.0.1
+      - uses: actions/add-to-project@f2c1f1fa649a891be84948ea89b5dfba1526ef05 # v2.0.1
         with:
           project-url: https://github.com/orgs/SAP/projects/72
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}

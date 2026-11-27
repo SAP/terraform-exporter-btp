@@ -15,6 +15,8 @@ permissions:
 jobs:
   set-default-values:
     runs-on: ubuntu-latest
+    environment:
+      name: project
     steps:
       - name: Add PR to default project
         uses: actions/add-to-project@f2c1f1fa649a891be84948ea89b5dfba1526ef05 # v2.0.1
